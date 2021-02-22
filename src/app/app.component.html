@@ -1,0 +1,70 @@
+<div class="home-bg" *ngIf="isHome"></div>
+<div class="main" [ngClass]="{home: isHome}">
+  <header>
+    <div class="container">
+      <a routerLink="/">
+        <img class="logo" src="/assets/images/logo.png" alt="">
+      </a>
+      <ul class="menu flex-1">
+        <li [ngClass]="{active: isHome}" (click)="menuType='home'">
+          <a routerLink="/">Home</a>
+        </li>
+        <li [ngClass]="{active: currentPage==='/swap'}" (click)="menuType='swap'">
+          <a routerLink="/swap">Swap</a>
+        </li>
+        <li>BuyCryto</li>
+        <li>Blog</li>
+        <li>Doc</li>
+      </ul>
+      <div *ngIf="isHome===false" class="connect" [ngClass]="{'account': account}" (click)="showConnect()">
+        <img *ngIf="!account" src="/assets/images/swap/link.png" alt="">
+        <img *ngIf="account" src="/assets/images/tokens/neo.png" alt="">
+        <span>{{ account ? (account.address | shortAddress: 5) : 'Connect Wallet' }}</span>
+      </div>
+    </div>
+  </header>
+  <router-outlet></router-outlet>
+  <footer *ngIf="isHome"></footer>
+</div>
+
+<section class="cover" *ngIf="showConnectModal">
+  <div class="container connect-container">
+    <p class="title">
+      <span>Connect wallet</span>
+      <img class="close" (click)="showConnectModal=false" src="/assets/images/swap/close.png" alt="">
+    </p>
+    <ul class="wallets">
+      <li class="wallet" (click)="connectWallet('NeoLine')">
+        <img class="logo" src="/assets/images/logo-NeoLine.png" alt="">
+        <span class="name">NeoLine</span>
+        <img class="option" src="/assets/images/swap/wallet-selected.png" alt="">
+      </li>
+      <li class="wallet" (click)="connectWallet('O3')">
+        <img class="logo" src="/assets/images/logo-O3.png" alt="">
+        <span class="name">O3</span>
+        <img class="option" src="/assets/images/swap/wallet-selected.png" alt="">
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="cover" *ngIf="showAccountModal">
+  <div class="container account-container">
+    <div class="title">
+      <span>Account</span>
+      <div class="title-right">
+        <button class="change"><img class="change" src="/assets/images/swap/account-change.png" alt="">Change</button>
+        <img class="close" (click)="showAccountModal=false" src="/assets/images/swap/close.png" alt="">
+      </div>
+    </div>
+    <div class="account">
+      <p class="name">{{ walletType }}</p>
+      <div class="row">
+        <img class="logo" src="/assets/images/logo-{{walletType}}.png" alt="">
+        <span class="address">{{ account.address | shortAddress: 9 }}</span>
+        <img class="copy" src="/assets/images/swap/copy.png" alt="">
+      </div>
+    </div>
+    <button class="disconnect" (click)="disConnect()">Disconnect</button>
+  </div>
+</section>

@@ -1,0 +1,248 @@
+.home-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-color: #121212;
+  background-image: url("/assets/images/home/bg1.png");
+  background-position: center top;
+  background-size: auto 920px;
+  background-repeat: no-repeat;
+}
+
+.main {
+  width: 100vw;
+  height: 100vh;
+  background: #121212;
+  color: #fff;
+  &.home {
+    width: 100%;
+    height: 100%;
+    background: none;
+    background-image: url("/assets/images/home/bg2.png");
+    background-position: center 600px;
+    background-size: auto 401px;
+    background-repeat: no-repeat;
+    header {
+      border-bottom: none;
+      ul.menu {
+        padding-right: 160px;
+      }
+    }
+  }
+}
+
+header {
+  font-size: 16px;
+  border-bottom: 1px solid #ffffff0d;
+  .container {
+    margin: 0 auto;
+    padding: 0 10px;
+    height: 90px;
+    max-width: 1400px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    height: 30px;
+    line-height: 30px;
+  }
+  ul.menu {
+    display: flex;
+    justify-content: flex-end;
+    height: 100%;
+    li {
+      display: inline-flex;
+      height: 100%;
+      line-height: 90px;
+      min-width: 80px;
+      margin-right: 35px;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      a {
+        height: 100%;
+        line-height: 90px;
+        color: #fff;
+      }
+      &.active a,
+      &:hover a {
+        color: #46b069;
+      }
+      &.active,
+      &:hover {
+        color: #46b069;
+        font-family: "fontBold";
+        &::before {
+          display: block;
+        }
+      }
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 20px;
+        height: 3px;
+        background: #46b069;
+        margin-left: -10px;
+        display: none;
+      }
+    }
+  }
+  .connect {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 160px;
+    height: 40px;
+    background: #2b312d;
+    border-radius: 20px;
+    font-family: "fontRegular";
+    cursor: pointer;
+    &.account {
+      color: #6162ef;
+      img {
+        width: 30px;
+        margin-right: 5px;
+        border-radius: 50%;
+      }
+    }
+
+    img {
+      width: 18px;
+      margin-right: 7px;
+    }
+  }
+}
+
+footer {
+  width: 1920px;
+  height: 400px;
+  margin-top: -93px;
+  background: #202020;
+}
+
+section.cover .container.connect-container {
+  ul.wallets {
+    li {
+      margin-top: 20px;
+      height: 70px;
+      background: #2a2a2a;
+      border: 1px solid #ffffff0d;
+      border-radius: 10px;
+      padding: 0 22px 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      &:hover,
+      &.active {
+        background: #2b312d;
+        border: 1px solid #46b069;
+        color: #46b069;
+        img.option {
+          display: block;
+        }
+      }
+      img.logo {
+        width: 36px;
+        margin-right: 20px;
+        border-radius: 50%;
+      }
+      .name {
+        flex: 1;
+      }
+      img.option {
+        width: 22px;
+        display: none;
+      }
+    }
+  }
+}
+
+section.cover .container.account-container {
+  margin-top: 280px;
+  height: 360px;
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .title-right {
+      position: absolute;
+      right: 30px;
+      display: flex;
+      align-items: center;
+      button {
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100px;
+        height: 36px;
+        background: #2f2f3b;
+        border-radius: 10px;
+        font-size: 16px;
+        color: #6162ef;
+        font-family: "fontRegular";
+        img.change {
+          width: 20px;
+          margin-right: 2px;
+        }
+      }
+      & > img {
+        width: 44px;
+        margin-left: 15px;
+        cursor: pointer;
+        position: static;
+      }
+    }
+  }
+  .account {
+    height: 120px;
+    background: #2a2a2a;
+    border: 1px solid #ffffff0d;
+    border-radius: 10px;
+    padding: 29px 20px 0 25px;
+    margin-top: 30px;
+    .name {
+      font-size: 16px;
+      color: #8aa1a1;
+    }
+    .row {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      img.logo {
+        width: 30px;
+        margin-right: 12px;
+        border-radius: 50%;
+      }
+      .address {
+        font-family: "fontRegular";
+      }
+      img.copy {
+        width: 14px;
+        margin-left: 16px;
+        cursor: pointer;
+      }
+    }
+  }
+  button.disconnect {
+    cursor: pointer;
+    width: 100%;
+    height: 60px;
+    background: #2a2a2a;
+    border: 1px solid #cd4242;
+    border-radius: 30px;
+    margin-top: 33px;
+    font-size: 18px;
+    color: #cd4242;
+    font-family: "fontRegular";
+  }
+}
