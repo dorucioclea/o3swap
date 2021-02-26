@@ -8,13 +8,4 @@ export interface Token {
 
 export type WalletType = 'O3' | 'NeoLine';
 
-export class Exchange {
-  huobi: any;
-  binance: any;
-  coinbase: any;
-}
-
-export class RateChain {
-  neo: any;
-  eth: any;
-}
+export type Chain = 'neo' | 'eth';

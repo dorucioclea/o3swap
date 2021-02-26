@@ -1,20 +1,3 @@
-section.error {
-  display: none;
-  position: fixed;
-  top: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-  min-width: 250px;
-  min-height: 50px;
-  background: #cd4242b3;
-  border-radius: 10px;
-  font-family: 'fontRegular';
-  text-align: center;
-  line-height: 20px;
-  padding: 15px 20px;
-  z-index: 99999;
-}
-
 section.wrapper {
   width: 520px;
   height: 631px;
@@ -73,9 +56,7 @@ section.wrapper {
 }
 
 section.select-token-wrapper {
-  // display: none;
   .input-token-error {
-    display: none;
     position: absolute;
     top: 101px;
     left: 50%;
@@ -115,9 +96,6 @@ section.select-token-wrapper {
         &.no-selected {
           margin-top: 25px;
           color: #4a4a4a;
-          img.logo {
-            display: none;
-          }
         }
         img.logo {
           margin-right: 15px;
@@ -246,7 +224,6 @@ section.select-token-wrapper {
 }
 
 section.inquiry-wrapper {
-  display: none;
   img {
     margin: 0 auto;
     margin-top: 120px;
@@ -272,7 +249,6 @@ section.inquiry-wrapper {
 }
 
 section.result-wrapper {
-  display: none;
   .exchange-amount {
     display: flex;
     align-items: center;
@@ -366,7 +342,6 @@ section.result-wrapper {
 }
 
 section.setting-wrapper {
-  display: none;
   .setting-item-title {
     font-size: 16px;
     margin-top: 67px;
@@ -380,7 +355,7 @@ section.setting-wrapper {
     .tail {
       position: absolute;
       right: 8px;
-      display: none;
+      // display: none;
     }
     ul.left {
       font-family: "fontRegular";
@@ -432,7 +407,6 @@ section.setting-wrapper {
 }
 
 section.choose-token-wrapper {
-  display: none;
   input {
     width: 100%;
     height: 60px;
@@ -498,7 +472,6 @@ section.choose-token-wrapper {
 
 section.cover {
   .container.exchange-container {
-    display: none;
     ul.exchanges {
       li {
         margin-top: 15px;

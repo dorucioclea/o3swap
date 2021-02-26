@@ -18,7 +18,7 @@
       </ul>
       <div *ngIf="isHome===false" class="connect" [ngClass]="{'account': account}" (click)="showConnect()">
         <img *ngIf="!account" src="/assets/images/swap/link.png" alt="">
-        <img *ngIf="account" src="/assets/images/tokens/neo.png" alt="">
+        <img *ngIf="account" src="/assets/images/tokens/{{chain}}.png" alt="">
         <span>{{ account ? (account.address | shortAddress: 5) : 'Connect Wallet' }}</span>
       </div>
     </div>
@@ -53,7 +53,7 @@
     <div class="title">
       <span>Account</span>
       <div class="title-right">
-        <button class="change"><img class="change" src="/assets/images/swap/account-change.png" alt="">Change</button>
+        <button class="change" (click)="changeWallet()"><img class="change" src="/assets/images/swap/account-change.png" alt="">Change</button>
         <img class="close" (click)="showAccountModal=false" src="/assets/images/swap/close.png" alt="">
       </div>
     </div>
@@ -62,7 +62,7 @@
       <div class="row">
         <img class="logo" src="/assets/images/logo-{{walletType}}.png" alt="">
         <span class="address">{{ account.address | shortAddress: 9 }}</span>
-        <img class="copy" src="/assets/images/swap/copy.png" alt="">
+        <img class="copy" (click)="copy(account.address)" src="/assets/images/swap/copy.png" alt="">
       </div>
     </div>
     <button class="disconnect" (click)="disConnect()">Disconnect</button>

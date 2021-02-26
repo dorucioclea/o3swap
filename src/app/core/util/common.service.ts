@@ -16,4 +16,10 @@ export class CommonService {
     }
     document.body.removeChild(input);
   }
+
+
+  isNeoAddress(address: string): boolean {
+    const isAddressPattern = new RegExp(/^A([0-9a-zA-Z]{33})$/);
+    return isAddressPattern.test(address);
+  }
 }

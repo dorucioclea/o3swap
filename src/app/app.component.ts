@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { Router, RouterEvent, NavigationEnd } from '@angular/router';
-import { Exchange, RateChain, Token, WalletType } from './pages/swap/type';
+import { WalletType } from '@lib';
+import o3dapi from 'o3-dapi-core';
 import o3dapiNeo from 'o3-dapi-neo';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { DEFAULT_FROM_TOKEN, TOKENS_OBJECT } from './pages/swap/constants';
+import { CommonService, ApiService } from '@core';
 
 type MenuType = 'home' | 'swap';
 interface Account {
@@ -25,6 +26,7 @@ export class AppComponent {
   menuType: MenuType = 'home';
   currentPage = this.router.url;
   isHome = true;
+  chain;
   // 弹窗
   showConnectModal = false;
   showAccountModal = false;
@@ -32,22 +34,15 @@ export class AppComponent {
   neolineDapiNeo;
   myNeoDapi;
   walletType: WalletType = 'O3';
-  chain = 'neo'; // 'neo' | 'eth'
   account: Account;
 
-  selectTokenType: string; // "from" | "to"
-  fromToken: Token = DEFAULT_FROM_TOKEN;
-  toToken: Token;
-  rates: RateChain = new RateChain();
-
-  fiat: Exchange = new Exchange();
-  receiveAmount: Exchange = new Exchange();
-  chooseExchange;
-  inquiryTimeout: any;
-
-  slipValue = 2;
-
-  constructor(private router: Router, private nzMessage: NzMessageService) {
+  constructor(
+    private router: Router,
+    private nzMessage: NzMessageService,
+    private commonService: CommonService,
+    public apiService: ApiService
+  ) {
+    this.chain = this.apiService.chain;
     this.isHome = this.isHomePage();
     this.router.events.subscribe((res: RouterEvent) => {
       if (res instanceof NavigationEnd) {
@@ -55,14 +50,8 @@ export class AppComponent {
         this.isHome = this.isHomePage();
       }
     });
+    o3dapi.initPlugins([o3dapiNeo]);
     this.initNeolineJs();
-  }
-
-  isHomePage(): boolean {
-    if (this.currentPage === '/' || this.currentPage === '/home') {
-      return true;
-    }
-    return false;
   }
 
   showConnect(): void {
@@ -73,18 +62,75 @@ export class AppComponent {
     }
   }
 
+  copy(value: string): void {
+    this.commonService.copy(value);
+  }
+
   connectWallet(type: WalletType): void {
     this.showConnectModal = false;
     this.walletType = type;
-    this.myNeoDapi = type === 'O3' ? o3dapiNeo : this.neolineDapiNeo;
+    this.apiService.pushWalletType(this.walletType);
+    if (this.chain === 'neo') {
+      this.getNeoAccount();
+    }
+  }
+
+  disConnect(): void {
+    this.showAccountModal = false;
+    this.account = undefined;
+    this.apiService.pushAccount(this.account);
+  }
+
+  changeWallet(): void {
+    this.showAccountModal = false;
+    this.showConnectModal = true;
+  }
+
+  isHomePage(): boolean {
+    if (this.currentPage === '/' || this.currentPage === '/home') {
+      return true;
+    }
+    return false;
+  }
+
+  initNeolineJs(): void {
+    window.addEventListener('NEOLine.NEO.EVENT.READY', () => {
+      this.neolineDapiNeo = new (window as any).NEOLine.Init();
+    });
+    window.addEventListener(
+      'NEOLine.NEO.EVENT.ACCOUNT_CHANGED',
+      (result: any) => {
+        this.account = result.detail;
+        this.apiService.pushAccount(this.account);
+        this.getNeoBalances();
+      }
+    );
+    window.addEventListener(
+      'NEOLine.NEO.EVENT.DISCONNECTED',
+      (account: any) => {
+        console.log('---------');
+        console.log(account);
+      }
+    );
+  }
+
+  getNeoAccount(): void {
+    this.myNeoDapi =
+      this.walletType === 'O3' ? o3dapi.NEO : this.neolineDapiNeo;
+    this.apiService.pushMyNeoDapi(this.myNeoDapi);
     this.myNeoDapi
       .getAccount()
       .then((result) => {
-        this.account = result;
-        this.getBalances();
+        console.log(result);
+        if (this.commonService.isNeoAddress(result.address)) {
+          this.account = result;
+          this.apiService.pushAccount(this.account);
+          this.getNeoBalances();
+        } else {
+          this.nzMessage.error('请连接 Neo 钱包');
+        }
       })
       .catch((error) => {
-        console.log(error);
         switch (error.type) {
           case 'NO_PROVIDER':
             window.open(
@@ -99,38 +145,13 @@ export class AppComponent {
             );
             break;
           default:
-            this.nzMessage.error(error.description);
+            this.nzMessage.error(error.description || '');
             break;
         }
       });
   }
 
-  disConnect(): void {
-    this.showAccountModal = false;
-    this.account = undefined;
-  }
-
-  initNeolineJs(): void {
-    window.addEventListener('NEOLine.NEO.EVENT.READY', () => {
-      this.neolineDapiNeo = new (window as any).NEOLine.Init();
-    });
-    window.addEventListener(
-      'NEOLine.NEO.EVENT.ACCOUNT_CHANGED',
-      (result: any) => {
-        this.account = result.detail;
-        this.getBalances();
-      }
-    );
-    window.addEventListener(
-      'NEOLine.NEO.EVENT.DISCONNECTED',
-      (account: any) => {
-        console.log('---------');
-        console.log(account);
-      }
-    );
-  }
-
-  getBalances(): void {
+  getNeoBalances(): void {
     this.myNeoDapi
       .getBalance({
         params: [{ address: this.account.address }],
@@ -138,16 +159,12 @@ export class AppComponent {
       })
       .then((addressTokens: any[]) => {
         const tokens = addressTokens[this.account.address];
-        // 修改 tokens 列表的余额amount
-        tokens.forEach((tokenItem) => {
-          if (TOKENS_OBJECT[this.chain][tokenItem.assetID]) {
-            TOKENS_OBJECT[this.chain][tokenItem.assetID].amount =
-              tokenItem.amount;
-          }
+        console.log(tokens);
+        const tempTokenBalance = {};
+        tokens.forEach((tokenItem: any) => {
+          tempTokenBalance[tokenItem.assetID] = tokenItem;
         });
-        // 修改 from token 的余额 amount
-        this.fromToken.amount =
-          TOKENS_OBJECT[this.chain][this.fromToken.assetID]?.amount || '0';
+        this.apiService.pushTokenBalances(tempTokenBalance);
       });
   }
 }
