@@ -25,6 +25,9 @@ const defaultResult = [
   styleUrls: ['./swap.component.less'],
 })
 export class SwapComponent implements OnInit {
+  TX_PAGES_PREFIX = 'https://neotube.io/transaction/';
+  txhash = '0xff2eaa131b5b65caa64c048224a9860742194cfb5dbff5c44790ec4e406a45cf';
+  txPage = this.TX_PAGES_PREFIX + this.txhash;
   o3SwapFee = '0.3';
   myNeoDapi;
   account;
@@ -38,6 +41,8 @@ export class SwapComponent implements OnInit {
   pageStatus: PageStatus = 'home';
   rates = {};
   showExchangeModal = false;
+  showTxHashModal = false;
+  isTxPending = false;
 
   selectTokenType: SelectTokenType;
   fromToken: Token;
@@ -456,4 +461,14 @@ export class SwapComponent implements OnInit {
     this.chooseSwapPath = this.receiveSwapPathArray[index];
     this.calculationPrice();
   }
+
+  //#region tx hash 弹窗
+  copy(hash: string): void {
+    this.commonService.copy(hash);
+  }
+  closeTxHashModal(): void {
+    this.showTxHashModal = false;
+    this.pageStatus = 'home';
+  }
+  //#endregion
 }
