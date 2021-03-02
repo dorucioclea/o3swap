@@ -33,6 +33,10 @@
       <span>Connect wallet</span>
       <img class="close" (click)="showConnectModal=false" src="/assets/images/swap/close.png" alt="">
     </p>
+    <div class="chains">
+      <img src="/assets/images/tokens/eth.png" alt="">
+      <img class="active" src="/assets/images/tokens/neo.png" alt="">
+    </div>
     <ul class="wallets">
       <li class="wallet" (click)="connectWallet('NeoLine')">
         <img class="logo" src="/assets/images/logo-NeoLine.png" alt="">
@@ -60,7 +64,7 @@
     <div class="account">
       <p class="name">{{ walletType }}</p>
       <div class="row">
-        <img class="logo" src="/assets/images/logo-{{walletType}}.png" alt="">
+        <img class="logo" src="/assets/images/tokens/{{chain}}.png" alt="">
         <span class="address">{{ account.address | shortAddress: 9 }}</span>
         <img class="copy" (click)="copy(account.address)" src="/assets/images/swap/copy.png" alt="">
       </div>

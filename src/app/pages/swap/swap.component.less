@@ -65,7 +65,7 @@ section.select-token-wrapper {
     min-height: 50px;
     background: #cd4242b3;
     border-radius: 10px;
-    font-family: 'fontRegular';
+    font-family: "fontRegular";
     text-align: center;
     line-height: 20px;
     padding: 15px 5px;
@@ -330,7 +330,18 @@ section.result-wrapper {
   .fee-item {
     margin-top: 20px;
     display: flex;
+    align-items: center;
     justify-content: space-between;
+    ul.routes {
+      display: flex;
+      span {
+        margin: 0 10px;
+      }
+      img {
+        width: 24px;
+        margin-right: 5px;
+      }
+    }
   }
   button.confirm {
     position: absolute;
@@ -342,16 +353,24 @@ section.result-wrapper {
 }
 
 section.setting-wrapper {
+  & > .title {
+    padding-bottom: 37px;
+  }
   .setting-item-title {
     font-size: 16px;
-    margin-top: 67px;
+    margin-top: 40px;
   }
   .slip {
-    margin-top: 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     position: relative;
+    .slip-error {
+      position: absolute;
+      bottom: -22px;
+      color: #cd4242;
+      font-family: "fontRegular";
+    }
     .tail {
       position: absolute;
       right: 8px;
@@ -380,12 +399,16 @@ section.setting-wrapper {
         }
       }
     }
+  }
+  .setting-item-content {
+    margin-top: 24px;
     input {
       width: 100px;
       height: 40px;
       background: #353535;
       border-radius: 10px;
       border: none;
+      padding: 0 20px;
       text-align: center;
       color: #fff;
       font-size: 16px;
@@ -398,11 +421,6 @@ section.setting-wrapper {
         color: #4a4a4a;
       }
     }
-  }
-  .slip-error {
-    color: #cd4242;
-    font-family: "fontRegular";
-    margin-top: 8px;
   }
 }
 
@@ -473,39 +491,99 @@ section.choose-token-wrapper {
 section.cover {
   .container.exchange-container {
     ul.exchanges {
-      li {
+      & > li {
+        position: relative;
         margin-top: 15px;
         height: 90px;
         background: #2a2a2a;
         border: 1px solid #ffffff0d;
         border-radius: 10px;
-        padding: 26px 21px 0 26px;
+        padding: 20px;
         cursor: pointer;
         &:hover {
           background: #2b312d;
           border: 1px solid #46b069;
+          .name {
+            font-family: "fontMedium";
+          }
         }
         &.active {
           background: linear-gradient(0deg, #46b069, #00af92);
-          .value {
+          .name {
             font-family: "fontDemiBold";
           }
-          .fiat {
+          .flex-row .fiat,
+          ul.routes {
             color: #fff;
           }
         }
         .flex-row {
           display: flex;
+          align-items: center;
           justify-content: space-between;
-          font-size: 18px;
+          .name {
+            font-size: 20px;
+          }
+          .fiat {
+            color: #8aa1a1;
+            font-size: 14px;
+            font-family: "fontRegular";
+          }
         }
-        .fiat {
+        ul.routes {
+          position: absolute;
+          right: 20px;
           text-align: right;
           color: #8aa1a1;
           margin-top: 11px;
           font-family: "fontRegular";
+          display: flex;
+          font-size: 14px;
+          width: max-content;
+          span {
+            margin: 0 10px;
+          }
+          img {
+            width: 24px;
+            margin-right: 5px;
+          }
         }
       }
     }
+    // ul.exchanges {
+    //   li {
+    //     margin-top: 15px;
+    //     height: 90px;
+    //     background: #2a2a2a;
+    //     border: 1px solid #ffffff0d;
+    //     border-radius: 10px;
+    //     padding: 26px 21px 0 26px;
+    //     cursor: pointer;
+    //     &:hover {
+    //       background: #2b312d;
+    //       border: 1px solid #46b069;
+    //     }
+    //     &.active {
+    //       background: linear-gradient(0deg, #46b069, #00af92);
+    //       .value {
+    //         font-family: "fontDemiBold";
+    //       }
+    //       .fiat {
+    //         color: #fff;
+    //       }
+    //     }
+    //     .flex-row {
+    //       display: flex;
+    //       justify-content: space-between;
+    //       font-size: 18px;
+    //     }
+    //     .fiat {
+    //       text-align: right;
+    //       color: #8aa1a1;
+    //       margin-top: 11px;
+    //       font-family: "fontRegular";
+    //     }
+    //   }
+    // }
   }
 }

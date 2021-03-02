@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-// import o3dapi from 'o3-dapi-core';
-import o3dapiNeo from 'o3-dapi-neo';
 import BigNumber from 'bignumber.js';
 import { ALL_TOKENS, SWAP_CONTRACT_HASH } from '@lib';
-import { Token, CommonHttpResponse } from '@lib';
-import { ApiService } from '@core';
+import { Token } from '@lib';
+import { ApiService, CommonService } from '@core';
 import { InvokeOutput } from 'o3-dapi-neo/lib/modules/write/invoke';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
@@ -14,14 +12,10 @@ const defaultResult = [
   {
     swapPath: ['FLM', 'nNEO', 'pnUSDT'],
     amount: [1500000, 21126, 5180],
-    receiveAmount: 5180,
-    fiat: '-',
   },
   {
-    swapPath: ['FLM', 'nNEO', 'pnWBTC', 'pnUSDT'],
+    swapPath: ['FLM', 'pnWBTC', 'pnUSDT'],
     amount: [1500000, 21126, 13, 4933],
-    receiveAmount: 4933,
-    fiat: '-',
   },
 ];
 
@@ -31,20 +25,19 @@ const defaultResult = [
   styleUrls: ['./swap.component.less'],
 })
 export class SwapComponent implements OnInit {
-  inquiryHost = 'http://localhost:5000/AssetQuery';
+  o3SwapFee = '0.3';
   myNeoDapi;
   account;
   walletType;
+  tokenBalance = {}; // 账户的 tokens
 
   TOKENS: any[] = []; // 所有的 tokens
   displayTokens: any[] = []; // 排除了 fromToken 或 toToken 的 tokens
   tokens: any[] = []; // 最终展示的 tokens
 
   pageStatus: PageStatus = 'home';
-  tokenBalance = {}; // 账户的 tokens
   rates = {};
   showExchangeModal = false;
-  inputError: string;
 
   selectTokenType: SelectTokenType;
   fromToken: Token;
@@ -53,24 +46,29 @@ export class SwapComponent implements OnInit {
 
   inputAmount: string; // 支付的 token 数量
   inputAmountFiat: string; // 支付的 token 美元价值
+  inputAmountError: string;
   receiveSwapPathArray;
   chooseSwapPath;
   chooseSwapPathIndex;
-  inquiryTimeout: any;
+  inquiryInterval;
   changeData = false;
+  price;
+  lnversePrice;
 
   // setting slip
   slipValueGroup = [0.1, 0.5, 1, 2];
   defaultSlipValue = 2;
-  slipValue: any = 2;
+  slipValue: any = this.defaultSlipValue;
   isCustom = false;
+  slipValueError: string;
 
   defaultDeadline = 10; // 分钟
   deadline = this.defaultDeadline;
 
   constructor(
     private apiService: ApiService,
-    private nzMessage: NzMessageService
+    private nzMessage: NzMessageService,
+    private commonService: CommonService
   ) {}
 
   ngOnInit(): void {
@@ -114,36 +112,25 @@ export class SwapComponent implements OnInit {
     });
   }
 
-  getTokenRate(token: Token): string {
-    const assetRate = this.rates[token.symbol.toLowerCase()];
-    if (
-      assetRate &&
-      (token.symbol === 'NEO' || token.assetID.includes(assetRate.asset_id))
-    ) {
-      return assetRate.price;
-    }
-    return '';
-  }
-
   calcutionInputAmountFiat(): void {
     if (!this.fromToken) {
       return;
     }
-    const price = this.getTokenRate(this.fromToken);
+    const price = this.rates[this.fromToken.symbol];
     if (this.inputAmount && price) {
       this.inputAmountFiat = new BigNumber(this.inputAmount)
         .multipliedBy(new BigNumber(price))
-        .toFixed(2);
+        .dp(2)
+        .toFixed();
     } else {
-      this.inputAmountFiat = '-';
+      this.inputAmountFiat = '';
     }
   }
 
   getRates(): void {
-    this.apiService.getRates().subscribe((res: CommonHttpResponse) => {
-      if (res.status === 'success') {
-        this.rates = res.data;
-      }
+    this.apiService.getRates().subscribe((res) => {
+      this.rates = res;
+      console.log(res);
     });
   }
   resetSwapData(): void {
@@ -152,8 +139,22 @@ export class SwapComponent implements OnInit {
   }
 
   //#region home page
+  checkInputAmount(): boolean {
+    const decimalPart = this.inputAmount && this.inputAmount.split('.')[1];
+    if (
+      this.fromToken &&
+      decimalPart &&
+      decimalPart.length > this.fromToken.decimals
+    ) {
+      this.inputAmountError = `You've exceeded the decimal limit.`;
+      return false;
+    }
+    this.inputAmountError = '';
+    return true;
+  }
   changeInputAmount($event): void {
     this.inputAmount = $event.target.value;
+    this.checkInputAmount();
     this.resetSwapData();
     this.calcutionInputAmountFiat();
   }
@@ -190,27 +191,80 @@ export class SwapComponent implements OnInit {
   }
 
   inquiry(): void {
+    if (this.checkInputAmount() === false) {
+      return;
+    }
     this.pageStatus = 'inquiring';
-    this.inquiryTimeout = setTimeout(() => {
+    setTimeout(() => {
+      this.getSwapPath();
+    }, 1500);
+    this.inquiryInterval = setInterval(() => {
+      this.getSwapPath();
+    }, 30000);
+  }
+
+  getSwapPath(): void {
+    // this.apiService
+    //   .getSwapPath(
+    //     this.fromToken.symbol,
+    //     this.toToken.symbol,
+    //     this.getFactAmountIn()
+    //   )
+    //   .subscribe((res) => {
+    //     if (res.length === 0) {
+    //       this.pageStatus = 'home';
+    //       this.nzMessage.error('支付数额太小或其他原因无法无法swap');
+    //     }
+    //     if (res.length > 0) {
+    //       this.pageStatus = 'result';
+    //       this.receiveSwapPathArray = res;
+    //       this.handleReceiveSwapPathFiat();
+    //       this.chooseSwapPathIndex = 0;
+    //       this.chooseSwapPath = this.receiveSwapPathArray[0];
+    //       this.calculationPrice();
+    //     }
+    //   });
+    this.chooseSwapPath = null;
+    setTimeout(() => {
       this.pageStatus = 'result';
       this.receiveSwapPathArray = defaultResult;
       this.handleReceiveSwapPathFiat();
       this.chooseSwapPathIndex = 0;
       this.chooseSwapPath = this.receiveSwapPathArray[0];
-    }, 1500);
+      this.calculationPrice();
+    }, 1000);
   }
 
+  reGetSwapPath(): void {
+    clearInterval(this.inquiryInterval);
+    this.getSwapPath();
+    this.inquiryInterval = setInterval(() => {
+      this.getSwapPath();
+    }, 30000);
+  }
   handleReceiveSwapPathFiat(): void {
     this.receiveSwapPathArray.forEach((item, index) => {
-      const price = this.getTokenRate(this.toToken);
-      if (item.receiveAmount && price) {
+      item.receiveAmount = item.amount[item.amount.length - 1];
+      const price = this.rates[this.toToken.symbol];
+      if (price) {
         this.receiveSwapPathArray[index].fiat = new BigNumber(
           item.receiveAmount
         )
           .multipliedBy(new BigNumber(price))
-          .toFixed(2);
+          .dp(2)
+          .toFixed();
       }
     });
+  }
+  calculationPrice(): void {
+    this.price = new BigNumber(this.chooseSwapPath.receiveAmount)
+      .dividedBy(new BigNumber(this.inputAmount))
+      .dp(7)
+      .toFixed();
+    this.lnversePrice = new BigNumber(this.inputAmount)
+      .dividedBy(new BigNumber(this.chooseSwapPath.receiveAmount))
+      .dp(7)
+      .toFixed();
   }
   //#endregion
 
@@ -218,21 +272,40 @@ export class SwapComponent implements OnInit {
   selectSlipValue(value: number): void {
     this.slipValue = value;
     this.isCustom = false;
+    this.checkSlipValue();
   }
-  inputSlipValue(): void {
+  clickCustomSlipValue(): void {
     this.isCustom = true;
     this.slipValue = '';
   }
-  updateDeadline(): void {
-    let deadline = Math.floor(Number(this.deadline));
-    if (
-      this.deadline == null ||
-      Number.isNaN(this.deadline) ||
-      this.deadline <= 0
-    ) {
-      deadline = this.defaultDeadline;
+  checkSlipValue(): void {
+    const tempSlip = Number(this.slipValue);
+    if (Number.isNaN(tempSlip) || tempSlip <= 0) {
+      return;
     }
-    this.deadline = deadline;
+    if (this.slipValue < 0.5) {
+      this.slipValueError = 'Your transaction may fail';
+    } else if (this.slipValue > 5) {
+      this.slipValueError = 'Your transaction may be frontrun';
+    } else {
+      this.slipValueError = '';
+    }
+  }
+  updateDeadline(): void {
+    let tempDeadline = Math.floor(Number(this.deadline));
+    if (Number.isNaN(tempDeadline) || tempDeadline <= 0) {
+      tempDeadline = this.defaultDeadline;
+    }
+    this.deadline = tempDeadline;
+  }
+  closeSetting(): void {
+    this.pageStatus = 'home';
+    this.updateDeadline();
+    const tempSlip = Number(this.slipValue);
+    if (Number.isNaN(tempSlip) || tempSlip <= 0) {
+      this.isCustom = false;
+      this.slipValue = this.defaultSlipValue;
+    }
   }
   //#endregion
 
@@ -241,6 +314,7 @@ export class SwapComponent implements OnInit {
     this.resetSwapData();
     if (this.selectTokenType === 'from') {
       this.fromToken = token;
+      this.checkInputAmount();
       this.calcutionInputAmountFiat();
     } else {
       this.toToken = token;
@@ -267,17 +341,11 @@ export class SwapComponent implements OnInit {
   }
   //#endregion
 
-  //#region inquiry page
-  backHome(): void {
-    this.pageStatus = 'home';
-    clearTimeout(this.inquiryTimeout);
-  }
-  //#endregion
-
   //#region result page
   resultBackHome(): void {
     this.pageStatus = 'home';
     this.changeData = false;
+    clearInterval(this.inquiryInterval);
   }
 
   getAssetHashByName(name: string): string {
@@ -285,20 +353,43 @@ export class SwapComponent implements OnInit {
     return token?.assetID || '';
   }
 
-  getAmountIn(): string {
-    return new BigNumber(this.inputAmount)
-      .times(1 - this.slipValue)
-      .shiftedBy(this.fromToken.decimals)
+  getFactAmountIn(): string {
+    const factPercentage = new BigNumber(1).minus(
+      new BigNumber(this.o3SwapFee).shiftedBy(-2)
+    );
+    const factAmount = new BigNumber(this.inputAmount)
+      .times(factPercentage)
+      .dp(this.fromToken.decimals)
       .toFixed();
+    return factAmount;
   }
 
-  getMinAmountOut(): string {
-    return new BigNumber(this.chooseSwapPath.receiveAmount)
-      .shiftedBy(this.toToken.decimals)
-      .toFixed();
+  getAmountIn(): string {
+    const amount = this.getFactAmountIn();
+    const factPercentage = new BigNumber(1).minus(
+      new BigNumber(this.slipValue).shiftedBy(-2)
+    );
+    const factAmount = new BigNumber(amount).times(factPercentage);
+    return this.commonService.decimalToInteger(
+      factAmount,
+      this.fromToken.decimals
+    );
   }
 
   swap(): void {
+    if (!this.account) {
+      this.nzMessage.error('请先连接钱包');
+      return;
+    }
+    if (
+      new BigNumber(this.inputAmount).comparedTo(
+        new BigNumber(this.fromToken.amount || 0)
+      ) > 0
+    ) {
+      this.nzMessage.error('钱包余额不足');
+      return;
+    }
+    clearInterval(this.inquiryInterval);
     this.myNeoDapi
       .invoke({
         scriptHash: SWAP_CONTRACT_HASH,
@@ -314,7 +405,10 @@ export class SwapComponent implements OnInit {
           },
           {
             type: 'Integer',
-            value: this.getMinAmountOut(),
+            value: this.commonService.decimalToInteger(
+              this.chooseSwapPath.receiveAmount,
+              this.toToken.decimals
+            ),
           },
           {
             type: 'Array',
@@ -355,4 +449,11 @@ export class SwapComponent implements OnInit {
       });
   }
   //#endregion
+
+  changeSwapPath(index: number): void {
+    this.showExchangeModal = false;
+    this.chooseSwapPathIndex = index;
+    this.chooseSwapPath = this.receiveSwapPathArray[index];
+    this.calculationPrice();
+  }
 }

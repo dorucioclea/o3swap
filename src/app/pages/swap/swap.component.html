@@ -1,6 +1,6 @@
 <section *ngIf="pageStatus==='home'" class="wrapper select-token-wrapper">
   <p class="title">Swap</p>
-  <div *ngIf="inputError" class="input-token-error">{{ inputError }}</div>
+  <div *ngIf="inputAmountError" class="input-token-error">{{ inputAmountError }}</div>
   <div class="token-select">
     <div class="token-select-item content-border" (click)="showTokens('from')">
       <p class="sub-title token-select-title">From</p>
@@ -23,7 +23,7 @@
   <div class="pay content-border">
     <div class="sub-title pay-title">
       <p>Pay</p>
-      <p>≈＄<span class="from-token-rate">{{ inputAmountFiat || '0.00' }}</span></p>
+      <p>≈＄{{ inputAmountFiat || '0.00' }}</p>
     </div>
     <div class="pay-amount">
       <input class="choose-amount" (input)="changeInputAmount($event)" [ngModel]="inputAmount" type="number"
@@ -31,21 +31,17 @@
       <span class="token-from">{{ fromToken?.symbol }}</span>
       <button class="all" (click)="allInputAmount()">All</button>
     </div>
-    <div class="pay-tip">Balance: <span class="all-balance">{{ fromToken?.amount || '0' }}</span>&nbsp;<span
-        class="token-from">{{ fromToken?.symbol }}</span>
-    </div>
+    <div class="pay-tip">Balance: {{ fromToken?.amount || '0' }} {{ fromToken?.symbol }}</div>
   </div>
   <div class="receive content-border" [ngClass]="{'content-border-active': !changeData&&chooseSwapPath }">
     <p class="sub-title receive-title">Receive</p>
-    <p class="receive-amount"><span class="amount-to">{{ chooseSwapPath?.receiveAmount || '--' }}</span>&nbsp;<span
-        class="token-to">{{ toToken?.symbol }}</span></p>
-    <p class="receive-fiat">≈＄<span class="fiat-amount">{{ chooseSwapPath?.fiat || '--.--' }}</span></p>
+    <p class="receive-amount">{{ chooseSwapPath?.receiveAmount || '--' }} {{ toToken?.symbol }}</p>
+    <p class="receive-fiat">≈＄{{ chooseSwapPath?.fiat || '--.--' }}</p>
     <button class="confirm" (click)="inquiry()"
       [ngClass]="{active: fromToken && toToken && inputAmount}">Inquiry</button>
     <img class="next" (click)="pageStatus='result'" src="/assets/images/swap/next.png" alt="">
   </div>
   <div class="setting-group">
-    <img class="refresh" src="/assets/images/swap/refresh.png" alt="">
     <img (click)="pageStatus='setting'" class="setting" back='select-token-wrapper'
       src="/assets/images/swap/setting.png" alt="">
   </div>
@@ -54,15 +50,12 @@
   <p class="title">Swap</p>
   <img src="/assets/images/swap/inquirying.gif" alt="">
   <p class="inqirying">Inquerying...</p>
-  <button class="back" (click)="backHome()">back</button>
 </section>
 <section *ngIf="pageStatus==='result'" class="wrapper result-wrapper">
   <p class="title">Swap</p>
   <div class="exchange-amount">
     <p class="left">
-      <span class="amount-from">{{ inputAmount }}</span>
-      &nbsp;
-      <span class="token-from">{{ fromToken?.symbol }}</span>
+      <span class="token-from">{{ inputAmount }} {{ fromToken?.symbol }}</span>
       <img class="exchange" src="/assets/images/swap/exchange.png" alt="">
       <span class="token-to">{{ toToken?.symbol }}</span>
     </p>
@@ -72,58 +65,66 @@
   </div>
   <div class="receive content-border content-border-active">
     <p class="sub-title">Receive</p>
-    <p class="amount"><span class="amount-to">{{ chooseSwapPath.receiveAmount }}</span>&nbsp;<span
-        class="token-to">{{ toToken?.symbol }}</span></p>
-    <p class="fiat">≈＄<span class="fiat-amount">{{ chooseSwapPath.fiat }}</span></p>
+    <p class="amount">{{ chooseSwapPath?.receiveAmount }} {{ toToken?.symbol }}</p>
+    <p class="fiat">≈＄{{ chooseSwapPath?.fiat }}</p>
     <div class="optimal">Optimal</div>
   </div>
   <p class="more-price" (click)="showExchangeModal=true">More Trading Price</p>
   <div class="fee-group">
     <div class="fee-item">
+      <p class="label">Routing</p>
+      <ul class="value routes">
+        <li *ngFor="let name of chooseSwapPath?.swapPath; index as index">
+          <span *ngIf="index!==0">></span>
+          <img src="/assets/images/tokens/neo/{{name}}.png" alt="">{{ name }}
+        </li>
+      </ul>
+    </div>
+    <div class="fee-item">
       <p class="label">Rate</p>
       <p class="value">
-        1 <span class="token-from">{{ fromToken?.symbol }}</span> = <span class="rate"></span> <span
-          class="token-to">{{ toToken?.symbol }}</span>
+        1 {{ fromToken?.symbol }} = {{ price }} {{ toToken?.symbol }}
       </p>
     </div>
     <div class="fee-item">
       <p class="label">lnverse Rate</p>
       <p class="value">
-        1 <span class="token-to">{{ toToken?.symbol }}</span> = <span class="lnverseRate"></span> <span
-          class="token-from">{{ fromToken?.symbol }}</span>
+        1 {{ toToken?.symbol }} = {{ lnversePrice }} {{ fromToken?.symbol }}
       </p>
     </div>
-    <!-- <div class="fee-item">
-      <p class="label">Estimated Network Fee</p>
-      <p class="value">1</p>
-    </div>
     <div class="fee-item">
-      <p class="label">Max Network Fee</p>
-      <p class="value">2</p>
-    </div> -->
+      <p class="label">Quote includes a {{ o3SwapFee }}% O3Swap fee</p>
+    </div>
   </div>
   <button class="confirm" (click)="swap()">Confirm</button>
   <div class="setting-group">
-    <img class="refresh" src="/assets/images/swap/refresh.png" alt="">
+    <img (click)="reGetSwapPath()" class="refresh" src="/assets/images/swap/refresh.png" alt="">
   </div>
 </section>
 <section *ngIf="pageStatus==='setting'" class="wrapper setting-wrapper">
   <p class="title">Settings</p>
   <div class="setting-item">
     <p class="setting-item-title">Slippage tolerance</p>
-    <div class="slip">
+    <div class="slip setting-item-content">
       <ul class="left">
         <li *ngFor="let slip of slipValueGroup" class="slip-item" (click)="selectSlipValue(slip)"
           [ngClass]="{active: !isCustom && slipValue===slip}">{{ slip }}%</li>
       </ul>
-      <input type="number" [ngClass]="{focus: isCustom}" (click)="inputSlipValue()" [(ngModel)]="isCustom && slipValue"
-        placeholder="Custom">
+      <input type="number" [ngClass]="{focus: isCustom}" (input)="checkSlipValue()" (click)="clickCustomSlipValue()"
+        [(ngModel)]="isCustom && slipValue" placeholder="Custom">
       <span class="tail" *ngIf="isCustom">%</span>
+      <p class="slip-error">{{ slipValueError }}</p>
     </div>
-    <p class="slip-error"></p>
+  </div>
+  <div class="setting-item">
+    <p class="setting-item-title">Transaction time limit</p>
+    <div class="setting-item-content tx-time-limit">
+      <input type="number" [(ngModel)]="deadline">
+      <span>&nbsp;&nbsp;min</span>
+    </div>
   </div>
   <div class="setting-group">
-    <img (click)="pageStatus='home'" class="close" src="/assets/images/swap/close.png" alt="">
+    <img (click)="closeSetting()" class="close" src="/assets/images/swap/close.png" alt="">
   </div>
 </section>
 <section *ngIf="pageStatus==='tokenList'" class="wrapper choose-token-wrapper">
@@ -150,10 +151,25 @@
 <section class="cover" *ngIf="showExchangeModal">
   <div class="container exchange-container">
     <p class="title">
-      <span>Choose Exchange</span>
+      <span>Choose Routing</span>
       <img (click)="showExchangeModal=false" class="close" src="/assets/images/swap/close.png" alt="">
     </p>
     <ul class="exchanges">
+      <li class="exchange-item" *ngFor="let swapItem of receiveSwapPathArray; index as index"
+        (click)="changeSwapPath(index)" [ngClass]="{active: chooseSwapPathIndex===index}">
+        <div class="flex-row">
+          <p class="name">{{ swapItem.receiveAmount }} {{ toToken.symbol }}</p>
+          <p class="fiat">≈＄{{ swapItem.fiat }}</p>
+        </div>
+        <ul class="routes">
+          <li *ngFor="let name of swapItem.swapPath; index as index">
+            <span *ngIf="index!==0">></span>
+            <img src="/assets/images/tokens/neo/{{name}}.png" alt="">{{ name }}
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <!-- <ul class="exchanges">
       <li class="exchange-item active" exchange='huobi'>
         <div class="flex-row">
           <span class="name">HUOBI</span>
@@ -184,6 +200,6 @@
         </div>
         <p class="fiat">≈＄<span class="fiat-amount" exchange='coinbase'>10000.000</span></p>
       </li>
-    </ul>
+    </ul> -->
   </div>
 </section>

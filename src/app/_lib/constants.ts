@@ -6,56 +6,49 @@ const NEO_TOKENS: Token[] = [
     symbol: 'nNEO',
     decimals: 8,
     amount: null,
-    logo:
-      'https://img.o3.network/logo/neo2/f46719e2d16bf50cddcef9d4bbfece901f73cbb6.png',
+    logo: '/assets/images/tokens/neo/nNEO.png',
   },
   {
     assetID: 'c277117879af3197fbef92c71e95800aa3b89d9a',
     symbol: 'pONT',
     decimals: 9,
     amount: null,
-    logo:
-      'https://img.o3.network/logo/neo2/c277117879af3197fbef92c71e95800aa3b89d9a.png',
+    logo: '/assets/images/tokens/neo/pONT.png',
   },
   {
     assetID: '0df563008be710f3e0130208f8adc95ed7e5518d',
     symbol: 'pnWETH',
     decimals: 18,
     amount: null,
-    logo:
-      'https://img.o3.network/logo/neo2/0df563008be710f3e0130208f8adc95ed7e5518d.png',
+    logo: '/assets/images/tokens/neo/pnWETH.png',
   },
   {
     assetID: '534dcac35b0dfadc7b2d716a7a73a7067c148b37',
     symbol: 'pnWBTC',
     decimals: 8,
     amount: null,
-    logo:
-      'https://img.o3.network/logo/neo2/534dcac35b0dfadc7b2d716a7a73a7067c148b37.png',
+    logo: '/assets/images/tokens/neo/pnWBTC.png',
   },
   {
     assetID: '282e3340d5a1cd6a461d5f558d91bc1dbc02a07b',
     symbol: 'pnUSDT',
     decimals: 6,
     amount: null,
-    logo:
-      'https://img.o3.network/logo/neo2/282e3340d5a1cd6a461d5f558d91bc1dbc02a07b.png',
+    logo: '/assets/images/tokens/neo/pnUSDT.png',
   },
   {
     assetID: '4d9eab13620fe3569ba3b0e56e2877739e4145e3',
     symbol: 'FLM',
     decimals: 8,
     amount: null,
-    logo:
-      'https://img.o3.network/logo/neo2/4d9eab13620fe3569ba3b0e56e2877739e4145e3.png',
+    logo: '/assets/images/tokens/neo/FLM.png',
   },
   {
     assetID: '3e09e602eeeb401a2fec8e8ea137d59aae54a139',
     symbol: 'SWTH',
     decimals: 8,
     amount: null,
-    logo:
-      'https://img.o3.network/logo/neo2/3e09e602eeeb401a2fec8e8ea137d59aae54a139.png',
+    logo: '/assets/images/tokens/neo/SWTH.png',
   },
 ];
 
@@ -68,8 +61,7 @@ export const DEFAULT_FROM_TOKEN: Token = {
   symbol: 'nNEO',
   decimals: 8,
   amount: null,
-  logo:
-    'https://img.o3.network/logo/neo2/f46719e2d16bf50cddcef9d4bbfece901f73cbb6.png',
+  logo: '/assets/images/tokens/neo/nNEO.png',
 };
 
 // export const NEO_SCRIPTHASH =

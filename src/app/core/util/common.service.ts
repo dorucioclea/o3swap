@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import BigNumber from 'bignumber.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Injectable()
@@ -17,6 +18,12 @@ export class CommonService {
     document.body.removeChild(input);
   }
 
+  decimalToInteger(value, decimals: number): string {
+    if (new BigNumber(value).isNaN()) {
+      return '';
+    }
+    return new BigNumber(value).shiftedBy(decimals).dp(0).toFixed();
+  }
 
   isNeoAddress(address: string): boolean {
     const isAddressPattern = new RegExp(/^A([0-9a-zA-Z]{33})$/);
