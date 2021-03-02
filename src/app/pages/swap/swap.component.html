@@ -69,7 +69,7 @@
     <p class="fiat">≈＄{{ chooseSwapPath?.fiat }}</p>
     <div class="optimal">Optimal</div>
   </div>
-  <p class="more-price" (click)="showExchangeModal=true">More Trading Price</p>
+  <p class="more-price" (click)="showRoutingModal=true">More Trading Price</p>
   <div class="fee-group">
     <div class="fee-item">
       <p class="label">Routing</p>
@@ -108,11 +108,11 @@
     <div class="slip setting-item-content">
       <ul class="left">
         <li *ngFor="let slip of slipValueGroup" class="slip-item" (click)="selectSlipValue(slip)"
-          [ngClass]="{active: !isCustom && slipValue===slip}">{{ slip }}%</li>
+          [ngClass]="{active: !isCustomSlip && slipValue===slip}">{{ slip }}%</li>
       </ul>
-      <input type="number" [ngClass]="{focus: isCustom}" (input)="checkSlipValue()" (click)="clickCustomSlipValue()"
-        [(ngModel)]="isCustom && slipValue" placeholder="Custom">
-      <span class="tail" *ngIf="isCustom">%</span>
+      <input type="number" [ngClass]="{focus: isCustomSlip}" (input)="checkSlipValue()" (click)="clickCustomSlipValue()"
+        [(ngModel)]="isCustomSlip && slipValue" placeholder="Custom">
+      <span class="tail" *ngIf="isCustomSlip">%</span>
       <p class="slip-error">{{ slipValueError }}</p>
     </div>
   </div>
@@ -148,11 +148,11 @@
     <img (click)="pageStatus='home'" class="close" src="/assets/images/swap/close.png" alt="">
   </div>
 </section>
-<section class="cover" *ngIf="showExchangeModal">
+<section class="cover" *ngIf="showRoutingModal">
   <div class="container exchange-container">
     <p class="title">
       <span>Choose Routing</span>
-      <img (click)="showExchangeModal=false" class="close" src="/assets/images/swap/close.png" alt="">
+      <img (click)="showRoutingModal=false" class="close" src="/assets/images/swap/close.png" alt="">
     </p>
     <ul class="exchanges">
       <li class="exchange-item" *ngFor="let swapItem of receiveSwapPathArray; index as index"

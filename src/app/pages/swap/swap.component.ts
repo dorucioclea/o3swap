@@ -28,7 +28,7 @@ export class SwapComponent implements OnInit {
   TX_PAGES_PREFIX = 'https://neotube.io/transaction/';
   txhash = '0xff2eaa131b5b65caa64c048224a9860742194cfb5dbff5c44790ec4e406a45cf';
   txPage = this.TX_PAGES_PREFIX + this.txhash;
-  o3SwapFee = '0.3';
+  o3SwapFee = '0.3'; // 系统收费 0.3%
   myNeoDapi;
   account;
   walletType;
@@ -40,7 +40,7 @@ export class SwapComponent implements OnInit {
 
   pageStatus: PageStatus = 'home';
   rates = {};
-  showExchangeModal = false;
+  showRoutingModal = false; // swap 路径弹窗
   showTxHashModal = false;
   isTxPending = false;
 
@@ -55,16 +55,16 @@ export class SwapComponent implements OnInit {
   receiveSwapPathArray;
   chooseSwapPath;
   chooseSwapPathIndex;
-  inquiryInterval;
-  changeData = false;
-  price;
-  lnversePrice;
+  inquiryInterval; // 询价定时器
+  changeData = false; // 询价后回到’home‘后，重新输入数量、from、 to => changeData = true
+  price; // swap 比
+  lnversePrice; // swap 反比
 
   // setting slip
   slipValueGroup = [0.1, 0.5, 1, 2];
-  defaultSlipValue = 2;
+  defaultSlipValue = 2; // 默认滑点 2%
   slipValue: any = this.defaultSlipValue;
-  isCustom = false;
+  isCustomSlip = false; // 自定义滑点
   slipValueError: string;
 
   defaultDeadline = 10; // 分钟
@@ -276,11 +276,11 @@ export class SwapComponent implements OnInit {
   //#region setting page
   selectSlipValue(value: number): void {
     this.slipValue = value;
-    this.isCustom = false;
+    this.isCustomSlip = false;
     this.checkSlipValue();
   }
   clickCustomSlipValue(): void {
-    this.isCustom = true;
+    this.isCustomSlip = true;
     this.slipValue = '';
   }
   checkSlipValue(): void {
@@ -308,7 +308,7 @@ export class SwapComponent implements OnInit {
     this.updateDeadline();
     const tempSlip = Number(this.slipValue);
     if (Number.isNaN(tempSlip) || tempSlip <= 0) {
-      this.isCustom = false;
+      this.isCustomSlip = false;
       this.slipValue = this.defaultSlipValue;
     }
   }
@@ -456,7 +456,7 @@ export class SwapComponent implements OnInit {
   //#endregion
 
   changeSwapPath(index: number): void {
-    this.showExchangeModal = false;
+    this.showRoutingModal = false;
     this.chooseSwapPathIndex = index;
     this.chooseSwapPath = this.receiveSwapPathArray[index];
     this.calculationPrice();
