@@ -108,8 +108,7 @@ export class AppComponent {
     window.addEventListener(
       'NEOLine.NEO.EVENT.DISCONNECTED',
       (account: any) => {
-        console.log('---------');
-        console.log(account);
+        // console.log(account);
       }
     );
   }
@@ -121,7 +120,7 @@ export class AppComponent {
     this.myNeoDapi
       .getAccount()
       .then((result) => {
-        console.log(result);
+        // console.log(result);
         if (this.commonService.isNeoAddress(result.address)) {
           this.account = result;
           this.apiService.pushAccount(this.account);
@@ -155,11 +154,11 @@ export class AppComponent {
     this.myNeoDapi
       .getBalance({
         params: [{ address: this.account.address }],
-        network: 'MainNet',
+        network: 'TestNet',
       })
       .then((addressTokens: any[]) => {
         const tokens = addressTokens[this.account.address];
-        console.log(tokens);
+        // console.log(tokens);
         const tempTokenBalance = {};
         tokens.forEach((tokenItem: any) => {
           tempTokenBalance[tokenItem.assetID] = tokenItem;

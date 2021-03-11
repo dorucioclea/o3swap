@@ -10,7 +10,7 @@ export class ApiService {
   apiDo = environment.apiDomain;
   chain: Chain = 'neo';
   RATE_HOST = 'https://hub.o3.network/v1';
-  INQUIRY_HOST = 'http://localhost:5000/AssetQuery';
+  INQUIRY_HOST = 'http://47.110.14.167:5002/AssetQuery';
 
   tokenBalanceSource = new Subject<any>();
   tokenBalanceSub$ = this.tokenBalanceSource.asObservable();

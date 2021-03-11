@@ -5,6 +5,8 @@ import { Token } from '@lib';
 import { ApiService, CommonService } from '@core';
 import { InvokeOutput } from 'o3-dapi-neo/lib/modules/write/invoke';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 type PageStatus = 'home' | 'tokenList' | 'setting' | 'inquiring' | 'result';
 type SelectTokenType = 'from' | 'to';
@@ -25,9 +27,11 @@ const defaultResult = [
   styleUrls: ['./swap.component.less'],
 })
 export class SwapComponent implements OnInit {
-  TX_PAGES_PREFIX = 'https://neotube.io/transaction/';
-  txhash = '0xff2eaa131b5b65caa64c048224a9860742194cfb5dbff5c44790ec4e406a45cf';
-  txPage = this.TX_PAGES_PREFIX + this.txhash;
+  TX_PAGES_PREFIX = 'https://testnet.neotube.io/transaction/';
+  // txhash = '0xff2eaa131b5b65caa64c048224a9860742194cfb5dbff5c44790ec4e406a45cf';
+  // txPage = this.TX_PAGES_PREFIX + this.txhash;
+  txhash: string;
+  txPage: string;
   o3SwapFee = '0.3'; // 系统收费 0.3%
   myNeoDapi;
   account;
@@ -42,7 +46,7 @@ export class SwapComponent implements OnInit {
   rates = {};
   showRoutingModal = false; // swap 路径弹窗
   showTxHashModal = false;
-  isTxPending = false;
+  isTxPending = true;
 
   selectTokenType: SelectTokenType;
   fromToken: Token;
@@ -135,7 +139,6 @@ export class SwapComponent implements OnInit {
   getRates(): void {
     this.apiService.getRates().subscribe((res) => {
       this.rates = res;
-      console.log(res);
     });
   }
   resetSwapData(): void {
@@ -209,35 +212,41 @@ export class SwapComponent implements OnInit {
   }
 
   getSwapPath(): void {
-    // this.apiService
-    //   .getSwapPath(
-    //     this.fromToken.symbol,
-    //     this.toToken.symbol,
-    //     this.getFactAmountIn()
-    //   )
-    //   .subscribe((res) => {
-    //     if (res.length === 0) {
-    //       this.pageStatus = 'home';
-    //       this.nzMessage.error('支付数额太小或其他原因无法无法swap');
-    //     }
-    //     if (res.length > 0) {
-    //       this.pageStatus = 'result';
-    //       this.receiveSwapPathArray = res;
-    //       this.handleReceiveSwapPathFiat();
-    //       this.chooseSwapPathIndex = 0;
-    //       this.chooseSwapPath = this.receiveSwapPathArray[0];
-    //       this.calculationPrice();
-    //     }
-    //   });
     this.chooseSwapPath = null;
-    setTimeout(() => {
-      this.pageStatus = 'result';
-      this.receiveSwapPathArray = defaultResult;
-      this.handleReceiveSwapPathFiat();
-      this.chooseSwapPathIndex = 0;
-      this.chooseSwapPath = this.receiveSwapPathArray[0];
-      this.calculationPrice();
-    }, 1000);
+    this.apiService
+      .getSwapPath(
+        this.fromToken.symbol,
+        this.toToken.symbol,
+        this.getAmountIn()
+      )
+      .subscribe((res) => {
+        if (res.length === 0) {
+          this.pageStatus = 'home';
+          this.nzMessage.error('支付数额太小或其他原因无法无法swap');
+        }
+        if (res.length > 0) {
+          this.pageStatus = 'result';
+          this.receiveSwapPathArray = res;
+          this.handleReceiveSwapPathFiat();
+          this.chooseSwapPathIndex = 0;
+          this.chooseSwapPath = this.receiveSwapPathArray[0];
+          this.calculationPrice();
+        }
+      });
+  }
+
+  getToNeoSwapPath(): Promise<any> {
+    if (this.fromToken.symbol === 'nNEO') {
+      return of(['nNEO']).toPromise();
+    }
+    return this.apiService
+      .getSwapPath(this.fromToken.symbol, 'nNEO', this.getAmountIn())
+      .pipe(
+        map((res) => {
+          return res[0].swapPath;
+        })
+      )
+      .toPromise();
   }
 
   reGetSwapPath(): void {
@@ -249,7 +258,10 @@ export class SwapComponent implements OnInit {
   }
   handleReceiveSwapPathFiat(): void {
     this.receiveSwapPathArray.forEach((item, index) => {
-      item.receiveAmount = item.amount[item.amount.length - 1];
+      const tempAmount = item.amount[item.amount.length - 1];
+      item.receiveAmount = new BigNumber(tempAmount).shiftedBy(
+        -this.toToken.decimals
+      );
       const price = this.rates[this.toToken.symbol];
       if (price) {
         this.receiveSwapPathArray[index].fiat = new BigNumber(
@@ -358,30 +370,27 @@ export class SwapComponent implements OnInit {
     return token?.assetID || '';
   }
 
-  getFactAmountIn(): string {
-    const factPercentage = new BigNumber(1).minus(
-      new BigNumber(this.o3SwapFee).shiftedBy(-2)
-    );
-    const factAmount = new BigNumber(this.inputAmount)
-      .times(factPercentage)
-      .dp(this.fromToken.decimals)
-      .toFixed();
-    return factAmount;
-  }
-
   getAmountIn(): string {
-    const amount = this.getFactAmountIn();
-    const factPercentage = new BigNumber(1).minus(
-      new BigNumber(this.slipValue).shiftedBy(-2)
-    );
-    const factAmount = new BigNumber(amount).times(factPercentage);
     return this.commonService.decimalToInteger(
-      factAmount,
+      this.inputAmount,
       this.fromToken.decimals
     );
   }
 
-  swap(): void {
+  getAmountOutMin(): number {
+    const amount = this.chooseSwapPath.amount[
+      this.chooseSwapPath.amount.length - 1
+    ];
+    const factPercentage = new BigNumber(1).minus(
+      new BigNumber(this.slipValue).shiftedBy(-2)
+    );
+    const factAmount = Math.ceil(
+      new BigNumber(amount).times(factPercentage).toNumber()
+    );
+    return factAmount;
+  }
+
+  async swap(): Promise<void> {
     if (!this.account) {
       this.nzMessage.error('请先连接钱包');
       return;
@@ -395,45 +404,65 @@ export class SwapComponent implements OnInit {
       return;
     }
     clearInterval(this.inquiryInterval);
+    const toNeoswapPath = await this.getToNeoSwapPath();
+    const args = [
+      {
+        type: 'Address',
+        value: this.account.address,
+      },
+      {
+        type: 'Integer',
+        value: this.getAmountIn(),
+      },
+      {
+        type: 'Integer',
+        value: this.getAmountOutMin(),
+      },
+      {
+        type: 'Array',
+        value: this.chooseSwapPath.swapPath.map((assetName) => ({
+          type: 'Hash160',
+          value: this.getAssetHashByName(assetName),
+        })),
+      },
+      {
+        type: 'Array',
+        value: toNeoswapPath.map((assetName) => ({
+          type: 'Hash160',
+          value: this.getAssetHashByName(assetName),
+        })),
+      },
+      {
+        type: 'Integer',
+        value: Math.floor(Date.now() / 1000 + this.deadline * 60),
+      },
+      {
+        type: 'Integer',
+        value: 0,
+      },
+    ];
     this.myNeoDapi
       .invoke({
         scriptHash: SWAP_CONTRACT_HASH,
-        operation: 'swapTokenInForTokenOut',
-        args: [
-          {
-            type: 'Address',
-            value: this.account.address,
-          },
-          {
-            type: 'Integer',
-            value: this.getAmountIn(),
-          },
-          {
-            type: 'Integer',
-            value: this.commonService.decimalToInteger(
-              this.chooseSwapPath.receiveAmount,
-              this.toToken.decimals
-            ),
-          },
-          {
-            type: 'Array',
-            value: this.chooseSwapPath.swapPath.map((assetName) => ({
-              type: 'Hash160',
-              value: this.getAssetHashByName(assetName),
-            })),
-          },
-          {
-            type: 'Integer',
-            value: Math.floor(Date.now() / 1000 + this.deadline * 60),
-          },
-        ],
+        operation: 'DelegateSwapTokenInForTokenOut',
+        args,
       })
-      .then(({ txid, nodeUrl }: InvokeOutput) => {
-        console.log('Invoke transaction success!');
-        console.log('Transaction ID: ' + txid);
-        console.log('RPC node URL: ' + nodeUrl);
+      .then(({ txid }: InvokeOutput) => {
+        this.showTxHashModal = true;
+        this.isTxPending = true;
+        this.txhash = '0x' + txid;
+        this.txPage = this.TX_PAGES_PREFIX + this.txhash;
+        window.addEventListener(
+          'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
+          (result: any) => {
+            if (result.detail.txid === this.txhash) {
+              this.isTxPending = false;
+            }
+          }
+        );
       })
       .catch((error) => {
+        console.log(error);
         switch (error.type) {
           case 'NO_PROVIDER':
             window.open(
@@ -469,6 +498,12 @@ export class SwapComponent implements OnInit {
   closeTxHashModal(): void {
     this.showTxHashModal = false;
     this.pageStatus = 'home';
+    this.fromToken = null;
+    this.toToken = null;
+    this.inputAmount = null;
+    this.inputAmountFiat = null;
+    this.chooseSwapPath = null;
+    this.changeData = true;
   }
   //#endregion
 }
