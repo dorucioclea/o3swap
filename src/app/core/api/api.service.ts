@@ -46,7 +46,8 @@ export class ApiService {
   ): Observable<any> {
     return this.http.post(
       `${this.INQUIRY_HOST}?StartAsset=${fromAssetName}&EndAsset=${toAssetName}&amount=${amount}`,
-      null
+      null,
+      { observe: 'events' }
     );
   }
 

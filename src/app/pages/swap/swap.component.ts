@@ -7,6 +7,7 @@ import { InvokeOutput } from 'o3-dapi-neo/lib/modules/write/invoke';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { of } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 
 type PageStatus = 'home' | 'tokenList' | 'setting' | 'inquiring' | 'result';
 type SelectTokenType = 'from' | 'to';
@@ -219,18 +220,24 @@ export class SwapComponent implements OnInit {
         this.toToken.symbol,
         this.getAmountIn()
       )
-      .subscribe((res) => {
-        if (res.length === 0) {
+      .subscribe((event) => {
+        if (event instanceof HttpResponse) {
+          if (event.body.length === 0) {
+            this.pageStatus = 'home';
+            this.nzMessage.error('支付数额太小、太大或其他原因无法无法swap');
+          }
+          if (event.body.length > 0) {
+            this.pageStatus = 'result';
+            this.receiveSwapPathArray = event.body;
+            this.handleReceiveSwapPathFiat();
+            this.chooseSwapPathIndex = 0;
+            this.chooseSwapPath = this.receiveSwapPathArray[0];
+            this.calculationPrice();
+          }
+        } else if (event instanceof HttpErrorResponse) {
           this.pageStatus = 'home';
-          this.nzMessage.error('支付数额太小或其他原因无法无法swap');
-        }
-        if (res.length > 0) {
-          this.pageStatus = 'result';
-          this.receiveSwapPathArray = res;
-          this.handleReceiveSwapPathFiat();
-          this.chooseSwapPathIndex = 0;
-          this.chooseSwapPath = this.receiveSwapPathArray[0];
-          this.calculationPrice();
+          clearInterval(this.inquiryInterval);
+          this.nzMessage.error('支付数额太小、太大或其他原因无法无法swap');
         }
       });
   }
