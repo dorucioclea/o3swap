@@ -104,7 +104,7 @@ const NEO_TOKENS: Token[] = [
   },
 ];
 
-const ETH_TOKENS = [];
+const ETH_TOKENS: Token[] = [];
 
 export const ALL_TOKENS = { neo: NEO_TOKENS, eth: ETH_TOKENS };
 

@@ -9,7 +9,14 @@ import { SharedModule } from '@shared/shared.module';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
-import { HomeComponent, SwapComponent } from './pages';
+import {
+  HomeComponent,
+  SwapComponent,
+  SwapHomeComponent,
+  SwapResultComponent,
+  SwapSettingComponent,
+  SwapTokenComponent,
+} from './pages';
 
 const PAGECOMPONENTS = [HomeComponent, SwapComponent];
 
@@ -36,7 +43,14 @@ const INTERCEPTOR_PROVIDES = [
 // #endregion
 
 @NgModule({
-  declarations: [AppComponent, ...PAGECOMPONENTS],
+  declarations: [
+    AppComponent,
+    ...PAGECOMPONENTS,
+    SwapHomeComponent,
+    SwapResultComponent,
+    SwapTokenComponent,
+    SwapSettingComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,

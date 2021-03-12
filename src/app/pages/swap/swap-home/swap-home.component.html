@@ -1,0 +1,48 @@
+<section class="wrapper select-token-wrapper">
+  <p class="title">Swap</p>
+  <div *ngIf="inputAmountError" class="input-token-error">{{ inputAmountError }}</div>
+  <div class="token-select">
+    <div class="token-select-item content-border" (click)="showTokens('from')">
+      <p class="sub-title token-select-title">From</p>
+      <div class="token-select-dropdown" [ngClass]="{'no-selected': !fromToken}">
+        <img *ngIf="fromToken" class="logo" [src]="fromToken?.logo" alt="">
+        <span class="name">{{ fromToken?.symbol || 'SELECT' }}</span>
+        <img class="arrow" src="/assets/images/swap/arrow-down.png" alt="">
+      </div>
+    </div>
+    <img class="token-exchange" src="/assets/images/swap/exchange.png" alt="">
+    <div class="token-select-item content-border" (click)="showTokens('to')">
+      <p class="sub-title token-select-title">To</p>
+      <div class="token-select-dropdown" [ngClass]="{'no-selected': !toToken}">
+        <img *ngIf="toToken" class="logo" [src]="toToken?.logo" alt="">
+        <span class="name">{{ toToken?.symbol || 'SELECT' }}</span>
+        <img class="arrow" src="/assets/images/swap/arrow-down.png" alt="">
+      </div>
+    </div>
+  </div>
+  <div class="pay content-border">
+    <div class="sub-title pay-title">
+      <p>Pay</p>
+      <p>≈＄{{ inputAmountFiat || '0.00' }}</p>
+    </div>
+    <div class="pay-amount">
+      <input class="choose-amount" (input)="changeInputAmount($event)" [ngModel]="inputAmount" type="number"
+        placeholder="0.0">
+      <span class="token-from">{{ fromToken?.symbol }}</span>
+      <button class="all" (click)="allInputAmount()">All</button>
+    </div>
+    <div class="pay-tip">Balance: {{ fromToken?.amount || '0' }} {{ fromToken?.symbol }}</div>
+  </div>
+  <div class="receive content-border" [ngClass]="{'content-border-active': !changeData&&chooseSwapPath }">
+    <p class="sub-title receive-title">Receive</p>
+    <p class="receive-amount">{{ chooseSwapPath?.receiveAmount || '--' }} {{ toToken?.symbol }}</p>
+    <p class="receive-fiat">≈＄{{ chooseSwapPath?.fiat || '--.--' }}</p>
+    <button class="confirm" (click)="inquiry()"
+      [ngClass]="{active: fromToken && toToken && inputAmount}">Inquiry</button>
+    <img class="next" (click)="backToResultPage()" src="/assets/images/swap/next.png" alt="">
+  </div>
+  <div class="setting-group">
+    <img (click)="backToSettingPage()" class="setting" back='select-token-wrapper' src="/assets/images/swap/setting.png"
+      alt="">
+  </div>
+</section>
