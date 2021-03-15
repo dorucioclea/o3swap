@@ -33,11 +33,10 @@ export class SwapComponent implements OnInit {
   selectTokenType: 'from' | 'to';
   inputAmount: string; // 支付的 token 数量
 
-  chooseSwapPath;
-  showInquiry = true;
-
   // setting slip
   settings: Setting;
+
+  initResultData;
 
   constructor(
     private apiService: ApiService,
@@ -69,18 +68,18 @@ export class SwapComponent implements OnInit {
       this.hideToken = this.fromToken;
       this.activeToken = this.toToken;
     }
-    this.chooseSwapPath = null;
+    this.initResultData = null;
     this.pageStatus = 'token';
   }
   toSettingPage(): void {
     this.pageStatus = 'setting';
   }
   toInquiryPage(amount): void {
+    this.initResultData = null;
     this.inputAmount = amount;
     this.pageStatus = 'result';
   }
   toResultPage(): void {
-    this.showInquiry = false;
     this.pageStatus = 'result';
   }
   //#endregion
@@ -101,10 +100,10 @@ export class SwapComponent implements OnInit {
     this.pageStatus = 'home';
   }
 
-  closeResultPage(chooseSwapPath): void {
-    if (chooseSwapPath) {
-      this.chooseSwapPath = chooseSwapPath;
-      this.pageStatus = 'home';
+  closeResultPage(initData: any): void {
+    if (initData) {
+      this.initResultData = initData;
     }
+    this.pageStatus = 'home';
   }
 }

@@ -20,28 +20,29 @@ export class SwapResultComponent implements OnInit {
   @Input() inputAmount: string; // 支付的 token 数量
   @Input() deadline: number;
   @Input() slipValue: number;
-  @Input() showInquiry: boolean;
+  @Input() initData: any;
   @Output() closeResultPage = new EventEmitter<any>();
-
-  TOKENS: Token[] = []; // 所有的 tokens
-  o3SwapFee = '0.3'; // 系统收费 0.3%
 
   myNeoDapi;
   account;
   walletType;
 
+  TOKENS: Token[] = []; // 所有的 tokens
+  o3SwapFee = '0.3'; // 系统收费 0.3%
+  showRoutingModal = false; // swap 路径弹窗
+  showTxHashModal = false;
+  showInquiry: boolean;
+  isTxPending = true;
   TX_PAGES_PREFIX = 'https://testnet.neotube.io/transaction/';
   // txhash = '0xff2eaa131b5b65caa64c048224a9860742194cfb5dbff5c44790ec4e406a45cf';
   // txPage = this.TX_PAGES_PREFIX + this.txhash;
   txhash: string;
   txPage: string;
-  chooseSwapPath: any;
-  showRoutingModal = false; // swap 路径弹窗
-  showTxHashModal = false;
-  isTxPending = true;
-  receiveSwapPathArray;
-  chooseSwapPathIndex;
   inquiryInterval; // 询价定时器
+
+  chooseSwapPath: any;
+  chooseSwapPathIndex;
+  receiveSwapPathArray;
   price; // swap 比
   lnversePrice; // swap 反比
 
@@ -63,11 +64,15 @@ export class SwapResultComponent implements OnInit {
 
   ngOnInit(): void {
     this.TOKENS = ALL_TOKENS[this.apiService.chain];
-    if (this.showInquiry) {
-      setTimeout(() => {
-        this.getSwapPath();
-      }, 1500);
+    if (this.initData) {
+      this.chooseSwapPath = this.initData.chooseSwapPath;
+      this.chooseSwapPathIndex = this.initData.chooseSwapPathIndex;
+      this.receiveSwapPathArray = this.initData.receiveSwapPathArray;
+      this.price = this.initData.price;
+      this.lnversePrice = this.initData.lnversePrice;
+      this.showInquiry = false;
     } else {
+      this.showInquiry = true;
       this.getSwapPath();
     }
     this.inquiryInterval = setInterval(() => {
@@ -77,7 +82,14 @@ export class SwapResultComponent implements OnInit {
 
   backToHomePage(): void {
     clearInterval(this.inquiryInterval);
-    this.closeResultPage.emit(this.chooseSwapPath);
+    const initData = {
+      chooseSwapPath: this.chooseSwapPath,
+      chooseSwapPathIndex: this.chooseSwapPathIndex,
+      receiveSwapPathArray: this.receiveSwapPathArray,
+      price: this.price,
+      lnversePrice: this.lnversePrice,
+    };
+    this.closeResultPage.emit(initData);
   }
   copy(hash: string): void {
     this.commonService.copy(hash);

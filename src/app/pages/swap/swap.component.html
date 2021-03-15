@@ -1,5 +1,5 @@
 <app-swap-home *ngIf="pageStatus==='home'" [rates]="rates" [fromToken]="fromToken" [toToken]="toToken"
-  [inputAmount]="inputAmount" [chooseSwapPath]="chooseSwapPath" (toTokenPage)="toTokenPage($event)"
+  [inputAmount]="inputAmount" [chooseSwapPath]="initResultData?.chooseSwapPath" (toTokenPage)="toTokenPage($event)"
   (toSettingPage)="toSettingPage()" (toInquiryPage)="toInquiryPage($event)" (toResultPage)="toResultPage()">
 </app-swap-home>
 
@@ -11,6 +11,6 @@
 </app-swap-setting>
 
 <app-swap-result *ngIf="pageStatus==='result'" [rates]="rates" [fromToken]="fromToken" [toToken]="toToken"
-  [inputAmount]="inputAmount" [deadline]="settings.deadline"
-  [slipValue]="settings.slipValue" [showInquiry]="showInquiry" (closeResultPage)="closeResultPage($event)">
+  [inputAmount]="inputAmount" [deadline]="settings.deadline" [slipValue]="settings.slipValue"
+  [initData]="initResultData" (closeResultPage)="closeResultPage($event)">
 </app-swap-result>
