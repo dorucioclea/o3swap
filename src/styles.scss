@@ -1,5 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-@import './styles/modal.less';
+@import './styles/modal.scss';
 
 * {
   margin: 0;
@@ -22,22 +22,22 @@ ul {
 
 @font-face {
   font-family: "fontRegular";
-  src: url("assets/fonts/NeverMind-Regular.ttf") format("truetype");
+  src: url("/assets/fonts/NeverMind-Regular.ttf") format("truetype");
 }
 
 @font-face {
   font-family: "fontMedium";
-  src: url("assets/fonts/NeverMind-Medium.ttf") format("truetype");
+  src: url("/assets/fonts/NeverMind-Medium.ttf") format("truetype");
 }
 
 @font-face {
   font-family: "fontBold";
-  src: url("assets/fonts/NeverMind-Bold.ttf") format("truetype");
+  src: url("/assets/fonts/NeverMind-Bold.ttf") format("truetype");
 }
 
 @font-face {
   font-family: "fontDemiBold";
-  src: url("assets/fonts/NeverMind-DemiBold.ttf") format("truetype");
+  src: url("/assets/fonts/NeverMind-DemiBold.ttf") format("truetype");
 }
 
 html,

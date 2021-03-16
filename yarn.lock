@@ -42,7 +42,7 @@
     glob "7.1.6"
     jest-worker "26.3.0"
     karma-source-map-support "1.4.0"
-    less-loader "6.2.0"
+    scss-loader "6.2.0"
     license-webpack-plugin "2.3.0"
     loader-utils "2.0.0"
     mini-css-extract-plugin "0.10.0"
@@ -2578,9 +2578,9 @@ canonical-path@1.0.0:
   resolved "https://registry.npm.taobao.org/canonical-path/download/canonical-path-1.0.0.tgz#fcb470c23958def85081856be7a86e904f180d1d"
   integrity sha1-/LRwwjlY3vhQgYVr56hukE8YDR0=
 
-caseless@~0.12.0:
+casescss@~0.12.0:
   version "0.12.0"
-  resolved "https://registry.npm.taobao.org/caseless/download/caseless-0.12.0.tgz#1b681c21ff84033c826543090689420d187151dc"
+  resolved "https://registry.npm.taobao.org/casescss/download/casescss-0.12.0.tgz#1b681c21ff84033c826543090689420d187151dc"
   integrity sha1-G2gcIf+EAzyCZUMJBolCDRhxUdw=
 
 chalk@^2.0.0, chalk@^2.0.1, chalk@^2.3.0, chalk@^2.4.1, chalk@^2.4.2:
@@ -5304,19 +5304,19 @@ klona@^2.0.3:
   resolved "https://registry.npm.taobao.org/klona/download/klona-2.0.4.tgz#7bb1e3affb0cb8624547ef7e8f6708ea2e39dfc0"
   integrity sha1-e7Hjr/sMuGJFR+9+j2cI6i4538A=
 
-less-loader@6.2.0:
+scss-loader@6.2.0:
   version "6.2.0"
-  resolved "https://registry.npm.taobao.org/less-loader/download/less-loader-6.2.0.tgz#8b26f621c155b342eefc24f5bd6e9dc40c42a719"
+  resolved "https://registry.npm.taobao.org/scss-loader/download/scss-loader-6.2.0.tgz#8b26f621c155b342eefc24f5bd6e9dc40c42a719"
   integrity sha1-iyb2IcFVs0Lu/CT1vW6dxAxCpxk=
   dependencies:
     clone "^2.1.2"
-    less "^3.11.3"
+    scss "^3.11.3"
     loader-utils "^2.0.0"
     schema-utils "^2.7.0"
 
-less@^3.11.3:
+scss@^3.11.3:
   version "3.13.1"
-  resolved "https://registry.npm.taobao.org/less/download/less-3.13.1.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fless%2Fdownload%2Fless-3.13.1.tgz#0ebc91d2a0e9c0c6735b83d496b0ab0583077909"
+  resolved "https://registry.npm.taobao.org/scss/download/scss-3.13.1.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fscss%2Fdownload%2Fscss-3.13.1.tgz#0ebc91d2a0e9c0c6735b83d496b0ab0583077909"
   integrity sha1-DryR0qDpwMZzW4PUlrCrBYMHeQk=
   dependencies:
     copy-anything "^2.0.1"
@@ -7282,7 +7282,7 @@ request@^2.88.2:
   dependencies:
     aws-sign2 "~0.7.0"
     aws4 "^1.8.0"
-    caseless "~0.12.0"
+    casescss "~0.12.0"
     combined-stream "~1.0.6"
     extend "~3.0.2"
     forever-agent "~0.6.1"

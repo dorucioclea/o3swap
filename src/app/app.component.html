@@ -9,12 +9,19 @@
         <li [ngClass]="{active: isHome}" (click)="menuType='home'">
           <a routerLink="/">Home</a>
         </li>
-        <li [ngClass]="{active: currentPage==='/swap'}" (click)="menuType='swap'">
-          <a routerLink="/swap">Swap</a>
+        <!-- <li [ngClass]="{active: currentPage==='/swap'}" (click)="menuType='swap'"> -->
+        <li>
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Swap</a>
         </li>
-        <li>BuyCryto</li>
-        <li>Blog</li>
-        <li>Doc</li>
+        <li>
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">BuyCryto</a>
+        </li>
+        <li>
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Blog</a>
+        </li>
+        <li>
+          <a>Doc</a>
+        </li>
       </ul>
       <div *ngIf="isHome===false" class="connect" [ngClass]="{'account': account}" (click)="showConnect()">
         <img *ngIf="!account" src="/assets/images/swap/link.png" alt="">
@@ -56,7 +63,8 @@
     <div class="title">
       <span>Account</span>
       <div class="title-right">
-        <button class="change" (click)="changeWallet()"><img class="change" src="/assets/images/swap/account-change.png" alt="">Change</button>
+        <button class="change" (click)="changeWallet()"><img class="change" src="/assets/images/swap/account-change.png"
+            alt="">Change</button>
         <img class="close" (click)="showAccountModal=false" src="/assets/images/swap/close.png" alt="">
       </div>
     </div>

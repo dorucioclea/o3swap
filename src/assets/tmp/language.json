@@ -1,0 +1,82 @@
+{
+  "feature1Title": {
+    "en": "Find the best prices on different chains.",
+    "zh": "发现不同链上最好的价格"
+  },
+  "feature1Detail1": {
+    "en": "i. Aggregate leading DEXs on different chains",
+    "zh": "i. 聚合不同链上领先的DEXs"
+  },
+  "feature1Detail2": {
+    "en": "Ii. Recommend the most effective trading route",
+    "zh": "Ii. 智能化推荐最有效的交易路线"
+  },
+  "feature1Detail3": {
+    "en": "Iii. Ensure secure transactions without hidden fee",
+    "zh": "Iii. 安全交易没有隐藏费用"
+  },
+  "feature2Title": {
+    "en": "Cross-chain exchange by one click.",
+    "zh": "一键跨链资产交易"
+  },
+  "feature2Detail1": {
+    "en": "I. Link different blockchain networks",
+    "zh": "I. 链接不同区块链网络 "
+  },
+  "feature2Detail2": {
+    "en": "Ii. Freely exchange multi-chain assets ",
+    "zh": "Ii. 多链资产自由兑换"
+  },
+  "feature2Detail3": {
+    "en": "Iii. The Bridge of Layer 2 Networks",
+    "zh": "Iii. Layer 2 网络的桥梁"
+  },
+  "roadmapQ1Detail1": {
+    "en": "Launch the website. Publish the light paper.",
+    "zh": "网站上线，发布light paper"
+  },
+  "roadmapQ1Detail2": {
+    "en": "Support NEO Swap.",
+    "zh": "Neo Swap 上线"
+  },
+  "roadmapQ1Detail3": {
+    "en": "Release O3 Aggregator.",
+    "zh": "发布跨链Swap"
+  },
+  "roadmapQ2Q3Detail1": {
+    "en": "Support ETH Swap.",
+    "zh": "ETH Swap上线"
+  },
+  "roadmapQ2Q3Detail2": {
+    "en": "Publish O3 Swap white paper and economic model.",
+    "zh": "发布O3 SWAP白皮书与经济模型"
+  },
+  "roadmapQ2Q3Detail3": {
+    "en": "Release OST (O3 SWAP token).",
+    "zh": "发行OST"
+  },
+  "roadmapQ2Q3Detail4": {
+    "en": "Launch trading mining.",
+    "zh": "开启交易挖矿"
+  },
+  "roadmapQ4Detail1": {
+    "en": "Launch DAO.",
+    "zh": "上线DAO"
+  },
+  "roadmapQ4Detail2": {
+    "en": "Support BSC, HECO, and Layer 2 aggregation protocol.",
+    "zh": "支持币安链，火币链，及layer2聚合协议"
+  },
+  "roadmap2022Detail1": {
+    "en": "Release V2. Support instant quote and pending order.",
+    "zh": "发布V2，支持即时询价，挂单交易"
+  },
+  "roadmap2022Detail2": {
+    "en": "Launch cross-chain 2.0.",
+    "zh": "发布跨链2.0"
+  },
+  "roadmap2022Detail3": {
+    "en": "Release O3 network.",
+    "zh": "发布O3.network"
+  }
+}

@@ -53,19 +53,20 @@ header {
   ul.menu {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     height: 100%;
     li {
       display: inline-flex;
-      height: 100%;
-      line-height: 90px;
+      height: 30px;
+      line-height: 30px;
       min-width: 80px;
       margin-right: 35px;
-      justify-content: center;
-      cursor: pointer;
       position: relative;
       a {
         height: 100%;
-        line-height: 90px;
+        line-height: 30px;
+        width: 100%;
+        text-align: center;
         color: #fff;
       }
       &.active a,
@@ -83,7 +84,7 @@ header {
       &::before {
         content: "";
         position: absolute;
-        top: 0;
+        top: -30px;
         left: 50%;
         width: 20px;
         height: 3px;

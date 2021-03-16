@@ -8,20 +8,20 @@
   <section class="price">
     <img src="/assets/images/home/price.gif" alt="">
     <div class="desc">
-      <p class="desc-title">Find the best prices on different chains</p>
-      <p>i. Aggregate leading DEXs on different chains</p>
-      <p>Ii. Recommend the most effective trading route</p>
-      <p>Iii. Ensure secure transactions without hidden fee</p>
+      <p class="desc-title">{{ "feature1Title" | translate: lang }}</p>
+      <p>{{ "feature1Detail1" | translate: lang }}</p>
+      <p>{{ "feature1Detail2" | translate: lang }}</p>
+      <p>{{ "feature1Detail3" | translate: lang }}</p>
     </div>
   </section>
 </section>
 <article class="wrapper">
   <section class="content exchange-click">
     <div class="desc">
-      <p class="desc-title">Cross-chain exchange by one click</p>
-      <p>I. Link different blockchain networks</p>
-      <p>Ii. Freely exchange multi-chain assets </p>
-      <p>Iii. The Bridge of Layer 2 Networks</p>
+      <p class="desc-title">{{ "feature2Title" | translate: lang }}</p>
+      <p>{{ "feature2Detail1" | translate: lang }}</p>
+      <p>{{ "feature2Detail2" | translate: lang }}</p>
+      <p>{{ "feature2Detail3" | translate: lang }}</p>
     </div>
     <img class="exchange" src="/assets/images/home/exchange.gif" alt="">
   </section>
@@ -78,9 +78,9 @@
             <img src="/assets/images/home/roadmap-dot.png" alt="">
             <p class="name">Q1</p>
             <div class="desc">
-              <p>1. Launch the website. Publish the light paper</p>
-              <p>2. Release Neo Swap</p>
-              <p>3. Release cross-chain Swap</p>
+              <p>1. {{ "roadmapQ1Detail1" | translate: lang }}</p>
+              <p>2. {{ "roadmapQ1Detail2" | translate: lang }}</p>
+              <p>3. {{ "roadmapQ1Detail3" | translate: lang }}</p>
             </div>
           </div>
           <div class="time time2" (mouseenter)="enterRoadmap(1)" (mouseleave)="leaveRoadmap()"
@@ -216,8 +216,12 @@
     </div>
     <div class="bottom">
       <img src="/assets/images/home/footer-logo.png" alt="">
-      <p class="copyright">© 2021 neoline copyright.</p>
-      <p class="language"><span>EN</span><span class="line">|</span><span>CN</span></p>
+      <p class="copyright">© {{ copyRightYear }} neoline copyright.</p>
+      <p class="language">
+        <span [ngClass]="{active: lang==='en'}" (click)="changeLang('en')">EN</span>
+        <span class="line">|</span>
+        <span [ngClass]="{active: lang==='zh'}" (click)="changeLang('zh')">CN</span>
+      </p>
       <p class="doc">Doc</p>
     </div>
   </footer>

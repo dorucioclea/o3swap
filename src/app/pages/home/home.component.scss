@@ -515,7 +515,8 @@ footer {
     .doc {
       cursor: pointer;
       color: #a4acb5;
-      &:hover {
+      &:hover,
+      &.active {
         color: #46b069;
       }
     }

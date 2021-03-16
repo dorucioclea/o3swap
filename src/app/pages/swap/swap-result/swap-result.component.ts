@@ -11,7 +11,7 @@ import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 @Component({
   selector: 'app-swap-result',
   templateUrl: './swap-result.component.html',
-  styleUrls: ['../common.less', './swap-result.component.less'],
+  styleUrls: ['../common.scss', './swap-result.component.scss'],
 })
 export class SwapResultComponent implements OnInit {
   @Input() rates;

@@ -4,9 +4,11 @@ import { ApiService } from '@core';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.less'],
+  styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
+  lang = 'en';
+  copyRightYear = new Date().getFullYear();
   roadmapIndex = 0;
   roadmapLen = 5;
   roadmapInterval;
@@ -47,6 +49,15 @@ export class HomeComponent implements OnInit {
     const json = { EMAIL: this.email };
     this.apiService.subscriptNews(json).subscribe((res) => {
       console.log(res);
+    });
+  }
+
+  changeLang(lang: 'en' | 'zh'): void {
+    this.lang = lang;
+    window.scrollTo({
+      left: 0,
+      top: 0,
+      behavior: 'smooth',
     });
   }
 }

@@ -4,7 +4,7 @@ import { defaultDeadline, defaultSlipValue } from '../swap.component';
 @Component({
   selector: 'app-swap-setting',
   templateUrl: './swap-setting.component.html',
-  styleUrls: ['../common.less', './swap-setting.component.less'],
+  styleUrls: ['../common.scss', './swap-setting.component.scss'],
 })
 export class SwapSettingComponent implements OnInit {
   @Input() slipValue: number | string;

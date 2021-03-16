@@ -6,7 +6,7 @@ import { ApiService } from '@core';
 @Component({
   selector: 'app-swap-token',
   templateUrl: './swap-token.component.html',
-  styleUrls: ['../common.less', './swap-token.component.less'],
+  styleUrls: ['../common.scss', './swap-token.component.scss'],
 })
 export class SwapTokenComponent implements OnInit {
   @Input() activeToken: Token;

@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js';
 @Component({
   selector: 'app-swap-home',
   templateUrl: './swap-home.component.html',
-  styleUrls: ['../common.less', './swap-home.component.less'],
+  styleUrls: ['../common.scss', './swap-home.component.scss'],
 })
 export class SwapHomeComponent implements OnInit {
   @Input() rates = {};
