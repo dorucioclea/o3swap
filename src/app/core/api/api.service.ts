@@ -92,11 +92,4 @@ export class ApiService {
       })
     );
   }
-
-  subscriptNews(data: any): Observable<any> {
-    return this.http.post(
-      `https://network.us1.list-manage.com/subscribe/post?u=3d72cfc6b405673c83b82325e&amp;id=f2135928fa`,
-      data
-    );
-  }
 }

@@ -20,6 +20,13 @@ section.home {
   height: 910px;
   padding-top: 200px;
   font-family: "fontBold";
+  .animate {
+    width: 600px;
+    height: 600px;
+    position: absolute;
+    top: 30px;
+    left: 800px;
+  }
   .title {
     font-size: 72px;
     color: #46b069;

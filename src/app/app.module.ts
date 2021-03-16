@@ -49,6 +49,14 @@ const INTERCEPTOR_PROVIDES = [
 ];
 // #endregion
 
+import { LottieModule } from 'ngx-lottie';
+import player from 'lottie-web';
+// Note we need a separate function as it's required
+// by the AOT compiler.
+function playerFactory(): any {
+  return player;
+}
+
 @NgModule({
   declarations: [AppComponent, ...PAGECOMPONENTS],
   imports: [
@@ -59,6 +67,7 @@ const INTERCEPTOR_PROVIDES = [
     BrowserAnimationsModule,
     CoreModule,
     SharedModule,
+    LottieModule.forRoot({ player: playerFactory }),
   ],
   providers: [{ provide: NZ_I18N, useValue: en_US }, ...INTERCEPTOR_PROVIDES],
   bootstrap: [AppComponent],
