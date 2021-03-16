@@ -108,16 +108,16 @@ section.chains {
         background-image: url("/assets/images/home/support-chain-neo-active.png");
       }
     }
-    .chain.ht {
-      background-image: url("/assets/images/home/support-chain-ht.png");
+    .chain.heco {
+      background-image: url("/assets/images/home/support-chain-heco.png");
       &:hover {
-        background-image: url("/assets/images/home/support-chain-ht-active.png");
+        background-image: url("/assets/images/home/support-chain-heco-active.png");
       }
     }
-    .chain.bnb {
-      background-image: url("/assets/images/home/support-chain-bnb.png");
+    .chain.bsc {
+      background-image: url("/assets/images/home/support-chain-bsc.png");
       &:hover {
-        background-image: url("/assets/images/home/support-chain-bnb-active.png");
+        background-image: url("/assets/images/home/support-chain-bsc-active.png");
       }
     }
     .chain.dot {
@@ -163,6 +163,19 @@ section.chains {
 
 section.exchanges {
   margin-top: 160px;
+  position: relative;
+  width: 100%;
+  .exchanges-wrapper {
+    width: 1400px;
+    margin: 0 auto;
+  }
+  img.bg {
+    position: absolute;
+    top: -112px;
+    right: -30px;
+    width: 561px;
+    height: 230px;
+  }
   .exchanges-group {
     display: flex;
     margin-top: 70px;
@@ -173,6 +186,19 @@ section.exchanges {
       border-radius: 20px;
       font-size: 16px;
       padding: 4px 0 0 40px;
+      position: relative;
+      &::before {
+        position: absolute;
+        top: 0;
+        right: 0;
+        content: "";
+        width: 110px;
+        height: 100px;
+        background-size: 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 0.8;
+      }
       &:not(:last-child) {
         margin-right: 40px;
       }
@@ -184,13 +210,32 @@ section.exchanges {
         margin-top: 36px;
       }
     }
-    ul.col1,
+    ul.col1 {
+      background: linear-gradient(0deg, #1212121f 0%, #46b0691f 100%);
+      &::before {
+        background-image: url("/assets/images/home/exchanges/class-eth.png");
+      }
+    }
+    ul.col2 {
+      background: linear-gradient(0deg, #1212121f 0%, #b28c151f 100%);
+      &::before {
+        background-image: url("/assets/images/home/exchanges/class-bsc.png");
+      }
+    }
     ul.col3 {
       background: linear-gradient(0deg, #1212121f 0%, #46b0691f 100%);
+      &::before {
+        background-image: url("/assets/images/home/exchanges/class-neo.png");
+      }
     }
-    ul.col2,
     ul.col4 {
-      background: linear-gradient(0deg, #1212121f 0%, #6162ef1f 100%);
+      background: linear-gradient(0deg, #1212121f 0%, #008cd61f 100%);
+      &::before {
+        background-image: url("/assets/images/home/exchanges/class-heco.png");
+      }
+    }
+    ul.col5 {
+      background: linear-gradient(0deg, #1212121f 0%, #46b0691f 100%);
     }
     ul.col2 {
       margin-top: 20px;
@@ -200,6 +245,9 @@ section.exchanges {
     }
     ul.col4 {
       margin-top: 60px;
+    }
+    ul.col5 {
+      margin-top: 80px;
     }
   }
 }
