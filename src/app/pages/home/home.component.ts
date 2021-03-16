@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ApiService } from '@core';
 
 @Component({
   selector: 'app-home',
@@ -12,7 +13,9 @@ export class HomeComponent implements OnInit {
   enterActiviteFirst = false;
   enterActiviteLast = false;
 
-  constructor() {}
+  email = '';
+
+  constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
     this.roadmapIntervalFun();
@@ -31,5 +34,19 @@ export class HomeComponent implements OnInit {
 
   leaveRoadmap(): void {
     this.roadmapIntervalFun();
+  }
+
+  subscriptNews(): void {
+    const formData = new FormData();
+    formData.append('EMAIL', this.email);
+
+    console.log(this.email);
+    // this.apiService.subscriptNews(formData).subscribe((res) => {
+    //   console.log(res);
+    // });
+    const json = { EMAIL: this.email };
+    this.apiService.subscriptNews(json).subscribe((res) => {
+      console.log(res);
+    });
   }
 }

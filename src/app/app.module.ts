@@ -18,7 +18,14 @@ import {
   SwapTokenComponent,
 } from './pages';
 
-const PAGECOMPONENTS = [HomeComponent, SwapComponent];
+const PAGECOMPONENTS = [
+  HomeComponent,
+  SwapComponent,
+  SwapHomeComponent,
+  SwapResultComponent,
+  SwapTokenComponent,
+  SwapSettingComponent,
+];
 
 //#region ng-zorro-antd
 import { FormsModule } from '@angular/forms';
@@ -43,14 +50,7 @@ const INTERCEPTOR_PROVIDES = [
 // #endregion
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    ...PAGECOMPONENTS,
-    SwapHomeComponent,
-    SwapResultComponent,
-    SwapTokenComponent,
-    SwapSettingComponent,
-  ],
+  declarations: [AppComponent, ...PAGECOMPONENTS],
   imports: [
     BrowserModule,
     AppRoutingModule,
