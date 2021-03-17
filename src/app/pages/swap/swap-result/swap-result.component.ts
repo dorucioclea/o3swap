@@ -51,6 +51,9 @@ export class SwapResultComponent implements OnInit {
     private nzMessage: NzMessageService,
     private commonService: CommonService
   ) {
+    this.myNeoDapi = this.apiService.myNeoDapi;
+    this.account = this.apiService.account;
+    this.walletType = this.apiService.walletType;
     this.apiService.myNeoDapiSub$.subscribe((res) => {
       this.myNeoDapi = res;
     });
@@ -181,6 +184,7 @@ export class SwapResultComponent implements OnInit {
           (result: any) => {
             if (result.detail.txid === this.txhash) {
               this.isTxPending = false;
+              this.apiService.getNeoBalances();
             }
           }
         );
@@ -271,8 +275,17 @@ export class SwapResultComponent implements OnInit {
     return this.apiService
       .getSwapPath(this.fromToken.symbol, 'nNEO', this.getAmountIn())
       .pipe(
-        map((res) => {
-          return res[0].swapPath;
+        map((event) => {
+          if (event instanceof HttpResponse) {
+            if (event.body.length > 0) {
+              return event.body[0].swapPath;
+            } else {
+              return [];
+            }
+          }
+          if (event instanceof HttpErrorResponse) {
+            return [];
+          }
         })
       )
       .toPromise();

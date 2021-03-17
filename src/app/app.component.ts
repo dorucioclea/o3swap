@@ -102,7 +102,7 @@ export class AppComponent {
       (result: any) => {
         this.account = result.detail;
         this.apiService.pushAccount(this.account);
-        this.getNeoBalances();
+        this.apiService.getNeoBalances();
       }
     );
     window.addEventListener(
@@ -124,7 +124,7 @@ export class AppComponent {
         if (this.commonService.isNeoAddress(result.address)) {
           this.account = result;
           this.apiService.pushAccount(this.account);
-          this.getNeoBalances();
+          this.apiService.getNeoBalances();
         } else {
           this.nzMessage.error('Please connect to Neo wallet');
         }
@@ -147,23 +147,6 @@ export class AppComponent {
             this.nzMessage.error(error.description || '');
             break;
         }
-      });
-  }
-
-  getNeoBalances(): void {
-    this.myNeoDapi
-      .getBalance({
-        params: [{ address: this.account.address }],
-        network: 'TestNet',
-      })
-      .then((addressTokens: any[]) => {
-        const tokens = addressTokens[this.account.address];
-        // console.log(tokens);
-        const tempTokenBalance = {};
-        tokens.forEach((tokenItem: any) => {
-          tempTokenBalance[tokenItem.assetID] = tokenItem;
-        });
-        this.apiService.pushTokenBalances(tempTokenBalance);
       });
   }
 }

@@ -71,7 +71,6 @@ export class HomeComponent implements OnInit {
 
     node.appendChild(nodeInput);
     form.appendChild(node);
-    console.log(form);
     document.body.appendChild(form);
     form.submit();
   }

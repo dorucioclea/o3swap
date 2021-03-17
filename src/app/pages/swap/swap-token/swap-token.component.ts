@@ -12,7 +12,7 @@ export class SwapTokenComponent implements OnInit {
   @Input() activeToken: Token;
   @Input() hideToken: Token;
   @Output() closeTokenPage = new EventEmitter<Token | void>();
-  tokenBalance = {}; // 账户的 tokens
+  tokenBalance; // 账户的 tokens
   allTokens: Token[] = []; // 所有的 tokens, 排除了 fromToken 或 toToken
   displayTokens: any[] = []; // 最终展示的 tokens, search 结果
 
@@ -24,6 +24,8 @@ export class SwapTokenComponent implements OnInit {
       ? tokens.filter((item) => item.assetID !== this.hideToken.assetID)
       : tokens;
     this.displayTokens = this.allTokens;
+    this.tokenBalance = this.apiService.tokenBalance;
+    this.handleTokenAmount();
     this.apiService.tokenBalanceSub$.subscribe((res) => {
       this.tokenBalance = res;
       this.handleTokenAmount();

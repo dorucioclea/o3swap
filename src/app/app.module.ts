@@ -16,6 +16,7 @@ import {
   SwapResultComponent,
   SwapSettingComponent,
   SwapTokenComponent,
+  DocsComponent,
 } from './pages';
 
 const PAGECOMPONENTS = [
@@ -25,6 +26,7 @@ const PAGECOMPONENTS = [
   SwapResultComponent,
   SwapTokenComponent,
   SwapSettingComponent,
+  DocsComponent,
 ];
 
 //#region ng-zorro-antd
@@ -49,6 +51,7 @@ const INTERCEPTOR_PROVIDES = [
 ];
 // #endregion
 
+//#region lottie
 import { LottieModule } from 'ngx-lottie';
 import player from 'lottie-web';
 // Note we need a separate function as it's required
@@ -56,6 +59,7 @@ import player from 'lottie-web';
 function playerFactory(): any {
   return player;
 }
+//#endregion
 
 @NgModule({
   declarations: [AppComponent, ...PAGECOMPONENTS],

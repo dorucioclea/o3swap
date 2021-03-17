@@ -19,10 +19,6 @@ interface Setting {
 })
 export class SwapComponent implements OnInit {
   pageStatus: PageStatus = 'home';
-  myNeoDapi;
-  account;
-  walletType;
-  tokenBalance = {}; // 账户的 tokens
 
   rates = {};
   fromToken: Token;
@@ -103,6 +99,11 @@ export class SwapComponent implements OnInit {
   closeResultPage(initData: any): void {
     if (initData) {
       this.initResultData = initData;
+    } else {
+      this.fromToken = null;
+      this.toToken = null;
+      this.inputAmount = '';
+      this.initResultData = null;
     }
     this.pageStatus = 'home';
   }

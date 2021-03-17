@@ -12,30 +12,41 @@ export class ApiService {
   RATE_HOST = 'https://hub.o3.network/v1';
   INQUIRY_HOST = 'http://47.110.14.167:5002/AssetQuery';
 
+  tokenBalance = {};
   tokenBalanceSource = new Subject<any>();
   tokenBalanceSub$ = this.tokenBalanceSource.asObservable();
+
+  myNeoDapi;
   myNeoDapiSource = new Subject<any>();
   myNeoDapiSub$ = this.myNeoDapiSource.asObservable();
+
+  account;
   accountSource = new Subject<any>();
   accountSub$ = this.accountSource.asObservable();
+
+  walletType;
   walletTypeSource = new Subject<any>();
   walletTypeSub$ = this.walletTypeSource.asObservable();
 
   constructor(private http: HttpClient) {}
 
   pushTokenBalances(value): void {
+    this.tokenBalance = value;
     this.tokenBalanceSource.next(value);
   }
 
   pushMyNeoDapi(value): void {
+    this.myNeoDapi = value;
     this.myNeoDapiSource.next(value);
   }
 
   pushAccount(value): void {
+    this.account = value;
     this.accountSource.next(value);
   }
 
   pushWalletType(value): void {
+    this.walletType = value;
     this.walletTypeSource.next(value);
   }
 
@@ -49,6 +60,23 @@ export class ApiService {
       null,
       { observe: 'events' }
     );
+  }
+
+  getNeoBalances(): void {
+    this.myNeoDapi
+      .getBalance({
+        params: [{ address: this.account.address }],
+        network: 'TestNet',
+      })
+      .then((addressTokens: any[]) => {
+        const tokens = addressTokens[this.account.address];
+        // console.log(tokens);
+        const tempTokenBalance = {};
+        tokens.forEach((tokenItem: any) => {
+          tempTokenBalance[tokenItem.assetID] = tokenItem;
+        });
+        this.pushTokenBalances(tempTokenBalance);
+      });
   }
 
   getRates(): Observable<any> {
