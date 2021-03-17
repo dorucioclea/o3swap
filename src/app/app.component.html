@@ -8,11 +8,11 @@
       <ul class="menu flex-1">
         <li [ngClass]="{active: isHome}" (click)="menuType='home'">
           <a routerLink="/">Home</a>
-        </li>
+          <!-- </li>
         <li [ngClass]="{active: currentPage==='/swap'}" (click)="menuType='swap'">
-          <a routerLink="/swap">Swap</a>
-          <!-- <li> -->
-          <!-- <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Swap</a> -->
+          <a routerLink="/swap">Swap</a> -->
+        <li>
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Swap</a>
         </li>
         <li>
           <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">BuyCryto</a>
@@ -21,7 +21,7 @@
           <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Blog</a>
         </li>
         <li>
-          <a>Doc</a>
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Doc</a>
         </li>
       </ul>
       <div *ngIf="isHome===false" class="connect" [ngClass]="{'account': account}" (click)="showConnect()">

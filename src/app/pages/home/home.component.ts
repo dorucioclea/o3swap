@@ -45,7 +45,7 @@ export class HomeComponent implements OnInit {
 
   subscriptNews(): void {
     if (this.checkEmail() === false) {
-      this.nzMessage.error('请输入正确的邮箱');
+      this.nzMessage.error('please enter your vaild email');
       return;
     }
     const form = document.createElement('form');
