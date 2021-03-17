@@ -11,7 +11,7 @@ export class HomeComponent implements OnInit {
   lang = 'en';
   copyRightYear = new Date().getFullYear();
   roadmapIndex = 0;
-  roadmapLen = 5;
+  roadmapLen = 4;
   roadmapInterval;
   enterActiviteFirst = false;
   enterActiviteLast = false;

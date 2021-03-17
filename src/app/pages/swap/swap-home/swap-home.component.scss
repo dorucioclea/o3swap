@@ -113,6 +113,7 @@ section.select-token-wrapper {
     margin-top: 49px;
     height: 196px;
     padding: 20px;
+    position: relative;
     &.content-border-active {
       .receive-amount {
         color: #46b069;
@@ -137,11 +138,11 @@ section.select-token-wrapper {
     }
     .receive-amount {
       font-size: 30px;
-      line-height: 23px;
+      line-height: 30px;
     }
     .receive-fiat {
       font-size: 16px;
-      margin-top: 13px;
+      margin-top: 11px;
       font-family: "fontRegular";
     }
     button.confirm {
@@ -155,11 +156,11 @@ section.select-token-wrapper {
       }
     }
     img {
-      position: relative;
-      width: 80px;
-      margin-top: 16px;
-      margin-left: -40px;
+      width: 60px;
+      position: absolute;
+      bottom: 6px;
       left: 50%;
+      margin-left: -30px;
       display: none;
       cursor: pointer;
     }

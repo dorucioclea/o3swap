@@ -49,6 +49,7 @@ section.setting-wrapper {
   }
   .setting-item-content {
     margin-top: 24px;
+    font-family: "fontRegular";
     input {
       width: 100px;
       height: 40px;
@@ -59,7 +60,6 @@ section.setting-wrapper {
       text-align: center;
       color: #fff;
       font-size: 16px;
-      font-family: "fontRegular";
       &.focus {
         background: #2b312d;
         border: 1px solid #46b069;

@@ -114,7 +114,7 @@
           <div class="time time1" (mouseenter)="enterRoadmap(0)" (mouseleave)="leaveRoadmap()"
             [ngClass]="{active: roadmapIndex===0}">
             <img src="/assets/images/home/roadmap-dot.png" alt="">
-            <p class="name">Q1</p>
+            <p class="name">2021 Q1</p>
             <div class="desc">
               <p>1. {{ "roadmapQ1Detail1" | translate: lang }}</p>
               <p>2. {{ "roadmapQ1Detail2" | translate: lang }}</p>
@@ -124,39 +124,31 @@
           <div class="time time2" (mouseenter)="enterRoadmap(1)" (mouseleave)="leaveRoadmap()"
             [ngClass]="{active: roadmapIndex===1}">
             <img src="/assets/images/home/roadmap-dot.png" alt="">
-            <p class="name">Q2-Q3</p>
+            <p class="name">2021 Q2-Q3</p>
             <div class="desc">
-              <p>1. Release ETH Swap</p>
-              <p>2. Publish O3 SWAP white paper and economic model</p>
-              <p>3. Release OST (O3 SWAP token)</p>
-              <p>4. Release DAO</p>
+              <p>1. {{ "roadmapQ2Q3Detail1" | translate: lang }}</p>
+              <p>2. {{ "roadmapQ2Q3Detail2" | translate: lang }}</p>
+              <p>3. {{ "roadmapQ2Q3Detail3" | translate: lang }}</p>
+              <p>4. {{ "roadmapQ2Q3Detail4" | translate: lang }}</p>
             </div>
           </div>
           <div class="time time3" (mouseenter)="enterRoadmap(2)" (mouseleave)="leaveRoadmap()"
             [ngClass]="{active: roadmapIndex===2}">
             <img src="/assets/images/home/roadmap-dot.png" alt="">
-            <p class="name">Q4</p>
+            <p class="name">2021 Q4</p>
             <div class="desc">
-              <p>1. Release BSC Hecochain swap</p>
-              <p>2. Launch the yield farming</p>
+              <p>1. {{ "roadmapQ4Detail1" | translate: lang }}</p>
+              <p>2. {{ "roadmapQ4Detail2" | translate: lang }}</p>
             </div>
           </div>
           <div class="time time4" (mouseenter)="enterRoadmap(3)" (mouseleave)="leaveRoadmap()"
             [ngClass]="{active: roadmapIndex===3}">
             <img src="/assets/images/home/roadmap-dot.png" alt="">
-            <p class="name">2021</p>
-            <div class="desc">
-              <p>1. Release V2. Support instant quote and pending order trading</p>
-              <p>2. Launch cross-chain 2.0</p>
-              <p>3. Release layer2 aggregation protocol</p>
-            </div>
-          </div>
-          <div class="time time5" (mouseenter)="enterRoadmap(4)" (mouseleave)="leaveRoadmap()"
-            [ngClass]="{active: roadmapIndex===4}">
-            <img src="/assets/images/home/roadmap-dot.png" alt="">
             <p class="name">2022</p>
             <div class="desc">
-              <p>1. Release O3.network</p>
+              <p>1. {{ "roadmap2022Detail1" | translate: lang }}</p>
+              <p>2. {{ "roadmap2022Detail2" | translate: lang }}</p>
+              <p>3. {{ "roadmap2022Detail3" | translate: lang }}</p>
             </div>
           </div>
         </div>
