@@ -116,7 +116,7 @@ export class SwapResultComponent implements OnInit {
 
   async swap(): Promise<void> {
     if (!this.account) {
-      this.nzMessage.error('请先连接钱包');
+      this.nzMessage.error('Please connect the wallet first');
       return;
     }
     if (
@@ -124,7 +124,7 @@ export class SwapResultComponent implements OnInit {
         new BigNumber(this.fromToken.amount || 0)
       ) > 0
     ) {
-      this.nzMessage.error('钱包余额不足');
+      this.nzMessage.error('Insufficient wallet balance');
       return;
     }
     clearInterval(this.inquiryInterval);

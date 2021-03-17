@@ -126,7 +126,7 @@ export class AppComponent {
           this.apiService.pushAccount(this.account);
           this.getNeoBalances();
         } else {
-          this.nzMessage.error('请连接 Neo 钱包');
+          this.nzMessage.error('Please connect to Neo wallet');
         }
       })
       .catch((error) => {
