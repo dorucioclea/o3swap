@@ -32,40 +32,40 @@
     "zh": "Iii. Layer 2 网络的桥梁"
   },
   "roadmapQ1Detail1": {
-    "en": "Launch the website. Publish the litepaper.",
-    "zh": "网站上线，发布 litepaper"
+    "en": "Launch the official website. ",
+    "zh": "O3 Swap 网站上线"
   },
   "roadmapQ1Detail2": {
-    "en": "Support NEO Swap.",
-    "zh": "Neo Swap 上线"
+    "en": "Release the swap module.",
+    "zh": "发布 Swap 模块"
   },
   "roadmapQ1Detail3": {
-    "en": "Release O3 Aggregator.",
-    "zh": "发布跨链Swap"
+    "en": "Publish O3 Swap Litepaper.",
+    "zh": "发布 Litepaper"
   },
   "roadmapQ2Q3Detail1": {
-    "en": "Support ETH Swap.",
-    "zh": "ETH Swap上线"
+    "en": "Launch the bridge module. Provide cross-chain service.",
+    "zh": "上线 bridge 模块，提供跨链服务"
   },
   "roadmapQ2Q3Detail2": {
-    "en": "Publish O3 Swap white paper and economic model.",
-    "zh": "发布O3 SWAP白皮书与经济模型"
+    "en": "Support ETH, BSC Swap.",
+    "zh": "Swap 支持 ETH，BSC 网络"
   },
   "roadmapQ2Q3Detail3": {
-    "en": "Release OST (O3 SWAP token).",
-    "zh": "发行OST"
+    "en": "Release O3 Swap token and economic model.",
+    "zh": "发行 O3 Swap 治理 token 与经济模型"
   },
   "roadmapQ2Q3Detail4": {
-    "en": "Launch trade mining.",
-    "zh": "开启交易挖矿"
+    "en": "Launch trade mining and other community incentives.",
+    "zh": "开启交易挖矿与其他社区激励"
   },
   "roadmapQ4Detail1": {
     "en": "Launch DAO.",
     "zh": "上线DAO"
   },
   "roadmapQ4Detail2": {
-    "en": "Support BSC, HECO, and Layer 2 aggregation protocol.",
-    "zh": "支持币安链，火币链，及layer2聚合协议"
+    "en": "Start Layer 2 development and deployment.",
+    "zh": "启动 Layer2 版本开发与部署 "
   },
   "roadmap2022Detail1": {
     "en": "Release V2. Support instant quote and pending order.",
