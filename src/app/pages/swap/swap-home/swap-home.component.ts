@@ -26,7 +26,9 @@ export class SwapHomeComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.calcutionInputAmountFiat();
+  }
 
   showTokens(type: 'from' | 'to'): void {
     this.toTokenPage.emit(type);

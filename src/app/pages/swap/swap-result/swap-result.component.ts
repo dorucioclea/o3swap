@@ -291,8 +291,11 @@ export class SwapResultComponent implements OnInit {
       .toPromise();
   }
   getAmountIn(): string {
+    const factAmount = new BigNumber(this.inputAmount)
+      .dividedBy(1.003)
+      .toFixed();
     return this.commonService.decimalToInteger(
-      this.inputAmount,
+      factAmount,
       this.fromToken.decimals
     );
   }

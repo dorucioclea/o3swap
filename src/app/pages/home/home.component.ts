@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { AnimationItem } from 'lottie-web';
 
 @Component({
   selector: 'app-home',
