@@ -1,17 +1,3 @@
-.home-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -1;
-  background-color: #121212;
-  background-image: url("/assets/images/home/bg1.png");
-  background-position: center top;
-  background-size: 1920px auto;
-  background-repeat: no-repeat;
-}
-
 .main {
   width: 100vw;
   height: 100vh;
@@ -20,9 +6,8 @@
   &.home {
     width: 100%;
     height: auto;
-    background: none;
-    background-image: url("/assets/images/home/bg2.png");
-    background-position: center 600px;
+    background-image: url("/assets/images/home/bg1.png");
+    background-position: center top;
     background-size: 1920px auto;
     background-repeat: no-repeat;
     header {
