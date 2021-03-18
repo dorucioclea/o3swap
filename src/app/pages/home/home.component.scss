@@ -118,6 +118,7 @@ section.exchanges {
         background-position: center;
         background-repeat: no-repeat;
         opacity: 0.8;
+        pointer-events: none;
       }
       &:not(:last-child) {
         margin-right: 40px;
@@ -130,7 +131,11 @@ section.exchanges {
         margin-top: 36px;
       }
       a {
+        pointer-events: auto;
         color: #fff;
+        &:hover {
+          color: #46b069;
+        }
       }
     }
     ul.col1 {

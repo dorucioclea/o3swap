@@ -55,7 +55,7 @@
           <li><a target="_blank" href="https://pancakeswap.finance/"><img
                 src="/assets/images/home/exchanges/pancakeswap.png" alt="">PancakeSwap</a></li>
           <li><a target="_blank" href="https://www.bakeryswap.org/#/home"><img
-                src="/assets/images/home/exchanges/bakeryswap.png" alt="">BackerySwap</a></li>
+                src="/assets/images/home/exchanges/bakeryswap.png" alt="">BakerySwap</a></li>
           <li><a target="_blank" href="https://dodoex.io/"><img src="/assets/images/home/exchanges/dodoex.png"
                 alt="">DODO</a></li>
           <li><a target="_blank" href="https://www.goosedefi.com/"><img
@@ -85,8 +85,10 @@
                 src="/assets/images/home/exchanges/anyswap.png" alt="">Anyswap</a></li>
           <li><a target="_blank" href="https://depth.fi/"><img src="/assets/images/home/exchanges/depth.png"
                 alt="">Depth</a></li>
-          <li><a target="_blank" href="https://complus.exchange/"><img src="/assets/images/home/exchanges/complus.png"
-                alt="">Complus</a></li>
+          <li><a target="_blank" href="https://www.chocoswap.org/"><img
+                src="/assets/images/home/exchanges/chocoswap.png" alt="">Chocoswap</a></li>
+          <!-- <li><a target="_blank" href="https://complus.exchange/"><img src="/assets/images/home/exchanges/complus.png"
+                alt="">Complus</a></li> -->
         </ul>
         <ul class="col col5"></ul>
       </div>
@@ -221,7 +223,7 @@
       <p class="title">Receive our Newsletter</p>
       <div class="email">
         <input type="email" [(ngModel)]="email" placeholder="Please fill in your email address">
-        <button (click)="subscriptNews()" class="submit">Subscript</button>
+        <button (click)="subscriptNews()" class="submit">Subscribe</button>
       </div>
     </div>
     <div class="contacts">
@@ -233,12 +235,15 @@
     <div class="bottom">
       <img src="/assets/images/home/footer-logo.png" alt="">
       <p class="copyright">© {{ copyRightYear }} O3 Labs Inc.</p>
-      <p class="language">
+      <!-- <p class="language">
         <span [ngClass]="{active: lang==='en'}" (click)="changeLang('en')">EN</span>
         <span class="line">|</span>
         <span [ngClass]="{active: lang==='zh'}" (click)="changeLang('zh')">CN</span>
-      </p>
+      </p> -->
       <p class="doc" nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="top">Doc</p>
+      <!-- <a href="https://docs.o3swap.com/" target="_blank">
+        <p class="doc">Doc</p>
+      </a> -->
     </div>
   </footer>
 </article>

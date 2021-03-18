@@ -16,7 +16,7 @@
           <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Swap</a>
         </li>
         <li>
-          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">BuyCrypto</a>
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Buy Crypto</a>
         </li>
         <li>
           <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Blog</a>
@@ -24,6 +24,9 @@
         <li>
           <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Doc</a>
         </li>
+        <!-- <li>
+          <a href="https://docs.o3swap.com/" target="_blank">Doc</a>
+        </li> -->
       </ul>
       <div *ngIf="isHome===false" class="connect" [ngClass]="{'account': account}" (click)="showConnect()">
         <img *ngIf="!account" src="/assets/images/swap/link.png" alt="">
