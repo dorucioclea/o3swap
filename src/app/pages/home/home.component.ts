@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { LiquiditySource } from './liquidity-source';
 
 @Component({
   selector: 'app-home',
@@ -7,6 +8,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
+  liquiditySource = LiquiditySource;
   lang = 'en';
   copyRightYear = new Date().getFullYear();
   roadmapIndex = 0;
