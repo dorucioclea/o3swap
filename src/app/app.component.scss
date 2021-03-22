@@ -47,6 +47,9 @@ header {
       min-width: 80px;
       margin-right: 35px;
       position: relative;
+      &.add-width {
+        min-width: 95px;
+      }
       a {
         height: 100%;
         line-height: 30px;
