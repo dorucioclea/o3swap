@@ -140,14 +140,14 @@ export class AppComponent {
   }
 
   initNeolineJs(): void {
-    this.myNeoDapi.getNetworks().then((res) => {
-      if ((res.defaultNetwork as string).toLowerCase().includes('test')) {
-        this.apiService.pushIsMainNet(false);
-        this.nzMessage.error('Please connect wallet to the main net.');
-      } else {
-        this.apiService.pushIsMainNet(true);
-      }
-    });
+    // this.myNeoDapi.getNetworks().then((res) => {
+    //   if ((res.defaultNetwork as string).toLowerCase().includes('test')) {
+    //     this.apiService.pushIsMainNet(false);
+    //     this.nzMessage.error('Please connect wallet to the main net.');
+    //   } else {
+    //     this.apiService.pushIsMainNet(true);
+    //   }
+    // });
     window.addEventListener(
       'NEOLine.NEO.EVENT.ACCOUNT_CHANGED',
       (result: any) => {
@@ -156,20 +156,20 @@ export class AppComponent {
         this.apiService.getNeoBalances();
       }
     );
-    window.addEventListener(
-      'NEOLine.NEO.EVENT.NETWORK_CHANGED',
-      (result: any) => {
-        if (
-          (result.detail.defaultNetwork as string)
-            .toLowerCase()
-            .includes('test')
-        ) {
-          this.apiService.pushIsMainNet(false);
-          this.nzMessage.error('Please connect wallet to the main net.');
-        } else {
-          this.apiService.pushIsMainNet(true);
-        }
-      }
-    );
+    // window.addEventListener(
+    //   'NEOLine.NEO.EVENT.NETWORK_CHANGED',
+    //   (result: any) => {
+    //     if (
+    //       (result.detail.defaultNetwork as string)
+    //         .toLowerCase()
+    //         .includes('test')
+    //     ) {
+    //       this.apiService.pushIsMainNet(false);
+    //       this.nzMessage.error('Please connect wallet to the main net.');
+    //     } else {
+    //       this.apiService.pushIsMainNet(true);
+    //     }
+    //   }
+    // );
   }
 }

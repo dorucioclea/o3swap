@@ -127,10 +127,10 @@ export class SwapResultComponent implements OnInit {
       this.nzMessage.error('Please connect the wallet first');
       return;
     }
-    if (this.isMainNet === false) {
-      this.nzMessage.error('Please connect wallet to the main net.');
-      return;
-    }
+    // if (this.isMainNet === false) {
+    //   this.nzMessage.error('Please connect wallet to the main net.');
+    //   return;
+    // }
     if (
       new BigNumber(this.inputAmount).comparedTo(
         new BigNumber(this.fromToken.amount || 0)
