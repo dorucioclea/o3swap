@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { Observable, Subject, forkJoin } from 'rxjs';
-import { Chain } from '@lib';
+import { Chain, WalletType } from '@lib';
 import { map } from 'rxjs/operators';
 
 @Injectable()
@@ -24,9 +24,13 @@ export class ApiService {
   accountSource = new Subject<any>();
   accountSub$ = this.accountSource.asObservable();
 
-  walletType;
-  walletTypeSource = new Subject<any>();
+  walletType: WalletType;
+  walletTypeSource = new Subject<WalletType>();
   walletTypeSub$ = this.walletTypeSource.asObservable();
+
+  isMainNet = true;
+  isMainNetSource = new Subject<boolean>();
+  isMainNetSub$ = this.isMainNetSource.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -45,9 +49,14 @@ export class ApiService {
     this.accountSource.next(value);
   }
 
-  pushWalletType(value): void {
+  pushWalletType(value: WalletType): void {
     this.walletType = value;
     this.walletTypeSource.next(value);
+  }
+
+  pushIsMainNet(value: boolean): void {
+    this.isMainNet = value;
+    this.isMainNetSource.next(value);
   }
 
   getSwapPath(

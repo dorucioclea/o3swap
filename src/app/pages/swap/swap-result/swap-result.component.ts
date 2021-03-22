@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ALL_TOKENS, SWAP_CONTRACT_HASH, Token } from '@lib';
+import { ALL_TOKENS, SWAP_CONTRACT_HASH, Token, WalletType } from '@lib';
 import { ApiService, CommonService } from '@core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import BigNumber from 'bignumber.js';
@@ -25,7 +25,8 @@ export class SwapResultComponent implements OnInit {
 
   myNeoDapi;
   account;
-  walletType;
+  walletType: WalletType;
+  isMainNet: boolean;
 
   TOKENS: Token[] = []; // 所有的 tokens
   o3SwapFee = '0.3'; // 系统收费 0.3%
@@ -54,6 +55,7 @@ export class SwapResultComponent implements OnInit {
     this.myNeoDapi = this.apiService.myNeoDapi;
     this.account = this.apiService.account;
     this.walletType = this.apiService.walletType;
+    this.isMainNet = this.apiService.isMainNet;
     this.apiService.myNeoDapiSub$.subscribe((res) => {
       this.myNeoDapi = res;
     });
@@ -62,6 +64,9 @@ export class SwapResultComponent implements OnInit {
     });
     this.apiService.walletTypeSub$.subscribe((res) => {
       this.walletType = res;
+    });
+    this.apiService.isMainNetSub$.subscribe((res) => {
+      this.isMainNet = res;
     });
   }
 
@@ -122,6 +127,10 @@ export class SwapResultComponent implements OnInit {
       this.nzMessage.error('Please connect the wallet first');
       return;
     }
+    if (this.isMainNet === false) {
+      this.nzMessage.error('Please connect wallet to the main net.');
+      return;
+    }
     if (
       new BigNumber(this.inputAmount).comparedTo(
         new BigNumber(this.fromToken.amount || 0)
@@ -179,15 +188,27 @@ export class SwapResultComponent implements OnInit {
         this.isTxPending = true;
         this.txhash = '0x' + txid;
         this.txPage = this.TX_PAGES_PREFIX + this.txhash;
-        window.addEventListener(
-          'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
-          (result: any) => {
-            if (result.detail.txid === this.txhash) {
-              this.isTxPending = false;
-              this.apiService.getNeoBalances();
+        if (this.walletType === 'NeoLine') {
+          window.addEventListener(
+            'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
+            (result: any) => {
+              if (result.detail.txid === this.txhash) {
+                this.isTxPending = false;
+                this.apiService.getNeoBalances();
+              }
             }
-          }
-        );
+          );
+        } else {
+          this.myNeoDapi.addEventListener(
+            this.myNeoDapi.Constants.EventName.TRANSACTION_CONFIRMED,
+            async (data) => {
+              if (data.txid === this.txhash) {
+                this.isTxPending = false;
+                this.apiService.getNeoBalances();
+              }
+            }
+          );
+        }
       })
       .catch((error) => {
         console.log(error);

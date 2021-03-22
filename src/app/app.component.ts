@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router, RouterEvent, NavigationEnd } from '@angular/router';
-import { WalletType } from '@lib';
+import { Chain, WalletType } from '@lib';
 import o3dapi from 'o3-dapi-core';
 import o3dapiNeo from 'o3-dapi-neo';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -26,7 +26,7 @@ export class AppComponent {
   menuType: MenuType = 'home';
   currentPage = this.router.url;
   isHome = true;
-  chain;
+  chain: Chain;
   // 弹窗
   showConnectModal = false;
   showAccountModal = false;
@@ -51,7 +51,9 @@ export class AppComponent {
       }
     });
     o3dapi.initPlugins([o3dapiNeo]);
-    this.initNeolineJs();
+    window.addEventListener('NEOLine.NEO.EVENT.READY', () => {
+      this.neolineDapiNeo = new (window as any).NEOLine.Init();
+    });
   }
 
   showConnect(): void {
@@ -71,6 +73,9 @@ export class AppComponent {
     this.walletType = type;
     this.apiService.pushWalletType(this.walletType);
     if (this.chain === 'neo') {
+      this.myNeoDapi =
+        this.walletType === 'O3' ? o3dapi.NEO : this.neolineDapiNeo;
+      this.apiService.pushMyNeoDapi(this.myNeoDapi);
       this.getNeoAccount();
     }
   }
@@ -93,35 +98,15 @@ export class AppComponent {
     return false;
   }
 
-  initNeolineJs(): void {
-    window.addEventListener('NEOLine.NEO.EVENT.READY', () => {
-      this.neolineDapiNeo = new (window as any).NEOLine.Init();
-    });
-    window.addEventListener(
-      'NEOLine.NEO.EVENT.ACCOUNT_CHANGED',
-      (result: any) => {
-        this.account = result.detail;
-        this.apiService.pushAccount(this.account);
-        this.apiService.getNeoBalances();
-      }
-    );
-    window.addEventListener(
-      'NEOLine.NEO.EVENT.DISCONNECTED',
-      (account: any) => {
-        // console.log(account);
-      }
-    );
-  }
-
   getNeoAccount(): void {
-    this.myNeoDapi =
-      this.walletType === 'O3' ? o3dapi.NEO : this.neolineDapiNeo;
-    this.apiService.pushMyNeoDapi(this.myNeoDapi);
     this.myNeoDapi
       .getAccount()
       .then((result) => {
         // console.log(result);
         if (this.commonService.isNeoAddress(result.address)) {
+          if (this.walletType === 'NeoLine') {
+            this.initNeolineJs();
+          }
           this.account = result;
           this.apiService.pushAccount(this.account);
           this.apiService.getNeoBalances();
@@ -148,5 +133,39 @@ export class AppComponent {
             break;
         }
       });
+  }
+
+  initNeolineJs(): void {
+    this.myNeoDapi.getNetworks().then((res) => {
+      if ((res.defaultNetwork as string).toLowerCase().includes('test')) {
+        this.apiService.pushIsMainNet(false);
+        this.nzMessage.error('Please connect wallet to the main net.');
+      } else {
+        this.apiService.pushIsMainNet(true);
+      }
+    });
+    window.addEventListener(
+      'NEOLine.NEO.EVENT.ACCOUNT_CHANGED',
+      (result: any) => {
+        this.account = result.detail;
+        this.apiService.pushAccount(this.account);
+        this.apiService.getNeoBalances();
+      }
+    );
+    window.addEventListener(
+      'NEOLine.NEO.EVENT.NETWORK_CHANGED',
+      (result: any) => {
+        if (
+          (result.detail.defaultNetwork as string)
+            .toLowerCase()
+            .includes('test')
+        ) {
+          this.apiService.pushIsMainNet(false);
+          this.nzMessage.error('Please connect wallet to the main net.');
+        } else {
+          this.apiService.pushIsMainNet(true);
+        }
+      }
+    );
   }
 }
