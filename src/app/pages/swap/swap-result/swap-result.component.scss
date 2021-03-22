@@ -217,6 +217,18 @@ section.cover {
   }
 }
 
+@keyframes loading {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
 section.cover .tx-hash-container {
   height: 360px;
   margin-top: 280px;
@@ -229,6 +241,9 @@ section.cover .tx-hash-container {
     height: 120px;
     margin: 0 auto;
     position: relative;
+    &.pending {
+      animation: loading 2s infinite linear;
+    }
     img {
       width: 100%;
       height: 100%;

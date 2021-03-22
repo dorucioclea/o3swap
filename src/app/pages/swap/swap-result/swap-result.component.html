@@ -118,7 +118,7 @@
       <img *ngIf='!isTxPending' (click)="closeTxHashModal()" class="close" src="/assets/images/swap/close.png" alt="">
     </p>
     <div class="content">
-      <div class="status-img">
+      <div class="status-img" [ngClass]="{pending: isTxPending}">
         <img *ngIf='isTxPending' src="/assets/images/swap-result/logo.png" alt="">
         <img class="pending-icon" *ngIf='isTxPending' src="/assets/images/swap-result/pending.png" alt="">
         <img *ngIf='!isTxPending' src="/assets/images/swap-result/success.png" alt="">
