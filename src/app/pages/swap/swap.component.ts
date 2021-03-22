@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '@core';
 import { Token } from '@lib';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 type PageStatus = 'home' | 'token' | 'setting' | 'result';
 export const defaultSlipValue = 2; // 默认滑点 2%
@@ -33,7 +34,10 @@ export class SwapComponent implements OnInit {
 
   initResultData;
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private nzMessage: NzMessageService
+  ) {}
   ngOnInit(): void {
     this.settings = {
       deadline: defaultDeadline,
@@ -93,6 +97,7 @@ export class SwapComponent implements OnInit {
     this.pageStatus = 'home';
   }
 
+  //#endregion result
   closeResultPage(initData: any): void {
     if (initData) {
       this.initResultData = initData;
@@ -104,4 +109,10 @@ export class SwapComponent implements OnInit {
     }
     this.pageStatus = 'home';
   }
+  swapFail(): void {
+    this.pageStatus = 'home';
+    this.initResultData = null;
+    this.nzMessage.error('Did not get the quotation, please get it again');
+  }
+  //#region
 }

@@ -28,6 +28,7 @@ export class SwapHomeComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
+    this.checkInputAmount();
     this.calcutionInputAmountFiat();
   }
 
@@ -44,6 +45,7 @@ export class SwapHomeComponent implements OnInit {
   }
 
   allInputAmount(): void {
+    this.inputAmountError = '';
     this.inputAmount = (this.fromToken && this.fromToken.amount) || '0';
     this.resetSwapData();
     this.calcutionInputAmountFiat();

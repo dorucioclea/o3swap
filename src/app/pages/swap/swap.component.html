@@ -12,5 +12,5 @@
 
 <app-swap-result *ngIf="pageStatus==='result'" [rates]="rates" [fromToken]="fromToken" [toToken]="toToken"
   [inputAmount]="inputAmount" [deadline]="settings.deadline" [slipValue]="settings.slipValue"
-  [initData]="initResultData" (closeResultPage)="closeResultPage($event)">
+  [initData]="initResultData" (closeResultPage)="closeResultPage($event)" (swapFail)="swapFail()">
 </app-swap-result>

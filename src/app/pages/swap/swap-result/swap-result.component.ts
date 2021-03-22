@@ -6,7 +6,6 @@ import BigNumber from 'bignumber.js';
 import { InvokeOutput } from 'o3-dapi-neo/lib/modules/write/invoke';
 import { of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-swap-result',
@@ -22,6 +21,7 @@ export class SwapResultComponent implements OnInit {
   @Input() slipValue: number;
   @Input() initData: any;
   @Output() closeResultPage = new EventEmitter<any>();
+  @Output() swapFail = new EventEmitter();
 
   myNeoDapi;
   account;
@@ -219,25 +219,18 @@ export class SwapResultComponent implements OnInit {
         this.toToken.symbol,
         this.getAmountIn()
       )
-      .subscribe((event) => {
-        if (event instanceof HttpResponse) {
-          this.showInquiry = false;
-          if (event.body.length === 0) {
-            this.nzMessage.error('支付数额太小、太大或其他原因无法无法swap');
-          }
-          if (event.body.length > 0) {
-            this.receiveSwapPathArray = event.body;
-            this.handleReceiveSwapPathFiat();
-            this.chooseSwapPathIndex = 0;
-            this.chooseSwapPath = this.receiveSwapPathArray[0];
-            this.calculationPrice();
-          }
-        } else if (event instanceof HttpErrorResponse) {
-          this.showInquiry = false;
+      .subscribe((res) => {
+        this.showInquiry = false;
+        if (res.length === 0) {
           clearInterval(this.inquiryInterval);
-          if (event.status === 400) {
-            this.nzMessage.error('支付数额太小、太大或其他原因无法无法swap');
-          }
+          this.swapFail.emit();
+        }
+        if (res.length > 0) {
+          this.receiveSwapPathArray = res;
+          this.handleReceiveSwapPathFiat();
+          this.chooseSwapPathIndex = 0;
+          this.chooseSwapPath = this.receiveSwapPathArray[0];
+          this.calculationPrice();
         }
       });
   }
@@ -275,15 +268,10 @@ export class SwapResultComponent implements OnInit {
     return this.apiService
       .getSwapPath(this.fromToken.symbol, 'nNEO', this.getAmountIn())
       .pipe(
-        map((event) => {
-          if (event instanceof HttpResponse) {
-            if (event.body.length > 0) {
-              return event.body[0].swapPath;
-            } else {
-              return [];
-            }
-          }
-          if (event instanceof HttpErrorResponse) {
+        map((res) => {
+          if (res.length > 0) {
+            return res[0].swapPath;
+          } else {
             return [];
           }
         })
