@@ -73,6 +73,10 @@ export class AppComponent {
     this.walletType = type;
     this.apiService.pushWalletType(this.walletType);
     if (this.chain === 'neo') {
+      if (this.walletType === 'NeoLine' && this.neolineDapiNeo === undefined) {
+        window.open('https://neoline.io');
+        return;
+      }
       this.myNeoDapi =
         this.walletType === 'O3' ? o3dapi.NEO : this.neolineDapiNeo;
       this.apiService.pushMyNeoDapi(this.myNeoDapi);
