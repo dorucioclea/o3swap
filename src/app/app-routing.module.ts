@@ -6,7 +6,7 @@ import { HomeComponent, SwapComponent } from './pages';
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'home', component: HomeComponent },
-  // { path: 'swap', component: SwapComponent },
+  { path: 'swap', component: SwapComponent },
   { path: '**', redirectTo: '/home' },
 ];
 

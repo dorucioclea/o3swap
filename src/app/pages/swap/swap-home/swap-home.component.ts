@@ -1,7 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Token } from '@lib';
-import { ApiService, CommonService } from '@core';
-import { NzMessageService } from 'ng-zorro-antd/message';
 import BigNumber from 'bignumber.js';
 
 @Component({
@@ -15,8 +13,11 @@ export class SwapHomeComponent implements OnInit {
   @Input() toToken: Token;
   @Input() chooseSwapPath;
   @Input() inputAmount: string; // 支付的 token 数量
-  @Output() toTokenPage = new EventEmitter<'from' | 'to'>();
-  @Output() toSettingPage = new EventEmitter();
+  @Output() toTokenPage = new EventEmitter<{
+    tokenType: string;
+    inputAmount: string;
+  }>();
+  @Output() toSettingPage = new EventEmitter<string>();
   @Output() toInquiryPage = new EventEmitter<string>();
   @Output() toResultPage = new EventEmitter();
 
@@ -31,7 +32,8 @@ export class SwapHomeComponent implements OnInit {
   }
 
   showTokens(type: 'from' | 'to'): void {
-    this.toTokenPage.emit(type);
+    const tempData = { tokenType: type, inputAmount: this.inputAmount };
+    this.toTokenPage.emit(tempData);
   }
 
   changeInputAmount($event): void {
@@ -42,7 +44,7 @@ export class SwapHomeComponent implements OnInit {
   }
 
   allInputAmount(): void {
-    this.inputAmount = this.fromToken.amount;
+    this.inputAmount = (this.fromToken && this.fromToken.amount) || '0';
     this.resetSwapData();
     this.calcutionInputAmountFiat();
   }
@@ -59,7 +61,7 @@ export class SwapHomeComponent implements OnInit {
   }
 
   backToSettingPage(): void {
-    this.toSettingPage.emit();
+    this.toSettingPage.emit(this.inputAmount);
   }
   //#region
   checkInputAmount(): boolean {

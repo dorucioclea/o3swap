@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiService, CommonService } from '@core';
+import { ApiService } from '@core';
 import { Token } from '@lib';
-import { NzMessageService } from 'ng-zorro-antd/message';
 
 type PageStatus = 'home' | 'token' | 'setting' | 'result';
 export const defaultSlipValue = 2; // 默认滑点 2%
@@ -34,11 +33,7 @@ export class SwapComponent implements OnInit {
 
   initResultData;
 
-  constructor(
-    private apiService: ApiService,
-    private nzMessage: NzMessageService,
-    private commonService: CommonService
-  ) {}
+  constructor(private apiService: ApiService) {}
   ngOnInit(): void {
     this.settings = {
       deadline: defaultDeadline,
@@ -55,8 +50,9 @@ export class SwapComponent implements OnInit {
   }
 
   //#region home
-  toTokenPage(tokenType: 'from' | 'to'): void {
+  toTokenPage({ tokenType, inputAmount }): void {
     this.selectTokenType = tokenType;
+    this.inputAmount = inputAmount;
     if (tokenType === 'from') {
       this.hideToken = this.toToken;
       this.activeToken = this.fromToken;
@@ -67,7 +63,8 @@ export class SwapComponent implements OnInit {
     this.initResultData = null;
     this.pageStatus = 'token';
   }
-  toSettingPage(): void {
+  toSettingPage(amount): void {
+    this.inputAmount = amount;
     this.pageStatus = 'setting';
   }
   toInquiryPage(amount): void {
