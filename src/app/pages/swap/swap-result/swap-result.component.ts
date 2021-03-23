@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { ALL_TOKENS, SWAP_CONTRACT_HASH, Token, WalletType } from '@lib';
 import { ApiService, CommonService } from '@core';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -12,7 +12,7 @@ import { map } from 'rxjs/operators';
   templateUrl: './swap-result.component.html',
   styleUrls: ['../common.scss', './swap-result.component.scss'],
 })
-export class SwapResultComponent implements OnInit {
+export class SwapResultComponent implements OnInit, OnDestroy {
   @Input() rates;
   @Input() fromToken: Token;
   @Input() toToken: Token;
@@ -88,8 +88,11 @@ export class SwapResultComponent implements OnInit {
     }, 30000);
   }
 
-  backToHomePage(): void {
+  ngOnDestroy(): void {
     clearInterval(this.inquiryInterval);
+  }
+
+  backToHomePage(): void {
     const initData = {
       chooseSwapPath: this.chooseSwapPath,
       chooseSwapPathIndex: this.chooseSwapPathIndex,
@@ -103,7 +106,6 @@ export class SwapResultComponent implements OnInit {
     this.commonService.copy(hash);
   }
   closeTxHashModal(): void {
-    clearInterval(this.inquiryInterval);
     this.closeResultPage.emit();
   }
 
@@ -243,24 +245,29 @@ export class SwapResultComponent implements OnInit {
       .subscribe((res) => {
         this.showInquiry = false;
         if (res.length === 0) {
-          clearInterval(this.inquiryInterval);
           this.swapFail.emit();
         }
         if (res.length > 0) {
           this.receiveSwapPathArray = res;
           this.handleReceiveSwapPathFiat();
-          this.chooseSwapPathIndex = 0;
-          this.chooseSwapPath = this.receiveSwapPathArray[0];
-          this.calculationPrice();
         }
       });
   }
   handleReceiveSwapPathFiat(): void {
+    let maxReveiveAmount = new BigNumber(0);
+    let maxReveiveAmountIndex = 0;
     this.receiveSwapPathArray.forEach((item, index) => {
       const tempAmount = item.amount[item.amount.length - 1];
       item.receiveAmount = new BigNumber(tempAmount).shiftedBy(
         -this.toToken.decimals
       );
+      // 计算最优价格
+      maxReveiveAmount =
+        maxReveiveAmount.comparedTo(item.receiveAmount) > 0
+          ? maxReveiveAmount
+          : item.receiveAmount;
+      maxReveiveAmountIndex = index;
+      // 计算法币价格
       const price = this.rates[this.toToken.symbol];
       if (price) {
         this.receiveSwapPathArray[index].fiat = new BigNumber(
@@ -271,6 +278,9 @@ export class SwapResultComponent implements OnInit {
           .toFixed();
       }
     });
+    this.chooseSwapPathIndex = maxReveiveAmountIndex;
+    this.chooseSwapPath = this.receiveSwapPathArray[maxReveiveAmountIndex];
+    this.calculationPrice();
   }
   calculationPrice(): void {
     this.price = new BigNumber(this.chooseSwapPath.receiveAmount)
