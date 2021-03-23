@@ -180,10 +180,12 @@
 <footer>
   <div class="subscript">
     <p class="title">Receive our Newsletter</p>
-    <div class="email">
-      <input type="email" [(ngModel)]="email" placeholder="Please fill in your email address">
-      <button (click)="subscriptNews()" class="submit">Subscribe</button>
+    <div class="email" *ngIf="canSubscribe" [ngClass]="{focus: isFocus}">
+      <input type="email" (focus)="isFocus=true" (blur)="isFocus=false" [(ngModel)]="email"
+        placeholder="Please fill in your email address">
+      <button nz-button [nzLoading]="isLoadingEmail" (click)="subscriptNews()" class="submit">Subscribe</button>
     </div>
+    <button *ngIf="!canSubscribe" class="success">Successfully subscribed</button>
   </div>
   <div class="contacts">
     <a target="_blank" href="https://twitter.com/O3_Labs">

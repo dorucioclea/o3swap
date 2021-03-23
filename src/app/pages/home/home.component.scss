@@ -441,8 +441,9 @@ footer {
       border-radius: 10px;
       margin-top: 29px;
       position: relative;
-      &:hover {
-        border: #46b069 1px solid;
+      border: 1px solid #4d49490d;
+      &.focus {
+        border: 1px solid #46b069;
       }
       input {
         position: absolute;
@@ -458,14 +459,26 @@ footer {
       button {
         position: absolute;
         right: 5px;
-        top: 5px;
-        bottom: 5px;
+        top: 4px;
+        bottom: 4px;
+        height: 50px;
         width: 120px;
+        border: 1px solid #46b069;
         background: #46b069;
         border-radius: 10px;
+        color: #fff;
         font-size: 16px;
         font-family: "fontBold";
       }
+    }
+    button.success {
+      margin-top: 39px;
+      padding: 0 20px;
+      height: 50px;
+      background: #46b069;
+      border-radius: 10px;
+      font-size: 16px;
+      font-family: "fontBold";
     }
   }
   .contacts,

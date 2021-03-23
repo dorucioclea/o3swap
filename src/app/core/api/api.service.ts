@@ -59,6 +59,10 @@ export class ApiService {
     this.isMainNetSource.next(value);
   }
 
+  postEmail(email: string): Observable<any> {
+    return this.http.post(`https://subscribe.o3swap.com/subscribe`, { email });
+  }
+
   getSwapPath(
     fromAssetName: string,
     toAssetName: string,

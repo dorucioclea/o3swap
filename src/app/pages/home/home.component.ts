@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { LiquiditySource } from './liquidity-source';
+import { ApiService } from '@core';
+import { CommonHttpResponse } from '@lib';
 
 @Component({
   selector: 'app-home',
@@ -18,12 +20,18 @@ export class HomeComponent implements OnInit {
   enterActiviteLast = false;
 
   email = '';
+  canSubscribe = true;
+  isFocus = false;
+  isLoadingEmail = false;
 
   options = {
     path: '/assets/home-json/data.json',
   };
 
-  constructor(private nzMessage: NzMessageService) {}
+  constructor(
+    private nzMessage: NzMessageService,
+    private apiService: ApiService
+  ) {}
 
   ngOnInit(): void {
     this.roadmapIntervalFun();
@@ -45,35 +53,24 @@ export class HomeComponent implements OnInit {
   }
 
   subscriptNews(): void {
+    if (this.isLoadingEmail === true) {
+      return;
+    }
     if (this.checkEmail() === false) {
       this.nzMessage.error('please enter your vaild email');
       return;
     }
-    const form = document.createElement('form');
-    form.method = 'post';
-    form.target = '_blank';
-    form.action =
-      'https://network.us1.list-manage.com/subscribe/post?u=3d72cfc6b405673c83b82325e&amp;id=f2135928fa';
-
-    const hiddenField = document.createElement('input');
-    hiddenField.type = 'hidden';
-    hiddenField.name = 'EMAIL';
-    hiddenField.value = this.email;
-    form.appendChild(hiddenField);
-
-    const node = document.createElement('div');
-    node.setAttribute('aria-hidden', 'true');
-    node.setAttribute('style', 'position: absolute; left: -5000px;');
-
-    const nodeInput = document.createElement('input');
-    nodeInput.type = 'text';
-    nodeInput.name = 'b_3d72cfc6b405673c83b82325e_f2135928fa';
-    nodeInput.setAttribute('tabindex', '-1');
-
-    node.appendChild(nodeInput);
-    form.appendChild(node);
-    document.body.appendChild(form);
-    form.submit();
+    this.isLoadingEmail = true;
+    this.apiService
+      .postEmail(this.email)
+      .subscribe((res: CommonHttpResponse) => {
+        this.isLoadingEmail = false;
+        if (res.status === 'success') {
+          this.canSubscribe = false;
+        } else {
+          this.nzMessage.error(res.error_msg);
+        }
+      });
   }
 
   checkEmail(): boolean {

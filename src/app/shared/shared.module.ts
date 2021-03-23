@@ -13,11 +13,17 @@ import { ErrSrcDirective } from './directive/err-src.directive';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { NzMessageModule } from 'ng-zorro-antd/message';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 
 const COMPONENTS = [LoadingComponent];
 const PIPES = [ShortAddressPipe, TransNumberPipe, TranslatePipe];
 const DIRECTIVES = [ErrSrcDirective];
-const THIRD_MODULES = [NzNotificationModule, NzMessageModule, NzToolTipModule];
+const THIRD_MODULES = [
+  NzNotificationModule,
+  NzMessageModule,
+  NzToolTipModule,
+  NzButtonModule,
+];
 
 @NgModule({
   declarations: [...PIPES, ...COMPONENTS, ...DIRECTIVES],
