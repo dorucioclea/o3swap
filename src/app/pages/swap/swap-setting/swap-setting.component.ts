@@ -18,7 +18,9 @@ export class SwapSettingComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.checkSlipValue();
+  }
 
   selectSlipValue(value: number): void {
     this.slipValue = value;
