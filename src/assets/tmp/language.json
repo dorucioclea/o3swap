@@ -36,8 +36,8 @@
     "zh": "O3 Swap 网站上线"
   },
   "roadmapQ1Detail2": {
-    "en": "Release the swap module.",
-    "zh": "发布 Swap 模块"
+    "en": "Release the Neo swap module.",
+    "zh": "发布 Neo swap 模块"
   },
   "roadmapQ1Detail3": {
     "en": "Publish O3 Swap Litepaper.",
@@ -48,7 +48,7 @@
     "zh": "上线 bridge 模块，提供跨链服务"
   },
   "roadmapQ2Q3Detail2": {
-    "en": "Support ETH, BSC Swap.",
+    "en": "Support ETH, BSC swap.",
     "zh": "Swap 支持 ETH，BSC 网络"
   },
   "roadmapQ2Q3Detail3": {
@@ -64,8 +64,8 @@
     "zh": "上线DAO"
   },
   "roadmapQ4Detail2": {
-    "en": "Start Layer 2 development and deployment.",
-    "zh": "启动 Layer2 版本开发与部署 "
+    "en": "Complete Layer 2 development and deployment.",
+    "zh": "完成 Layer2 版本开发与部署 "
   },
   "roadmap2022Detail1": {
     "en": "Release V2. Support instant quote and pending order.",

@@ -38,6 +38,7 @@ export class SwapComponent implements OnInit {
     private apiService: ApiService,
     private nzMessage: NzMessageService
   ) {}
+
   ngOnInit(): void {
     this.settings = {
       deadline: defaultDeadline,
