@@ -28,6 +28,7 @@ export class SwapTokenComponent implements OnInit {
 
   allTokens: Token[] = []; // 所有的 tokens, 排除了 fromToken 或 toToken
   displayTokens: any[] = []; // 最终展示的 tokens, search 结果
+  isfocusSearchInput = false;
 
   constructor(private apiService: ApiService, private store: Store<AppState>) {
     this.wallet$ = store.select('wallet');
