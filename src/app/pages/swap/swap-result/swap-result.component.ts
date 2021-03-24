@@ -159,7 +159,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         new BigNumber(this.fromToken.amount || 0)
       ) > 0
     ) {
-      this.nzMessage.error('Insufficient wallet balance');
+      this.nzMessage.error('Insufficient balance');
       return;
     }
     clearInterval(this.inquiryInterval);

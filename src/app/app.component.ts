@@ -125,6 +125,7 @@ export class AppComponent implements OnInit {
     this.myNeoDapi
       .getAccount()
       .then((result) => {
+        // console.log(result);
         if (this.commonService.isNeoAddress(result.address)) {
           this.account = result;
           this.store.dispatch({

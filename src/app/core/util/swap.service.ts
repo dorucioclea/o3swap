@@ -34,6 +34,14 @@ export class SwapService {
   }
 
   getNeoBalances(): void {
+    // 正式环境删除
+    if (this.walletType === 'O3') {
+      this.store.dispatch({
+        type: UPDATE_NEO_BALANCES,
+        data: {},
+      });
+      return;
+    }
     this.myNeoDapi
       .getBalance({
         params: [{ address: this.account.address }],
@@ -70,7 +78,7 @@ export class SwapService {
         );
         break;
       default:
-        this.nzMessage.error(error.description || '');
+        this.nzMessage.error(error.type);
         break;
     }
   }

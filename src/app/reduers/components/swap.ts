@@ -10,7 +10,7 @@ const initialState = {
   neoDapi: null,
   account: null,
   balances: {},
-  isMainNet: null,
+  isMainNet: true,
 };
 
 export default function swap(state = initialState, action): any {
