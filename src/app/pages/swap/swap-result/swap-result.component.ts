@@ -259,9 +259,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   handleReceiveSwapPathFiat(swapPathArr: any[]): void {
     swapPathArr.forEach((item, index) => {
       const tempAmount = item.amount[item.amount.length - 1];
-      item.receiveAmount = new BigNumber(tempAmount).shiftedBy(
-        -this.toToken.decimals
-      );
+      item.receiveAmount = new BigNumber(tempAmount)
+        .shiftedBy(-this.toToken.decimals)
+        .toFixed();
       // 计算法币价格
       const price = this.rates[this.toToken.symbol];
       if (price) {
@@ -271,8 +271,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
           .toFixed();
       }
     });
-    swapPathArr.sort((a, b) => b.receiveAmount - a.receiveAmount);
-    this.receiveSwapPathArray = swapPathArr;
+    this.receiveSwapPathArray = this.commonService.shellSortSwapPath(
+      swapPathArr
+    );
     this.chooseSwapPathIndex = 0;
     this.chooseSwapPath = this.receiveSwapPathArray[0];
     this.calculationPrice();

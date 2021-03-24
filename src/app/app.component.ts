@@ -179,6 +179,7 @@ export class AppComponent implements OnInit {
     //         .includes('test')
     //     ) {
     //       this.store.dispatch({ type: UPDATE_NEO_IS_MAINNET, data: false });
+    //       this.swapService.getNeoBalances();
     //       this.nzMessage.error('Please connect wallet to the main net.');
     //     } else {
     //       this.store.dispatch({ type: UPDATE_NEO_IS_MAINNET, data: true });
