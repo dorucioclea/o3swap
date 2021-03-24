@@ -252,38 +252,29 @@ export class SwapResultComponent implements OnInit, OnDestroy {
           this.swapFail.emit();
         }
         if (res.length > 0) {
-          this.receiveSwapPathArray = res;
-          this.handleReceiveSwapPathFiat();
+          this.handleReceiveSwapPathFiat(res);
         }
       });
   }
-  handleReceiveSwapPathFiat(): void {
-    let maxReveiveAmount = new BigNumber(0);
-    let maxReveiveAmountIndex = 0;
-    this.receiveSwapPathArray.forEach((item, index) => {
+  handleReceiveSwapPathFiat(swapPathArr: any[]): void {
+    swapPathArr.forEach((item, index) => {
       const tempAmount = item.amount[item.amount.length - 1];
       item.receiveAmount = new BigNumber(tempAmount).shiftedBy(
         -this.toToken.decimals
       );
-      // 计算最优价格
-      maxReveiveAmount =
-        maxReveiveAmount.comparedTo(item.receiveAmount) > 0
-          ? maxReveiveAmount
-          : item.receiveAmount;
-      maxReveiveAmountIndex = index;
       // 计算法币价格
       const price = this.rates[this.toToken.symbol];
       if (price) {
-        this.receiveSwapPathArray[index].fiat = new BigNumber(
-          item.receiveAmount
-        )
+        item.fiat = new BigNumber(item.receiveAmount)
           .multipliedBy(new BigNumber(price))
           .dp(2)
           .toFixed();
       }
     });
-    this.chooseSwapPathIndex = maxReveiveAmountIndex;
-    this.chooseSwapPath = this.receiveSwapPathArray[maxReveiveAmountIndex];
+    swapPathArr.sort((a, b) => b.receiveAmount - a.receiveAmount);
+    this.receiveSwapPathArray = swapPathArr;
+    this.chooseSwapPathIndex = 0;
+    this.chooseSwapPath = this.receiveSwapPathArray[0];
     this.calculationPrice();
   }
   calculationPrice(): void {

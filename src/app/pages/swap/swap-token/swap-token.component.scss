@@ -35,18 +35,20 @@ section.choose-token-wrapper {
     }
   }
   ul.tokens {
-    margin-top: 30px;
+    margin-top: 60px;
     margin-left: 90px;
     padding-right: 12px;
     font-size: 18px;
-    height: 380px;
-    overflow: scroll;
+    height: 350px;
+    overflow-y: scroll;
     li.token {
-      margin-top: 30px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
+      &:not(:first-child) {
+        margin-top: 30px;
+      }
       &:hover,
       &.active {
         color: #46b069;
