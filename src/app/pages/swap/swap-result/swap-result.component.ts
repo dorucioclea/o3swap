@@ -1,11 +1,31 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { ALL_TOKENS, SWAP_CONTRACT_HASH, Token, WalletType } from '@lib';
-import { ApiService, CommonService } from '@core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
+import {
+  Account,
+  ALL_TOKENS,
+  Chain,
+  SWAP_CONTRACT_HASH,
+  Token,
+  WalletType,
+} from '@lib';
+import { ApiService, CommonService, SwapService } from '@core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import BigNumber from 'bignumber.js';
 import { InvokeOutput } from 'o3-dapi-neo/lib/modules/write/invoke';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+
+interface AppState {
+  wallet: any;
+  swap: any;
+}
 
 @Component({
   selector: 'app-swap-result',
@@ -20,16 +40,21 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   @Input() deadline: number;
   @Input() slipValue: number;
   @Input() initData: any;
-  @Output() closeResultPage = new EventEmitter<any>();
+  @Output() closePage = new EventEmitter<any>();
   @Output() swapFail = new EventEmitter();
 
+  swap$: Observable<any>;
   myNeoDapi;
-  account;
-  walletType: WalletType;
+  account: Account;
   isMainNet: boolean;
+
+  wallet$: Observable<any>;
+  chain: Chain;
+  walletType: WalletType;
 
   TOKENS: Token[] = []; // 所有的 tokens
   o3SwapFee = '0.3'; // 系统收费 0.3%
+  allPercentage = 1.003; // 系统收费 0.3%
   showRoutingModal = false; // swap 路径弹窗
   showTxHashModal = false;
   showInquiry: boolean;
@@ -48,30 +73,26 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   lnversePrice; // swap 反比
 
   constructor(
+    private store: Store<AppState>,
     private apiService: ApiService,
     private nzMessage: NzMessageService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private swapService: SwapService
   ) {
-    this.myNeoDapi = this.apiService.myNeoDapi;
-    this.account = this.apiService.account;
-    this.walletType = this.apiService.walletType;
-    this.isMainNet = this.apiService.isMainNet;
-    this.apiService.myNeoDapiSub$.subscribe((res) => {
-      this.myNeoDapi = res;
-    });
-    this.apiService.accountSub$.subscribe((res) => {
-      this.account = res;
-    });
-    this.apiService.walletTypeSub$.subscribe((res) => {
-      this.walletType = res;
-    });
-    this.apiService.isMainNetSub$.subscribe((res) => {
-      this.isMainNet = res;
-    });
+    this.wallet$ = store.select('wallet');
+    this.swap$ = store.select('swap');
   }
 
   ngOnInit(): void {
-    this.TOKENS = ALL_TOKENS[this.apiService.chain];
+    this.wallet$.subscribe((state) => {
+      this.walletType = state.walletType;
+      this.chain = state.chain;
+      this.TOKENS = ALL_TOKENS[this.chain];
+    });
+    this.swap$.subscribe((state) => {
+      this.myNeoDapi = state.neoDapi;
+      this.account = state.account;
+    });
     if (this.initData) {
       this.chooseSwapPath = this.initData.chooseSwapPath;
       this.chooseSwapPathIndex = this.initData.chooseSwapPathIndex;
@@ -100,13 +121,13 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       price: this.price,
       lnversePrice: this.lnversePrice,
     };
-    this.closeResultPage.emit(initData);
+    this.closePage.emit(initData);
   }
   copy(hash: string): void {
     this.commonService.copy(hash);
   }
   closeTxHashModal(): void {
-    this.closeResultPage.emit();
+    this.closePage.emit();
   }
 
   changeSwapPath(index: number): void {
@@ -196,7 +217,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
             (result: any) => {
               if (result.detail.txid === this.txhash) {
                 this.isTxPending = false;
-                this.apiService.getNeoBalances();
+                this.swapService.getNeoBalances();
               }
             }
           );
@@ -206,31 +227,14 @@ export class SwapResultComponent implements OnInit, OnDestroy {
             async (data) => {
               if (data.txid === this.txhash) {
                 this.isTxPending = false;
-                this.apiService.getNeoBalances();
+                this.swapService.getNeoBalances();
               }
             }
           );
         }
       })
       .catch((error) => {
-        console.log(error);
-        switch (error.type) {
-          case 'NO_PROVIDER':
-            window.open(
-              this.walletType === 'O3'
-                ? 'https://o3.network/#download'
-                : 'https://neoline.io'
-            );
-            break;
-          case 'CONNECTION_DENIED':
-            this.nzMessage.error(
-              'The user rejected the request to connect with your dApp'
-            );
-            break;
-          default:
-            this.nzMessage.error(error.description || '');
-            break;
-        }
+        this.swapService.handleDapiError(error);
       });
   }
   //#region
@@ -311,7 +315,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
   getAmountIn(): string {
     const factAmount = new BigNumber(this.inputAmount)
-      .dividedBy(1.003)
+      .dividedBy(this.allPercentage)
       .toFixed();
     return this.commonService.decimalToInteger(
       factAmount,

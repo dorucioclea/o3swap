@@ -2,6 +2,7 @@ import { APP_INITIALIZER, NgModule } from '@angular/core';
 
 import { ApiService } from './api/api.service';
 import { CommonService } from './util/common.service';
+import { SwapService } from './util/swap.service';
 
 import { StartupService } from './startup/startup.service';
 export function StartupServiceFactory(startupService: StartupService): any {
@@ -18,6 +19,6 @@ const APPINIT_PROVIDES = [
 ];
 
 @NgModule({
-  providers: [ApiService, CommonService, ...APPINIT_PROVIDES],
+  providers: [ApiService, CommonService, SwapService, ...APPINIT_PROVIDES],
 })
 export class CoreModule {}

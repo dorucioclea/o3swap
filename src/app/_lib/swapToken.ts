@@ -1,4 +1,10 @@
-import { Token } from './type';
+export interface Token {
+  symbol: string;
+  logo: string;
+  assetID: string;
+  amount: string;
+  decimals: number;
+}
 
 // const NEO_TOKENS: Token[] = [
 //   {

@@ -1,7 +1,14 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ALL_TOKENS } from '@lib';
+import { ALL_TOKENS, Chain } from '@lib';
 import { Token } from '@lib';
 import { ApiService } from '@core';
+import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+
+interface AppState {
+  wallet: any;
+  swap: any;
+}
 
 @Component({
   selector: 'app-swap-token',
@@ -11,33 +18,43 @@ import { ApiService } from '@core';
 export class SwapTokenComponent implements OnInit {
   @Input() activeToken: Token;
   @Input() hideToken: Token;
-  @Output() closeTokenPage = new EventEmitter<Token | void>();
+  @Output() closePage = new EventEmitter<Token | void>();
+
+  swap$: Observable<any>;
   tokenBalance; // 账户的 tokens
+
+  wallet$: Observable<any>;
+  chain: Chain;
+
   allTokens: Token[] = []; // 所有的 tokens, 排除了 fromToken 或 toToken
   displayTokens: any[] = []; // 最终展示的 tokens, search 结果
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService, private store: Store<AppState>) {
+    this.wallet$ = store.select('wallet');
+    this.swap$ = store.select('swap');
+  }
 
   ngOnInit(): void {
-    const tokens = ALL_TOKENS[this.apiService.chain];
-    this.allTokens = this.hideToken
-      ? tokens.filter((item) => item.assetID !== this.hideToken.assetID)
-      : tokens;
-    this.displayTokens = this.allTokens;
-    this.tokenBalance = this.apiService.tokenBalance;
-    this.handleTokenAmount();
-    this.apiService.tokenBalanceSub$.subscribe((res) => {
-      this.tokenBalance = res;
+    this.wallet$.subscribe((state) => {
+      this.chain = state.chain;
+      const tokens = ALL_TOKENS[this.chain];
+      this.allTokens = this.hideToken
+        ? tokens.filter((item) => item.assetID !== this.hideToken.assetID)
+        : tokens;
+      this.displayTokens = this.allTokens;
+    });
+    this.swap$.subscribe((state) => {
+      this.tokenBalance = state.balances;
       this.handleTokenAmount();
     });
   }
 
   backToHomePage(): void {
-    this.closeTokenPage.emit();
+    this.closePage.emit();
   }
 
   selectThisToken(token: Token): void {
-    this.closeTokenPage.emit(token);
+    this.closePage.emit(token);
   }
 
   search($event): void {
@@ -61,6 +78,7 @@ export class SwapTokenComponent implements OnInit {
   //#region
   handleTokenAmount(): void {
     this.allTokens.forEach((tokenItem, index) => {
+      this.allTokens[index].amount = null;
       if (this.tokenBalance[tokenItem.assetID]) {
         this.allTokens[index].amount = this.tokenBalance[
           tokenItem.assetID
@@ -68,6 +86,7 @@ export class SwapTokenComponent implements OnInit {
       }
     });
     this.displayTokens.forEach((tokenItem, index) => {
+      this.displayTokens[index].amount = null;
       if (this.tokenBalance[tokenItem.assetID]) {
         this.displayTokens[index].amount = this.tokenBalance[
           tokenItem.assetID

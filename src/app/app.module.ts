@@ -9,6 +9,9 @@ import { SharedModule } from '@shared/shared.module';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
+import { StoreModule } from '@ngrx/store';
+import rootReducer from './reduers';
+
 import {
   HomeComponent,
   SwapComponent,
@@ -70,6 +73,7 @@ function playerFactory(): any {
     CoreModule,
     SharedModule,
     LottieModule.forRoot({ player: playerFactory }),
+    StoreModule.forRoot(rootReducer, {}),
   ],
   providers: [{ provide: NZ_I18N, useValue: en_US }, ...INTERCEPTOR_PROVIDES],
   bootstrap: [AppComponent],

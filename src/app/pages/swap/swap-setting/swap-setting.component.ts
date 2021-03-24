@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { defaultDeadline, defaultSlipValue } from '../swap.component';
-
 @Component({
   selector: 'app-swap-setting',
   templateUrl: './swap-setting.component.html',
@@ -10,7 +9,7 @@ export class SwapSettingComponent implements OnInit {
   @Input() slipValue: number | string;
   @Input() isCustomSlip: boolean; // 自定义滑点
   @Input() deadline: number;
-  @Output() closeSettingPage = new EventEmitter<any>();
+  @Output() closePage = new EventEmitter<any>();
 
   // setting slip
   slipValueGroup = [0.1, 0.5, 1, 2];
@@ -39,7 +38,7 @@ export class SwapSettingComponent implements OnInit {
       slipValue: this.slipValue,
       isCustomSlip: this.isCustomSlip,
     };
-    this.closeSettingPage.emit(settingObj);
+    this.closePage.emit(settingObj);
   }
 
   //#region

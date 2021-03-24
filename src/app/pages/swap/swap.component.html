@@ -4,13 +4,13 @@
 </app-swap-home>
 
 <app-swap-token *ngIf="pageStatus==='token'" [activeToken]="activeToken" [hideToken]="hideToken"
-  (closeTokenPage)="closeTokenPage($event)"></app-swap-token>
+  (closePage)="closeTokenPage($event)"></app-swap-token>
 
 <app-swap-setting *ngIf="pageStatus==='setting'" [deadline]="settings.deadline" [slipValue]="settings.slipValue"
-  [isCustomSlip]="settings.isCustomSlip" (closeSettingPage)="closeSettingPage($event)">
+  [isCustomSlip]="settings.isCustomSlip" (closePage)="closeSettingPage($event)">
 </app-swap-setting>
 
 <app-swap-result *ngIf="pageStatus==='result'" [rates]="rates" [fromToken]="fromToken" [toToken]="toToken"
   [inputAmount]="inputAmount" [deadline]="settings.deadline" [slipValue]="settings.slipValue"
-  [initData]="initResultData" (closeResultPage)="closeResultPage($event)" (swapFail)="swapFail()">
+  [initData]="initResultData" (closePage)="closeResultPage($event)" (swapFail)="swapFail()">
 </app-swap-result>
