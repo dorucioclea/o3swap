@@ -115,60 +115,83 @@ footer {
 }
 
 section.cover .container.connect-container {
+  height: 360px;
   .chains {
     position: absolute;
     bottom: 0;
     left: 0;
-    height: 463px;
+    height: 270px;
     width: 90px;
     background: #222222;
-    border-top-right-radius: 30px;
+    border-top-right-radius: 20px;
     border-bottom-left-radius: 40px;
-    padding: 6px 24px;
+    padding: 3px 15px;
     img {
+      cursor: pointer;
       width: 40px;
       margin-top: 24px;
       border-radius: 10px;
       opacity: 0.2;
-      border-radius: 50%;
+      border-radius: 10px;
       &.active {
         opacity: 1;
       }
     }
   }
+  .wallet-type {
+    font-size: 16px;
+    margin-bottom: 20px;
+    padding-left: 90px;
+    margin-top: 15px;
+  }
   ul.wallets {
     padding-left: 90px;
     li {
       margin-top: 20px;
-      height: 70px;
-      background: #2a2a2a;
-      border: 1px solid #ffffff0d;
-      border-radius: 10px;
-      padding: 0 22px 0 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-      &:hover,
-      &.active {
-        background: #2b312d;
-        border: 1px solid #46b069;
-        color: #46b069;
-        img.option {
+      div {
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 12px 18px;
+        background: #2a2a2a;
+        border: 1px dashed #4a4a4a;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        &:hover {
+          background: #303030;
+        }
+        &.active {
+          cursor: default;
+          background: #303030;
+          border: none;
+          padding: 20px;
           display: block;
+          .name {
+            color: #46b069;
+          }
         }
       }
       img.logo {
         width: 36px;
-        margin-right: 20px;
+        margin-right: 10px;
         border-radius: 50%;
       }
       .name {
         flex: 1;
       }
       img.option {
-        width: 22px;
-        display: none;
+        width: 14px;
+      }
+      .address {
+        margin-top: 12px;
+        font-size: 14px;
+        color: #8aa1a1;
+        img.copy {
+          width: 13px;
+          margin-left: 7px;
+          cursor: pointer;
+        }
       }
     }
   }

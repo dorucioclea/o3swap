@@ -29,6 +29,7 @@
     "o3-dapi-neo": "^0.6.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
+    "web3": "^1.3.4",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {

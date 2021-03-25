@@ -58,7 +58,7 @@ export interface Token {
 //   },
 // ];
 
-const NEO_TOKENS: Token[] = [
+export const NEO_TOKENS: Token[] = [
   {
     assetID: '17da3881ab2d050fea414c80b3fa8324d756f60e',
     symbol: 'nNEO',
@@ -110,9 +110,9 @@ const NEO_TOKENS: Token[] = [
   },
 ];
 
-const ETH_TOKENS: Token[] = [];
+export const ETH_TOKENS: Token[] = [];
 
-export const ALL_TOKENS = { neo: NEO_TOKENS, eth: ETH_TOKENS };
+export const ALL_TOKENS: Token[] = [...NEO_TOKENS, ...ETH_TOKENS];
 
 export const DEFAULT_FROM_TOKEN: Token = {
   assetID: 'f46719e2d16bf50cddcef9d4bbfece901f73cbb6',
@@ -121,8 +121,3 @@ export const DEFAULT_FROM_TOKEN: Token = {
   amount: null,
   logo: '/assets/images/tokens/neo/nNEO.png',
 };
-
-// export const NEO_SCRIPTHASH =
-//   '0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b';
-
-export const SWAP_CONTRACT_HASH = '0x7a10eeaaf99871fe0a9a39ebd027c97705585666';

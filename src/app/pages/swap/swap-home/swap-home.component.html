@@ -37,8 +37,7 @@
     <p class="sub-title receive-title">Receive</p>
     <p class="receive-amount">{{ chooseSwapPath?.receiveAmount || '--' }} {{ toToken?.symbol }}</p>
     <p class="receive-fiat">≈＄{{ chooseSwapPath?.fiat || '--.--' }}</p>
-    <button class="confirm" (click)="inquiry()"
-      [ngClass]="{active: fromToken && toToken && inputAmount}">Inquiry</button>
+    <button class="confirm" (click)="inquiry()" [ngClass]="{active: checkCanInquiry()}">Inquiry</button>
     <img class="next" (click)="backToResultPage()" src="/assets/images/swap/next.png" alt="">
   </div>
   <div class="setting-group">

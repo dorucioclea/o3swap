@@ -28,7 +28,7 @@ export class SwapHomeComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    this.checkInputAmount();
+    this.checkInputAmountDecimal();
     this.calcutionInputAmountFiat();
   }
 
@@ -39,7 +39,7 @@ export class SwapHomeComponent implements OnInit {
 
   changeInputAmount($event): void {
     this.inputAmount = $event.target.value;
-    this.checkInputAmount();
+    this.checkInputAmountDecimal();
     this.resetSwapData();
     this.calcutionInputAmountFiat();
   }
@@ -52,7 +52,7 @@ export class SwapHomeComponent implements OnInit {
   }
 
   inquiry(): void {
-    if (this.checkInputAmount() === false) {
+    if (this.checkCanInquiry() === false) {
       return;
     }
     this.toInquiryPage.emit(this.inputAmount);
@@ -66,7 +66,19 @@ export class SwapHomeComponent implements OnInit {
     this.toSettingPage.emit(this.inputAmount);
   }
   //#region
-  checkInputAmount(): boolean {
+  checkCanInquiry(): boolean {
+    if (!this.fromToken || !this.toToken || !this.inputAmount) {
+      return false;
+    }
+    if (new BigNumber(this.inputAmount).comparedTo(0) <= 0) {
+      return false;
+    }
+    if (this.checkInputAmountDecimal() === false) {
+      return false;
+    }
+    return true;
+  }
+  checkInputAmountDecimal(): boolean {
     const decimalPart = this.inputAmount && this.inputAmount.split('.')[1];
     if (
       this.fromToken &&

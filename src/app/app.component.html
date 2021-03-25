@@ -27,10 +27,10 @@
           <a href="https://docs.o3swap.com/" target="_blank">Doc</a>
         </li> -->
       </ul>
-      <div *ngIf="isHome===false" class="connect" [ngClass]="{'account': account}" (click)="showConnect()">
-        <img *ngIf="!account" src="/assets/images/swap/link.png" alt="">
-        <img *ngIf="account" src="/assets/images/tokens/{{chain}}.png" alt="">
-        <span>{{ account ? (account.address | shortAddress: 5) : 'Connect Wallet' }}</span>
+      <div *ngIf="isHome===false" class="connect" [ngClass]="{'account': neoAccount}" (click)="showConnect()">
+        <img *ngIf="!neoAccount" src="/assets/images/swap/link.png" alt="">
+        <img *ngIf="neoAccount" src="/assets/images/tokens/neo.png" alt="">
+        <span>{{ neoAccount ? (neoAccount.address | shortAddress: 5) : 'Connect Wallet' }}</span>
       </div>
     </div>
   </header>
@@ -44,19 +44,42 @@
       <img class="close" (click)="showConnectModal=false" src="/assets/images/swap/close.png" alt="">
     </p>
     <div class="chains">
-      <img src="/assets/images/tokens/eth.png" alt="">
-      <img class="active" src="/assets/images/tokens/neo.png" alt="">
+      <img [ngClass]="{active: connectWalletType==='ETH'}" (click)="connectWalletType='ETH'"
+        src="/assets/images/tokens/eth.png" alt="">
+      <img [ngClass]="{active: connectWalletType==='NEO'}" (click)="connectWalletType='NEO'"
+        src="/assets/images/tokens/neo.png" alt="">
     </div>
-    <ul class="wallets">
-      <li class="wallet" (click)="connectWallet('NeoLine')">
-        <img class="logo" src="/assets/images/logo-NeoLine.png" alt="">
-        <span class="name">NeoLine</span>
-        <img class="option" src="/assets/images/swap/wallet-selected.png" alt="">
+    <p class="wallet-type">{{ connectWalletType }} Wallet</p>
+    <ul class="wallets" *ngIf="connectWalletType==='ETH'">
+      <li class="wallet" *ngFor="let wallet of ETH_WALLETS" (click)="connectEthWallet(wallet)">
+        <div *ngIf="ethWalletName!==wallet.name">
+          <img class="logo" [src]="wallet.logo" alt="">
+          <span class="name">Connect {{ wallet.name }}</span>
+          <img class="option" src="/assets/images/swap/add.png" alt="">
+        </div>
+        <div *ngIf="ethWalletName===wallet.name" class="active">
+          <span class="name">{{ wallet.name }}</span>
+          <p class="address">
+            {{ ethAccount.address | shortAddress: 10 }}
+            <img class="copy" (click)="copy(ethAccount.address)" src="/assets/images/swap/copy.png" alt="">
+          </p>
+        </div>
       </li>
-      <li class="wallet" (click)="connectWallet('O3')">
-        <img class="logo" src="/assets/images/logo-O3.png" alt="">
-        <span class="name">O3</span>
-        <img class="option" src="/assets/images/swap/wallet-selected.png" alt="">
+    </ul>
+    <ul class="wallets" *ngIf="connectWalletType==='NEO'">
+      <li class="wallet" *ngFor="let wallet of NEO_WALLETS" (click)="connectNeoWallet(wallet)">
+        <div *ngIf="neoWalletName!==wallet.name">
+          <img class="logo" [src]="wallet.logo" alt="">
+          <span class="name">Connect {{ wallet.name }}</span>
+          <img class="option" src="/assets/images/swap/add.png" alt="">
+        </div>
+        <div *ngIf="neoWalletName===wallet.name" class="active">
+          <span class="name">{{ wallet.name }}</span>
+          <p class="address">
+            {{ neoAccount.address | shortAddress: 10 }}
+            <img class="copy" (click)="copy(neoAccount.address)" src="/assets/images/swap/copy.png" alt="">
+          </p>
+        </div>
       </li>
     </ul>
   </div>
@@ -73,11 +96,11 @@
       </div>
     </div>
     <div class="account">
-      <p class="name">{{ walletType }}</p>
+      <p class="name">{{ neoWalletName }}</p>
       <div class="row">
-        <img class="logo" src="/assets/images/tokens/{{chain}}.png" alt="">
-        <span class="address">{{ account.address | shortAddress: 9 }}</span>
-        <img class="copy" (click)="copy(account.address)" src="/assets/images/swap/copy.png" alt="">
+        <img class="logo" src="/assets/images/tokens/neo.png" alt="">
+        <span class="address">{{ neoAccount.address | shortAddress: 9 }}</span>
+        <img class="copy" (click)="copy(neoAccount.address)" src="/assets/images/swap/copy.png" alt="">
       </div>
     </div>
     <button class="disconnect" (click)="disConnect()">Disconnect</button>

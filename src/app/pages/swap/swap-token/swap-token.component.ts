@@ -1,13 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ALL_TOKENS, Chain } from '@lib';
+import { ALL_TOKENS, NEO_TOKENS, SwapStateType } from '@lib';
 import { Token } from '@lib';
 import { ApiService } from '@core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
-interface AppState {
-  wallet: any;
-  swap: any;
+interface State {
+  swap: SwapStateType;
 }
 
 @Component({
@@ -23,31 +22,24 @@ export class SwapTokenComponent implements OnInit {
   swap$: Observable<any>;
   tokenBalance; // 账户的 tokens
 
-  wallet$: Observable<any>;
-  chain: Chain;
-
   allTokens: Token[] = []; // 所有的 tokens, 排除了 fromToken 或 toToken
   displayTokens: any[] = []; // 最终展示的 tokens, search 结果
   isfocusSearchInput = false;
 
-  constructor(private apiService: ApiService, private store: Store<AppState>) {
-    this.wallet$ = store.select('wallet');
+  constructor(private apiService: ApiService, private store: Store<State>) {
     this.swap$ = store.select('swap');
   }
 
   ngOnInit(): void {
-    this.wallet$.subscribe((state) => {
-      this.chain = state.chain;
-      const tokens = ALL_TOKENS[this.chain];
-      this.allTokens = this.hideToken
-        ? tokens.filter((item) => item.assetID !== this.hideToken.assetID)
-        : tokens;
-      this.displayTokens = this.allTokens;
-    });
     this.swap$.subscribe((state) => {
       this.tokenBalance = state.balances;
       this.handleTokenAmount();
     });
+    const tokens = NEO_TOKENS;
+    this.allTokens = this.hideToken
+      ? tokens.filter((item) => item.assetID !== this.hideToken.assetID)
+      : tokens;
+    this.displayTokens = this.allTokens;
   }
 
   backToHomePage(): void {

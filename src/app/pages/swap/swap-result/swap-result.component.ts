@@ -8,23 +8,26 @@ import {
 } from '@angular/core';
 import {
   Account,
-  ALL_TOKENS,
-  Chain,
-  SWAP_CONTRACT_HASH,
+  O3SWAP_FEE_PERCENTAGE,
   Token,
-  WalletType,
+  NeoWalletName,
+  AssetQueryResponse,
+  AssetQueryResponseItem,
+  SwapStateType,
 } from '@lib';
-import { ApiService, CommonService, SwapService } from '@core';
+import {
+  ApiService,
+  CommonService,
+  SwapService,
+  NeolineWalletApiService,
+} from '@core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import BigNumber from 'bignumber.js';
-import { InvokeOutput } from 'o3-dapi-neo/lib/modules/write/invoke';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
-interface AppState {
-  wallet: any;
-  swap: any;
+interface State {
+  swap: SwapStateType;
 }
 
 @Component({
@@ -44,17 +47,12 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   @Output() swapFail = new EventEmitter();
 
   swap$: Observable<any>;
-  myNeoDapi;
-  account: Account;
+  neoAccount: Account;
   isMainNet: boolean;
-
-  wallet$: Observable<any>;
-  chain: Chain;
-  walletType: WalletType;
+  neoWalletName: NeoWalletName;
 
   TOKENS: Token[] = []; // 所有的 tokens
-  o3SwapFee = '0.3'; // 系统收费 0.3%
-  allPercentage = 1.003; // 系统收费 0.3%
+  o3SwapFee = O3SWAP_FEE_PERCENTAGE;
   showRoutingModal = false; // swap 路径弹窗
   showTxHashModal = false;
   showInquiry: boolean;
@@ -66,32 +64,26 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   txPage: string;
   inquiryInterval; // 询价定时器
 
-  chooseSwapPath: any;
-  chooseSwapPathIndex;
-  receiveSwapPathArray;
-  price; // swap 比
-  lnversePrice; // swap 反比
+  chooseSwapPath: AssetQueryResponseItem;
+  chooseSwapPathIndex: number;
+  receiveSwapPathArray: AssetQueryResponse;
+  price: string; // swap 比
+  lnversePrice: string; // swap 反比
 
   constructor(
-    private store: Store<AppState>,
+    store: Store<State>,
     private apiService: ApiService,
     private nzMessage: NzMessageService,
     private commonService: CommonService,
-    private swapService: SwapService
+    private swapService: SwapService,
+    private neolineWalletApiService: NeolineWalletApiService
   ) {
-    this.wallet$ = store.select('wallet');
     this.swap$ = store.select('swap');
   }
 
   ngOnInit(): void {
-    this.wallet$.subscribe((state) => {
-      this.walletType = state.walletType;
-      this.chain = state.chain;
-      this.TOKENS = ALL_TOKENS[this.chain];
-    });
     this.swap$.subscribe((state) => {
-      this.myNeoDapi = state.neoDapi;
-      this.account = state.account;
+      this.neoAccount = state.neoAccount;
     });
     if (this.initData) {
       this.chooseSwapPath = this.initData.chooseSwapPath;
@@ -102,8 +94,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.showInquiry = false;
     } else {
       this.showInquiry = true;
-      this.getSwapPath();
     }
+    this.getSwapPath();
     this.inquiryInterval = setInterval(() => {
       this.getSwapPath();
     }, 30000);
@@ -146,7 +138,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   async swap(): Promise<void> {
-    if (!this.account) {
+    if (!this.neoAccount) {
       this.nzMessage.error('Please connect the wallet first');
       return;
     }
@@ -163,78 +155,18 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       return;
     }
     clearInterval(this.inquiryInterval);
-    const toNeoswapPath = await this.getToNeoSwapPath();
-    const args = [
-      {
-        type: 'Address',
-        value: this.account.address,
-      },
-      {
-        type: 'Integer',
-        value: this.getAmountIn(),
-      },
-      {
-        type: 'Integer',
-        value: this.getAmountOutMin(),
-      },
-      {
-        type: 'Array',
-        value: this.chooseSwapPath.swapPath.map((assetName) => ({
-          type: 'Hash160',
-          value: this.getAssetHashByName(assetName),
-        })),
-      },
-      {
-        type: 'Array',
-        value: toNeoswapPath.map((assetName) => ({
-          type: 'Hash160',
-          value: this.getAssetHashByName(assetName),
-        })),
-      },
-      {
-        type: 'Integer',
-        value: Math.floor(Date.now() / 1000 + this.deadline * 60),
-      },
-      {
-        type: 'Integer',
-        value: 0,
-      },
-    ];
-    this.myNeoDapi
-      .invoke({
-        scriptHash: SWAP_CONTRACT_HASH,
-        operation: 'DelegateSwapTokenInForTokenOut',
-        args,
-      })
-      .then(({ txid }: InvokeOutput) => {
+    this.neolineWalletApiService
+      .swap(
+        this.fromToken,
+        this.chooseSwapPath,
+        this.inputAmount,
+        this.slipValue,
+        this.deadline
+      )
+      .then((txid) => {
         this.showTxHashModal = true;
         this.isTxPending = true;
-        this.txhash = '0x' + txid;
-        this.txPage = this.TX_PAGES_PREFIX + this.txhash;
-        if (this.walletType === 'NeoLine') {
-          window.addEventListener(
-            'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
-            (result: any) => {
-              if (result.detail.txid === this.txhash) {
-                this.isTxPending = false;
-                this.swapService.getNeoBalances();
-              }
-            }
-          );
-        } else {
-          this.myNeoDapi.addEventListener(
-            this.myNeoDapi.Constants.EventName.TRANSACTION_CONFIRMED,
-            async (data) => {
-              if (data.txid === this.txhash) {
-                this.isTxPending = false;
-                this.swapService.getNeoBalances();
-              }
-            }
-          );
-        }
-      })
-      .catch((error) => {
-        this.swapService.handleDapiError(error);
+        this.txPage = this.TX_PAGES_PREFIX + txid;
       });
   }
   //#region
@@ -244,7 +176,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       .getSwapPath(
         this.fromToken.symbol,
         this.toToken.symbol,
-        this.getAmountIn()
+        this.swapService.getAmountIn(this.fromToken, this.inputAmount)
       )
       .subscribe((res) => {
         this.showInquiry = false;
@@ -256,8 +188,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         }
       });
   }
-  handleReceiveSwapPathFiat(swapPathArr: any[]): void {
-    swapPathArr.forEach((item, index) => {
+  handleReceiveSwapPathFiat(swapPathArr: AssetQueryResponse): void {
+    swapPathArr.forEach((item) => {
       const tempAmount = item.amount[item.amount.length - 1];
       item.receiveAmount = new BigNumber(tempAmount)
         .shiftedBy(-this.toToken.decimals)
@@ -287,48 +219,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       .dividedBy(new BigNumber(this.chooseSwapPath.receiveAmount))
       .dp(7)
       .toFixed();
-  }
-  getToNeoSwapPath(): Promise<any> {
-    if (this.fromToken.symbol === 'nNEO') {
-      return of(['nNEO']).toPromise();
-    }
-    return this.apiService
-      .getSwapPath(this.fromToken.symbol, 'nNEO', this.getAmountIn())
-      .pipe(
-        map((res) => {
-          if (res.length > 0) {
-            return res[0].swapPath;
-          } else {
-            return [];
-          }
-        })
-      )
-      .toPromise();
-  }
-  getAmountIn(): string {
-    const factAmount = new BigNumber(this.inputAmount)
-      .dividedBy(this.allPercentage)
-      .toFixed();
-    return this.commonService.decimalToInteger(
-      factAmount,
-      this.fromToken.decimals
-    );
-  }
-  getAmountOutMin(): number {
-    const amount = this.chooseSwapPath.amount[
-      this.chooseSwapPath.amount.length - 1
-    ];
-    const factPercentage = new BigNumber(1).minus(
-      new BigNumber(this.slipValue).shiftedBy(-2)
-    );
-    const factAmount = Math.ceil(
-      new BigNumber(amount).times(factPercentage).toNumber()
-    );
-    return factAmount;
-  }
-  getAssetHashByName(name: string): string {
-    const token = this.TOKENS.find((item) => item.symbol === name);
-    return (token && token.assetID) || '';
   }
   //#endregion
 }

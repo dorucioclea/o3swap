@@ -1,76 +1,74 @@
 import { Injectable } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { Account, UPDATE_NEO_BALANCES, WalletType } from '@lib';
+import BigNumber from 'bignumber.js';
+import { of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import {
+  AssetQueryResponse,
+  ALL_PERCENTAGE,
+  AssetQueryResponseItem,
+  NEO_TOKENS,
+  Token,
+  WalletType,
+  NeoWalletName,
+} from '@lib';
+import { ApiService } from '../api/api.service';
+import { CommonService } from './common.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
-
-interface AppState {
-  swap: any;
-  wallet: any;
-}
 
 @Injectable()
 export class SwapService {
-  wallet$: Observable<any>;
-  walletType: WalletType;
-
-  swap$: Observable<any>;
-  myNeoDapi;
-  account: Account;
-
   constructor(
-    private store: Store<AppState>,
+    private apiService: ApiService,
+    private commonService: CommonService,
     private nzMessage: NzMessageService
-  ) {
-    this.swap$ = store.select('swap');
-    this.wallet$ = store.select('wallet');
-    this.wallet$.subscribe((state) => {
-      this.walletType = state.walletType;
-    });
-    this.swap$.subscribe((state) => {
-      this.myNeoDapi = state.neoDapi;
-      this.account = state.account;
-    });
-  }
+  ) {}
 
-  getNeoBalances(): void {
-    // 正式环境删除
-    if (this.walletType === 'O3') {
-      this.store.dispatch({
-        type: UPDATE_NEO_BALANCES,
-        data: {},
-      });
-      return;
+  getToNeoSwapPath(fromToken: Token, inputAmount: string): Promise<string[]> {
+    if (fromToken.symbol === 'nNEO') {
+      return of(['nNEO']).toPromise();
     }
-    this.myNeoDapi
-      .getBalance({
-        params: [{ address: this.account.address }],
-        network: 'TestNet',
-      })
-      .then((addressTokens: any[]) => {
-        const tokens = addressTokens[this.account.address];
-        const tempTokenBalance = {};
-        tokens.forEach((tokenItem: any) => {
-          tempTokenBalance[tokenItem.assetID] = tokenItem;
-        });
-        this.store.dispatch({
-          type: UPDATE_NEO_BALANCES,
-          data: tempTokenBalance,
-        });
-      })
-      .catch((error) => {
-        this.handleDapiError(error);
-      });
+    return this.apiService
+      .getSwapPath(
+        fromToken.symbol,
+        'nNEO',
+        this.getAmountIn(fromToken, inputAmount)
+      )
+      .pipe(
+        map((res: AssetQueryResponse) => {
+          if (res.length > 0) {
+            return res[0].swapPath;
+          } else {
+            return [];
+          }
+        })
+      )
+      .toPromise();
   }
-
-  handleDapiError(error): void {
+  getAmountIn(fromToken: Token, inputAmount: string): string {
+    const factAmount = new BigNumber(inputAmount)
+      .dividedBy(ALL_PERCENTAGE)
+      .toFixed();
+    return this.commonService.decimalToInteger(factAmount, fromToken.decimals);
+  }
+  getAmountOutMin(
+    chooseSwapPath: AssetQueryResponseItem,
+    slipValue: number
+  ): string {
+    const amount = chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
+    const factPercentage = new BigNumber(1).minus(
+      new BigNumber(slipValue).shiftedBy(-2)
+    );
+    const factAmount = new BigNumber(amount).times(factPercentage).toFixed();
+    return factAmount;
+  }
+  getNeoAssetHashByName(name: string): string {
+    const token = NEO_TOKENS.find((item) => item.symbol === name);
+    return (token && token.assetID) || '';
+  }
+  handleNeoDapiError(error, walletName: NeoWalletName): void {
     switch (error.type) {
       case 'NO_PROVIDER':
-        window.open(
-          this.walletType === 'O3'
-            ? 'https://o3.network/#download'
-            : 'https://neoline.io'
-        );
+        this.toDownloadWallet(walletName);
         break;
       case 'CONNECTION_DENIED':
         this.nzMessage.error(
@@ -79,6 +77,23 @@ export class SwapService {
         break;
       default:
         this.nzMessage.error(error.type);
+        break;
+    }
+  }
+  toDownloadWallet(type: WalletType): void {
+    switch (type) {
+      case 'O3':
+        window.open('https://o3.network/#download');
+        break;
+      case 'NeoLine':
+        window.open(
+          'https://chrome.google.com/webstore/detail/neoline/cphhlgmgameodnhkjdmkpanlelnlohao'
+        );
+        break;
+      case 'MetaMask':
+        window.open(
+          'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn'
+        );
         break;
     }
   }

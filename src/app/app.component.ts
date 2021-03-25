@@ -2,25 +2,31 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterEvent, NavigationEnd } from '@angular/router';
 import {
   Account,
-  Chain,
-  RESET_NEO_ACCOUNT,
+  ETH_WALLETS,
+  NEO_WALLETS,
+  NeoWalletName,
+  EthWalletName,
+  NeoWallet,
+  UPDATE_NEO_ACCOUNT,
+  SwapStateType,
   UPDATE_NEO_BALANCES,
-  UPDATE_NEO_IS_MAINNET,
-  UPDATE_WALLET_TYPE,
-  WalletType,
+  RESET_NEO_BALANCES,
 } from '@lib';
-import o3dapi from 'o3-dapi-core';
-import o3dapiNeo from 'o3-dapi-neo';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { CommonService, ApiService, SwapService } from '@core';
-import { Store, UPDATE } from '@ngrx/store';
+import {
+  CommonService,
+  ApiService,
+  SwapService,
+  NeolineWalletApiService,
+  O3WalletApiService,
+} from '@core';
+import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { UPDATE_ACCOUNT, UPDATE_NEO_DAPI_JS } from '@lib';
 
 type MenuType = 'home' | 'swap';
-interface AppState {
-  wallet: any;
-  swap: any;
+type ConnectWalletType = 'ETH' | 'NEO';
+interface State {
+  swap: SwapStateType;
 }
 
 @Component({
@@ -29,31 +35,30 @@ interface AppState {
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
+  NEO_WALLETS = NEO_WALLETS;
+  ETH_WALLETS = ETH_WALLETS;
   menuType: MenuType = 'home';
   currentPage = this.router.url;
   isHome = true;
+  connectWalletType: ConnectWalletType = 'NEO';
   // 弹窗
   showConnectModal = false;
   showAccountModal = false;
-  neolineDapiNeo;
 
   swap$: Observable<any>;
-  myNeoDapi;
-  account: Account;
-
-  wallet$: Observable<any>;
-  walletType: WalletType;
-  chain: Chain;
+  neoAccount: Account;
+  ethAccount: Account;
+  neoWalletName: NeoWalletName;
+  ethWalletName: EthWalletName;
 
   constructor(
-    private store: Store<AppState>,
+    private store: Store<State>,
     private router: Router,
-    private nzMessage: NzMessageService,
     private commonService: CommonService,
     public apiService: ApiService,
-    private swapService: SwapService
+    private o3WalletApiService: O3WalletApiService,
+    private neolineWalletApiService: NeolineWalletApiService
   ) {
-    this.wallet$ = store.select('wallet');
     this.swap$ = store.select('swap');
     this.router.events.subscribe((res: RouterEvent) => {
       if (res instanceof NavigationEnd) {
@@ -64,21 +69,15 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.wallet$.subscribe((state) => {
-      this.walletType = state.walletType;
-      this.chain = state.chain;
-    });
     this.swap$.subscribe((state) => {
-      this.account = state.account;
-    });
-    o3dapi.initPlugins([o3dapiNeo]);
-    window.addEventListener('NEOLine.NEO.EVENT.READY', () => {
-      this.neolineDapiNeo = new (window as any).NEOLine.Init();
+      this.neoAccount = state.neoAccount;
+      this.neoWalletName = state.neoWalletName;
+      this.ethWalletName = state.ethWalletName;
     });
   }
 
   showConnect(): void {
-    if (!this.account) {
+    if (!this.neoAccount) {
       this.showConnectModal = true;
     } else {
       this.showAccountModal = true;
@@ -89,24 +88,26 @@ export class AppComponent implements OnInit {
     this.commonService.copy(value);
   }
 
-  connectWallet(type: WalletType): void {
-    this.showConnectModal = false;
-    this.walletType = type;
-    if (this.chain === 'neo') {
-      if (this.walletType === 'NeoLine' && this.neolineDapiNeo === undefined) {
-        window.open('https://neoline.io');
-        return;
-      }
-      this.myNeoDapi =
-        this.walletType === 'O3' ? o3dapi.NEO : this.neolineDapiNeo;
-      this.getNeoAccount();
+  connectNeoWallet(wallet: NeoWallet): void {
+    switch (wallet.name) {
+      case 'NeoLine':
+        this.neolineWalletApiService.connect();
+        break;
+      case 'O3':
+        this.o3WalletApiService.connect();
+        break;
     }
+  }
+
+  connectEthWallet(type: EthWalletName): void {
+    this.showConnectModal = false;
   }
 
   disConnect(): void {
     this.showAccountModal = false;
-    this.account = null;
-    this.store.dispatch({ type: RESET_NEO_ACCOUNT });
+    this.neoAccount = null;
+    this.store.dispatch({ type: UPDATE_NEO_ACCOUNT, data: null });
+    this.store.dispatch({ type: RESET_NEO_BALANCES });
   }
 
   changeWallet(): void {
@@ -119,72 +120,5 @@ export class AppComponent implements OnInit {
       return true;
     }
     return false;
-  }
-
-  getNeoAccount(): void {
-    this.myNeoDapi
-      .getAccount()
-      .then((result) => {
-        // console.log(result);
-        if (this.commonService.isNeoAddress(result.address)) {
-          this.account = result;
-          this.store.dispatch({
-            type: UPDATE_ACCOUNT,
-            data: this.account,
-          });
-          this.store.dispatch({
-            type: UPDATE_NEO_DAPI_JS,
-            data: this.myNeoDapi,
-          });
-          this.store.dispatch({
-            type: UPDATE_WALLET_TYPE,
-            data: this.walletType,
-          });
-          if (this.walletType === 'NeoLine') {
-            this.initNeolineJs();
-          }
-          this.swapService.getNeoBalances();
-        } else {
-          this.nzMessage.error('Please connect to Neo wallet');
-        }
-      })
-      .catch((error) => {
-        this.swapService.handleDapiError(error);
-      });
-  }
-
-  initNeolineJs(): void {
-    // this.myNeoDapi.getNetworks().then((res) => {
-    //   if ((res.defaultNetwork as string).toLowerCase().includes('test')) {
-    //     this.store.dispatch({ type: UPDATE_NEO_IS_MAINNET, data: false });
-    //     this.nzMessage.error('Please connect wallet to the main net.');
-    //   } else {
-    //     this.store.dispatch({ type: UPDATE_NEO_IS_MAINNET, data: true });
-    //   }
-    // });
-    window.addEventListener(
-      'NEOLine.NEO.EVENT.ACCOUNT_CHANGED',
-      (result: any) => {
-        this.account = result.detail;
-        this.store.dispatch({ type: UPDATE_ACCOUNT, data: this.account });
-        this.swapService.getNeoBalances();
-      }
-    );
-    // window.addEventListener(
-    //   'NEOLine.NEO.EVENT.NETWORK_CHANGED',
-    //   (result: any) => {
-    //     if (
-    //       (result.detail.defaultNetwork as string)
-    //         .toLowerCase()
-    //         .includes('test')
-    //     ) {
-    //       this.store.dispatch({ type: UPDATE_NEO_IS_MAINNET, data: false });
-    //       this.swapService.getNeoBalances();
-    //       this.nzMessage.error('Please connect wallet to the main net.');
-    //     } else {
-    //       this.store.dispatch({ type: UPDATE_NEO_IS_MAINNET, data: true });
-    //     }
-    //   }
-    // );
   }
 }

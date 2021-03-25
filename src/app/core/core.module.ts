@@ -1,9 +1,5 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 
-import { ApiService } from './api/api.service';
-import { CommonService } from './util/common.service';
-import { SwapService } from './util/swap.service';
-
 import { StartupService } from './startup/startup.service';
 export function StartupServiceFactory(startupService: StartupService): any {
   return () => startupService.load();
@@ -18,7 +14,25 @@ const APPINIT_PROVIDES = [
   },
 ];
 
+//#region services
+import { ApiService } from './api/api.service';
+import { CommonService } from './util/common.service';
+import { SwapService } from './util/swap.service';
+import { MetaMaskWalletApiService } from './util/walletApi/metamask';
+import { NeolineWalletApiService } from './util/walletApi/neoline';
+import { O3WalletApiService } from './util/walletApi/o3';
+
+const SERVICES = [
+  ApiService,
+  CommonService,
+  SwapService,
+  MetaMaskWalletApiService,
+  NeolineWalletApiService,
+  O3WalletApiService,
+];
+//#endregion
+
 @NgModule({
-  providers: [ApiService, CommonService, SwapService, ...APPINIT_PROVIDES],
+  providers: [...SERVICES, ...APPINIT_PROVIDES],
 })
 export class CoreModule {}
