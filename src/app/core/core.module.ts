@@ -20,7 +20,8 @@ import { CommonService } from './util/common.service';
 import { SwapService } from './util/swap.service';
 import { MetaMaskWalletApiService } from './util/walletApi/metamask';
 import { NeolineWalletApiService } from './util/walletApi/neoline';
-import { O3WalletApiService } from './util/walletApi/o3';
+import { O3NeoWalletApiService } from './util/walletApi/o3-neo';
+import { O3EthWalletApiService } from './util/walletApi/o3-eth';
 
 const SERVICES = [
   ApiService,
@@ -28,7 +29,8 @@ const SERVICES = [
   SwapService,
   MetaMaskWalletApiService,
   NeolineWalletApiService,
-  O3WalletApiService,
+  O3NeoWalletApiService,
+  O3EthWalletApiService,
 ];
 //#endregion
 

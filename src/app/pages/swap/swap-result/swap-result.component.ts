@@ -7,7 +7,6 @@ import {
   Output,
 } from '@angular/core';
 import {
-  Account,
   O3SWAP_FEE_PERCENTAGE,
   Token,
   NeoWalletName,
@@ -47,7 +46,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   @Output() swapFail = new EventEmitter();
 
   swap$: Observable<any>;
-  neoAccount: Account;
+  neoAccountAddress: string;
   isMainNet: boolean;
   neoWalletName: NeoWalletName;
 
@@ -83,7 +82,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.swap$.subscribe((state) => {
-      this.neoAccount = state.neoAccount;
+      this.neoAccountAddress = state.neoAccountAddress;
     });
     if (this.initData) {
       this.chooseSwapPath = this.initData.chooseSwapPath;
@@ -138,7 +137,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   async swap(): Promise<void> {
-    if (!this.neoAccount) {
+    if (!this.neoAccountAddress) {
       this.nzMessage.error('Please connect the wallet first');
       return;
     }

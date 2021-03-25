@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { CommonService, SwapService } from '@core';
+import { SwapService } from '../swap.service';
+import { CommonService } from '../common.service';
 import {
-  Account,
   NeoWalletName,
   SWAP_CONTRACT_HASH,
   Token,
@@ -22,9 +22,9 @@ interface State {
 @Injectable()
 export class NeolineWalletApiService {
   walletName: NeoWalletName = 'NeoLine';
-  neolineDapi;
+  accountAddress: string;
 
-  account: Account;
+  neolineDapi;
 
   constructor(
     private store: Store<State>,
@@ -37,7 +37,7 @@ export class NeolineWalletApiService {
     });
   }
 
-  connect(): boolean | void {
+  connect(): void {
     if (this.neolineDapi === undefined) {
       this.swapService.toDownloadWallet(this.walletName);
       return;
@@ -46,21 +46,17 @@ export class NeolineWalletApiService {
       .getAccount()
       .then((result) => {
         // console.log(result);
-        if (this.commonService.isNeoAddress(result.address)) {
-          this.account = result;
-          this.store.dispatch({
-            type: UPDATE_NEO_ACCOUNT,
-            data: this.account,
-          });
-          this.store.dispatch({
-            type: UPDATE_NEO_WALLET_NAME,
-            data: this.walletName,
-          });
-          this.initNeolineJs();
-          this.getBalances();
-        } else {
-          this.nzMessage.error('Please connect to Neo wallet');
-        }
+        this.accountAddress = result.address;
+        this.store.dispatch({
+          type: UPDATE_NEO_ACCOUNT,
+          data: this.accountAddress,
+        });
+        this.store.dispatch({
+          type: UPDATE_NEO_WALLET_NAME,
+          data: this.walletName,
+        });
+        this.addListener();
+        this.getBalances();
       })
       .catch((error) => {
         this.swapService.handleNeoDapiError(error, 'NeoLine');
@@ -70,11 +66,11 @@ export class NeolineWalletApiService {
   getBalances(): void {
     this.neolineDapi
       .getBalance({
-        params: [{ address: this.account.address }],
+        params: [{ address: this.accountAddress }],
         network: 'TestNet',
       })
       .then((addressTokens: any[]) => {
-        const tokens = addressTokens[this.account.address];
+        const tokens = addressTokens[this.accountAddress];
         const tempTokenBalance = {};
         tokens.forEach((tokenItem: any) => {
           tempTokenBalance[tokenItem.assetID] = tokenItem;
@@ -103,7 +99,7 @@ export class NeolineWalletApiService {
     const args = [
       {
         type: 'Address',
-        value: this.account.address,
+        value: this.accountAddress,
       },
       {
         type: 'Integer',
@@ -159,14 +155,14 @@ export class NeolineWalletApiService {
       });
   }
 
-  private initNeolineJs(): void {
+  private addListener(): void {
     window.addEventListener(
       'NEOLine.NEO.EVENT.ACCOUNT_CHANGED',
       (result: any) => {
-        this.account = result.detail;
+        this.accountAddress = result.detail.address;
         this.store.dispatch({
           type: UPDATE_NEO_ACCOUNT,
-          data: this.account,
+          data: this.accountAddress,
         });
         this.getBalances();
       }

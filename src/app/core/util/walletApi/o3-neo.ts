@@ -6,7 +6,6 @@ import o3dapiNeo from 'o3-dapi-neo';
 import { CommonService } from '../common.service';
 import { SwapService } from '../swap.service';
 import {
-  Account,
   NeoWalletName,
   SWAP_CONTRACT_HASH,
   Token,
@@ -22,10 +21,9 @@ interface State {
 }
 
 @Injectable()
-export class O3WalletApiService {
+export class O3NeoWalletApiService {
   walletName: NeoWalletName = 'O3';
-
-  account: Account;
+  accountAddress: string;
 
   constructor(
     private store: Store<State>,
@@ -36,24 +34,20 @@ export class O3WalletApiService {
     o3dapi.initPlugins([o3dapiNeo]);
   }
 
-  connect(): boolean | void {
+  connect(): void {
     o3dapi.NEO.getAccount()
       .then((result) => {
         // console.log(result);
-        if (this.commonService.isNeoAddress(result.address)) {
-          this.account = result;
-          this.store.dispatch({
-            type: UPDATE_NEO_ACCOUNT,
-            data: this.account,
-          });
-          this.store.dispatch({
-            type: UPDATE_NEO_WALLET_NAME,
-            data: this.walletName,
-          });
-          this.getBalances();
-        } else {
-          this.nzMessage.error('Please connect to Neo wallet');
-        }
+        this.accountAddress = result.address;
+        this.store.dispatch({
+          type: UPDATE_NEO_ACCOUNT,
+          data: this.accountAddress,
+        });
+        this.store.dispatch({
+          type: UPDATE_NEO_WALLET_NAME,
+          data: this.walletName,
+        });
+        this.getBalances();
       })
       .catch((error) => {
         this.swapService.handleNeoDapiError(error, 'O3');
@@ -67,11 +61,11 @@ export class O3WalletApiService {
     });
     return;
     o3dapi.NEO.getBalance({
-      params: [{ address: this.account.address }],
+      params: [{ address: this.accountAddress }],
       network: 'MainNet',
     })
       .then((addressTokens: any[]) => {
-        const tokens = addressTokens[this.account.address];
+        const tokens = addressTokens[this.accountAddress];
         const tempTokenBalance = {};
         tokens.forEach((tokenItem: any) => {
           tempTokenBalance[tokenItem.assetID] = tokenItem;
@@ -100,7 +94,7 @@ export class O3WalletApiService {
     const args = [
       {
         type: 'Address',
-        value: this.account.address,
+        value: this.accountAddress,
       },
       {
         type: 'Integer',

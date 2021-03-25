@@ -1,19 +1,13 @@
-export type WalletType = 'O3' | 'NeoLine' | 'MetaMask';
+export type WalletName = 'O3' | 'NeoLine' | 'MetaMask';
 export type NeoWalletName = 'O3' | 'NeoLine';
 export type EthWalletName = 'O3' | 'MetaMask';
-
-export type Chain = 'neo' | 'eth';
-export interface Account {
-  address: string;
-  label: string;
-}
 
 export const CHAIN_ID_ETHEREUM = 2;
 export const CHAIN_ID_ONTOLOGY = 3;
 export const CHAIN_ID_NEO = 4;
 
 export interface Wallet {
-  name: WalletType;
+  name: WalletName;
   chainId: number;
   logo: string;
   downloadUrl: string;

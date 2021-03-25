@@ -5,4 +5,5 @@ export * from './startup/startup.service';
 export * from './util/swap.service';
 export * from './util/walletApi/neoline';
 export * from './util/walletApi/metamask';
-export * from './util/walletApi/o3';
+export * from './util/walletApi/o3-neo';
+export * from './util/walletApi/o3-eth';

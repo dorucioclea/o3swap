@@ -6,15 +6,16 @@ import {
   RESET_NEO_BALANCES,
   UPDATE_ETH_WALLET_NAME,
   UPDATE_NEO_WALLET_NAME,
+  UPDATE_ETH_ACCOUNT,
 } from '@lib';
 
 const initialState: SwapStateType = {
   neoWalletName: null,
-  neoAccount: null,
+  ethWalletName: null,
+  neoAccountAddress: null,
+  ethAccountAddress: null,
   balances: {},
   isMainNet: true,
-  ethWalletName: null,
-  ethAccount: null,
 };
 
 export default function swap(state = initialState, action): any {
@@ -24,7 +25,9 @@ export default function swap(state = initialState, action): any {
     case UPDATE_ETH_WALLET_NAME:
       return { ...state, ethWalletName: action.data };
     case UPDATE_NEO_ACCOUNT:
-      return { ...state, neoAccount: action.data };
+      return { ...state, neoAccountAddress: action.data };
+    case UPDATE_ETH_ACCOUNT:
+      return { ...state, ethAccountAddress: action.data };
     case UPDATE_NEO_BALANCES:
       return { ...state, balances: action.data };
     case RESET_NEO_BALANCES:

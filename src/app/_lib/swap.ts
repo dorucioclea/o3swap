@@ -2,8 +2,8 @@ import { NeoWalletName, EthWalletName } from './wallet';
 export interface SwapStateType {
   neoWalletName: NeoWalletName;
   ethWalletName: EthWalletName;
-  neoAccount: Account;
-  ethAccount: Account;
+  neoAccountAddress: string;
+  ethAccountAddress: string;
   balances: object;
   isMainNet: boolean;
 }

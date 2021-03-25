@@ -8,7 +8,7 @@ import {
   AssetQueryResponseItem,
   NEO_TOKENS,
   Token,
-  WalletType,
+  WalletName,
   NeoWalletName,
 } from '@lib';
 import { ApiService } from '../api/api.service';
@@ -80,7 +80,7 @@ export class SwapService {
         break;
     }
   }
-  toDownloadWallet(type: WalletType): void {
+  toDownloadWallet(type: WalletName): void {
     switch (type) {
       case 'O3':
         window.open('https://o3.network/#download');

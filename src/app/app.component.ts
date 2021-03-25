@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnChanges, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterEvent, NavigationEnd } from '@angular/router';
 import {
-  Account,
   ETH_WALLETS,
   NEO_WALLETS,
   NeoWalletName,
@@ -11,6 +10,7 @@ import {
   SwapStateType,
   UPDATE_NEO_BALANCES,
   RESET_NEO_BALANCES,
+  EthWallet,
 } from '@lib';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import {
@@ -18,7 +18,9 @@ import {
   ApiService,
   SwapService,
   NeolineWalletApiService,
-  O3WalletApiService,
+  O3NeoWalletApiService,
+  O3EthWalletApiService,
+  MetaMaskWalletApiService,
 } from '@core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -46,8 +48,8 @@ export class AppComponent implements OnInit {
   showAccountModal = false;
 
   swap$: Observable<any>;
-  neoAccount: Account;
-  ethAccount: Account;
+  neoAccountAddress: string;
+  ethAccountAddress: string;
   neoWalletName: NeoWalletName;
   ethWalletName: EthWalletName;
 
@@ -56,8 +58,11 @@ export class AppComponent implements OnInit {
     private router: Router,
     private commonService: CommonService,
     public apiService: ApiService,
-    private o3WalletApiService: O3WalletApiService,
-    private neolineWalletApiService: NeolineWalletApiService
+    private o3NeoWalletApiService: O3NeoWalletApiService,
+    private o3EthWalletApiService: O3EthWalletApiService,
+    private neolineWalletApiService: NeolineWalletApiService,
+    private metaMaskWalletApiService: MetaMaskWalletApiService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     this.swap$ = store.select('swap');
     this.router.events.subscribe((res: RouterEvent) => {
@@ -70,18 +75,16 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.swap$.subscribe((state) => {
-      this.neoAccount = state.neoAccount;
+      this.neoAccountAddress = state.neoAccountAddress;
+      this.ethAccountAddress = state.ethAccountAddress;
       this.neoWalletName = state.neoWalletName;
       this.ethWalletName = state.ethWalletName;
+      this.changeDetectorRef.detectChanges();
     });
   }
 
   showConnect(): void {
-    if (!this.neoAccount) {
-      this.showConnectModal = true;
-    } else {
-      this.showAccountModal = true;
-    }
+    this.showConnectModal = true;
   }
 
   copy(value: string): void {
@@ -94,18 +97,25 @@ export class AppComponent implements OnInit {
         this.neolineWalletApiService.connect();
         break;
       case 'O3':
-        this.o3WalletApiService.connect();
+        this.o3NeoWalletApiService.connect();
         break;
     }
   }
 
-  connectEthWallet(type: EthWalletName): void {
-    this.showConnectModal = false;
+  connectEthWallet(wallet: EthWallet): void {
+    switch (wallet.name) {
+      case 'MetaMask':
+        this.metaMaskWalletApiService.connect();
+        break;
+      case 'O3':
+        this.o3EthWalletApiService.connect();
+        break;
+    }
   }
 
   disConnect(): void {
     this.showAccountModal = false;
-    this.neoAccount = null;
+    this.neoAccountAddress = null;
     this.store.dispatch({ type: UPDATE_NEO_ACCOUNT, data: null });
     this.store.dispatch({ type: RESET_NEO_BALANCES });
   }
