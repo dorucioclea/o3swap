@@ -42,16 +42,16 @@ export class SwapTokenComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.swap$.subscribe((state) => {
-      this.tokenBalance = state.balances;
-      this.handleTokenAmount();
-      // this.changeDetectorRef.detectChanges();
-    });
     const tokens = NEO_TOKENS;
     this.allTokens = this.hideToken
       ? tokens.filter((item) => item.assetID !== this.hideToken.assetID)
       : tokens;
     this.displayTokens = this.allTokens;
+    this.swap$.subscribe((state) => {
+      this.tokenBalance = state.balances;
+      this.handleTokenAmount();
+      // this.changeDetectorRef.detectChanges();
+    });
   }
 
   backToHomePage(): void {

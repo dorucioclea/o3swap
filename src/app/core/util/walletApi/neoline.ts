@@ -13,11 +13,16 @@ import {
   UPDATE_NEO_WALLET_NAME,
   AssetQueryResponseItem,
   SwapStateType,
+  ADD_TX,
+  CONFIRMED_TX,
+  UPDATE_PENDING_TX,
+  SWAP_CROSS_CHAIN_CONTRACT_HASH,
 } from '@lib';
 import { Observable } from 'rxjs';
 
 interface State {
   swap: SwapStateType;
+  cache: any;
 }
 
 @Injectable()
@@ -27,6 +32,9 @@ export class NeolineWalletApiService {
 
   swap$: Observable<any>;
   neoWalletName: NeoWalletName;
+
+  cache$;
+  txStatus;
 
   neolineDapi;
 
@@ -39,6 +47,10 @@ export class NeolineWalletApiService {
     this.swap$ = store.select('swap');
     this.swap$.subscribe((state) => {
       this.neoWalletName = state.neoWalletName;
+    });
+    this.cache$ = store.select('cache');
+    this.cache$.subscribe((state) => {
+      this.txStatus = state.txStatus;
     });
     window.addEventListener('NEOLine.NEO.EVENT.READY', () => {
       this.neolineDapi = new (window as any).NEOLine.Init();
@@ -89,6 +101,106 @@ export class NeolineWalletApiService {
         });
       })
       .catch((error) => {
+        this.swapService.handleNeoDapiError(error, 'NeoLine');
+      });
+  }
+
+  async swapCrossChain(
+    fromToken: Token,
+    chooseSwapPath: AssetQueryResponseItem,
+    inputAmount: string,
+    slipValue: number,
+    deadline: number,
+    toAddress: string,
+    isMix: boolean = false,
+    crossAssetHash: string = ''
+  ): Promise<string> {
+    const toNeoswapPath = await this.swapService.getToNeoSwapPath(
+      fromToken,
+      inputAmount
+    );
+    const args = [
+      {
+        type: 'Address',
+        value: this.accountAddress,
+      },
+      {
+        type: 'Integer',
+        value: this.swapService.getAmountIn(fromToken, inputAmount),
+      },
+      {
+        type: 'Integer',
+        value: this.swapService.getAmountOutMin(chooseSwapPath, slipValue),
+      },
+      {
+        type: 'Array',
+        value: chooseSwapPath.swapPath.map((assetName) => ({
+          type: 'Hash160',
+          value: this.swapService.getNeoAssetHashByName(assetName),
+        })),
+      },
+      {
+        type: 'Array',
+        value: toNeoswapPath.map((assetName) => ({
+          type: 'Hash160',
+          value: this.swapService.getNeoAssetHashByName(assetName),
+        })),
+      },
+      {
+        type: 'Integer',
+        value: Math.floor(Date.now() / 1000 + deadline * 60),
+      },
+      {
+        type: 'Integer',
+        value: 0,
+      },
+      {
+        type: 'String',
+        value: toAddress,
+      },
+      {
+        type: 'Integer',
+        value: 2,
+      },
+      {
+        type: 'Integer',
+        value: 0,
+      },
+      {
+        type: 'Boolean',
+        value: isMix,
+      },
+      {
+        type: 'Hash160',
+        value: crossAssetHash,
+      },
+    ];
+    console.log(args);
+    return this.neolineDapi
+      .invoke({
+        scriptHash: SWAP_CROSS_CHAIN_CONTRACT_HASH,
+        operation: 'DelegateSwapTokenInForTokenOutNCrossChain',
+        args,
+      })
+      .then(({ txid }) => {
+        const txHash = '0x' + txid;
+        this.store.dispatch({ type: UPDATE_PENDING_TX, data: txHash });
+        this.store.dispatch({ type: ADD_TX, data: txHash });
+        window.addEventListener(
+          'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
+          (result: any) => {
+            console.log(result.detail.txid);
+            this.getBalances();
+            this.store.dispatch({
+              type: CONFIRMED_TX,
+              data: result.detail.txid,
+            });
+          }
+        );
+        return txHash;
+      })
+      .catch((error) => {
+        console.log(error);
         this.swapService.handleNeoDapiError(error, 'NeoLine');
       });
   }
@@ -148,17 +260,23 @@ export class NeolineWalletApiService {
       })
       .then(({ txid }) => {
         const txHash = '0x' + txid;
+        this.store.dispatch({ type: UPDATE_PENDING_TX, data: txHash });
+        this.store.dispatch({ type: ADD_TX, data: txHash });
         window.addEventListener(
           'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
           (result: any) => {
-            if (result.detail.txid === txHash) {
-              this.getBalances();
-            }
+            console.log(result.detail.txid);
+            this.getBalances();
+            this.store.dispatch({
+              type: CONFIRMED_TX,
+              data: result.detail.txid,
+            });
           }
         );
         return txHash;
       })
       .catch((error) => {
+        console.log(error);
         this.swapService.handleNeoDapiError(error, 'NeoLine');
       });
   }

@@ -8,6 +8,7 @@ import {
   UPDATE_ETH_ACCOUNT,
   UPDATE_METAMASK_CHAIN_ID,
   UPDATE_NEOLINE_IS_MAINNET,
+  UPDATE_PENDING_TX,
 } from '@lib';
 
 const initialState: SwapStateType = {
@@ -18,6 +19,7 @@ const initialState: SwapStateType = {
   balances: {}, // neo 链连接钱包的balances
   neolineIsMainNet: true,
   metamaskIsMainNet: true,
+  pendingTx: null,
 };
 
 export default function swap(state = initialState, action): any {
@@ -41,6 +43,9 @@ export default function swap(state = initialState, action): any {
       return { ...state, neolineIsMainNet: action.data };
     case UPDATE_METAMASK_CHAIN_ID:
       return { ...state, metamaskIsMainNet: action.data };
+
+    case UPDATE_PENDING_TX:
+      return { ...state, pendingTx: action.data };
     default:
       return state;
   }

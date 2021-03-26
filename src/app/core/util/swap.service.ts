@@ -58,7 +58,7 @@ export class SwapService {
     const factPercentage = new BigNumber(1).minus(
       new BigNumber(slipValue).shiftedBy(-2)
     );
-    const factAmount = new BigNumber(amount).times(factPercentage).toFixed();
+    const factAmount = new BigNumber(amount).times(factPercentage).dp(0).toFixed();
     return factAmount;
   }
   getNeoAssetHashByName(name: string): string {

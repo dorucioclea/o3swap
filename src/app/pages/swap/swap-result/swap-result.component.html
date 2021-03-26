@@ -114,7 +114,7 @@
 <section class="cover" *ngIf="showTxHashModal">
   <div class="container tx-hash-container">
     <p class="title">
-      <img *ngIf='isTxPending' class="close pending" src="/assets/images/swap-result/close-pending.png" alt="">
+      <img *ngIf='isTxPending' (click)="minTxHashModal()" class="close pending" src="/assets/images/swap-result/close-pending.png" alt="">
       <img *ngIf='!isTxPending' (click)="closeTxHashModal()" class="close" src="/assets/images/swap/close.png" alt="">
     </p>
     <div class="content">
@@ -126,8 +126,8 @@
       <p class="status">{{ isTxPending ? 'Pending' : 'Success' }}</p>
       <div class="desc">
         <span>Hash</span>
-        {{ txhash | shortAddress: 10 }}
-        <img class="copy" (click)="copy(txhash)" src="/assets/images/swap-result/copy.png" alt="">
+        {{ pendingTx | shortAddress: 10 }}
+        <img class="copy" (click)="copy(pendingTx)" src="/assets/images/swap-result/copy.png" alt="">
         <a target="_blank" [href]="txPage">
           <img src="/assets/images/swap-result/link.png" alt="">
         </a>
