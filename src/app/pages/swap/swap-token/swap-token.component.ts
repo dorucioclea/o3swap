@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { ALL_TOKENS, NEO_TOKENS, SwapStateType } from '@lib';
 import { Token } from '@lib';
 import { ApiService } from '@core';
@@ -26,7 +33,11 @@ export class SwapTokenComponent implements OnInit {
   displayTokens: any[] = []; // 最终展示的 tokens, search 结果
   isfocusSearchInput = false;
 
-  constructor(private apiService: ApiService, private store: Store<State>) {
+  constructor(
+    private apiService: ApiService,
+    private store: Store<State>,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {
     this.swap$ = store.select('swap');
   }
 
@@ -34,6 +45,7 @@ export class SwapTokenComponent implements OnInit {
     this.swap$.subscribe((state) => {
       this.tokenBalance = state.balances;
       this.handleTokenAmount();
+      // this.changeDetectorRef.detectChanges();
     });
     const tokens = NEO_TOKENS;
     this.allTokens = this.hideToken

@@ -21,32 +21,32 @@ export interface EthWallet extends Wallet {
 }
 export const NEO_WALLETS: NeoWallet[] = [
   {
+    name: 'O3',
+    chainId: CHAIN_ID_NEO,
+    logo: '/assets/images/logo-O3.png',
+    downloadUrl: 'https://o3.network/#download',
+  },
+  {
     name: 'NeoLine',
     chainId: CHAIN_ID_NEO,
     logo: '/assets/images/logo-NeoLine.png',
     downloadUrl:
       'https://chrome.google.com/webstore/detail/neoline/cphhlgmgameodnhkjdmkpanlelnlohao',
   },
+];
+
+export const ETH_WALLETS: EthWallet[] = [
   {
     name: 'O3',
     chainId: CHAIN_ID_NEO,
     logo: '/assets/images/logo-O3.png',
     downloadUrl: 'https://o3.network/#download',
   },
-];
-
-export const ETH_WALLETS: EthWallet[] = [
   {
     name: 'MetaMask',
     chainId: CHAIN_ID_ETHEREUM,
     logo: '/assets/images/logo-MetaMask.png',
     downloadUrl:
       'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
-  },
-  {
-    name: 'O3',
-    chainId: CHAIN_ID_NEO,
-    logo: '/assets/images/logo-O3.png',
-    downloadUrl: 'https://o3.network/#download',
   },
 ];

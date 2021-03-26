@@ -27,18 +27,61 @@
           <a href="https://docs.o3swap.com/" target="_blank">Doc</a>
         </li> -->
       </ul>
-      <div *ngIf="isHome===false" class="connect" [ngClass]="{'account': neoAccountAddress}" (click)="showConnect()">
-        <img *ngIf="!neoAccountAddress" src="/assets/images/swap/link.png" alt="">
-        <img *ngIf="neoAccountAddress" src="/assets/images/tokens/neo.png" alt="">
-        <span>{{ neoAccountAddress ? (neoAccountAddress | shortAddress: 5) : 'Connect Wallet' }}</span>
+      <div *ngIf="isHome===false" class="connect">
+        <div class="wallet" *ngIf="ethWalletName">
+          <img (mouseenter)="showAccountModal('ETH')" (mouseleave)="hideAccountModal('ETH')"
+            src="/assets/images/tokens/eth.png" alt="">
+          <div class="dropdown" *ngIf="showEthAccountModal" (mouseenter)="showAccountModal('ETH')"
+            (mouseleave)="hideAccountModal('ETH')">
+            <div class="title">
+              <span>Account</span>
+              <button class="change-btn" (click)="changeWallet('ETH')">
+                <img class="change" src="/assets/images/swap/account-change.png" alt="">Change
+              </button>
+            </div>
+            <div class="account">
+              <p class="name">{{ ethWalletName }} Wallet</p>
+              <p class="address">
+                {{ ethAccountAddress | shortAddress: 6 }}
+                <img class="copy" (click)="copy(ethAccountAddress)" src="/assets/images/swap/copy.png" alt="">
+              </p>
+            </div>
+            <button class="disconnect" (click)="disConnect('ETH')">Disconnect</button>
+          </div>
+        </div>
+        <div class="wallet" *ngIf="neoWalletName">
+          <img (mouseenter)="showAccountModal('NEO')" (mouseleave)="hideAccountModal('NEO')"
+            src="/assets/images/tokens/neo.png" alt="">
+          <div class="dropdown" *ngIf="showNeoAccountModal" (mouseenter)="showAccountModal('NEO')"
+            (mouseleave)="hideAccountModal('NEO')">
+            <div class="title">
+              <span>Account</span>
+              <button class="change-btn" (click)="changeWallet('NEO')">
+                <img class="change" src="/assets/images/swap/account-change.png" alt="">Change
+              </button>
+            </div>
+            <div class="account">
+              <p class="name">{{ neoWalletName }} Wallet</p>
+              <p class="address">
+                {{ neoAccountAddress | shortAddress: 6 }}
+                <img class="copy" (click)="copy(neoAccountAddress)" src="/assets/images/swap/copy.png" alt="">
+              </p>
+            </div>
+            <button class="disconnect" (click)="disConnect('NEO')">Disconnect</button>
+          </div>
+        </div>
+        <div class="connect-btn" *ngIf="!ethWalletName||!neoWalletName" (click)="showConnect()">
+          <img src="/assets/images/swap/link.png" alt="">
+          <span>Connect Wallet</span>
+        </div>
       </div>
     </div>
   </header>
   <router-outlet></router-outlet>
 </div>
 
-<section class="cover" *ngIf="showConnectModal">
-  <div class="container connect-container">
+<section class="cover" (click)="showConnectModal=false" *ngIf="showConnectModal">
+  <div class="container connect-container" (click)="$event.stopPropagation()">
     <p class="title">
       <span>Connect wallet</span>
       <img class="close" (click)="showConnectModal=false" src="/assets/images/swap/close.png" alt="">
@@ -82,27 +125,5 @@
         </div>
       </li>
     </ul>
-  </div>
-</section>
-
-<section class="cover" *ngIf="showAccountModal">
-  <div class="container account-container">
-    <div class="title">
-      <span>Account</span>
-      <div class="title-right">
-        <button class="change" (click)="changeWallet()"><img class="change" src="/assets/images/swap/account-change.png"
-            alt="">Change</button>
-        <img class="close" (click)="showAccountModal=false" src="/assets/images/swap/close.png" alt="">
-      </div>
-    </div>
-    <div class="account">
-      <p class="name">{{ neoWalletName }}</p>
-      <div class="row">
-        <img class="logo" src="/assets/images/tokens/neo.png" alt="">
-        <span class="address">{{ neoAccountAddress | shortAddress: 9 }}</span>
-        <img class="copy" (click)="copy(neoAccountAddress)" src="/assets/images/swap/copy.png" alt="">
-      </div>
-    </div>
-    <button class="disconnect" (click)="disConnect()">Disconnect</button>
   </div>
 </section>

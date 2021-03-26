@@ -5,7 +5,8 @@ export interface SwapStateType {
   neoAccountAddress: string;
   ethAccountAddress: string;
   balances: object;
-  isMainNet: boolean;
+  neolineIsMainNet: boolean;
+  metamaskIsMainNet: boolean;
 }
 
 export const SWAP_CONTRACT_HASH = '0x7a10eeaaf99871fe0a9a39ebd027c97705585666';

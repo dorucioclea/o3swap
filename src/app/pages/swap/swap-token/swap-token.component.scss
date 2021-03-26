@@ -24,6 +24,7 @@ section.choose-token-wrapper {
     left: 0;
     height: 420px;
     width: 90px;
+    z-index: 9999;
     background: #222222;
     border-top-right-radius: 40px;
     border-bottom-left-radius: 40px;
@@ -40,23 +41,24 @@ section.choose-token-wrapper {
     }
   }
   ul.tokens {
-    margin-top: 60px;
-    margin-left: 90px;
-    padding-right: 12px;
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    height: 380px;
     font-size: 18px;
-    height: 350px;
     overflow-y: scroll;
     li.token {
+      padding-left: 110px;
+      padding-right: 40px;
+      height: 66px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
-      &:not(:first-child) {
-        margin-top: 30px;
-      }
       &:hover,
       &.active {
-        color: #46b069;
+        background: #303030;
       }
       .amount {
         font-family: "fontRegular";

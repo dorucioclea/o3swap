@@ -9,11 +9,12 @@ import {
   Token,
   UPDATE_NEO_ACCOUNT,
   UPDATE_NEO_BALANCES,
-  UPDATE_NEO_IS_MAINNET,
+  UPDATE_NEOLINE_IS_MAINNET,
   UPDATE_NEO_WALLET_NAME,
   AssetQueryResponseItem,
   SwapStateType,
 } from '@lib';
+import { Observable } from 'rxjs';
 
 interface State {
   swap: SwapStateType;
@@ -21,8 +22,11 @@ interface State {
 
 @Injectable()
 export class NeolineWalletApiService {
-  walletName: NeoWalletName = 'NeoLine';
+  myWalletName: NeoWalletName = 'NeoLine';
   accountAddress: string;
+
+  swap$: Observable<any>;
+  neoWalletName: NeoWalletName;
 
   neolineDapi;
 
@@ -32,6 +36,10 @@ export class NeolineWalletApiService {
     private commonService: CommonService,
     private swapService: SwapService
   ) {
+    this.swap$ = store.select('swap');
+    this.swap$.subscribe((state) => {
+      this.neoWalletName = state.neoWalletName;
+    });
     window.addEventListener('NEOLine.NEO.EVENT.READY', () => {
       this.neolineDapi = new (window as any).NEOLine.Init();
     });
@@ -39,7 +47,7 @@ export class NeolineWalletApiService {
 
   connect(): void {
     if (this.neolineDapi === undefined) {
-      this.swapService.toDownloadWallet(this.walletName);
+      this.swapService.toDownloadWallet(this.myWalletName);
       return;
     }
     this.neolineDapi
@@ -53,7 +61,7 @@ export class NeolineWalletApiService {
         });
         this.store.dispatch({
           type: UPDATE_NEO_WALLET_NAME,
-          data: this.walletName,
+          data: this.myWalletName,
         });
         this.addListener();
         this.getBalances();
@@ -164,15 +172,17 @@ export class NeolineWalletApiService {
           type: UPDATE_NEO_ACCOUNT,
           data: this.accountAddress,
         });
-        this.getBalances();
+        if (this.neoWalletName === this.myWalletName) {
+          this.getBalances();
+        }
       }
     );
     // this.neolineDapi.getNetworks().then((res) => {
     //   if ((res.defaultNetwork as string).toLowerCase().includes('test')) {
-    //     this.store.dispatch({ type: UPDATE_NEO_IS_MAINNET, data: false });
-    //     this.nzMessage.error('Please connect wallet to the main net.');
+    //     this.store.dispatch({ type: UPDATE_NEOLINE_IS_MAINNET, data: false });
+    //     this.nzMessage.error('Please switch network to MainNet on NeoLine wallet.');
     //   } else {
-    //     this.store.dispatch({ type: UPDATE_NEO_IS_MAINNET, data: true });
+    //     this.store.dispatch({ type: UPDATE_NEOLINE_IS_MAINNET, data: true });
     //   }
     // });
     // window.addEventListener(
@@ -183,11 +193,11 @@ export class NeolineWalletApiService {
     //         .toLowerCase()
     //         .includes('test')
     //     ) {
-    //       this.store.dispatch({ type: UPDATE_NEO_IS_MAINNET, data: false });
+    //       this.store.dispatch({ type: UPDATE_NEOLINE_IS_MAINNET, data: false });
     //       this.getBalances();
-    //       this.nzMessage.error('Please connect wallet to the main net.');
+    //       this.nzMessage.error('Please switch network to MainNet on NeoLine wallet.');
     //     } else {
-    //       this.store.dispatch({ type: UPDATE_NEO_IS_MAINNET, data: true });
+    //       this.store.dispatch({ type: UPDATE_NEOLINE_IS_MAINNET, data: true });
     //     }
     //   }
     // );

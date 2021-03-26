@@ -1,4 +1,4 @@
-import { Component, OnChanges, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterEvent, NavigationEnd } from '@angular/router';
 import {
   ETH_WALLETS,
@@ -8,9 +8,11 @@ import {
   NeoWallet,
   UPDATE_NEO_ACCOUNT,
   SwapStateType,
-  UPDATE_NEO_BALANCES,
   RESET_NEO_BALANCES,
   EthWallet,
+  UPDATE_NEO_WALLET_NAME,
+  UPDATE_ETH_ACCOUNT,
+  UPDATE_ETH_WALLET_NAME,
 } from '@lib';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import {
@@ -45,7 +47,10 @@ export class AppComponent implements OnInit {
   connectWalletType: ConnectWalletType = 'NEO';
   // 弹窗
   showConnectModal = false;
-  showAccountModal = false;
+  showNeoAccountModal = false;
+  showEthAccountModal = false;
+  showNeoAccountModalTimeOut;
+  showEthAccountModalTimeOut;
 
   swap$: Observable<any>;
   neoAccountAddress: string;
@@ -113,16 +118,65 @@ export class AppComponent implements OnInit {
     }
   }
 
-  disConnect(): void {
-    this.showAccountModal = false;
-    this.neoAccountAddress = null;
-    this.store.dispatch({ type: UPDATE_NEO_ACCOUNT, data: null });
-    this.store.dispatch({ type: RESET_NEO_BALANCES });
+  disConnect(type: ConnectWalletType): void {
+    switch (type) {
+      case 'ETH':
+        this.showEthAccountModal = false;
+        this.ethWalletName = null;
+        this.ethAccountAddress = null;
+        this.store.dispatch({ type: UPDATE_ETH_ACCOUNT, data: null });
+        this.store.dispatch({ type: UPDATE_ETH_WALLET_NAME, data: null });
+        break;
+      case 'NEO':
+        this.showNeoAccountModal = false;
+        this.neoWalletName = null;
+        this.neoAccountAddress = null;
+        this.store.dispatch({ type: UPDATE_NEO_ACCOUNT, data: null });
+        this.store.dispatch({ type: UPDATE_NEO_WALLET_NAME, data: null });
+        this.store.dispatch({ type: RESET_NEO_BALANCES });
+        break;
+    }
   }
 
-  changeWallet(): void {
-    this.showAccountModal = false;
+  changeWallet(type: ConnectWalletType): void {
+    this.connectWalletType = type;
     this.showConnectModal = true;
+    switch (type) {
+      case 'ETH':
+        this.showEthAccountModal = false;
+        break;
+      case 'NEO':
+        this.showNeoAccountModal = false;
+        break;
+    }
+  }
+
+  showAccountModal(type: ConnectWalletType): void {
+    switch (type) {
+      case 'ETH':
+        clearTimeout(this.showEthAccountModalTimeOut);
+        this.showEthAccountModal = true;
+        break;
+      case 'NEO':
+        clearTimeout(this.showNeoAccountModalTimeOut);
+        this.showNeoAccountModal = true;
+        break;
+    }
+  }
+
+  hideAccountModal(type: ConnectWalletType): void {
+    switch (type) {
+      case 'ETH':
+        this.showEthAccountModalTimeOut = setTimeout(() => {
+          this.showEthAccountModal = false;
+        }, 200);
+        break;
+      case 'NEO':
+        this.showNeoAccountModalTimeOut = setTimeout(() => {
+          this.showNeoAccountModal = false;
+        }, 200);
+        break;
+    }
   }
 
   isHomePage(): boolean {
