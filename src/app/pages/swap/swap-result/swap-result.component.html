@@ -110,28 +110,3 @@
     </ul> -->
   </div>
 </section>
-
-<section class="cover" *ngIf="showTxHashModal">
-  <div class="container tx-hash-container">
-    <p class="title">
-      <img *ngIf='isTxPending' (click)="minTxHashModal()" class="close pending" src="/assets/images/swap-result/close-pending.png" alt="">
-      <img *ngIf='!isTxPending' (click)="closeTxHashModal()" class="close" src="/assets/images/swap/close.png" alt="">
-    </p>
-    <div class="content">
-      <div class="status-img" [ngClass]="{pending: isTxPending}">
-        <img *ngIf='isTxPending' src="/assets/images/swap-result/logo.png" alt="">
-        <img class="pending-icon" *ngIf='isTxPending' src="/assets/images/swap-result/pending.png" alt="">
-        <img *ngIf='!isTxPending' src="/assets/images/swap-result/success.png" alt="">
-      </div>
-      <p class="status">{{ isTxPending ? 'Pending' : 'Success' }}</p>
-      <div class="desc">
-        <span>Hash</span>
-        {{ pendingTx | shortAddress: 10 }}
-        <img class="copy" (click)="copy(pendingTx)" src="/assets/images/swap-result/copy.png" alt="">
-        <a target="_blank" [href]="txPage">
-          <img src="/assets/images/swap-result/link.png" alt="">
-        </a>
-      </div>
-    </div>
-  </div>
-</section>

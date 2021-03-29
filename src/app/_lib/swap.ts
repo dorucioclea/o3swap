@@ -1,4 +1,10 @@
 import { NeoWalletName, EthWalletName } from './wallet';
+
+export interface SwapTransaction {
+  txid: string;
+  isPending: boolean;
+  min: boolean;
+}
 export interface SwapStateType {
   neoWalletName: NeoWalletName;
   ethWalletName: EthWalletName;
@@ -7,7 +13,7 @@ export interface SwapStateType {
   balances: object;
   neolineIsMainNet: boolean;
   metamaskIsMainNet: boolean;
-  pendingTx: string;
+  transaction: SwapTransaction;
 }
 
 export const SWAP_CONTRACT_HASH = '0x7a10eeaaf99871fe0a9a39ebd027c97705585666';

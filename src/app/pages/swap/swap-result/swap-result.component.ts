@@ -14,6 +14,7 @@ import {
   AssetQueryResponseItem,
   SwapStateType,
   UPDATE_PENDING_TX,
+  SwapTransaction,
 } from '@lib';
 import {
   ApiService,
@@ -29,7 +30,6 @@ import { Store } from '@ngrx/store';
 
 interface State {
   swap: SwapStateType;
-  cache: any;
 }
 
 @Component({
@@ -53,21 +53,12 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   ethAccountAddress: string;
   isMainNet: boolean;
   neoWalletName: NeoWalletName;
-  pendingTx: string;
-
-  cache$;
-  txStatus;
 
   TOKENS: Token[] = []; // 所有的 tokens
   o3SwapFee = O3SWAP_FEE_PERCENTAGE;
   showRoutingModal = false; // swap 路径弹窗
   showTxHashModal = false;
   showInquiry: boolean;
-  isTxPending = true;
-  TX_PAGES_PREFIX = 'https://testnet.neotube.io/transaction/';
-  // txhash = '0xff2eaa131b5b65caa64c048224a9860742194cfb5dbff5c44790ec4e406a45cf';
-  // txPage = this.TX_PAGES_PREFIX + this.txhash;
-  txPage: string;
   inquiryInterval; // 询价定时器
 
   chooseSwapPath: AssetQueryResponseItem;
@@ -86,7 +77,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     private o3NeoWalletApiService: O3NeoWalletApiService
   ) {
     this.swap$ = store.select('swap');
-    this.cache$ = store.select('cache');
   }
 
   ngOnInit(): void {
@@ -95,19 +85,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.ethAccountAddress = state.ethAccountAddress;
       this.neoWalletName = state.neoWalletName;
       this.isMainNet = state.isMainNet;
-      if (state.pendingTx !== null) {
-        this.pendingTx = state.pendingTx;
-        this.showTxHashModal = true;
-        this.isTxPending = true;
-        this.txPage = this.TX_PAGES_PREFIX + this.pendingTx;
-      }
-    });
-    this.cache$.subscribe((state) => {
-      this.txStatus = state.txStatus;
-      if (this.txStatus[this.pendingTx] === true) {
-        this.isTxPending = false;
-        this.store.dispatch({ type: UPDATE_PENDING_TX, data: null });
-      }
     });
     if (this.initData) {
       this.chooseSwapPath = this.initData.chooseSwapPath;
@@ -138,12 +115,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       lnversePrice: this.lnversePrice,
     };
     this.closePage.emit(initData);
-  }
-  copy(hash: string): void {
-    this.commonService.copy(hash);
-  }
-  closeTxHashModal(): void {
-    this.closePage.emit();
   }
 
   changeSwapPath(index: number): void {
@@ -198,6 +169,10 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   swap(): void {
+    // if (this.toToken.symbol === 'fWBTC') {
+    // this.swapCrossChain();
+    // return;
+    // }
     if (!this.neoAccountAddress) {
       this.nzMessage.error('Please connect the wallet first');
       return;
@@ -228,7 +203,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     );
   }
 
-  minTxHashModal(): void {}
   //#region
   getSwapPath(): void {
     this.chooseSwapPath = null;

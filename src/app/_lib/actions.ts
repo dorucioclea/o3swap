@@ -13,6 +13,3 @@ export const UPDATE_METAMASK_CHAIN_ID = 'UPDATE_METAMASK_CHAIN_ID';
 
 export const UPDATE_PENDING_TX = 'UPDATE_PENDING_TX';
 
-// cache
-export const CONFIRMED_TX = 'CONFIRMED_TX';
-export const ADD_TX = 'ADD_TX';

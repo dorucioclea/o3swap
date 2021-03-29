@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiService } from '@core';
-import { Token } from '@lib';
+import { ApiService, CommonService } from '@core';
+import { SwapStateType, SwapTransaction, Token, UPDATE_PENDING_TX } from '@lib';
+import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { Observable } from 'rxjs';
 
 type PageStatus = 'home' | 'token' | 'setting' | 'result';
 export const defaultSlipValue = 2; // 默认滑点 2%
@@ -12,12 +14,22 @@ interface Setting {
   deadline: number;
 }
 
+interface State {
+  swap: SwapStateType;
+}
+
 @Component({
   selector: 'app-swap',
   templateUrl: './swap.component.html',
   styleUrls: ['./swap.component.scss'],
 })
 export class SwapComponent implements OnInit {
+  TX_PAGES_PREFIX = 'https://testnet.neotube.io/transaction/';
+  txPage: string;
+
+  swap$: Observable<any>;
+  transaction: SwapTransaction;
+
   pageStatus: PageStatus = 'home';
 
   rates = {};
@@ -35,11 +47,20 @@ export class SwapComponent implements OnInit {
   initResultData;
 
   constructor(
+    public store: Store<State>,
     private apiService: ApiService,
-    private nzMessage: NzMessageService
-  ) {}
+    private nzMessage: NzMessageService,
+    private commonService: CommonService
+  ) {
+    this.swap$ = store.select('swap');
+  }
 
   ngOnInit(): void {
+    this.swap$.subscribe((state) => {
+      this.transaction = Object.assign({}, state.transaction);
+      this.txPage = this.TX_PAGES_PREFIX + this.transaction.txid;
+      console.log(this.transaction);
+    });
     this.settings = {
       deadline: defaultDeadline,
       slipValue: defaultSlipValue,
@@ -52,6 +73,20 @@ export class SwapComponent implements OnInit {
     this.apiService.getRates().subscribe((res) => {
       this.rates = res;
     });
+  }
+
+  minTxHashModal(): void {
+    this.transaction.min = true;
+    this.store.dispatch({ type: UPDATE_PENDING_TX, data: this.transaction });
+  }
+
+  maxTxHashModal(): void {
+    this.transaction.min = false;
+    this.store.dispatch({ type: UPDATE_PENDING_TX, data: this.transaction });
+  }
+
+  copy(hash: string): void {
+    this.commonService.copy(hash);
   }
 
   //#region home
