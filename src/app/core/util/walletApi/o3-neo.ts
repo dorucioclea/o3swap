@@ -80,7 +80,7 @@ export class O3NeoWalletApiService {
         const tokens = addressTokens[this.accountAddress];
         const tempTokenBalance = {};
         tokens.forEach((tokenItem: any) => {
-          tempTokenBalance[tokenItem.assetID] = tokenItem;
+          tempTokenBalance[tokenItem.asset_id] = tokenItem;
         });
         this.store.dispatch({
           type: UPDATE_NEO_BALANCES,
@@ -212,8 +212,8 @@ export class O3NeoWalletApiService {
         value: 0,
       },
       {
-        type: 'String',
-        value: toAddress,
+        type: 'Hash160',
+        value: this.swapService.getHash160FromAddress(toAddress),
       },
       {
         type: 'Integer',

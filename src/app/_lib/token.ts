@@ -74,6 +74,13 @@ export const NEO_TOKENS: Token[] = [
     logo: '/assets/images/tokens/neo/pONT.png',
   },
   {
+    assetID: '9b2446d658859a96a7c40204d027bf5f9ca896e5',
+    symbol: 'fWETH',
+    decimals: 18,
+    amount: null,
+    logo: '/assets/images/tokens/neo/pnWETH.png',
+  },
+  {
     assetID: '23535b6fd46b8f867ed010bab4c2bd8ef0d0c64f',
     symbol: 'pnWETH',
     decimals: 18,

@@ -198,10 +198,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   swap(): void {
-    this.swapCrossChain();
-    return;
-    if (this.toToken.symbol === 'fWBTC') {
-    }
     if (!this.neoAccountAddress) {
       this.nzMessage.error('Please connect the wallet first');
       return;

@@ -14,6 +14,8 @@ import {
 import { ApiService } from '../api/api.service';
 import { CommonService } from './common.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import * as crypto from 'crypto-js';
+import { ethers } from 'ethers';
 
 @Injectable()
 export class SwapService {
@@ -58,12 +60,20 @@ export class SwapService {
     const factPercentage = new BigNumber(1).minus(
       new BigNumber(slipValue).shiftedBy(-2)
     );
-    const factAmount = new BigNumber(amount).times(factPercentage).dp(0).toFixed();
+    const factAmount = new BigNumber(amount)
+      .times(factPercentage)
+      .dp(0)
+      .toFixed();
     return factAmount;
   }
   getNeoAssetHashByName(name: string): string {
     const token = NEO_TOKENS.find((item) => item.symbol === name);
     return (token && token.assetID) || '';
+  }
+  getHash160FromAddress(text: string): any {
+    const address = ethers.utils.getAddress(text);
+    const res = crypto.RIPEMD160(crypto.SHA256(address).toString()).toString();
+    return res;
   }
   handleNeoDapiError(error, walletName: NeoWalletName): void {
     switch (error.type) {

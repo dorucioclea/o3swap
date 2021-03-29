@@ -45,6 +45,7 @@ export class MetaMaskWalletApiService {
     this.ethereum
       .request({ method: 'eth_requestAccounts' })
       .then((result) => {
+        // console.log(result);
         this.accountAddress = result[0];
         this.store.dispatch({
           type: UPDATE_ETH_ACCOUNT,

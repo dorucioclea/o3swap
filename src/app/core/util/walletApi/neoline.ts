@@ -65,7 +65,7 @@ export class NeolineWalletApiService {
     this.neolineDapi
       .getAccount()
       .then((result) => {
-        // console.log(result);
+        console.log(result);
         this.accountAddress = result.address;
         this.store.dispatch({
           type: UPDATE_NEO_ACCOUNT,
@@ -91,9 +91,10 @@ export class NeolineWalletApiService {
       })
       .then((addressTokens: any[]) => {
         const tokens = addressTokens[this.accountAddress];
+        // console.log(tokens);
         const tempTokenBalance = {};
         tokens.forEach((tokenItem: any) => {
-          tempTokenBalance[tokenItem.assetID] = tokenItem;
+          tempTokenBalance[tokenItem.asset_id] = tokenItem;
         });
         this.store.dispatch({
           type: UPDATE_NEO_BALANCES,
@@ -155,8 +156,8 @@ export class NeolineWalletApiService {
         value: 0,
       },
       {
-        type: 'String',
-        value: toAddress,
+        type: 'Hash160',
+        value: this.swapService.getHash160FromAddress(toAddress),
       },
       {
         type: 'Integer',
