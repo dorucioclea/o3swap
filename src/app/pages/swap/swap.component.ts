@@ -32,8 +32,16 @@ export class SwapComponent implements OnInit {
   pendingMinOptions = {
     path: '/assets/json/pending-min.json',
   };
+  txCompleteOptions = {
+    path: '/assets/json/tx-complete.json',
+    loop: false
+  };
+  txWaitingOptions = {
+    path: '/assets/json/tx-waiting.json',
+  };
   TX_PAGES_PREFIX = 'https://testnet.neotube.io/transaction/';
   txPage: string;
+  showTxDetail = false;
 
   swap$: Observable<any>;
   transaction: SwapTransaction;

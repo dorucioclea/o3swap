@@ -82,6 +82,7 @@ header {
     }
   }
   .connect {
+    min-width: 150px;
     display: flex;
     .wallet {
       position: relative;
@@ -198,7 +199,7 @@ footer {
     border-bottom-left-radius: 40px;
     padding: 3px 15px;
     img {
-      cursor: pointer;
+      // cursor: pointer;
       width: 40px;
       margin-top: 24px;
       border-radius: 10px;

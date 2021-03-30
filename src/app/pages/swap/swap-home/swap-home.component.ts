@@ -66,6 +66,7 @@ export class SwapHomeComponent implements OnInit {
     });
     modal.afterClose.subscribe((res) => {
       if (res) {
+        this.changeData = true;
         if (type === 'from') {
           this.fromToken = res;
           this.checkInputAmountDecimal();
@@ -79,6 +80,7 @@ export class SwapHomeComponent implements OnInit {
 
   changeInputAmount($event): void {
     this.inputAmount = $event.target.value;
+    this.changeData = true;
     this.checkInputAmountDecimal();
     this.resetSwapData();
     this.calcutionInputAmountFiat();
@@ -87,6 +89,7 @@ export class SwapHomeComponent implements OnInit {
   allInputAmount(): void {
     this.inputAmountError = '';
     this.inputAmount = (this.fromToken && this.fromToken.amount) || '0';
+    this.changeData = true;
     this.resetSwapData();
     this.calcutionInputAmountFiat();
   }

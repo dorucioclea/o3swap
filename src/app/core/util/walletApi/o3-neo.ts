@@ -149,6 +149,10 @@ export class O3NeoWalletApiService {
           txid: txHash,
           isPending: true,
           min: false,
+          fromTokenName: fromToken.symbol,
+          toTokenName:
+            chooseSwapPath.swapPath[chooseSwapPath.swapPath.length - 1],
+          amount: inputAmount,
         };
         this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
         o3dapi.NEO.addEventListener(
@@ -252,6 +256,10 @@ export class O3NeoWalletApiService {
           txid: txHash,
           isPending: true,
           min: false,
+          fromTokenName: fromToken.symbol,
+          toTokenName:
+            chooseSwapPath.swapPath[chooseSwapPath.swapPath.length - 1],
+          amount: inputAmount,
         };
         this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
         o3dapi.NEO.addEventListener(

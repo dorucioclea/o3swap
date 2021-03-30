@@ -18,6 +18,7 @@ import { NzMessageModule } from 'ng-zorro-antd/message';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzProgressModule } from 'ng-zorro-antd/progress';
 
 const COMPONENTS = [
   LoadingComponent,
@@ -33,6 +34,7 @@ const THIRD_MODULES = [
   NzToolTipModule,
   NzButtonModule,
   NzModalModule,
+  NzProgressModule,
 ];
 
 @NgModule({

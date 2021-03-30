@@ -181,6 +181,10 @@ export class NeolineWalletApiService {
           txid: txHash,
           isPending: true,
           min: false,
+          fromTokenName: fromToken.symbol,
+          toTokenName:
+            chooseSwapPath.swapPath[chooseSwapPath.swapPath.length - 1],
+          amount: inputAmount,
         };
         this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
         window.addEventListener(
@@ -264,6 +268,10 @@ export class NeolineWalletApiService {
           txid: txHash,
           isPending: true,
           min: false,
+          fromTokenName: fromToken.symbol,
+          toTokenName:
+            chooseSwapPath.swapPath[chooseSwapPath.swapPath.length - 1],
+          amount: inputAmount,
         };
         this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
         window.addEventListener(

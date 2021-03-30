@@ -27,13 +27,13 @@
     <div class="fee-item">
       <p class="label">From</p>
       <p class="value">
-        {{ addressFrom | shortAddress: 10 }}
+        {{ neoAccountAddress | shortAddress: 10 }}
       </p>
     </div>
     <div class="fee-item">
       <p class="label">To</p>
       <p class="value">
-        {{ addressTo | shortAddress: 10 }}
+        {{ neoAccountAddress | shortAddress: 10 }}
       </p>
     </div>
     <div class="fee-item" [ngClass]="{route: chooseSwapPath?.swapPath.length > 4}">

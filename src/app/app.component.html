@@ -70,7 +70,7 @@
             <button class="disconnect" (click)="disConnect('NEO')">Disconnect</button>
           </div>
         </div>
-        <div class="connect-btn" *ngIf="!ethWalletName||!neoWalletName" (click)="showConnect()">
+        <div class="connect-btn" *ngIf="!neoWalletName" (click)="showConnect()">
           <img src="/assets/images/swap/link.png" alt="">
           <span>Connect Wallet</span>
         </div>
@@ -88,7 +88,7 @@
     </div>
     <p class="title">Connect wallet</p>
     <div class="chains">
-      <img [ngClass]="{active: connectWalletType==='ETH'}" (click)="connectWalletType='ETH'"
+      <img [ngClass]="{active: connectWalletType==='ETH'}"
         src="/assets/images/tokens/eth.png" alt="">
       <img [ngClass]="{active: connectWalletType==='NEO'}" (click)="connectWalletType='NEO'"
         src="/assets/images/tokens/neo.png" alt="">

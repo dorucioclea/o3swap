@@ -51,9 +51,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     path: '/assets/json/Inquerying.json',
   };
 
-  addressFrom = '0xd34E3B073a484823058Ab76fc2304D5394beafE4';
-  addressTo = '0xd34E3B073a484823058Ab76fc2304D5394beafE4';
-
   // setting modal
   setting$: Observable<any>;
   slipValue: number;
@@ -223,13 +220,20 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.neoWalletName === 'NeoLine'
         ? this.neolineWalletApiService
         : this.o3NeoWalletApiService;
-    swapApi.swap(
-      this.fromToken,
-      this.chooseSwapPath,
-      this.inputAmount,
-      this.slipValue,
-      this.deadline
-    );
+    swapApi
+      .swap(
+        this.fromToken,
+        this.chooseSwapPath,
+        this.inputAmount,
+        this.slipValue,
+        this.deadline
+      )
+      .then((res) => {
+        console.log(res);
+        if (res) {
+          this.closePage.emit();
+        }
+      });
   }
 
   //#region
@@ -247,14 +251,14 @@ export class SwapResultComponent implements OnInit, OnDestroy {
           this.swapFail.emit();
         }
         if (res.length > 0) {
-          this.handleReceiveSwapPathFiat(res);
+          this.receiveSwapPathArray = res;
+          this.handleReceiveSwapPathFiat();
         }
       });
   }
-  handleReceiveSwapPathFiat(swapPathArr: AssetQueryResponse): void {
-    swapPathArr.forEach((item) => {
-      const tempAmount = item.amount[item.amount.length - 1];
-      item.receiveAmount = new BigNumber(tempAmount)
+  handleReceiveSwapPathFiat(): void {
+    this.receiveSwapPathArray.forEach((item) => {
+      item.receiveAmount = new BigNumber(item.receiveAmount)
         .shiftedBy(-this.toToken.decimals)
         .toFixed();
       // 计算法币价格
@@ -266,9 +270,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
           .toFixed();
       }
     });
-    this.receiveSwapPathArray = this.commonService.shellSortSwapPath(
-      swapPathArr
-    );
     this.chooseSwapPathIndex = 0;
     this.chooseSwapPath = this.receiveSwapPathArray[0];
     this.calculationPrice();

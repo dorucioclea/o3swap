@@ -26,9 +26,30 @@
       </div>
       <p class="status">{{ transaction?.isPending ? 'Pending' : 'Success' }}</p>
       <div class="desc">
-        <span>Hash</span>
-        {{ transaction?.txid | shortAddress: 10 }}
-        <img class="copy" (click)="copy(transaction?.txid)" src="/assets/images/swap-result/copy.png" alt="">
+        Swap {{ transaction?.amount }}{{ transaction?.fromTokenName }} for {{ transaction?.toTokenName }}
+      </div>
+      <nz-progress [nzPercent]="transaction?.isPending ? 60 : 100" [nzShowInfo]="false" nzStrokeWidth="6"
+        nzStrokeColor="#46B069">
+      </nz-progress>
+      <div class="show-detail">
+        <img [ngClass]="{show: showTxDetail}" (click)="showTxDetail=!showTxDetail"
+          src="/assets/images/swap-result/more.png" alt="">
+      </div>
+      <div class="tx-group" *ngIf="showTxDetail">
+        <div class="tx-item">
+          <div class="left">
+            <ng-lottie *ngIf="!transaction?.isPending" class="tx-json" [options]="txCompleteOptions"></ng-lottie>
+            <ng-lottie *ngIf="transaction?.isPending" class="tx-json" [options]="txWaitingOptions"></ng-lottie>
+          </div>
+          <div class="right">
+            <p class="name">{{ transaction?.toTokenName }}</p>
+            <div class="hash">
+              <span>Hash</span>
+              {{ transaction?.txid | shortAddress: 10 }}
+              <img class="copy" (click)="copy(transaction?.txid)" src="/assets/images/swap-result/copy.png" alt="">
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

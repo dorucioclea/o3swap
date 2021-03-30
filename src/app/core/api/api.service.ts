@@ -3,7 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { Observable, forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { CommonHttpResponse } from '@lib';
+import { AssetQueryResponse, CommonHttpResponse } from '@lib';
+import BigNumber from 'bignumber.js';
 
 @Injectable()
 export class ApiService {
@@ -22,10 +23,20 @@ export class ApiService {
     toAssetName: string,
     amount: string
   ): Observable<any> {
-    return this.http.post(
-      `${this.INQUIRY_HOST}?StartAsset=${fromAssetName}&EndAsset=${toAssetName}&amount=${amount}`,
-      null
-    );
+    return this.http
+      .post(
+        `${this.INQUIRY_HOST}?StartAsset=${fromAssetName}&EndAsset=${toAssetName}&amount=${amount}`,
+        null
+      )
+      .pipe(
+        map((res: any) => {
+          if (res.length > 0) {
+            return this.handleReceiveSwapPathFiat(res);
+          } else {
+            return [];
+          }
+        })
+      );
   }
 
   getRates(): Observable<any> {
@@ -43,5 +54,42 @@ export class ApiService {
         return rates;
       })
     );
+  }
+
+  handleReceiveSwapPathFiat(
+    swapPathArr: AssetQueryResponse
+  ): AssetQueryResponse {
+    swapPathArr.forEach((item) => {
+      item.receiveAmount = item.amount[item.amount.length - 1];
+    });
+    return this.shellSortSwapPath(swapPathArr);
+  }
+
+  shellSortSwapPath(arr: any[]): any[] {
+    const len = arr.length;
+    let temp;
+    let gap = 1;
+    while (gap < len / 3) {
+      // 动态定义间隔序列
+      gap = gap * 3 + 1;
+    }
+    for (gap; gap > 0; gap = Math.floor(gap / 3)) {
+      for (let i = gap; i < len; i++) {
+        temp = arr[i];
+        let j;
+        for (
+          j = i - gap;
+          j >= 0 &&
+          new BigNumber(arr[j].receiveAmount).comparedTo(
+            new BigNumber(temp.receiveAmount)
+          ) < 0;
+          j -= gap
+        ) {
+          arr[j + gap] = arr[j];
+        }
+        arr[j + gap] = temp;
+      }
+    }
+    return arr;
   }
 }
