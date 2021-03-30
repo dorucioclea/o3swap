@@ -5,30 +5,28 @@ import {
   NEO_WALLETS,
   NeoWalletName,
   EthWalletName,
-  NeoWallet,
   UPDATE_NEO_ACCOUNT,
   SwapStateType,
   RESET_NEO_BALANCES,
-  EthWallet,
   UPDATE_NEO_WALLET_NAME,
   UPDATE_ETH_ACCOUNT,
   UPDATE_ETH_WALLET_NAME,
+  NeoWallet,
+  EthWallet,
 } from '@lib';
-import { NzMessageService } from 'ng-zorro-antd/message';
 import {
   CommonService,
   ApiService,
-  SwapService,
-  NeolineWalletApiService,
-  O3NeoWalletApiService,
-  O3EthWalletApiService,
   MetaMaskWalletApiService,
+  NeolineWalletApiService,
+  O3EthWalletApiService,
+  O3NeoWalletApiService,
 } from '@core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 type MenuType = 'home' | 'swap';
-type ConnectWalletType = 'ETH' | 'NEO';
+export type ConnectWalletType = 'ETH' | 'NEO';
 interface State {
   swap: SwapStateType;
 }
@@ -45,8 +43,8 @@ export class AppComponent implements OnInit {
   currentPage = this.router.url;
   isHome = true;
   connectWalletType: ConnectWalletType = 'NEO';
-  // 弹窗
-  showConnectModal = false;
+  showConnectModal = false; // connect wallet modal
+  // account modal
   showNeoAccountModal = false;
   showEthAccountModal = false;
   showNeoAccountModalTimeOut;
@@ -88,36 +86,50 @@ export class AppComponent implements OnInit {
     });
   }
 
+  isHomePage(): boolean {
+    if (this.currentPage === '/' || this.currentPage === '/home') {
+      return true;
+    }
+    return false;
+  }
+
   showConnect(): void {
     this.showConnectModal = true;
+  }
+
+  showAccountModal(type: ConnectWalletType): void {
+    switch (type) {
+      case 'ETH':
+        clearTimeout(this.showEthAccountModalTimeOut);
+        this.showEthAccountModal = true;
+        break;
+      case 'NEO':
+        clearTimeout(this.showNeoAccountModalTimeOut);
+        this.showNeoAccountModal = true;
+        break;
+    }
+  }
+
+  hideAccountModal(type: ConnectWalletType): void {
+    switch (type) {
+      case 'ETH':
+        this.showEthAccountModalTimeOut = setTimeout(() => {
+          this.showEthAccountModal = false;
+        }, 200);
+        break;
+      case 'NEO':
+        this.showNeoAccountModalTimeOut = setTimeout(() => {
+          this.showNeoAccountModal = false;
+        }, 200);
+        break;
+    }
   }
 
   copy(value: string): void {
     this.commonService.copy(value);
   }
 
-  connectNeoWallet(wallet: NeoWallet): void {
-    switch (wallet.name) {
-      case 'NeoLine':
-        this.neolineWalletApiService.connect();
-        break;
-      case 'O3':
-        this.o3NeoWalletApiService.connect();
-        break;
-    }
-  }
-
-  connectEthWallet(wallet: EthWallet): void {
-    switch (wallet.name) {
-      case 'MetaMask':
-        this.metaMaskWalletApiService.connect();
-        break;
-      case 'O3':
-        this.o3EthWalletApiService.connect();
-        break;
-    }
-  }
-
+  //#region account modal
   disConnect(type: ConnectWalletType): void {
     switch (type) {
       case 'ETH':
@@ -150,39 +162,33 @@ export class AppComponent implements OnInit {
         break;
     }
   }
+  //#endregion
 
-  showAccountModal(type: ConnectWalletType): void {
-    switch (type) {
-      case 'ETH':
-        clearTimeout(this.showEthAccountModalTimeOut);
-        this.showEthAccountModal = true;
+  //#region connect wallet modal
+  connectNeoWallet(wallet: NeoWallet): void {
+    switch (wallet.name) {
+      case 'NeoLine':
+        this.neolineWalletApiService.connect();
         break;
-      case 'NEO':
-        clearTimeout(this.showNeoAccountModalTimeOut);
-        this.showNeoAccountModal = true;
+      case 'O3':
+        this.o3NeoWalletApiService.connect();
         break;
     }
   }
 
-  hideAccountModal(type: ConnectWalletType): void {
-    switch (type) {
-      case 'ETH':
-        this.showEthAccountModalTimeOut = setTimeout(() => {
-          this.showEthAccountModal = false;
-        }, 200);
+  connectEthWallet(wallet: EthWallet): void {
+    switch (wallet.name) {
+      case 'MetaMask':
+        this.metaMaskWalletApiService.connect();
         break;
-      case 'NEO':
-        this.showNeoAccountModalTimeOut = setTimeout(() => {
-          this.showNeoAccountModal = false;
-        }, 200);
+      case 'O3':
+        this.o3EthWalletApiService.connect();
         break;
     }
   }
 
-  isHomePage(): boolean {
-    if (this.currentPage === '/' || this.currentPage === '/home') {
-      return true;
-    }
-    return false;
+  closeConnectModal(): void {
+    this.showConnectModal = false;
   }
+  //#endregion
 }

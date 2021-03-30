@@ -1,14 +1,6 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ChangeDetectorRef,
-} from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ALL_TOKENS, NEO_TOKENS, SwapStateType } from '@lib';
 import { Token } from '@lib';
-import { ApiService } from '@core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NzModalRef } from 'ng-zorro-antd/modal';
@@ -18,7 +10,6 @@ interface State {
 }
 
 @Component({
-  selector: 'app-swap-token',
   templateUrl: './swap-token.component.html',
   styleUrls: ['./swap-token.component.scss'],
 })
@@ -34,7 +25,6 @@ export class SwapTokenComponent implements OnInit {
   isfocusSearchInput = false;
 
   constructor(
-    private apiService: ApiService,
     private store: Store<State>,
     private changeDetectorRef: ChangeDetectorRef,
     private modal: NzModalRef

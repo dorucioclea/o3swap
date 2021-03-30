@@ -48,7 +48,6 @@ export class SwapHomeComponent implements OnInit {
       this.isCustomSlip = state.isCustomSlip;
       this.deadline = state.deadline;
     });
-    this.showTokens('from');
     this.checkInputAmountDecimal();
     this.calcutionInputAmountFiat();
   }

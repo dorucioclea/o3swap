@@ -3,7 +3,6 @@ import { Token, AssetQueryResponse } from '@lib';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 
 @Component({
-  selector: 'app-swap-exchange',
   templateUrl: './swap-exchange.component.html',
   styleUrls: ['./swap-exchange.component.scss'],
 })

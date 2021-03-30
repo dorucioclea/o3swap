@@ -1,52 +1,6 @@
-section.cover {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  background: #00000080;
-  .container {
-    margin: 0 auto;
-    margin-top: 180px;
-    width: 460px;
-    height: 560px;
-    background: #2a2a2a;
-    border-radius: 40px;
-    padding: 38px 30px;
-    position: relative;
-    .title {
-      font-size: 20px;
-      padding-bottom: 20px;
-      font-family: "fontDemiBold";
-      img.close {
-        width: 50px;
-        position: absolute;
-        top: 23px;
-        right: 20px;
-        cursor: pointer;
-      }
-    }
-    .close-group {
-      position: absolute;
-      top: 23px;
-      right: 20px;
-      padding-bottom: 20px;
-      img {
-        cursor: pointer;
-        width: 50px;
-      }
-      .link {
-        margin-right: 10px;
-        img {
-          width: 21px;
-        }
-      }
-    }
-  }
-}
-
 .custom-modal {
   width: 400px !important;
+  transform-origin: center !important;
   padding: 0;
   color: #fff;
   top: 260px;
