@@ -1,7 +1,21 @@
-
-section.setting-wrapper {
+section.wrapper {
+  padding: 30px;
+  .setting-group {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    img {
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      border-radius: 10px;
+      &:not(:last-child) {
+        margin-right: 20px;
+      }
+    }
+  }
   & > .title {
-    padding-bottom: 37px;
+    font-size: 20px;
   }
   .setting-item-title {
     font-size: 16px;
@@ -30,7 +44,7 @@ section.setting-wrapper {
       border-radius: 10px;
       li {
         display: inline-block;
-        width: 60px;
+        width: 55px;
         height: 40px;
         line-height: 40px;
         text-align: center;
@@ -38,7 +52,7 @@ section.setting-wrapper {
         cursor: pointer;
         border: 1px solid #353535;
         &:not(:last-child) {
-          margin-right: 15px;
+          margin-right: 10px;
         }
         &.active {
           background: #2b312d;
@@ -52,16 +66,15 @@ section.setting-wrapper {
     margin-top: 24px;
     font-family: "fontRegular";
     input {
-      width: 100px;
+      width: 70px;
       height: 40px;
       background: #353535;
       border: 1px solid #353535;
       border-radius: 10px;
       border: none;
-      padding: 0 20px;
       text-align: center;
       color: #fff;
-      font-size: 16px;
+      font-size: 14px;
       &.focus {
         background: #2b312d;
         border: 1px solid #46b069;

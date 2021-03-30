@@ -11,6 +11,7 @@ import { Token } from '@lib';
 import { ApiService } from '@core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { NzModalRef } from 'ng-zorro-antd/modal';
 
 interface State {
   swap: SwapStateType;
@@ -19,12 +20,11 @@ interface State {
 @Component({
   selector: 'app-swap-token',
   templateUrl: './swap-token.component.html',
-  styleUrls: ['../common.scss', './swap-token.component.scss'],
+  styleUrls: ['./swap-token.component.scss'],
 })
 export class SwapTokenComponent implements OnInit {
   @Input() activeToken: Token;
   @Input() hideToken: Token;
-  @Output() closePage = new EventEmitter<Token | void>();
 
   swap$: Observable<any>;
   tokenBalance; // 账户的 tokens
@@ -36,7 +36,8 @@ export class SwapTokenComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private store: Store<State>,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private modal: NzModalRef
   ) {
     this.swap$ = store.select('swap');
   }
@@ -54,12 +55,12 @@ export class SwapTokenComponent implements OnInit {
     });
   }
 
-  backToHomePage(): void {
-    this.closePage.emit();
+  close(): void {
+    this.modal.close();
   }
 
   selectThisToken(token: Token): void {
-    this.closePage.emit(token);
+    this.modal.close(token);
   }
 
   search($event): void {

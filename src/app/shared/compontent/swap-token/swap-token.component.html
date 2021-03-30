@@ -1,7 +1,12 @@
-<section class="wrapper choose-token-wrapper">
+<section class="wrapper">
+  <div class="setting-group">
+    <img (click)="close()" class="close" src="/assets/images/swap/close.png" alt="">
+  </div>
   <p class="title">Choose</p>
-  <input type="text" (focus)="isfocusSearchInput=true" (blur)="isfocusSearchInput=false"
-    [ngClass]="{focus: isfocusSearchInput}" (keyup.enter)="search($event)" placeholder="Search">
+  <div class="search">
+    <input type="text" (focus)="isfocusSearchInput=true" (blur)="isfocusSearchInput=false"
+      [ngClass]="{focus: isfocusSearchInput}" (keyup.enter)="search($event)" placeholder="Search">
+  </div>
   <div class="chains">
     <img src="/assets/images/tokens/eth.png" alt="">
     <img class="active" src="/assets/images/tokens/neo.png" alt="">
@@ -16,7 +21,4 @@
       <span class="amount">{{ tokenItem?.amount | number: '1.0-8' }}</span>
     </li>
   </ul>
-  <div class="setting-group">
-    <img (click)="backToHomePage()" class="close" src="/assets/images/swap/close.png" alt="">
-  </div>
 </section>

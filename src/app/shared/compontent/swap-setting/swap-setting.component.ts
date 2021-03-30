@@ -1,21 +1,22 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { defaultDeadline, defaultSlipValue } from '../swap.component';
+import { Component, Input, OnInit } from '@angular/core';
+import { DEFAULT_DEADLINE, DEFAULT_SLIPVALUE } from '@lib';
+import { NzModalRef } from 'ng-zorro-antd/modal';
+
 @Component({
   selector: 'app-swap-setting',
   templateUrl: './swap-setting.component.html',
-  styleUrls: ['../common.scss', './swap-setting.component.scss'],
+  styleUrls: ['./swap-setting.component.scss'],
 })
 export class SwapSettingComponent implements OnInit {
   @Input() slipValue: number | string;
   @Input() isCustomSlip: boolean; // 自定义滑点
   @Input() deadline: number;
-  @Output() closePage = new EventEmitter<any>();
 
   // setting slip
   slipValueGroup = [0.1, 0.5, 1, 2];
   slipValueError: string;
 
-  constructor() {}
+  constructor(private modal: NzModalRef) {}
 
   ngOnInit(): void {
     this.checkSlipValue();
@@ -30,7 +31,11 @@ export class SwapSettingComponent implements OnInit {
     this.isCustomSlip = true;
     this.slipValue = '';
   }
-  backToHomePage(): void {
+  inputSlipValue(event): void {
+    this.slipValue = event.target.value;
+    this.isCustomSlip = true;
+  }
+  close(): void {
     this.updateDeadline();
     this.updateSlipValue();
     const settingObj = {
@@ -38,7 +43,7 @@ export class SwapSettingComponent implements OnInit {
       slipValue: this.slipValue,
       isCustomSlip: this.isCustomSlip,
     };
-    this.closePage.emit(settingObj);
+    this.modal.close(settingObj);
   }
 
   //#region
@@ -58,7 +63,7 @@ export class SwapSettingComponent implements OnInit {
   updateDeadline(): void {
     let tempDeadline = Math.floor(Number(this.deadline));
     if (Number.isNaN(tempDeadline) || tempDeadline <= 0) {
-      tempDeadline = defaultDeadline;
+      tempDeadline = DEFAULT_DEADLINE;
     }
     this.deadline = tempDeadline;
   }
@@ -66,7 +71,7 @@ export class SwapSettingComponent implements OnInit {
     const tempSlip = Number(this.slipValue);
     if (Number.isNaN(tempSlip) || tempSlip <= 0) {
       this.isCustomSlip = false;
-      this.slipValue = defaultSlipValue;
+      this.slipValue = DEFAULT_SLIPVALUE;
     }
   }
   //#endregion

@@ -30,6 +30,7 @@ import { Store } from '@ngrx/store';
 
 interface State {
   swap: SwapStateType;
+  setting: any;
 }
 
 @Component({
@@ -42,8 +43,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   @Input() fromToken: Token;
   @Input() toToken: Token;
   @Input() inputAmount: string; // 支付的 token 数量
-  @Input() deadline: number;
-  @Input() slipValue: number;
   @Input() initData: any;
   @Output() closePage = new EventEmitter<any>();
   @Output() swapFail = new EventEmitter();
@@ -54,6 +53,11 @@ export class SwapResultComponent implements OnInit, OnDestroy {
 
   addressFrom = '0xd34E3B073a484823058Ab76fc2304D5394beafE4';
   addressTo = '0xd34E3B073a484823058Ab76fc2304D5394beafE4';
+
+  // setting modal
+  setting$: Observable<any>;
+  slipValue: number;
+  deadline: number;
 
   swap$: Observable<any>;
   neoAccountAddress: string;
@@ -84,6 +88,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     private o3NeoWalletApiService: O3NeoWalletApiService
   ) {
     this.swap$ = store.select('swap');
+    this.setting$ = store.select('setting');
   }
 
   ngOnInit(): void {
@@ -92,6 +97,10 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.ethAccountAddress = state.ethAccountAddress;
       this.neoWalletName = state.neoWalletName;
       this.isMainNet = state.isMainNet;
+    });
+    this.setting$.subscribe((state) => {
+      this.slipValue = state.slipValue;
+      this.deadline = state.deadline;
     });
     if (this.initData) {
       this.chooseSwapPath = this.initData.chooseSwapPath;

@@ -1,24 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService, CommonService } from '@core';
-import { DEFAULT_FROM_TOKEN, SwapStateType, SwapTransaction, Token, UPDATE_PENDING_TX } from '@lib';
+import {
+  DEFAULT_FROM_TOKEN,
+  SwapStateType,
+  SwapTransaction,
+  Token,
+  UPDATE_PENDING_TX,
+} from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AnimationOptions } from 'ngx-lottie';
 import { Observable } from 'rxjs';
 
-type PageStatus = 'home' | 'token' | 'setting' | 'result';
-export const defaultSlipValue = 2; // 默认滑点 2%
-export const defaultDeadline = 10; // 分钟
-interface Setting {
-  slipValue: number | string;
-  isCustomSlip: boolean;
-  deadline: number;
-}
-
+type PageStatus = 'home' | 'result';
 interface State {
   swap: SwapStateType;
 }
-
 @Component({
   selector: 'app-swap',
   templateUrl: './swap.component.html',
@@ -39,18 +36,11 @@ export class SwapComponent implements OnInit {
   transaction: SwapTransaction;
 
   pageStatus: PageStatus = 'home';
-
   rates = {};
+
   fromToken: Token;
   toToken: Token;
-
-  activeToken: Token;
-  hideToken: Token;
-  selectTokenType: 'from' | 'to';
   inputAmount: string; // 支付的 token 数量
-
-  // setting slip
-  settings: Setting;
 
   initResultData;
 
@@ -68,11 +58,6 @@ export class SwapComponent implements OnInit {
       this.transaction = Object.assign({}, state.transaction);
       this.txPage = this.TX_PAGES_PREFIX + this.transaction.txid;
     });
-    this.settings = {
-      deadline: defaultDeadline,
-      slipValue: defaultSlipValue,
-      isCustomSlip: false,
-    };
     this.getRates();
   }
 
@@ -97,48 +82,17 @@ export class SwapComponent implements OnInit {
   }
 
   //#region home
-  toTokenPage({ tokenType, inputAmount }): void {
-    this.selectTokenType = tokenType;
+  toInquiryPage({ inputAmount, fromToken, toToken }): void {
+    this.initResultData = null;
     this.inputAmount = inputAmount;
-    if (tokenType === 'from') {
-      this.hideToken = this.toToken;
-      this.activeToken = this.fromToken;
-    } else {
-      this.hideToken = this.fromToken;
-      this.activeToken = this.toToken;
-    }
-    this.initResultData = null;
-    this.pageStatus = 'token';
-  }
-  toSettingPage(amount): void {
-    this.inputAmount = amount;
-    this.pageStatus = 'setting';
-  }
-  toInquiryPage(amount): void {
-    this.initResultData = null;
-    this.inputAmount = amount;
+    this.fromToken = fromToken;
+    this.toToken = toToken;
     this.pageStatus = 'result';
   }
   toResultPage(): void {
     this.pageStatus = 'result';
   }
   //#endregion
-
-  closeSettingPage(settings: Setting): void {
-    this.settings = settings;
-    this.pageStatus = 'home';
-  }
-
-  closeTokenPage(token: Token): void {
-    if (token) {
-      if (this.selectTokenType === 'from') {
-        this.fromToken = token;
-      } else {
-        this.toToken = token;
-      }
-    }
-    this.pageStatus = 'home';
-  }
 
   //#endregion result
   closeResultPage(initData: any): void {

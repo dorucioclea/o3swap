@@ -1,6 +1,14 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Token } from '@lib';
+import { Token, UPDATE_SETTING } from '@lib';
 import BigNumber from 'bignumber.js';
+import { SwapSettingComponent, SwapTokenComponent } from '@shared';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+
+interface State {
+  setting: any;
+}
 
 @Component({
   selector: 'app-swap-home',
@@ -13,28 +21,59 @@ export class SwapHomeComponent implements OnInit {
   @Input() toToken: Token;
   @Input() chooseSwapPath;
   @Input() inputAmount: string; // 支付的 token 数量
-  @Output() toTokenPage = new EventEmitter<{
-    tokenType: string;
+  @Output() toInquiryPage = new EventEmitter<{
     inputAmount: string;
+    fromToken: Token;
+    toToken: Token;
   }>();
-  @Output() toSettingPage = new EventEmitter<string>();
-  @Output() toInquiryPage = new EventEmitter<string>();
   @Output() toResultPage = new EventEmitter();
+
+  // setting modal
+  setting$: Observable<any>;
+  slipValue: number;
+  isCustomSlip: boolean; // 自定义滑点
+  deadline: number;
 
   changeData = false;
   inputAmountFiat: string; // 支付的 token 美元价值
   inputAmountError: string;
 
-  constructor() {}
+  constructor(private modal: NzModalService, public store: Store<State>) {
+    this.setting$ = store.select('setting');
+  }
 
   ngOnInit(): void {
+    this.setting$.subscribe((state) => {
+      this.slipValue = state.slipValue;
+      this.isCustomSlip = state.isCustomSlip;
+      this.deadline = state.deadline;
+    });
+    this.showTokens('from');
     this.checkInputAmountDecimal();
     this.calcutionInputAmountFiat();
   }
 
   showTokens(type: 'from' | 'to'): void {
-    const tempData = { tokenType: type, inputAmount: this.inputAmount };
-    this.toTokenPage.emit(tempData);
+    const modal = this.modal.create({
+      nzContent: SwapTokenComponent,
+      nzFooter: null,
+      nzTitle: null,
+      nzClosable: false,
+      nzClassName: 'custom-modal',
+      nzComponentParams: {
+        activeToken: type === 'from' ? this.fromToken : this.toToken,
+        hideToken: type === 'from' ? this.toToken : this.fromToken,
+      },
+    });
+    modal.afterClose.subscribe((res) => {
+      if (res) {
+        if (type === 'from') {
+          this.fromToken = res;
+        } else {
+          this.toToken = res;
+        }
+      }
+    });
   }
 
   changeInputAmount($event): void {
@@ -55,15 +94,34 @@ export class SwapHomeComponent implements OnInit {
     if (this.checkCanInquiry() === false) {
       return;
     }
-    this.toInquiryPage.emit(this.inputAmount);
+    this.toInquiryPage.emit({
+      inputAmount: this.inputAmount,
+      fromToken: this.fromToken,
+      toToken: this.toToken,
+    });
   }
 
   backToResultPage(): void {
     this.toResultPage.emit();
   }
 
-  backToSettingPage(): void {
-    this.toSettingPage.emit(this.inputAmount);
+  showSetting(): void {
+    const moadl = this.modal.create({
+      nzContent: SwapSettingComponent,
+      nzFooter: null,
+      nzTitle: null,
+      nzClosable: false,
+      nzClassName: 'custom-modal',
+      nzMaskClosable: false,
+      nzComponentParams: {
+        slipValue: this.slipValue,
+        isCustomSlip: this.isCustomSlip,
+        deadline: this.deadline,
+      },
+    });
+    moadl.afterClose.subscribe((res) => {
+      this.store.dispatch({ type: UPDATE_SETTING, data: res });
+    });
   }
   //#region
   checkCanInquiry(): boolean {
