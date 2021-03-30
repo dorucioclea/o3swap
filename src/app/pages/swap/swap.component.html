@@ -7,8 +7,9 @@
   [inputAmount]="inputAmount" [initData]="initResultData" (closePage)="closeResultPage($event)" (swapFail)="swapFail()">
 </app-swap-result>
 
-<section class="cover" *ngIf="transaction?.min===false">
-  <div class="container tx-hash-container">
+<nz-modal [nzVisible]="transaction?.min===false" [nzFooter]="null" [nzClosable]="false" [nzTitle]="null"
+  nzClassName="custom-modal">
+  <div class="modal-content tx-modal-content">
     <div class="close-group">
       <a class="link" *ngIf='!transaction?.isPending' target="_blank" [href]="txPage">
         <img src="/assets/images/swap-result/link.png" alt="">
@@ -31,11 +32,11 @@
       </div>
     </div>
   </div>
-</section>
+</nz-modal>
 
 <section class="min-tx" *ngIf="transaction?.min===true" (click)="maxTxHashModal()"
   [ngClass]="{pending: transaction?.isPending}">
-  <img *ngIf="transaction?.isPending" src="/assets/images/swap-result/pending-icon.png" alt="">
+  <ng-lottie *ngIf="transaction?.isPending" class="pending-min-json" [options]="pendingMinOptions"></ng-lottie>
   <img *ngIf="!transaction?.isPending" src="/assets/images/swap-result/success-icon.png" alt="">
   {{ transaction?.isPending ? 'A record is pending' : 'A record succeeded' }}
 </section>

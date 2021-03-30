@@ -81,52 +81,50 @@
 </div>
 
 <nz-modal [(nzVisible)]="showConnectModal" (nzOnCancel)="showConnectModal=false" [nzFooter]="null" [nzClosable]="false"
-  [nzTitle]="null" nzClassName="custom-modal" [nzContent]="modalContent">
-  <ng-template #modalContent>
-    <div class="connect-modal-content">
-      <div class="setting-group">
-        <img (click)="closeConnectModal()" class="close" src="/assets/images/swap/close.png" alt="">
-      </div>
-      <p class="title">Connect wallet</p>
-      <div class="chains">
-        <img [ngClass]="{active: connectWalletType==='ETH'}" (click)="connectWalletType='ETH'"
-          src="/assets/images/tokens/eth.png" alt="">
-        <img [ngClass]="{active: connectWalletType==='NEO'}" (click)="connectWalletType='NEO'"
-          src="/assets/images/tokens/neo.png" alt="">
-      </div>
-      <p class="wallet-type">{{ connectWalletType }} Wallet</p>
-      <ul class="wallets" *ngIf="connectWalletType==='ETH'">
-        <li class="wallet" *ngFor="let wallet of ETH_WALLETS" (click)="connectEthWallet(wallet)">
-          <div *ngIf="ethWalletName!==wallet.name">
-            <img class="logo" [src]="wallet.logo" alt="">
-            <span class="name">Connect {{ wallet.name }}</span>
-            <img class="option" src="/assets/images/swap/add.png" alt="">
-          </div>
-          <div *ngIf="ethWalletName===wallet.name" class="active">
-            <span class="name">{{ wallet.name }}</span>
-            <p class="address">
-              {{ ethAccountAddress | shortAddress: 10 }}
-              <img class="copy" (click)="copy(ethAccountAddress)" src="/assets/images/swap/copy.png" alt="">
-            </p>
-          </div>
-        </li>
-      </ul>
-      <ul class="wallets" *ngIf="connectWalletType==='NEO'">
-        <li class="wallet" *ngFor="let wallet of NEO_WALLETS" (click)="connectNeoWallet(wallet)">
-          <div *ngIf="neoWalletName!==wallet.name">
-            <img class="logo" [src]="wallet.logo" alt="">
-            <span class="name">Connect {{ wallet.name }}</span>
-            <img class="option" src="/assets/images/swap/add.png" alt="">
-          </div>
-          <div *ngIf="neoWalletName===wallet.name" class="active">
-            <span class="name">{{ wallet.name }}</span>
-            <p class="address">
-              {{ neoAccountAddress | shortAddress: 10 }}
-              <img class="copy" (click)="copy(neoAccountAddress)" src="/assets/images/swap/copy.png" alt="">
-            </p>
-          </div>
-        </li>
-      </ul>
+  [nzTitle]="null" nzClassName="custom-modal">
+  <div class="connect-modal-content modal-content">
+    <div class="close-group">
+      <img (click)="closeConnectModal()" class="close" src="/assets/images/swap/close.png" alt="">
     </div>
-  </ng-template>
+    <p class="title">Connect wallet</p>
+    <div class="chains">
+      <img [ngClass]="{active: connectWalletType==='ETH'}" (click)="connectWalletType='ETH'"
+        src="/assets/images/tokens/eth.png" alt="">
+      <img [ngClass]="{active: connectWalletType==='NEO'}" (click)="connectWalletType='NEO'"
+        src="/assets/images/tokens/neo.png" alt="">
+    </div>
+    <p class="wallet-type">{{ connectWalletType }} Wallet</p>
+    <ul class="wallets" *ngIf="connectWalletType==='ETH'">
+      <li class="wallet" *ngFor="let wallet of ETH_WALLETS" (click)="connectEthWallet(wallet)">
+        <div *ngIf="ethWalletName!==wallet.name">
+          <img class="logo" [src]="wallet.logo" alt="">
+          <span class="name">Connect {{ wallet.name }}</span>
+          <img class="option" src="/assets/images/swap/add.png" alt="">
+        </div>
+        <div *ngIf="ethWalletName===wallet.name" class="active">
+          <span class="name">{{ wallet.name }}</span>
+          <p class="address">
+            {{ ethAccountAddress | shortAddress: 10 }}
+            <img class="copy" (click)="copy(ethAccountAddress)" src="/assets/images/swap/copy.png" alt="">
+          </p>
+        </div>
+      </li>
+    </ul>
+    <ul class="wallets" *ngIf="connectWalletType==='NEO'">
+      <li class="wallet" *ngFor="let wallet of NEO_WALLETS" (click)="connectNeoWallet(wallet)">
+        <div *ngIf="neoWalletName!==wallet.name">
+          <img class="logo" [src]="wallet.logo" alt="">
+          <span class="name">Connect {{ wallet.name }}</span>
+          <img class="option" src="/assets/images/swap/add.png" alt="">
+        </div>
+        <div *ngIf="neoWalletName===wallet.name" class="active">
+          <span class="name">{{ wallet.name }}</span>
+          <p class="address">
+            {{ neoAccountAddress | shortAddress: 10 }}
+            <img class="copy" (click)="copy(neoAccountAddress)" src="/assets/images/swap/copy.png" alt="">
+          </p>
+        </div>
+      </li>
+    </ul>
+  </div>
 </nz-modal>

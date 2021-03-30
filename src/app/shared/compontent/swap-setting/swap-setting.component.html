@@ -1,5 +1,5 @@
-<section class="wrapper">
-  <div class="setting-group">
+<section class="wrapper modal-content">
+  <div class="close-group">
     <img (click)="close()" class="close" src="/assets/images/swap/close.png" alt="">
   </div>
   <p class="title">Settings</p>
@@ -11,7 +11,8 @@
           [ngClass]="{active: !isCustomSlip && slipValue===slip}">{{ slip }}%</li>
       </ul>
       <input type="number" [ngClass]="{focus: isCustomSlip}" (input)="checkSlipValue()" (click)="clickCustomSlipValue()"
-        [ngModel]="isCustomSlip && slipValue" (input)="inputSlipValue($event)" placeholder="Custom">
+        [ngModel]="isCustomSlip && slipValue" (input)="inputSlipValue($event)" (blur)="updateSlipValue()"
+        placeholder="Custom">
       <span class="tail" *ngIf="isCustomSlip">%</span>
       <p class="slip-error">{{ slipValueError }}</p>
     </div>
@@ -19,7 +20,7 @@
   <div class="setting-item">
     <p class="setting-item-title">Transaction time limit</p>
     <div class="setting-item-content tx-time-limit">
-      <input type="number" [(ngModel)]="deadline">
+      <input type="number" (blur)="updateDeadline()" [(ngModel)]="deadline">
       <span>&nbsp;&nbsp;min</span>
     </div>
   </div>

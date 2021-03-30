@@ -28,8 +28,10 @@ export class SwapSettingComponent implements OnInit {
     this.checkSlipValue();
   }
   clickCustomSlipValue(): void {
+    if (this.isCustomSlip === false) {
+      this.slipValue = '';
+    }
     this.isCustomSlip = true;
-    this.slipValue = '';
   }
   inputSlipValue(event): void {
     this.slipValue = event.target.value;
@@ -43,6 +45,7 @@ export class SwapSettingComponent implements OnInit {
       slipValue: this.slipValue,
       isCustomSlip: this.isCustomSlip,
     };
+    console.log(settingObj);
     this.modal.close(settingObj);
   }
 
@@ -56,21 +59,27 @@ export class SwapSettingComponent implements OnInit {
       this.slipValueError = 'Your transaction may fail';
     } else if (this.slipValue > 5) {
       this.slipValueError = 'Your transaction may be frontrun';
+    } else if (this.slipValue >= 100) {
+      this.slipValueError = 'Enter a valid slippage percentage';
     } else {
       this.slipValueError = '';
     }
   }
   updateDeadline(): void {
     let tempDeadline = Math.floor(Number(this.deadline));
-    if (Number.isNaN(tempDeadline) || tempDeadline <= 0) {
+    if (
+      Number.isNaN(tempDeadline) ||
+      tempDeadline <= 0 ||
+      tempDeadline >= 100
+    ) {
       tempDeadline = DEFAULT_DEADLINE;
     }
     this.deadline = tempDeadline;
   }
   updateSlipValue(): void {
     const tempSlip = Number(this.slipValue);
-    if (Number.isNaN(tempSlip) || tempSlip <= 0) {
-      this.isCustomSlip = false;
+    if (Number.isNaN(tempSlip) || tempSlip <= 0 || tempSlip >= 100) {
+      // this.isCustomSlip = false;
       this.slipValue = DEFAULT_SLIPVALUE;
     }
   }

@@ -1,11 +1,11 @@
-<section class="wrapper">
-  <div class="setting-group">
+<section class="wrapper modal-content">
+  <div class="close-group">
     <img (click)="close()" class="close" src="/assets/images/swap/close.png" alt="">
   </div>
   <p class="title">Choose</p>
   <div class="search">
     <input type="text" (focus)="isfocusSearchInput=true" (blur)="isfocusSearchInput=false"
-      [ngClass]="{focus: isfocusSearchInput}" (keyup.enter)="search($event)" placeholder="Search">
+      [ngClass]="{focus: isfocusSearchInput}" (keyup.enter)="search($event)" placeholder="Search token name">
   </div>
   <div class="chains">
     <img src="/assets/images/tokens/eth.png" alt="">

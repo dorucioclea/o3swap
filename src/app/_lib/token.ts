@@ -59,14 +59,14 @@ export interface Token {
 // ];
 
 export const NEO_TOKENS: Token[] = [
-  {
-    assetID:
-      '0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b',
-    symbol: 'NEO',
-    decimals: 0,
-    amount: null,
-    logo: '/assets/images/tokens/neo/NEO.png',
-  },
+  // {
+  //   assetID:
+  //     '0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b',
+  //   symbol: 'NEO',
+  //   decimals: 0,
+  //   amount: null,
+  //   logo: '/assets/images/tokens/neo/NEO.png',
+  // },
   {
     assetID: '17da3881ab2d050fea414c80b3fa8324d756f60e',
     symbol: 'nNEO',
@@ -88,14 +88,14 @@ export const NEO_TOKENS: Token[] = [
     amount: null,
     logo: '/assets/images/tokens/neo/pnUSDT.png',
   },
-  {
-    assetID:
-      '0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7',
-    symbol: 'GAS',
-    decimals: 8,
-    amount: null,
-    logo: '/assets/images/tokens/neo/GAS.png',
-  },
+  // {
+  //   assetID:
+  //     '0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7',
+  //   symbol: 'GAS',
+  //   decimals: 8,
+  //   amount: null,
+  //   logo: '/assets/images/tokens/neo/GAS.png',
+  // },
   {
     assetID: '806f018810c6f74c22d1b27fe4da2feec7298c58',
     symbol: 'SWTH',

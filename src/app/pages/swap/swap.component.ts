@@ -29,6 +29,9 @@ export class SwapComponent implements OnInit {
   pendingOptions = {
     path: '/assets/json/pending.json',
   };
+  pendingMinOptions = {
+    path: '/assets/json/pending-min.json',
+  };
   TX_PAGES_PREFIX = 'https://testnet.neotube.io/transaction/';
   txPage: string;
 

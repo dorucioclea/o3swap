@@ -19,7 +19,11 @@ const initialState: SwapStateType = {
   balances: {}, // neo 链连接钱包的balances
   neolineIsMainNet: true,
   metamaskIsMainNet: true,
-  transaction: null,
+  transaction: {
+    txid: '0x52e14abb27f946f9abcc743a06001a71d3eb776fbeddf1c00459abf8f96c1534',
+    isPending: true,
+    min: false,
+  },
 };
 
 export default function swap(state = initialState, action): any {

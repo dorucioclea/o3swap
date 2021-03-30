@@ -68,6 +68,8 @@ export class SwapHomeComponent implements OnInit {
       if (res) {
         if (type === 'from') {
           this.fromToken = res;
+          this.checkInputAmountDecimal();
+          this.calcutionInputAmountFiat();
         } else {
           this.toToken = res;
         }

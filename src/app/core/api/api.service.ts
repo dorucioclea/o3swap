@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { Observable, forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { CommonHttpResponse } from '@lib';
 
 @Injectable()
 export class ApiService {
@@ -28,26 +29,16 @@ export class ApiService {
   }
 
   getRates(): Observable<any> {
-    const neoHttp = this.http.get(`${this.RATE_HOST}/coin/rates?chain=neo`);
-    const ethHttp = this.http.get(`${this.RATE_HOST}/coin/rates?chain=eth`);
-    const btcHttp = this.http.get(`${this.RATE_HOST}/coin/rates?chain=btc`);
-    const ontHttp = this.http.get(`${this.RATE_HOST}/coin/rates?chain=ont`);
-    return forkJoin([neoHttp, ethHttp, btcHttp, ontHttp]).pipe(
-      map((res: any) => {
+    return this.http.get(`${this.RATE_HOST}/crypto/rates`).pipe(
+      map((res: CommonHttpResponse) => {
         const rates: any = { pnUSDT: 1 };
-        if (res[0].status === 'success') {
-          rates.nNEO = res[0].data.neo.price;
-          rates.FLM = res[0].data.flm.price;
-          rates.SWTH = res[0].data.swth.price;
-        }
-        if (res[1].status === 'success') {
-          rates.pnWETH = res[1].data.eth.price;
-        }
-        if (res[2].status === 'success') {
-          rates.pnWBTC = res[2].data.btc.price;
-        }
-        if (res[3].status === 'success') {
-          rates.pONT = res[3].data.ont.price;
+        if (res.status === 'success') {
+          rates.nNEO = res.data.neo2.neo.price;
+          rates.FLM = res.data.neo2.flm.price;
+          rates.SWTH = res.data.neo2.swth.price;
+          rates.fWETH = res.data.eth.eth.price;
+          rates.pnWBTC = res.data.btc.btc.price;
+          rates.pONT = res.data.ont.ont.price;
         }
         return rates;
       })

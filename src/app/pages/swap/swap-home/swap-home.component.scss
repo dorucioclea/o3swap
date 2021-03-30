@@ -31,13 +31,20 @@ section.select-token-wrapper {
       height: 130px;
       padding: 0 25px;
       .row1 {
+        height: 16px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         font-size: 16px;
         color: #8aa1a1;
         .right {
+          display: inline-flex;
           font-size: 14px;
+          span.from-amount {
+            display: inline-block;
+            max-width: 150px;
+            word-break: break-all;
+          }
           .all {
             color: #6162ef;
             margin-left: 10px;

@@ -6,7 +6,9 @@
       <div class="row1">
         <span class="left">From</span>
         <p class="right">
-          <span class="pay-tip">Balance: {{ fromToken?.amount || '0' }} {{ fromToken?.symbol }}</span>
+          Balance:&nbsp;
+          <span class="from-amount">{{ fromToken?.amount || '0' }}</span>
+          &nbsp;{{ fromToken?.symbol }}
           <span class="all" (click)="allInputAmount()">Max</span>
         </p>
       </div>
