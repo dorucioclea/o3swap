@@ -64,7 +64,8 @@ section.choose-token-wrapper {
         font-family: "fontRegular";
       }
       img {
-        width: 36px;
+        max-width: 36px;
+        max-height: 36px;
         margin-right: 15px;
       }
     }

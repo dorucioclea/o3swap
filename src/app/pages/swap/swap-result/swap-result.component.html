@@ -22,9 +22,21 @@
     <p class="fiat">≈＄{{ chooseSwapPath?.fiat }}</p>
     <div class="optimal">Optimal</div>
   </div>
-  <p class="more-price" (click)="showRoutingModal=true">More Trading Price</p>
+  <p class="more-price" (click)="showRoutingModal=true">More Trading Price ></p>
   <div class="fee-group">
     <div class="fee-item">
+      <p class="label">From</p>
+      <p class="value">
+        {{ addressFrom | shortAddress: 10 }}
+      </p>
+    </div>
+    <div class="fee-item">
+      <p class="label">To</p>
+      <p class="value">
+        {{ addressTo | shortAddress: 10 }}
+      </p>
+    </div>
+    <div class="fee-item" [ngClass]="{route: chooseSwapPath?.swapPath.length > 4}">
       <p class="label">Routing</p>
       <ul class="value routes">
         <li *ngFor="let name of chooseSwapPath?.swapPath; index as index">
@@ -45,9 +57,9 @@
         1 {{ toToken?.symbol }} = {{ lnversePrice }} {{ fromToken?.symbol }}
       </p>
     </div>
-    <div class="fee-item">
+    <!-- <div class="fee-item">
       <p class="label">Quote includes a {{ o3SwapFee }}% O3Swap fee</p>
-    </div>
+    </div> -->
   </div>
   <button class="confirm" (click)="swap()">Confirm</button>
   <div class="setting-group">
@@ -64,14 +76,14 @@
     <ul class="exchanges">
       <li class="exchange-item" *ngFor="let swapItem of receiveSwapPathArray; index as index"
         (click)="changeSwapPath(index)" [ngClass]="{active: chooseSwapPathIndex===index}">
-        <div class="flex-row">
+        <div class="left">
           <p class="name">{{ swapItem.receiveAmount }} {{ toToken.symbol }}</p>
           <p class="fiat">≈＄{{ swapItem.fiat }}</p>
         </div>
         <ul class="routes">
           <li *ngFor="let name of swapItem.swapPath; index as index">
-            <span *ngIf="index!==0">></span>
             <img src="/assets/images/tokens/neo/{{name}}.png" alt="">{{ name }}
+            <span *ngIf="index!==swapItem.swapPath.length-1">></span>
           </li>
         </ul>
       </li>

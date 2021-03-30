@@ -52,6 +52,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     path: '/assets/json/Inquerying.json',
   };
 
+  addressFrom = '0xd34E3B073a484823058Ab76fc2304D5394beafE4';
+  addressTo = '0xd34E3B073a484823058Ab76fc2304D5394beafE4';
+
   swap$: Observable<any>;
   neoAccountAddress: string;
   ethAccountAddress: string;
@@ -101,9 +104,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.showInquiry = true;
     }
     this.getSwapPath();
-    this.inquiryInterval = setInterval(() => {
-      this.getSwapPath();
-    }, 30000);
+    // this.inquiryInterval = setInterval(() => {
+    //   this.getSwapPath();
+    // }, 30000);
   }
 
   ngOnDestroy(): void {

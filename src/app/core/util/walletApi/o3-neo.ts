@@ -79,7 +79,7 @@ export class O3NeoWalletApiService {
         const tokens = addressTokens[this.accountAddress];
         const tempTokenBalance = {};
         tokens.forEach((tokenItem: any) => {
-          tempTokenBalance[tokenItem.asset_id] = tokenItem;
+          tempTokenBalance[tokenItem.asset_id || tokenItem.assetID] = tokenItem;
         });
         this.store.dispatch({
           type: UPDATE_NEO_BALANCES,

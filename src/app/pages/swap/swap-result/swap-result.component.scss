@@ -19,8 +19,8 @@ section.result-wrapper {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 60px;
-    font-size: 24px;
+    margin-top: 53px;
+    font-size: 22px;
     .left {
       display: flex;
       align-items: center;
@@ -48,9 +48,13 @@ section.result-wrapper {
   }
   .receive {
     height: 110px;
-    margin-top: 33px;
+    margin-top: 24px;
     position: relative;
-    padding: 20px 30px 0 30px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
     .optimal {
       width: 70px;
       height: 24px;
@@ -65,18 +69,23 @@ section.result-wrapper {
       background-size: 100%;
       background-repeat: no-repeat;
     }
+    .sub-title {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+    }
     .amount,
     .fiat {
       text-align: center;
     }
     .amount {
-      font-size: 30px;
-      line-height: 23px;
+      font-size: 24px;
+      line-height: 28px;
       color: #46b069;
     }
     .fiat {
-      font-size: 16px;
-      margin-top: 11px;
+      font-size: 14px;
+      margin-top: 12px;
       font-family: "fontRegular";
     }
   }
@@ -84,37 +93,44 @@ section.result-wrapper {
     text-align: center;
     padding: 18px 0;
     color: #46b069;
-    border-bottom: 1px solid #ffffff1a;
+    border-bottom: 2px dashed #ffffff1a;
     cursor: pointer;
     font-family: "fontRegular";
   }
   .fee-group {
-    font-size: 16px;
+    font-size: 14px;
     color: #8aa1a1;
     font-family: "fontRegular";
   }
   .fee-item {
-    margin-top: 20px;
+    margin-top: 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    &.route {
+      flex-direction: column;
+      align-items: initial;
+      ul.routes {
+        margin-top: 10px;
+      }
+    }
     ul.routes {
       display: flex;
+      justify-content: flex-end;
       span {
-        margin: 0 5px;
+        margin: 0 4px;
       }
       img {
-        width: 20px;
-        margin-right: 3px;
+        max-width: 20px;
+        max-height: 20px;
+        margin-right: 4px;
       }
     }
   }
   button.confirm {
-    position: absolute;
-    width: calc(100% - 80px);
-    bottom: 40px;
-    left: 40px;
-    right: 40px;
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 30px;
   }
 }
 
@@ -133,14 +149,14 @@ section.cover {
       overflow-y: scroll;
       & > li {
         position: relative;
-        height: 100px;
         background: #2a2a2a;
         border: 1px solid #ffffff0d;
         border-radius: 10px;
         padding: 20px;
+        display: flex;
         cursor: pointer;
         &:not(:first-child) {
-          margin-top: 15px;
+          margin-top: 12px;
         }
         &:hover {
           background: #2b312d;
@@ -154,40 +170,39 @@ section.cover {
           .name {
             font-family: "fontDemiBold";
           }
-          .flex-row .fiat,
-          ul.routes {
+          .left .fiat {
             color: #fff;
           }
+          ul.routes {
+            color: #eff2f2;
+          }
         }
-        .flex-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
+        .left {
+          width: 210px;
+          display: inline-flex;
+          justify-content: center;
+          flex-direction: column;
+          margin-right: 30px;
           .name {
-            font-size: 20px;
+            font-size: 18px;
           }
           .fiat {
+            margin-top: 13px;
             color: #8aa1a1;
             font-size: 14px;
             font-family: "fontRegular";
           }
         }
         ul.routes {
-          position: absolute;
-          right: 20px;
-          bottom: 9px;
-          text-align: right;
           color: #8aa1a1;
           font-family: "fontRegular";
-          display: flex;
-          font-size: 14px;
-          width: max-content;
-          span {
-            margin: 0 5px;
+          font-size: 12px;
+          li:not(:first-child) {
+            margin-top: -5px;
           }
           img {
             width: 20px;
-            margin-right: 3px;
+            margin-right: 10px;
           }
         }
       }
