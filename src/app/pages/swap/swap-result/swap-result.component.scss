@@ -117,13 +117,10 @@ section.result-wrapper {
     ul.routes {
       display: flex;
       justify-content: flex-end;
-      span {
-        margin: 0 4px;
-      }
       img {
         max-width: 20px;
         max-height: 20px;
-        margin-right: 4px;
+        margin: 0 4px;
       }
     }
   }

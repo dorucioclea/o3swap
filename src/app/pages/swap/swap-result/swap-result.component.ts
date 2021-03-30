@@ -13,8 +13,6 @@ import {
   AssetQueryResponse,
   AssetQueryResponseItem,
   SwapStateType,
-  UPDATE_PENDING_TX,
-  SwapTransaction,
 } from '@lib';
 import {
   ApiService,
@@ -27,6 +25,8 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import BigNumber from 'bignumber.js';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { SwapExchangeComponent } from '@shared';
 
 interface State {
   swap: SwapStateType;
@@ -67,8 +67,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
 
   TOKENS: Token[] = []; // 所有的 tokens
   o3SwapFee = O3SWAP_FEE_PERCENTAGE;
-  showRoutingModal = false; // swap 路径弹窗
-  showTxHashModal = false;
   showInquiry: boolean;
   inquiryInterval; // 询价定时器
 
@@ -85,7 +83,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     private commonService: CommonService,
     private swapService: SwapService,
     private neolineWalletApiService: NeolineWalletApiService,
-    private o3NeoWalletApiService: O3NeoWalletApiService
+    private o3NeoWalletApiService: O3NeoWalletApiService,
+    private modal: NzModalService
   ) {
     this.swap$ = store.select('swap');
     this.setting$ = store.select('setting');
@@ -113,9 +112,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.showInquiry = true;
     }
     this.getSwapPath();
-    // this.inquiryInterval = setInterval(() => {
-    //   this.getSwapPath();
-    // }, 30000);
+    this.inquiryInterval = setInterval(() => {
+      this.getSwapPath();
+    }, 30000);
   }
 
   ngOnDestroy(): void {
@@ -133,11 +132,25 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     this.closePage.emit(initData);
   }
 
-  changeSwapPath(index: number): void {
-    this.showRoutingModal = false;
-    this.chooseSwapPathIndex = index;
-    this.chooseSwapPath = this.receiveSwapPathArray[index];
-    this.calculationPrice();
+  showRoutingModal(): void {
+    const modal = this.modal.create({
+      nzContent: SwapExchangeComponent,
+      nzFooter: null,
+      nzTitle: null,
+      nzClosable: false,
+      nzClassName: 'custom-modal',
+      nzComponentParams: {
+        chooseSwapPathIndex: this.chooseSwapPathIndex,
+        receiveSwapPathArray: this.receiveSwapPathArray,
+      },
+    });
+    modal.afterClose.subscribe((index) => {
+      if (index >= 0) {
+        this.chooseSwapPathIndex = index;
+        this.chooseSwapPath = this.receiveSwapPathArray[index];
+        this.calculationPrice();
+      }
+    });
   }
 
   reGetSwapPath(): void {
