@@ -3,6 +3,7 @@ import { ApiService, CommonService } from '@core';
 import { SwapStateType, SwapTransaction, Token, UPDATE_PENDING_TX } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { AnimationOptions } from 'ngx-lottie';
 import { Observable } from 'rxjs';
 
 type PageStatus = 'home' | 'token' | 'setting' | 'result';
@@ -24,6 +25,13 @@ interface State {
   styleUrls: ['./swap.component.scss'],
 })
 export class SwapComponent implements OnInit {
+  successOptions: AnimationOptions = {
+    path: '/assets/json/success.json',
+    loop: false,
+  };
+  pendingOptions = {
+    path: '/assets/json/pending.json',
+  };
   TX_PAGES_PREFIX = 'https://testnet.neotube.io/transaction/';
   txPage: string;
 
@@ -59,7 +67,6 @@ export class SwapComponent implements OnInit {
     this.swap$.subscribe((state) => {
       this.transaction = Object.assign({}, state.transaction);
       this.txPage = this.TX_PAGES_PREFIX + this.transaction.txid;
-      console.log(this.transaction);
     });
     this.settings = {
       deadline: defaultDeadline,

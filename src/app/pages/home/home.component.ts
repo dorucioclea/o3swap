@@ -24,8 +24,16 @@ export class HomeComponent implements OnInit {
   isFocus = false;
   isLoadingEmail = false;
 
-  options = {
-    path: '/assets/home-json/data.json',
+  priceOptions = {
+    path: '/assets/json/price/data.json',
+  };
+
+  swapOptions = {
+    path: '/assets/json/swap/data.json',
+  };
+
+  exchangeOptions = {
+    path: '/assets/json/exchange.json',
   };
 
   constructor(

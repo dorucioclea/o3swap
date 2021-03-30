@@ -48,6 +48,10 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   @Output() closePage = new EventEmitter<any>();
   @Output() swapFail = new EventEmitter();
 
+  inquiryOptions = {
+    path: '/assets/json/Inquerying.json',
+  };
+
   swap$: Observable<any>;
   neoAccountAddress: string;
   ethAccountAddress: string;

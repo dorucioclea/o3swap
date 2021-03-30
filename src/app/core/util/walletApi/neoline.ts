@@ -169,7 +169,6 @@ export class NeolineWalletApiService {
         value: crossAssetHash,
       },
     ];
-    console.log(args);
     return this.neolineDapi
       .invoke({
         scriptHash: SWAP_CROSS_CHAIN_CONTRACT_HASH,

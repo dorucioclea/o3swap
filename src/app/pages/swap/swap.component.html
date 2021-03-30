@@ -28,8 +28,8 @@
     </div>
     <div class="content">
       <div class="status-img">
-        <img *ngIf='transaction?.isPending' src="/assets/images/swap-result/pending.png" alt="">
-        <img *ngIf='!transaction?.isPending' src="/assets/images/swap-result/success.png" alt="">
+        <ng-lottie *ngIf='transaction?.isPending' class="pending-json" [options]="pendingOptions"></ng-lottie>
+        <ng-lottie *ngIf='!transaction?.isPending' class="success-json" [options]="successOptions"></ng-lottie>
       </div>
       <p class="status">{{ transaction?.isPending ? 'Pending' : 'Success' }}</p>
       <div class="desc">

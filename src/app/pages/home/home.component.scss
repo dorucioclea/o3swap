@@ -35,7 +35,7 @@ section.home {
     margin-top: 40px;
     font-size: 18px;
   }
-  img {
+  .price-json {
     width: 420px;
     position: absolute;
     top: 100px;
@@ -151,7 +151,7 @@ section.price {
     display: flex;
     align-items: center;
   }
-  .animate {
+  .swap-json {
     width: 600px;
     height: 600px;
   }
@@ -181,7 +181,7 @@ section.exchange-click {
     display: flex;
     align-items: center;
   }
-  img.exchange {
+  .exchange-json {
     height: 307px;
     padding-left: 78px;
   }

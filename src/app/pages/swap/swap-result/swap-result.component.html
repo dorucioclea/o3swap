@@ -1,7 +1,7 @@
 <section class="wrapper inquiry-wrapper" *ngIf="showInquiry">
   <p class="title">Swap</p>
-  <img src="/assets/images/swap/inquirying.gif" alt="">
-  <p class="inqirying">Inquerying...</p>
+  <ng-lottie class="inquiry-json" [options]="inquiryOptions"></ng-lottie>
+  <p class="inquirying">Inquerying...</p>
 </section>
 
 <section class="wrapper result-wrapper" *ngIf="!showInquiry">
