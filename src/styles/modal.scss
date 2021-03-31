@@ -4,6 +4,12 @@
   padding: 0;
   color: #fff;
   top: 260px;
+  &.tx-modal {
+    width: 360px !important;
+  }
+  &.connect-wallet-modal {
+    width: 420px !important;
+  }
   .ant-modal-content,
   .ant-modal-body {
     padding: 0;

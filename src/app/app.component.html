@@ -81,15 +81,14 @@
 </div>
 
 <nz-modal [(nzVisible)]="showConnectModal" (nzOnCancel)="showConnectModal=false" [nzFooter]="null" [nzClosable]="false"
-  [nzTitle]="null" nzClassName="custom-modal">
+  [nzTitle]="null" nzClassName="custom-modal connect-wallet-modal">
   <div class="connect-modal-content modal-content">
     <div class="close-group">
       <img (click)="closeConnectModal()" class="close" src="/assets/images/swap/close.png" alt="">
     </div>
     <p class="title">Connect wallet</p>
     <div class="chains">
-      <img [ngClass]="{active: connectWalletType==='ETH'}"
-        src="/assets/images/tokens/eth.png" alt="">
+      <img [ngClass]="{active: connectWalletType==='ETH'}" src="/assets/images/tokens/eth.png" alt="">
       <img [ngClass]="{active: connectWalletType==='NEO'}" (click)="connectWalletType='NEO'"
         src="/assets/images/tokens/neo.png" alt="">
     </div>

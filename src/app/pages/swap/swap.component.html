@@ -7,8 +7,8 @@
   [inputAmount]="inputAmount" [initData]="initResultData" (closePage)="closeResultPage($event)" (swapFail)="swapFail()">
 </app-swap-result>
 
-<nz-modal [nzVisible]="transaction?.min===false" [nzFooter]="null" [nzClosable]="false" [nzTitle]="null"
-  nzClassName="custom-modal">
+<nz-modal [nzVisible]="transaction?.min===false" (nzOnCancel)="minTxHashModal()" [nzFooter]="null" [nzClosable]="false"
+  [nzTitle]="null" nzClassName="custom-modal tx-modal">
   <div class="modal-content tx-modal-content">
     <div class="close-group">
       <a class="link" *ngIf='!transaction?.isPending' target="_blank" [href]="txPage">
@@ -46,7 +46,7 @@
             <div class="hash">
               <span>Hash</span>
               {{ transaction?.txid | shortAddress: 10 }}
-              <img class="copy" (click)="copy(transaction?.txid)" src="/assets/images/swap-result/copy.png" alt="">
+              <img class="copy" (click)="copy(transaction?.txid)" src="/assets/images/swap/copy.png" alt="">
             </div>
           </div>
         </div>

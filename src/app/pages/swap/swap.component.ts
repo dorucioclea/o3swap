@@ -34,13 +34,14 @@ export class SwapComponent implements OnInit {
   };
   txCompleteOptions = {
     path: '/assets/json/tx-complete.json',
-    loop: false
+    loop: false,
   };
   txWaitingOptions = {
     path: '/assets/json/tx-waiting.json',
   };
   TX_PAGES_PREFIX = 'https://testnet.neotube.io/transaction/';
   txPage: string;
+  showTxModal = false;
   showTxDetail = false;
 
   swap$: Observable<any>;
@@ -67,6 +68,7 @@ export class SwapComponent implements OnInit {
   ngOnInit(): void {
     this.swap$.subscribe((state) => {
       this.transaction = Object.assign({}, state.transaction);
+      this.showTxModal = this.transaction.min === false ? true : false;
       this.txPage = this.TX_PAGES_PREFIX + this.transaction.txid;
     });
     this.getRates();

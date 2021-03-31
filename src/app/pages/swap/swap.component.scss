@@ -24,18 +24,6 @@ section.min-tx {
   }
 }
 
-@keyframes loading {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
 .tx-modal-content {
   padding: 30px;
   text-align: center;
@@ -66,6 +54,7 @@ section.min-tx {
     img {
       cursor: pointer;
       width: 15px;
+      transition: all 0.3s;
       &.show {
         transform: rotate(180deg);
       }
