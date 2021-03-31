@@ -206,23 +206,26 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.neoWalletName === 'NeoLine'
         ? this.neolineWalletApiService
         : this.o3NeoWalletApiService;
-    swapApi.swapCrossChain(
-      this.fromToken,
-      this.chooseSwapPath,
-      this.inputAmount,
-      this.slipValue,
-      this.deadline,
-      this.ethAccountAddress
-    );
+    swapApi
+      .swapCrossChain(
+        this.fromToken,
+        this.chooseSwapPath,
+        this.inputAmount,
+        this.slipValue,
+        this.deadline,
+        this.ethAccountAddress
+      )
+      .then((res) => {
+        console.log(res);
+        if (res) {
+          this.closePage.emit();
+        }
+      });
   }
 
-  swap(): void {
-    // if (this.toToken.symbol === 'fWBTC') {
-    // this.swapCrossChain();
-    // return;
-    // }
+  swapNeo(): void {
     if (!this.neoAccountAddress) {
-      this.nzMessage.error('Please connect the wallet first');
+      this.nzMessage.error('Please connect the NEO wallet first');
       return;
     }
     // if (this.isMainNet === false) {
@@ -258,13 +261,24 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       });
   }
 
+  swap(): void {
+    if (this.fromToken.chain === 'NEO' && this.toToken.chain === 'NEO') {
+      this.swapNeo();
+      return;
+    }
+    if (this.fromToken.chain === 'NEO' && this.toToken.chain !== 'NEO') {
+      this.swapCrossChain();
+      return;
+    }
+  }
+
   //#region
   getSwapPath(): void {
     this.chooseSwapPath = null;
     this.apiService
       .getSwapPath(
         this.fromToken.symbol,
-        this.toToken.symbol,
+        this.toToken,
         this.swapService.getAmountIn(this.fromToken, this.inputAmount)
       )
       .subscribe((res) => {

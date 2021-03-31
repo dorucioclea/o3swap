@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { Observable, forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AssetQueryResponse, CommonHttpResponse } from '@lib';
+import { AssetQueryResponse, CommonHttpResponse, Token } from '@lib';
 import BigNumber from 'bignumber.js';
 
 @Injectable()
@@ -20,9 +20,18 @@ export class ApiService {
 
   getSwapPath(
     fromAssetName: string,
-    toAssetName: string,
+    toToken: Token | string,
     amount: string
   ): Observable<any> {
+    let toAssetName: string;
+    if (typeof toToken === 'string') {
+      toAssetName = toToken;
+    } else {
+      toAssetName = toToken.symbol;
+      if (toToken.chain !== 'NEO') {
+        toAssetName = toToken.atNeoAssetName;
+      }
+    }
     return this.http
       .post(
         `${this.INQUIRY_HOST}?StartAsset=${fromAssetName}&EndAsset=${toAssetName}&amount=${amount}`,
@@ -31,7 +40,7 @@ export class ApiService {
       .pipe(
         map((res: any) => {
           if (res.length > 0) {
-            return this.handleReceiveSwapPathFiat(res);
+            return this.handleReceiveSwapPathFiat(res, toToken);
           } else {
             return [];
           }
@@ -42,11 +51,12 @@ export class ApiService {
   getRates(): Observable<any> {
     return this.http.get(`${this.RATE_HOST}/crypto/rates`).pipe(
       map((res: CommonHttpResponse) => {
-        const rates: any = { pnUSDT: 1 };
+        const rates: any = { pnUSDT: 1, USDT: 1 };
         if (res.status === 'success') {
           rates.nNEO = res.data.neo2.neo.price;
           rates.FLM = res.data.neo2.flm.price;
           rates.SWTH = res.data.neo2.swth.price;
+          rates.ETH = res.data.eth.eth.price;
           rates.fWETH = res.data.eth.eth.price;
           rates.pnWBTC = res.data.btc.btc.price;
           rates.pONT = res.data.ont.ont.price;
@@ -57,10 +67,15 @@ export class ApiService {
   }
 
   handleReceiveSwapPathFiat(
-    swapPathArr: AssetQueryResponse
+    swapPathArr: AssetQueryResponse,
+    toToken: Token | string
   ): AssetQueryResponse {
     swapPathArr.forEach((item) => {
       item.receiveAmount = item.amount[item.amount.length - 1];
+      const endTokenName = item.swapPath[item.swapPath.length - 1];
+      if (typeof toToken !== 'string' && endTokenName !== toToken.symbol) {
+        item.swapPath.push(toToken.symbol);
+      }
     });
     return this.shellSortSwapPath(swapPathArr);
   }

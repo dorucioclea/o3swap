@@ -8,11 +8,13 @@
       [ngClass]="{focus: isfocusSearchInput}" (input)="search($event)" placeholder="Search token name">
   </div>
   <div class="chains">
-    <img src="/assets/images/tokens/all.png" alt="">
-    <img src="/assets/images/tokens/eth.png" alt="">
-    <img class="active" src="/assets/images/tokens/neo.png" alt="">
-    <!-- <img src="/assets/images/tokens/bsc.png" alt="">
-    <img src="/assets/images/tokens/heco.png" alt=""> -->
+    <img (click)="changeChain('ALL')" [ngClass]="{active: chain==='ALL', disable: isFrom}"
+      src="/assets/images/chains/all.png" alt="">
+    <img (click)="changeChain('ETH')" [ngClass]="{active: chain==='ETH', disable: isFrom}"
+      src="/assets/images/chains/eth.png" alt="">
+    <img (click)="changeChain('NEO')" [ngClass]="{active: chain==='NEO'}" src="/assets/images/chains/neo.png" alt="">
+    <!-- <img src="/assets/images/chains/bsc.png" alt="">
+    <img src="/assets/images/chains/heco.png" alt=""> -->
   </div>
   <ul class="tokens scroll">
     <li class="token" *ngFor="let tokenItem of displayTokens"

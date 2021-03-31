@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
-import { ALL_TOKENS, NEO_TOKENS, SwapStateType } from '@lib';
+import { CHAIN_TOKENS, SwapStateType, CHAINS } from '@lib';
 import { Token } from '@lib';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -16,10 +16,12 @@ interface State {
 export class SwapTokenComponent implements OnInit {
   @Input() activeToken: Token;
   @Input() hideToken: Token;
+  @Input() isFrom: boolean;
 
   swap$: Observable<any>;
   tokenBalance; // 账户的 tokens
 
+  chain: CHAINS;
   allTokens: Token[] = []; // 所有的 tokens, 排除了 fromToken 或 toToken
   displayTokens: any[] = []; // 最终展示的 tokens, search 结果
   isfocusSearchInput = false;
@@ -33,7 +35,8 @@ export class SwapTokenComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const tokens = NEO_TOKENS;
+    this.chain = this.isFrom === true ? 'NEO' : 'ALL';
+    const tokens = CHAIN_TOKENS[this.chain];
     this.allTokens = this.hideToken
       ? tokens.filter((item) => item.assetID !== this.hideToken.assetID)
       : tokens;
@@ -47,6 +50,18 @@ export class SwapTokenComponent implements OnInit {
 
   close(): void {
     this.modal.close();
+  }
+
+  changeChain(chain: CHAINS): void {
+    if (this.isFrom || this.chain === chain) {
+      return;
+    }
+    this.chain = chain;
+    const tokens = CHAIN_TOKENS[this.chain];
+    this.allTokens = this.hideToken
+      ? tokens.filter((item) => item.assetID !== this.hideToken.assetID)
+      : tokens;
+    this.displayTokens = this.allTokens;
   }
 
   selectThisToken(token: Token): void {
@@ -76,8 +91,24 @@ export class SwapTokenComponent implements OnInit {
 
   //#region
   handleTokenAmount(): void {
+    CHAIN_TOKENS.ALL.forEach((tokenItem, index) => {
+      CHAIN_TOKENS.ALL[index].amount = '0';
+      if (this.tokenBalance[tokenItem.assetID]) {
+        CHAIN_TOKENS.ALL[index].amount = this.tokenBalance[
+          tokenItem.assetID
+        ].amount;
+      }
+    });
+    CHAIN_TOKENS.NEO.forEach((tokenItem, index) => {
+      CHAIN_TOKENS.NEO[index].amount = '0';
+      if (this.tokenBalance[tokenItem.assetID]) {
+        CHAIN_TOKENS.NEO[index].amount = this.tokenBalance[
+          tokenItem.assetID
+        ].amount;
+      }
+    });
     this.allTokens.forEach((tokenItem, index) => {
-      this.allTokens[index].amount = null;
+      this.allTokens[index].amount = '0';
       if (this.tokenBalance[tokenItem.assetID]) {
         this.allTokens[index].amount = this.tokenBalance[
           tokenItem.assetID
@@ -85,13 +116,15 @@ export class SwapTokenComponent implements OnInit {
       }
     });
     this.displayTokens.forEach((tokenItem, index) => {
-      this.displayTokens[index].amount = null;
+      this.displayTokens[index].amount = '0';
       if (this.tokenBalance[tokenItem.assetID]) {
         this.displayTokens[index].amount = this.tokenBalance[
           tokenItem.assetID
         ].amount;
       }
     });
+    CHAIN_TOKENS.ALL = this.sortTokens(CHAIN_TOKENS.ALL);
+    CHAIN_TOKENS.NEO = this.sortTokens(CHAIN_TOKENS.NEO);
     this.allTokens = this.sortTokens(this.allTokens);
     this.displayTokens = this.sortTokens(this.displayTokens);
   }
@@ -99,7 +132,7 @@ export class SwapTokenComponent implements OnInit {
     const targetTokens = [];
     const noMoneyTokens = [];
     tokens.forEach((item) => {
-      if (item.amount !== null) {
+      if (item.amount !== '0') {
         targetTokens.push(item);
       } else {
         noMoneyTokens.push(item);

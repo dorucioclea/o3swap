@@ -128,10 +128,7 @@ export class NeolineWalletApiService {
       },
       {
         type: 'Array',
-        value: chooseSwapPath.swapPath.map((assetName) => ({
-          type: 'Hash160',
-          value: this.swapService.getNeoAssetHashByName(assetName),
-        })),
+        value: this.swapService.getAssetHashPath(chooseSwapPath.swapPath),
       },
       {
         type: 'Array',

@@ -40,6 +40,10 @@ section.wrapper {
       width: 40px;
       border-radius: 10px;
       opacity: 0.2;
+      cursor: pointer;
+      &.disable {
+        cursor: default;
+      }
       &:not(:first-child) {
         margin-top: 24px;
       }

@@ -6,7 +6,7 @@ import {
   AssetQueryResponse,
   ALL_PERCENTAGE,
   AssetQueryResponseItem,
-  NEO_TOKENS,
+  ALL_NEO_TOKENS,
   Token,
   WalletName,
   NeoWalletName,
@@ -66,14 +66,30 @@ export class SwapService {
       .toFixed();
     return factAmount;
   }
+  getAssetHashPath(swapPath: string[]): any[] {
+    const target = [];
+    swapPath.forEach((name) => {
+      const assetHash = this.getNeoAssetHashByName(name);
+      if (assetHash) {
+        target.push({ type: 'Hash160', value: assetHash });
+      }
+    });
+    return target;
+  }
   getNeoAssetHashByName(name: string): string {
-    const token = NEO_TOKENS.find((item) => item.symbol === name);
+    const token = ALL_NEO_TOKENS.find((item) => item.symbol === name);
     return (token && token.assetID) || '';
   }
   getHash160FromAddress(text: string): any {
-    const address = ethers.utils.getAddress(text);
-    const res = crypto.RIPEMD160(crypto.SHA256(address).toString()).toString();
-    return res;
+    text = text.slice(2);
+    return this.reverseHex(text);
+  }
+  private reverseHex(hex): string {
+    let out = '';
+    for (let i = hex.length - 2; i >= 0; i -= 2) {
+      out += hex.substr(i, 2);
+    }
+    return out;
   }
   handleNeoDapiError(error, walletName: NeoWalletName): void {
     switch (error.type) {

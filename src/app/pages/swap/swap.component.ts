@@ -1,12 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService, CommonService } from '@core';
-import {
-  DEFAULT_FROM_TOKEN,
-  SwapStateType,
-  SwapTransaction,
-  Token,
-  UPDATE_PENDING_TX,
-} from '@lib';
+import { SwapStateType, SwapTransaction, Token, UPDATE_PENDING_TX } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AnimationOptions } from 'ngx-lottie';

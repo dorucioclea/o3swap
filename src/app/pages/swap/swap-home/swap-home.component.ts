@@ -62,6 +62,7 @@ export class SwapHomeComponent implements OnInit {
       nzComponentParams: {
         activeToken: type === 'from' ? this.fromToken : this.toToken,
         hideToken: type === 'from' ? this.toToken : this.fromToken,
+        isFrom: type === 'from' ? true : false,
       },
     });
     modal.afterClose.subscribe((res) => {

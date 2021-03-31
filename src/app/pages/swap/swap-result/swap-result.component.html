@@ -33,7 +33,7 @@
     <div class="fee-item">
       <p class="label">To</p>
       <p class="value">
-        {{ neoAccountAddress | shortAddress: 10 }}
+        {{ toToken.chain==='NEO' ? neoAccountAddress : ethAccountAddress | shortAddress: 10 }}
       </p>
     </div>
     <div class="fee-item" [ngClass]="{route: chooseSwapPath?.swapPath.length > 4}">
@@ -41,7 +41,7 @@
       <ul class="value routes">
         <li *ngFor="let name of chooseSwapPath?.swapPath; index as index">
           <span *ngIf="index!==0">></span>
-          <img src="/assets/images/tokens/neo/{{name}}.png" alt="">{{ name }}
+          <img src="/assets/images/tokens/{{name}}.png" alt="">{{ name }}
         </li>
       </ul>
     </div>

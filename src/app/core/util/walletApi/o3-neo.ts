@@ -211,10 +211,7 @@ export class O3NeoWalletApiService {
       },
       {
         type: 'Array',
-        value: toNeoswapPath.map((assetName) => ({
-          type: 'Hash160',
-          value: this.swapService.getNeoAssetHashByName(assetName),
-        })),
+        value: this.swapService.getAssetHashPath(chooseSwapPath.swapPath),
       },
       {
         type: 'Integer',
