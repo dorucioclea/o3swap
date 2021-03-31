@@ -45,7 +45,7 @@ export class SwapSettingComponent implements OnInit {
       slipValue: this.slipValue,
       isCustomSlip: this.isCustomSlip,
     };
-    console.log(settingObj);
+    // console.log(settingObj);
     this.modal.close(settingObj);
   }
 

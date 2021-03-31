@@ -131,7 +131,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       .pipe(take(this.seconds))
       .subscribe((time) => {
         time++;
-        console.log(time);
+        // console.log(time);
         this.inquiryTime = this.seconds - time;
         if (time === this.seconds) {
           this.getSwapPath();
