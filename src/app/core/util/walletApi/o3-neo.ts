@@ -93,6 +93,7 @@ export class O3NeoWalletApiService {
 
   async swap(
     fromToken: Token,
+    toToken: Token,
     chooseSwapPath: AssetQueryResponseItem,
     inputAmount: string,
     slipValue: number,
@@ -150,8 +151,7 @@ export class O3NeoWalletApiService {
           isPending: true,
           min: false,
           fromTokenName: fromToken.symbol,
-          toTokenName:
-            chooseSwapPath.swapPath[chooseSwapPath.swapPath.length - 1],
+          toToken,
           amount: inputAmount,
         };
         this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
@@ -177,6 +177,7 @@ export class O3NeoWalletApiService {
 
   async swapCrossChain(
     fromToken: Token,
+    toToken: Token,
     chooseSwapPath: AssetQueryResponseItem,
     inputAmount: string,
     slipValue: number,
@@ -254,8 +255,7 @@ export class O3NeoWalletApiService {
           isPending: true,
           min: false,
           fromTokenName: fromToken.symbol,
-          toTokenName:
-            chooseSwapPath.swapPath[chooseSwapPath.swapPath.length - 1],
+          toToken,
           amount: inputAmount,
         };
         this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
@@ -264,11 +264,6 @@ export class O3NeoWalletApiService {
           (result) => {
             if (result.txid === txHash) {
               this.getBalances();
-              this.transaction.isPending = false;
-              this.store.dispatch({
-                type: UPDATE_PENDING_TX,
-                data: this.transaction,
-              });
             }
           }
         );

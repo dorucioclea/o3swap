@@ -49,6 +49,14 @@ export const ALL_NEO_TOKENS: Token[] = [
     logo: '/assets/images/tokens/pnUSDT.png',
     chain: 'NEO',
   },
+  {
+    assetID: 'b55026d49bb5b585e1d2f9820efdc969f4b8cde6',
+    symbol: 'fUSDT',
+    decimals: 6,
+    amount: '0',
+    logo: '/assets/images/tokens/fUSDT.png',
+    chain: 'NEO',
+  },
   // {
   //   assetID:
   //     '0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7',
@@ -88,6 +96,14 @@ export const ALL_NEO_TOKENS: Token[] = [
     decimals: 8,
     amount: '0',
     logo: '/assets/images/tokens/pnWBTC.png',
+    chain: 'NEO',
+  },
+  {
+    assetID: 'aa94bb6ff87660da94bbe57c34e0373163b7ac93',
+    symbol: 'fWBTC',
+    decimals: 8,
+    amount: '0',
+    logo: '/assets/images/tokens/fWBTC.png',
     chain: 'NEO',
   },
 ];
@@ -118,11 +134,11 @@ export const NEO_TOKENS: Token[] = [
     chain: 'NEO',
   },
   {
-    assetID: 'b8f78d43ea9fe006c85a26b9aff67bcf69dd4fe1',
-    symbol: 'pnUSDT',
+    assetID: 'b55026d49bb5b585e1d2f9820efdc969f4b8cde6',
+    symbol: 'fUSDT',
     decimals: 6,
     amount: '0',
-    logo: '/assets/images/tokens/pnUSDT.png',
+    logo: '/assets/images/tokens/fUSDT.png',
     chain: 'NEO',
   },
   // {
@@ -159,11 +175,11 @@ export const NEO_TOKENS: Token[] = [
     chain: 'NEO',
   },
   {
-    assetID: '69c57a716567a0f6910a0b3c1d4508fa163eb927',
-    symbol: 'pnWBTC',
+    assetID: 'aa94bb6ff87660da94bbe57c34e0373163b7ac93',
+    symbol: 'fWBTC',
     decimals: 8,
     amount: '0',
-    logo: '/assets/images/tokens/pnWBTC.png',
+    logo: '/assets/images/tokens/fWBTC.png',
     chain: 'NEO',
   },
 ];
@@ -273,3 +289,13 @@ export const CHAIN_TOKENS = {
 };
 
 export type CHAINS = 'ALL' | 'NEO' | 'ETH' | 'BSC' | 'HECO';
+
+export const CrossChainToToken: Token = {
+  assetID: '0000000000000000000000000000000000000000',
+  symbol: 'ETH',
+  decimals: 18,
+  amount: '0',
+  logo: '/assets/images/tokens/ETH.png',
+  chain: 'ETH',
+  atNeoAssetName: 'pnWETH',
+};

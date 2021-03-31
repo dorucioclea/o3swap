@@ -9,6 +9,7 @@ import {
   UPDATE_METAMASK_CHAIN_ID,
   UPDATE_NEOLINE_IS_MAINNET,
   UPDATE_PENDING_TX,
+  CrossChainToToken,
 } from '@lib';
 
 const initialState: SwapStateType = {
@@ -20,14 +21,14 @@ const initialState: SwapStateType = {
   neolineIsMainNet: true,
   metamaskIsMainNet: true,
   transaction: null,
-  // {
-  //   txid: '0x52e14abb27f946f9abcc743a06001a71d3eb776fbeddf1c00459abf8f96c1534',
-  //   isPending: false,
+  // transaction: {
+  //   txid: '0f4787014a5442fc02843dc376548fa7a4dd400a92850f783873b034d84dccd5',
+  //   isPending: true,
   //   min: false,
   //   fromTokenName: 'nNEO',
-  //   toTokenName: 'fWETH',
-  //   amount: '100'
-  // }
+  //   toToken: CrossChainToToken,
+  //   amount: '100',
+  // },
 };
 
 export default function swap(state = initialState, action): any {

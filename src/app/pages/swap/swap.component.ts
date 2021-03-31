@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ApiService, CommonService } from '@core';
 import { SwapStateType, SwapTransaction, Token, UPDATE_PENDING_TX } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AnimationOptions } from 'ngx-lottie';
-import { Observable } from 'rxjs';
+import { interval, Observable, Unsubscribable } from 'rxjs';
 
 type PageStatus = 'home' | 'result';
 interface State {
@@ -15,7 +15,7 @@ interface State {
   templateUrl: './swap.component.html',
   styleUrls: ['./swap.component.scss'],
 })
-export class SwapComponent implements OnInit {
+export class SwapComponent implements OnInit, OnDestroy {
   successOptions: AnimationOptions = {
     path: '/assets/json/success.json',
     loop: false,
@@ -30,11 +30,12 @@ export class SwapComponent implements OnInit {
     path: '/assets/json/tx-complete.json',
     loop: false,
   };
-  txWaitingOptions = {
+  txPendingOptions = {
     path: '/assets/json/tx-waiting.json',
   };
-  TX_PAGES_PREFIX = 'https://testnet.neotube.io/transaction/';
-  txPage: string;
+  NEO_TX_PAGES_PREFIX = 'https://testnet.neotube.io/transaction';
+  POLY_TX_PAGES_PREFIX = 'https://explorer.poly.network/testnet/tx';
+  ETH_TX_PAGES_PREFIX = 'https://ropsten.etherscan.io/tx';
   showTxModal = false;
   showTxDetail = false;
 
@@ -50,6 +51,14 @@ export class SwapComponent implements OnInit {
 
   initResultData;
 
+  crossRequestResult = {
+    step1: { hash: '', status: 1 }, // 0 = 未开始, 1 = 进行中, 2 = 已完成
+    step2: { hash: '', status: 0 },
+    step3: { hash: '', status: 0 },
+  };
+  requestCrossInterval: Unsubscribable;
+  swapProgress = 20;
+
   constructor(
     public store: Store<State>,
     private apiService: ApiService,
@@ -61,11 +70,65 @@ export class SwapComponent implements OnInit {
 
   ngOnInit(): void {
     this.swap$.subscribe((state) => {
+      if (
+        state.transaction &&
+        state.transaction.txid !== this.transaction.txid &&
+        state.transaction.toToken &&
+        state.transaction.toToken.chain !== 'NEO' &&
+        state.transaction.isPending
+      ) {
+        this.transaction = Object.assign({}, state.transaction);
+        this.setRequestCrossInterval();
+      }
       this.transaction = Object.assign({}, state.transaction);
       this.showTxModal = this.transaction.min === false ? true : false;
-      this.txPage = this.TX_PAGES_PREFIX + this.transaction.txid;
+      if (this.transaction.isPending === false) {
+        this.swapProgress = 100;
+      } else {
+        if (this.transaction.progress) {
+          if (this.transaction.progress.step3.status === 2) {
+            this.swapProgress = 100;
+          } else if (this.transaction.progress.step2.status === 2) {
+            this.swapProgress = 66;
+          } else if (this.transaction.progress.step1.status === 2) {
+            this.swapProgress = 33;
+          } else {
+            this.swapProgress = 20;
+          }
+        } else {
+          this.swapProgress = 20;
+        }
+      }
     });
     this.getRates();
+  }
+
+  ngOnDestroy(): void {
+    this.requestCrossInterval.unsubscribe();
+  }
+
+  setRequestCrossInterval(): void {
+    this.requestCrossInterval = interval(5000).subscribe(() => {
+      this.apiService
+        .getCrossChainSwapDetail(this.transaction.txid)
+        .subscribe((res) => {
+          this.crossRequestResult = res;
+          console.log(res);
+          this.transaction.progress = res;
+          this.store.dispatch({
+            type: UPDATE_PENDING_TX,
+            data: this.transaction,
+          });
+          if (
+            this.crossRequestResult.step1.status === 2 &&
+            this.crossRequestResult.step2.status === 2 &&
+            this.crossRequestResult.step3.status === 2
+          ) {
+            this.transaction.isPending = false;
+            this.requestCrossInterval.unsubscribe();
+          }
+        });
+    });
   }
 
   getRates(): void {

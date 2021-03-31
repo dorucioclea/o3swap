@@ -11,9 +11,6 @@
   [nzTitle]="null" nzClassName="custom-modal tx-modal">
   <div class="modal-content tx-modal-content">
     <div class="close-group">
-      <a class="link" *ngIf='!transaction?.isPending' target="_blank" [href]="txPage">
-        <img src="/assets/images/swap-result/link.png" alt="">
-      </a>
       <img *ngIf='transaction?.isPending' (click)="minTxHashModal()" class="close"
         src="/assets/images/swap-result/close-pending.png" alt="">
       <img *ngIf='!transaction?.isPending' (click)="minTxHashModal()" class="close" src="/assets/images/swap/close.png"
@@ -26,27 +23,113 @@
       </div>
       <p class="status">{{ transaction?.isPending ? 'Pending' : 'Success' }}</p>
       <div class="desc">
-        Swap {{ transaction?.amount }}{{ transaction?.fromTokenName }} for {{ transaction?.toTokenName }}
+        Swap {{ transaction?.amount }} {{ transaction?.fromTokenName }} for {{ transaction?.toToken?.symbol }}
       </div>
-      <nz-progress [nzPercent]="transaction?.isPending ? 60 : 100" [nzShowInfo]="false" nzStrokeWidth="6"
-        nzStrokeColor="#46B069">
+      <nz-progress [nzPercent]="swapProgress" [nzShowInfo]="false" nzStrokeWidth="6" nzStrokeColor="#46B069">
       </nz-progress>
       <div class="show-detail">
         <img [ngClass]="{show: showTxDetail}" (click)="showTxDetail=!showTxDetail"
           src="/assets/images/swap-result/more.png" alt="">
       </div>
-      <div class="tx-group" *ngIf="showTxDetail">
+      <div class="tx-group" *ngIf="showTxDetail && transaction.toToken.chain==='NEO'">
         <div class="tx-item">
           <div class="left">
             <ng-lottie *ngIf="!transaction?.isPending" class="tx-json" [options]="txCompleteOptions"></ng-lottie>
-            <ng-lottie *ngIf="transaction?.isPending" class="tx-json" [options]="txWaitingOptions"></ng-lottie>
+            <ng-lottie *ngIf="transaction?.isPending" class="tx-json" [options]="txPendingOptions"></ng-lottie>
           </div>
           <div class="right">
-            <p class="name">{{ transaction?.toTokenName }}</p>
+            <p class="name">{{ transaction?.toToken.symbol }}</p>
             <div class="hash">
               <span>Hash</span>
-              {{ transaction?.txid | shortAddress: 10 }}
+              {{ transaction?.txid | shortAddress: 6 }}
               <img class="copy" (click)="copy(transaction?.txid)" src="/assets/images/swap/copy.png" alt="">
+            </div>
+            <div class="link" *ngIf="!transaction?.isPending">
+              <a target="_blank" href="{{NEO_TX_PAGES_PREFIX}}/{{transaction?.txid}}">
+                <span></span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tx-group cross-chain" *ngIf="showTxDetail && transaction.toToken.chain!=='NEO'">
+        <div class="tx-item">
+          <div class="left">
+            <ng-lottie *ngIf="crossRequestResult.step1.status===1" class="tx-json" [options]="txPendingOptions">
+            </ng-lottie>
+            <ng-lottie *ngIf="crossRequestResult.step1.status===2" class="tx-json" [options]="txCompleteOptions">
+            </ng-lottie>
+          </div>
+          <div class="right">
+            <p class="name">{{ transaction?.toToken.atNeoAssetName }}</p>
+            <div class="hash" *ngIf="crossRequestResult.step1.status===2">
+              <span>Hash</span>
+              {{ transaction?.txid | shortAddress: 6 }}
+              <img class="copy" (click)="copy(transaction?.txid)" src="/assets/images/swap/copy.png" alt="">
+            </div>
+            <div class="hash" *ngIf="crossRequestResult.step1.status===1">
+              In progress
+            </div>
+            <div class="link" *ngIf="crossRequestResult.step1.status===2">
+              <a target="_blank" href="{{NEO_TX_PAGES_PREFIX}}/{{transaction?.txid}}">
+                <span></span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="tx-item">
+          <div class="left">
+            <img *ngIf="crossRequestResult.step2.status===0" src="/assets/images/swap-result/tx-waiting.png" alt="">
+            <ng-lottie *ngIf="crossRequestResult.step2.status===1" class="tx-json" [options]="txPendingOptions">
+            </ng-lottie>
+            <ng-lottie *ngIf="crossRequestResult.step2.status===2" class="tx-json" [options]="txCompleteOptions">
+            </ng-lottie>
+          </div>
+          <div class="right">
+            <p class="name">poly</p>
+            <div class="hash" *ngIf="crossRequestResult.step2.status===2">
+              <span>Hash</span>
+              {{ crossRequestResult.step2.hash | shortAddress: 6 }}
+              <img class="copy" (click)="copy(crossRequestResult.step2.hash)" src="/assets/images/swap/copy.png" alt="">
+            </div>
+            <div class="hash" *ngIf="crossRequestResult.step2.status===1">
+              In progress
+            </div>
+            <div class="hash" *ngIf="crossRequestResult.step2.status===0">
+              Waiting
+            </div>
+            <div class="link" *ngIf="crossRequestResult.step2.status===2">
+              <a target="_blank" href="{{POLY_TX_PAGES_PREFIX}}/{{crossRequestResult.step2.hash}}">
+                <span></span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="tx-item">
+          <div class="left">
+            <img *ngIf="crossRequestResult.step3.status===0" src="/assets/images/swap-result/tx-waiting.png" alt="">
+            <ng-lottie *ngIf="crossRequestResult.step3.status===1" class="tx-json" [options]="txPendingOptions">
+            </ng-lottie>
+            <ng-lottie *ngIf="crossRequestResult.step3.status===2" class="tx-json" [options]="txCompleteOptions">
+            </ng-lottie>
+          </div>
+          <div class="right">
+            <p class="name">{{ transaction?.toToken.symbol }}</p>
+            <div class="hash" *ngIf="crossRequestResult.step3.status===2">
+              <span>Hash</span>
+              {{ crossRequestResult.step3.hash | shortAddress: 6 }}
+              <img class="copy" (click)="copy(crossRequestResult.step3.hash)" src="/assets/images/swap/copy.png" alt="">
+            </div>
+            <div class="hash" *ngIf="crossRequestResult.step3.status===1">
+              In progress
+            </div>
+            <div class="hash" *ngIf="crossRequestResult.step3.status===0">
+              Waiting
+            </div>
+            <div class="link" *ngIf="crossRequestResult.step3.status===2">
+              <a target="_blank" href="{{ETH_TX_PAGES_PREFIX}}/{{crossRequestResult.step3.hash}}">
+                <span></span>
+              </a>
             </div>
           </div>
         </div>

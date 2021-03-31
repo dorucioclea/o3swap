@@ -11,11 +11,51 @@ export class ApiService {
   apiDo = environment.apiDomain;
   RATE_HOST = 'https://hub.o3.network/v1';
   INQUIRY_HOST = 'http://47.110.14.167:5002/AssetQuery';
+  CROSS_CHAIN_SWAP_DETAIL = 'https://explorer.poly.network/testnet';
 
   constructor(private http: HttpClient) {}
 
   postEmail(email: string): Observable<any> {
     return this.http.post(`https://subscribe.o3swap.com/subscribe`, { email });
+  }
+
+  getCrossChainSwapDetail(hash: string): Observable<any> {
+    if (hash.startsWith('0x')) {
+      hash = hash.slice(2);
+    }
+    return this.http
+      .get(`${this.CROSS_CHAIN_SWAP_DETAIL}/api/v1/getcrosstx?txhash=${hash}`)
+      .pipe(
+        map((res: any) => {
+          const target = {
+            step1: { hash: '', status: 1 }, // 0 = 未开始, 1 = 进行中, 2 = 已完成
+            step2: { hash: '', status: 0 },
+            step3: { hash: '', status: 0 },
+          };
+          if (res.desc === 'success' && res.result) {
+            const data = JSON.parse(res.result);
+            if (data.fchaintx && data.fchaintx.txhash) {
+              target.step1.hash = data.fchaintx.txhash;
+              target.step1.status = 2;
+            }
+            if (data.mchaintx && data.mchaintx.txhash) {
+              target.step2.hash = data.mchaintx.txhash;
+              target.step2.status = 2;
+            }
+            if (data.tchaintx && data.tchaintx.txhash) {
+              target.step3.hash = data.tchaintx.txhash;
+              target.step3.status = 2;
+            }
+            if (target.step1.status === 2 && target.step2.status === 0) {
+              target.step2.status = 1;
+            }
+            if (target.step2.status === 2 && target.step3.status === 0) {
+              target.step3.status = 1;
+            }
+          }
+          return target;
+        })
+      );
   }
 
   getSwapPath(

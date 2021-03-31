@@ -101,6 +101,7 @@ export class NeolineWalletApiService {
 
   async swapCrossChain(
     fromToken: Token,
+    toToken: Token,
     chooseSwapPath: AssetQueryResponseItem,
     inputAmount: string,
     slipValue: number,
@@ -179,8 +180,7 @@ export class NeolineWalletApiService {
           isPending: true,
           min: false,
           fromTokenName: fromToken.symbol,
-          toTokenName:
-            chooseSwapPath.swapPath[chooseSwapPath.swapPath.length - 1],
+          toToken,
           amount: inputAmount,
         };
         this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
@@ -190,11 +190,6 @@ export class NeolineWalletApiService {
             console.log(result.detail.txid);
             if (result.detail.txid === txHash) {
               this.getBalances();
-              this.transaction.isPending = false;
-              this.store.dispatch({
-                type: UPDATE_PENDING_TX,
-                data: this.transaction,
-              });
             }
           }
         );
@@ -208,6 +203,7 @@ export class NeolineWalletApiService {
 
   async swap(
     fromToken: Token,
+    toToken: Token,
     chooseSwapPath: AssetQueryResponseItem,
     inputAmount: string,
     slipValue: number,
@@ -266,8 +262,7 @@ export class NeolineWalletApiService {
           isPending: true,
           min: false,
           fromTokenName: fromToken.symbol,
-          toTokenName:
-            chooseSwapPath.swapPath[chooseSwapPath.swapPath.length - 1],
+          toToken,
           amount: inputAmount,
         };
         this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });

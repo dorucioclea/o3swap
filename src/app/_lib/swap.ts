@@ -1,3 +1,4 @@
+import { Token } from '@lib';
 import { NeoWalletName, EthWalletName } from './wallet';
 
 export interface SwapTransaction {
@@ -5,8 +6,13 @@ export interface SwapTransaction {
   isPending: boolean;
   min: boolean;
   fromTokenName: string;
-  toTokenName: string;
+  toToken: Token;
   amount: string;
+  progress?: {
+    step1: { hash: string; status: 0 | 1 | 2 };
+    step2: { hash: string; status: 0 | 1 | 2 };
+    step3: { hash: string; status: 0 | 1 | 2 };
+  };
 }
 export interface SwapStateType {
   neoWalletName: NeoWalletName;

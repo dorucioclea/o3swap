@@ -209,6 +209,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     swapApi
       .swapCrossChain(
         this.fromToken,
+        this.toToken,
         this.chooseSwapPath,
         this.inputAmount,
         this.slipValue,
@@ -248,6 +249,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     swapApi
       .swap(
         this.fromToken,
+        this.toToken,
         this.chooseSwapPath,
         this.inputAmount,
         this.slipValue,

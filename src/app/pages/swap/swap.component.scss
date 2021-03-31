@@ -62,12 +62,33 @@ section.min-tx {
   }
   .tx-group {
     margin-top: 20px;
+    position: relative;
+    &.cross-chain {
+      .tx-item {
+        align-items: flex-start;
+        .left {
+          margin-top: 10px;
+        }
+      }
+      &::before {
+        content: "";
+        position: absolute;
+        left: 9px;
+        top: 15px;
+        width: 2px;
+        height: 140px;
+        background: #303030;
+      }
+    }
     .tx-item {
       height: 60px;
       display: flex;
+      align-items: center;
       .left {
+        width: 20px;
         margin-right: 10px;
-        .tx-json {
+        .tx-json,
+        img {
           width: 20px;
           height: 20px;
         }
@@ -79,6 +100,7 @@ section.min-tx {
         background: #303030;
         border-radius: 10px;
         padding: 12px 0 12px 20px;
+        position: relative;
         .hash {
           margin-top: 10px;
           color: #8aa1a1;
@@ -89,6 +111,34 @@ section.min-tx {
             cursor: pointer;
             width: 13px;
             margin-left: 8px;
+          }
+        }
+        .link {
+          position: absolute;
+          top: 5px;
+          right: 5px;
+          width: 40px;
+          height: 50px;
+          background: #353535;
+          border-radius: 10px;
+          a {
+            width: 100%;
+            height: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+          }
+          span {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 100% auto;
+            background-image: url("/assets/images/swap-result/link.png");
+          }
+          &:hover span {
+            background-image: url("/assets/images/swap-result/link-active.png");
           }
         }
       }

@@ -91,22 +91,22 @@ export class SwapTokenComponent implements OnInit {
 
   //#region
   handleTokenAmount(): void {
-    CHAIN_TOKENS.ALL.forEach((tokenItem, index) => {
-      CHAIN_TOKENS.ALL[index].amount = '0';
-      if (this.tokenBalance[tokenItem.assetID]) {
-        CHAIN_TOKENS.ALL[index].amount = this.tokenBalance[
-          tokenItem.assetID
-        ].amount;
-      }
-    });
-    CHAIN_TOKENS.NEO.forEach((tokenItem, index) => {
-      CHAIN_TOKENS.NEO[index].amount = '0';
-      if (this.tokenBalance[tokenItem.assetID]) {
-        CHAIN_TOKENS.NEO[index].amount = this.tokenBalance[
-          tokenItem.assetID
-        ].amount;
-      }
-    });
+    // CHAIN_TOKENS.ALL.forEach((tokenItem, index) => {
+    //   CHAIN_TOKENS.ALL[index].amount = '0';
+    //   if (this.tokenBalance[tokenItem.assetID]) {
+    //     CHAIN_TOKENS.ALL[index].amount = this.tokenBalance[
+    //       tokenItem.assetID
+    //     ].amount;
+    //   }
+    // });
+    // CHAIN_TOKENS.NEO.forEach((tokenItem, index) => {
+    //   CHAIN_TOKENS.NEO[index].amount = '0';
+    //   if (this.tokenBalance[tokenItem.assetID]) {
+    //     CHAIN_TOKENS.NEO[index].amount = this.tokenBalance[
+    //       tokenItem.assetID
+    //     ].amount;
+    //   }
+    // });
     this.allTokens.forEach((tokenItem, index) => {
       this.allTokens[index].amount = '0';
       if (this.tokenBalance[tokenItem.assetID]) {
@@ -123,8 +123,8 @@ export class SwapTokenComponent implements OnInit {
         ].amount;
       }
     });
-    CHAIN_TOKENS.ALL = this.sortTokens(CHAIN_TOKENS.ALL);
-    CHAIN_TOKENS.NEO = this.sortTokens(CHAIN_TOKENS.NEO);
+    // CHAIN_TOKENS.ALL = this.sortTokens(CHAIN_TOKENS.ALL);
+    // CHAIN_TOKENS.NEO = this.sortTokens(CHAIN_TOKENS.NEO);
     this.allTokens = this.sortTokens(this.allTokens);
     this.displayTokens = this.sortTokens(this.displayTokens);
   }

@@ -5,7 +5,7 @@ section.wrapper {
   }
   ul.exchanges {
     padding: 0 30px;
-    margin-top: 15px;
+    margin-top: 25px;
     max-height: 440px;
     overflow-y: scroll;
     & > li {
@@ -46,6 +46,7 @@ section.wrapper {
         margin-right: 25px;
         .name {
           font-size: 18px;
+          line-height: 20px;
         }
         .fiat {
           margin-top: 13px;
