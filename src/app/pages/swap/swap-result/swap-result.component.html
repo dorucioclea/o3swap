@@ -63,6 +63,9 @@
   </div>
   <button class="confirm" (click)="swap()">Confirm</button>
   <div class="setting-group">
-    <img (click)="reGetSwapPath()" class="refresh" src="/assets/images/swap/refresh.png" alt="">
+    <div class="refresh">
+      After<span>{{ inquiryTime }}</span>s
+      <img (click)="reGetSwapPath()" src="/assets/images/swap/refresh.png" alt="">
+    </div>
   </div>
 </section>

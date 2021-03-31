@@ -89,3 +89,17 @@ input::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+
+// 滚动条样式
+.scroll::-webkit-scrollbar {
+  width: 6px;
+}
+/*正常时候的主干部分*/
+.scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+/*正常情况下滑块的样式*/
+.scroll::-webkit-scrollbar-thumb {
+  background-color: #121212;
+  border-radius: 5px;
+}

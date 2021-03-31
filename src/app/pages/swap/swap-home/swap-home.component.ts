@@ -78,6 +78,16 @@ export class SwapHomeComponent implements OnInit {
     });
   }
 
+  exchangeToken(): void {
+    if (this.toToken || this.fromToken) {
+      const temp = this.fromToken;
+      this.fromToken = this.toToken;
+      this.toToken = temp;
+      this.checkInputAmountDecimal();
+      this.calcutionInputAmountFiat();
+    }
+  }
+
   changeInputAmount($event): void {
     this.inputAmount = $event.target.value;
     this.changeData = true;

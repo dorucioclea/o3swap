@@ -23,10 +23,17 @@ import {
 } from '@core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import BigNumber from 'bignumber.js';
-import { Observable } from 'rxjs';
+import {
+  interval,
+  Observable,
+  Subscription,
+  timer,
+  Unsubscribable,
+} from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { SwapExchangeComponent } from '@shared';
+import { take } from 'rxjs/operators';
 
 interface State {
   swap: SwapStateType;
@@ -65,7 +72,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   TOKENS: Token[] = []; // 所有的 tokens
   o3SwapFee = O3SWAP_FEE_PERCENTAGE;
   showInquiry: boolean;
-  inquiryInterval; // 询价定时器
+  inquiryInterval: Unsubscribable; // 询价定时器
+  seconds = 30;
+  inquiryTime = this.seconds;
 
   chooseSwapPath: AssetQueryResponseItem;
   chooseSwapPathIndex: number;
@@ -109,13 +118,28 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.showInquiry = true;
     }
     this.getSwapPath();
-    this.inquiryInterval = setInterval(() => {
-      this.getSwapPath();
-    }, 30000);
+    this.setInquiryInterval();
   }
 
   ngOnDestroy(): void {
-    clearInterval(this.inquiryInterval);
+    this.inquiryInterval.unsubscribe();
+  }
+
+  setInquiryInterval(): void {
+    this.inquiryTime = this.seconds;
+    this.inquiryInterval = interval(1000)
+      .pipe(take(this.seconds))
+      .subscribe((time) => {
+        time++;
+        console.log(time);
+        this.inquiryTime = this.seconds - time;
+        if (time === this.seconds) {
+          this.getSwapPath();
+          timer(1000).subscribe(() => {
+            this.setInquiryInterval();
+          });
+        }
+      });
   }
 
   backToHomePage(): void {
@@ -151,11 +175,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   reGetSwapPath(): void {
-    clearInterval(this.inquiryInterval);
+    this.inquiryInterval.unsubscribe();
     this.getSwapPath();
-    this.inquiryInterval = setInterval(() => {
-      this.getSwapPath();
-    }, 30000);
+    this.setInquiryInterval();
   }
 
   swapCrossChain(): void {
@@ -179,7 +201,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.nzMessage.error('Insufficient balance');
       return;
     }
-    clearInterval(this.inquiryInterval);
+    this.inquiryInterval.unsubscribe();
     const swapApi =
       this.neoWalletName === 'NeoLine'
         ? this.neolineWalletApiService
@@ -215,7 +237,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.nzMessage.error('Insufficient balance');
       return;
     }
-    clearInterval(this.inquiryInterval);
+    this.inquiryInterval.unsubscribe();
     const swapApi =
       this.neoWalletName === 'NeoLine'
         ? this.neolineWalletApiService

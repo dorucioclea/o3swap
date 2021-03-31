@@ -55,16 +55,19 @@ export class SwapTokenComponent implements OnInit {
 
   search($event): void {
     let value: string = $event.target.value;
-    value = value.trim().toUpperCase();
+    value = value.trim().toLowerCase();
     if (value === '') {
       this.displayTokens = this.allTokens;
       return;
     }
     const tempTokens = this.allTokens.filter((item) =>
-      item.symbol.startsWith(value)
+      item.symbol.toLowerCase().startsWith(value)
     );
     this.allTokens.forEach((item) => {
-      if (item.symbol.includes(value) && !item.symbol.startsWith(value)) {
+      if (
+        item.symbol.toLowerCase().includes(value) &&
+        !item.symbol.toLowerCase().startsWith(value)
+      ) {
         tempTokens.push(item);
       }
     });
@@ -89,6 +92,20 @@ export class SwapTokenComponent implements OnInit {
         ].amount;
       }
     });
+    this.allTokens = this.sortTokens(this.allTokens);
+    this.displayTokens = this.sortTokens(this.displayTokens);
+  }
+  sortTokens(tokens: Token[]): Token[] {
+    const targetTokens = [];
+    const noMoneyTokens = [];
+    tokens.forEach((item) => {
+      if (item.amount !== null) {
+        targetTokens.push(item);
+      } else {
+        noMoneyTokens.push(item);
+      }
+    });
+    return targetTokens.concat(...noMoneyTokens);
   }
   //#endregion
 }

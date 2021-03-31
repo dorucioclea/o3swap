@@ -129,4 +129,30 @@ section.result-wrapper {
     margin-top: 20px;
     border-radius: 30px;
   }
+  .setting-group {
+    .refresh {
+      width: 120px;
+      height: 50px;
+      background: #8aa1a12e;
+      border-radius: 10px;
+      color: #8aa1a1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      img {
+        width: 18px;
+        height: 18px;
+        background: transparent;
+        border-radius: none;
+        margin-left: 8px;
+      }
+      span {
+        text-align: center;
+        display: inline-block;
+        width: 20px;
+        color: #46b069;
+        margin: 0 4px;
+      }
+    }
+  }
 }

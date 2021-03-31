@@ -23,7 +23,7 @@
       </div>
       <p class="from-fiat">≈＄{{ inputAmountFiat || '0.00' }}</p>
     </div>
-    <img class="token-exchange" src="/assets/images/swap/exchange-home.png" alt="">
+    <img class="token-exchange" (click)="exchangeToken()" src="/assets/images/swap/exchange-home.png" alt="">
     <div class="to token-select-item">
       <div class="row1">
         <span class="left">To</span>
