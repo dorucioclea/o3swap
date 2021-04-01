@@ -81,7 +81,7 @@ export class O3NeoWalletApiService {
       });
       return;
     }
-    o3dapi.NEO.getBalance({
+    return o3dapi.NEO.getBalance({
       params: [{ address: this.accountAddress }],
       network: NEOLINE_NETWORK,
     })
@@ -143,7 +143,7 @@ export class O3NeoWalletApiService {
         o3dapi.NEO.addEventListener(
           o3dapi.NEO.Constants.EventName.TRANSACTION_CONFIRMED,
           (result) => {
-            if (result.txid === txHash) {
+            if ((txHash as string).includes(result.txid)) {
               this.getBalances();
               this.transaction.isPending = false;
               this.store.dispatch({
@@ -228,7 +228,7 @@ export class O3NeoWalletApiService {
         o3dapi.NEO.addEventListener(
           o3dapi.NEO.Constants.EventName.TRANSACTION_CONFIRMED,
           (result) => {
-            if (result.txid === txHash) {
+            if ((txHash as string).includes(result.txid)) {
               this.getBalances();
               this.transaction.isPending = false;
               this.store.dispatch({
@@ -318,7 +318,7 @@ export class O3NeoWalletApiService {
         o3dapi.NEO.addEventListener(
           o3dapi.NEO.Constants.EventName.TRANSACTION_CONFIRMED,
           (result) => {
-            if (result.txid === txHash) {
+            if ((txHash as string).includes(result.txid)) {
               this.getBalances();
               this.transaction.isPending = false;
               this.store.dispatch({
@@ -427,7 +427,7 @@ export class O3NeoWalletApiService {
         o3dapi.NEO.addEventListener(
           o3dapi.NEO.Constants.EventName.TRANSACTION_CONFIRMED,
           (result) => {
-            if (result.txid === txHash) {
+            if ((txHash as string).includes(result.txid)) {
               this.getBalances();
             }
           }
