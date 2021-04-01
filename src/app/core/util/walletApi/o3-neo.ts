@@ -19,9 +19,11 @@ import {
   SWAP_CROSS_CHAIN_CONTRACT_HASH,
   SwapTransaction,
   NEO_NNEO_CONTRACT_HASH,
+  NEOLINE_NETWORK,
 } from '@lib';
 import { Observable } from 'rxjs';
 import { wallet } from '@cityofzion/neon-js';
+import BigNumber from 'bignumber.js';
 
 interface State {
   swap: SwapStateType;
@@ -73,14 +75,16 @@ export class O3NeoWalletApiService {
     fromTokenAssetId?: string,
     inputAmount?: string
   ): Promise<boolean> {
-    this.store.dispatch({
-      type: UPDATE_NEO_BALANCES,
-      data: {},
-    });
-    return;
+    if (NEOLINE_NETWORK === 'TestNet') {
+      this.store.dispatch({
+        type: UPDATE_NEO_BALANCES,
+        data: {},
+      });
+      return;
+    }
     o3dapi.NEO.getBalance({
       params: [{ address: this.accountAddress }],
-      network: 'MainNet',
+      network: NEOLINE_NETWORK,
     })
       .then((addressTokens: any[]) => {
         const tokens = addressTokens[this.accountAddress];
@@ -92,6 +96,16 @@ export class O3NeoWalletApiService {
           type: UPDATE_NEO_BALANCES,
           data: tempTokenBalance,
         });
+        if (
+          tempTokenBalance[fromTokenAssetId] &&
+          new BigNumber(tempTokenBalance[fromTokenAssetId].amount).comparedTo(
+            new BigNumber(inputAmount)
+          ) >= 0
+        ) {
+          return true;
+        } else {
+          return false;
+        }
       })
       .catch((error) => {
         this.swapService.handleNeoDapiError(error, 'O3');

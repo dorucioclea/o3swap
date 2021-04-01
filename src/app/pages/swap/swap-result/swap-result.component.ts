@@ -66,7 +66,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   swap$: Observable<any>;
   neoAccountAddress: string;
   ethAccountAddress: string;
-  isMainNet: boolean;
   neoWalletName: NeoWalletName;
 
   TOKENS: Token[] = []; // 所有的 tokens
@@ -101,7 +100,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.neoAccountAddress = state.neoAccountAddress;
       this.ethAccountAddress = state.ethAccountAddress;
       this.neoWalletName = state.neoWalletName;
-      this.isMainNet = state.isMainNet;
     });
     this.setting$.subscribe((state) => {
       this.slipValue = state.slipValue;
@@ -189,10 +187,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.nzMessage.error('Please connect the ETH wallet first');
       return;
     }
-    // if (this.isMainNet === false) {
-    //   this.nzMessage.error('Please connect wallet to the main net.');
-    //   return;
-    // }
     this.inquiryInterval.unsubscribe();
     const swapApi =
       this.neoWalletName === 'NeoLine'
@@ -221,10 +215,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.nzMessage.error('Please connect the NEO wallet first');
       return;
     }
-    // if (this.isMainNet === false) {
-    //   this.nzMessage.error('Please connect wallet to the main net.');
-    //   return;
-    // }
     this.inquiryInterval.unsubscribe();
     const swapApi =
       this.neoWalletName === 'NeoLine'
@@ -252,10 +242,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.nzMessage.error('Please connect the NEO wallet first');
       return;
     }
-    // if (this.isMainNet === false) {
-    //   this.nzMessage.error('Please connect wallet to the main net.');
-    //   return;
-    // }
     this.inquiryInterval.unsubscribe();
     const swapApi =
       this.neoWalletName === 'NeoLine'
@@ -276,10 +262,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.nzMessage.error('Please connect the NEO wallet first');
       return;
     }
-    // if (this.isMainNet === false) {
-    //   this.nzMessage.error('Please connect wallet to the main net.');
-    //   return;
-    // }
     this.inquiryInterval.unsubscribe();
     const swapApi =
       this.neoWalletName === 'NeoLine'

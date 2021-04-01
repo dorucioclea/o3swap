@@ -6,8 +6,8 @@ import {
   UPDATE_ETH_WALLET_NAME,
   UPDATE_NEO_WALLET_NAME,
   UPDATE_ETH_ACCOUNT,
-  UPDATE_METAMASK_CHAIN_ID,
-  UPDATE_NEOLINE_IS_MAINNET,
+  UPDATE_METAMASK_NETWORK_ID,
+  UPDATE_NEOLINE_NETWORK,
   UPDATE_PENDING_TX,
   CrossChainToToken,
 } from '@lib';
@@ -18,8 +18,8 @@ const initialState: SwapStateType = {
   neoAccountAddress: null,
   ethAccountAddress: null,
   balances: {}, // neo 链连接钱包的balances
-  neolineIsMainNet: true,
-  metamaskIsMainNet: true,
+  neolineNetwork: null,
+  metamaskNetworkId: null,
   transaction: null,
   // transaction: {
   //   txid: '0f4787014a5442fc02843dc376548fa7a4dd400a92850f783873b034d84dccd5',
@@ -48,10 +48,10 @@ export default function swap(state = initialState, action): any {
     case RESET_NEO_BALANCES:
       return { ...state, balances: {} };
 
-    case UPDATE_NEOLINE_IS_MAINNET:
-      return { ...state, neolineIsMainNet: action.data };
-    case UPDATE_METAMASK_CHAIN_ID:
-      return { ...state, metamaskIsMainNet: action.data };
+    case UPDATE_NEOLINE_NETWORK:
+      return { ...state, neolineNetwork: action.data };
+    case UPDATE_METAMASK_NETWORK_ID:
+      return { ...state, metamaskNetworkId: action.data };
 
     case UPDATE_PENDING_TX:
       return { ...state, transaction: action.data };

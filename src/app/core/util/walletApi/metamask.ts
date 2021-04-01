@@ -4,7 +4,7 @@ import {
   SwapStateType,
   UPDATE_ETH_ACCOUNT,
   UPDATE_ETH_WALLET_NAME,
-  UPDATE_METAMASK_CHAIN_ID,
+  UPDATE_METAMASK_NETWORK_ID,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import BigNumber from 'bignumber.js';
@@ -66,8 +66,9 @@ export class MetaMaskWalletApiService {
     this.ethereum
       .request({ method: 'net_version' })
       .then((chainId) => {
+        console.log('chainId: ' + chainId);
         this.store.dispatch({
-          type: UPDATE_METAMASK_CHAIN_ID,
+          type: UPDATE_METAMASK_NETWORK_ID,
           data: chainId,
         });
       })
@@ -91,8 +92,9 @@ export class MetaMaskWalletApiService {
       }
     });
     this.ethereum.on('chainChanged', (chainId) => {
+      console.log('chainId: ' + chainId);
       this.store.dispatch({
-        type: UPDATE_METAMASK_CHAIN_ID,
+        type: UPDATE_METAMASK_NETWORK_ID,
         data: chainId,
       });
     });

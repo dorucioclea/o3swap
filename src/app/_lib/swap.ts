@@ -22,14 +22,17 @@ export interface SwapTransaction {
   amount: string;
   progress?: TxProgress;
 }
+
+export type NeolineNetwork = 'MainNet' | 'TestNet';
+
 export interface SwapStateType {
   neoWalletName: NeoWalletName;
   ethWalletName: EthWalletName;
   neoAccountAddress: string;
   ethAccountAddress: string;
   balances: object;
-  neolineIsMainNet: boolean;
-  metamaskIsMainNet: boolean;
+  neolineNetwork: NeolineNetwork;
+  metamaskNetworkId: number;
   transaction: SwapTransaction;
 }
 
