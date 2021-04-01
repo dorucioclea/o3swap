@@ -130,7 +130,7 @@ export class ApiService {
         },
       ];
     }
-    console.log(neoNNeoRes);
+    // console.log(neoNNeoRes);
     if (neoNNeoRes) {
       return of(this.handleReceiveSwapPathFiat(neoNNeoRes, toToken));
     }
