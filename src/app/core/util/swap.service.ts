@@ -145,7 +145,11 @@ export class SwapService {
         );
         break;
       default:
-        this.nzMessage.error(error.type);
+        if (typeof error === 'string') {
+          this.nzMessage.error(error);
+        } else {
+          this.nzMessage.error(error.type || 'Unknown error');
+        }
         break;
     }
   }
