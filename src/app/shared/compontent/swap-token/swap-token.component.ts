@@ -1,9 +1,16 @@
-import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  ChangeDetectorRef,
+  OnDestroy,
+} from '@angular/core';
 import { CHAIN_TOKENS, SwapStateType, CHAINS, NNEO_TOKEN } from '@lib';
 import { Token } from '@lib';
-import { Observable } from 'rxjs';
+import { Observable, Unsubscribable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NzModalRef } from 'ng-zorro-antd/modal';
+import { CommonService } from '@core';
 
 interface State {
   swap: SwapStateType;
@@ -13,7 +20,9 @@ interface State {
   templateUrl: './swap-token.component.html',
   styleUrls: ['./swap-token.component.scss'],
 })
-export class SwapTokenComponent implements OnInit {
+export class SwapTokenComponent implements OnInit, OnDestroy {
+  myNNEO_TOKEN;
+  myCHAIN_TOKENS;
   @Input() isFrom: boolean;
   @Input() fromToken: Token;
   @Input() toToken: Token;
@@ -24,6 +33,7 @@ export class SwapTokenComponent implements OnInit {
 
   swap$: Observable<any>;
   tokenBalance; // 账户的 tokens
+  swapUnScribe: Unsubscribable;
 
   chain: CHAINS;
   allTokens: Token[] = []; // 所有的 tokens, 排除了 fromToken 或 toToken
@@ -33,26 +43,47 @@ export class SwapTokenComponent implements OnInit {
   constructor(
     private store: Store<State>,
     private changeDetectorRef: ChangeDetectorRef,
-    private modal: NzModalRef
+    private modal: NzModalRef,
+    private commonService: CommonService
   ) {
     this.swap$ = store.select('swap');
   }
+  ngOnDestroy(): void {
+    this.swapUnScribe.unsubscribe();
+  }
 
   ngOnInit(): void {
+    this.cloneChainTokens();
+    this.myNNEO_TOKEN = JSON.parse(JSON.stringify(NNEO_TOKEN));
     this.checkShowOnlyNNeo();
     this.activeToken = this.isFrom ? this.fromToken : this.toToken;
     this.hideToken = this.isFrom ? this.toToken : this.fromToken;
     this.chain = this.isFrom === true ? 'NEO' : 'NEO';
-    const tokens = this.showOnlyNNeo ? NNEO_TOKEN : CHAIN_TOKENS[this.chain];
+    const tokens = this.showOnlyNNeo
+      ? this.myNNEO_TOKEN
+      : this.myCHAIN_TOKENS[this.chain];
     this.allTokens = this.hideToken
       ? tokens.filter((item) => item.assetID !== this.hideToken.assetID)
       : tokens;
     this.displayTokens = this.allTokens;
-    this.swap$.subscribe((state) => {
-      this.tokenBalance = state.balances;
-      this.handleTokenAmount();
+    this.swapUnScribe = this.swap$.subscribe((state) => {
+      if (
+        JSON.stringify(state.balances) !== JSON.stringify(this.tokenBalance)
+      ) {
+        this.tokenBalance = JSON.parse(JSON.stringify(state.balances));
+        this.handleTokenAmount();
+      }
       // this.changeDetectorRef.detectChanges();
     });
+  }
+
+  cloneChainTokens(): void {
+    this.myCHAIN_TOKENS = {};
+    this.myCHAIN_TOKENS.ALL = JSON.parse(JSON.stringify(CHAIN_TOKENS.ALL));
+    this.myCHAIN_TOKENS.NEO = JSON.parse(JSON.stringify(CHAIN_TOKENS.NEO));
+    this.myCHAIN_TOKENS.ETH = JSON.parse(JSON.stringify(CHAIN_TOKENS.ETH));
+    this.myCHAIN_TOKENS.BSC = JSON.parse(JSON.stringify(CHAIN_TOKENS.BSC));
+    this.myCHAIN_TOKENS.HECO = JSON.parse(JSON.stringify(CHAIN_TOKENS.HECO));
   }
 
   close(): void {
@@ -78,7 +109,9 @@ export class SwapTokenComponent implements OnInit {
       return;
     }
     this.chain = chain;
-    const tokens = this.showOnlyNNeo ? NNEO_TOKEN : CHAIN_TOKENS[this.chain];
+    const tokens = this.showOnlyNNeo
+      ? this.myNNEO_TOKEN
+      : this.myCHAIN_TOKENS[this.chain];
     this.allTokens = this.hideToken
       ? tokens.filter((item) => item.assetID !== this.hideToken.assetID)
       : tokens;
@@ -112,27 +145,26 @@ export class SwapTokenComponent implements OnInit {
 
   //#region
   handleTokenAmount(): void {
-    if (this.tokenBalance[NNEO_TOKEN[0].assetID]) {
-      NNEO_TOKEN[0].amount = this.tokenBalance[NNEO_TOKEN[0].assetID].amount;
+    if (this.tokenBalance[this.myNNEO_TOKEN[0].assetID]) {
+      this.myNNEO_TOKEN[0].amount = this.tokenBalance[
+        this.myNNEO_TOKEN[0].assetID
+      ].amount;
     }
-    CHAIN_TOKENS.ALL.forEach((tokenItem, index) => {
-      CHAIN_TOKENS.ALL[index].amount = '0';
+    this.myCHAIN_TOKENS.ALL.forEach((tokenItem, index) => {
       if (this.tokenBalance[tokenItem.assetID]) {
-        CHAIN_TOKENS.ALL[index].amount = this.tokenBalance[
+        this.myCHAIN_TOKENS.ALL[index].amount = this.tokenBalance[
           tokenItem.assetID
         ].amount;
       }
     });
-    CHAIN_TOKENS.NEO.forEach((tokenItem, index) => {
-      CHAIN_TOKENS.NEO[index].amount = '0';
+    this.myCHAIN_TOKENS.NEO.forEach((tokenItem, index) => {
       if (this.tokenBalance[tokenItem.assetID]) {
-        CHAIN_TOKENS.NEO[index].amount = this.tokenBalance[
+        this.myCHAIN_TOKENS.NEO[index].amount = this.tokenBalance[
           tokenItem.assetID
         ].amount;
       }
     });
     this.allTokens.forEach((tokenItem, index) => {
-      this.allTokens[index].amount = '0';
       if (this.tokenBalance[tokenItem.assetID]) {
         this.allTokens[index].amount = this.tokenBalance[
           tokenItem.assetID
@@ -140,15 +172,14 @@ export class SwapTokenComponent implements OnInit {
       }
     });
     this.displayTokens.forEach((tokenItem, index) => {
-      this.displayTokens[index].amount = '0';
       if (this.tokenBalance[tokenItem.assetID]) {
         this.displayTokens[index].amount = this.tokenBalance[
           tokenItem.assetID
         ].amount;
       }
     });
-    CHAIN_TOKENS.ALL = this.sortTokens(CHAIN_TOKENS.ALL);
-    CHAIN_TOKENS.NEO = this.sortTokens(CHAIN_TOKENS.NEO);
+    this.myCHAIN_TOKENS.ALL = this.sortTokens(this.myCHAIN_TOKENS.ALL);
+    this.myCHAIN_TOKENS.NEO = this.sortTokens(this.myCHAIN_TOKENS.NEO);
     this.allTokens = this.sortTokens(this.allTokens);
     this.displayTokens = this.sortTokens(this.displayTokens);
   }
