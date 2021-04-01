@@ -21,6 +21,7 @@ import {
 } from '@lib';
 import { Observable } from 'rxjs';
 import { wallet } from '@cityofzion/neon-js';
+import BigNumber from 'bignumber.js';
 
 interface State {
   swap: SwapStateType;
@@ -80,8 +81,11 @@ export class NeolineWalletApiService {
       });
   }
 
-  getBalances(): void {
-    this.neolineDapi
+  getBalances(
+    fromTokenAssetId?: string,
+    inputAmount?: string
+  ): Promise<boolean> {
+    return this.neolineDapi
       .getBalance({
         params: [{ address: this.accountAddress }],
         network: 'TestNet',
@@ -93,10 +97,21 @@ export class NeolineWalletApiService {
         tokens.forEach((tokenItem: any) => {
           tempTokenBalance[tokenItem.asset_id || tokenItem.assetID] = tokenItem;
         });
+        console.log('temp: ' + tempTokenBalance);
         this.store.dispatch({
           type: UPDATE_NEO_BALANCES,
           data: tempTokenBalance,
         });
+        if (
+          tempTokenBalance[fromTokenAssetId] &&
+          new BigNumber(tempTokenBalance[fromTokenAssetId].amount).comparedTo(
+            new BigNumber(inputAmount)
+          ) >= 0
+        ) {
+          return true;
+        } else {
+          return false;
+        }
       })
       .catch((error) => {
         this.swapService.handleNeoDapiError(error, 'NeoLine');
@@ -108,7 +123,11 @@ export class NeolineWalletApiService {
     toToken: Token, // nneo
     inputAmount: string
   ): Promise<string> {
-    console.log(inputAmount);
+    const checkBalance = await this.getBalances(fromToken.assetID, inputAmount);
+    if (checkBalance !== true) {
+      this.nzMessage.error('Insufficient balance');
+      return;
+    }
     return this.neolineDapi
       .invoke({
         scriptHash: NEO_NNEO_CONTRACT_HASH,
@@ -157,8 +176,10 @@ export class NeolineWalletApiService {
     inputAmount: string,
     toAddress: string
   ): Promise<string> {
-    if (toToken.assetID.startsWith('0x')) {
-      toToken.assetID = toToken.assetID.slice(2);
+    const checkBalance = await this.getBalances(fromToken.assetID, inputAmount);
+    if (checkBalance !== true) {
+      this.nzMessage.error('Insufficient balance');
+      return;
     }
     const utxoRes = await this.apiService.getUtxo(toAddress, inputAmount);
     if (utxoRes === false) {
@@ -247,6 +268,11 @@ export class NeolineWalletApiService {
     isMix: boolean = false,
     crossAssetHash: string = ''
   ): Promise<string> {
+    const checkBalance = await this.getBalances(fromToken.assetID, inputAmount);
+    if (checkBalance !== true) {
+      this.nzMessage.error('Insufficient balance');
+      return;
+    }
     const toNeoswapPath = await this.swapService.getToNeoSwapPath(
       fromToken,
       inputAmount
@@ -346,6 +372,11 @@ export class NeolineWalletApiService {
     slipValue: number,
     deadline: number
   ): Promise<string> {
+    const checkBalance = await this.getBalances(fromToken.assetID, inputAmount);
+    if (checkBalance !== true) {
+      this.nzMessage.error('Insufficient balance');
+      return;
+    }
     const toNeoswapPath = await this.swapService.getToNeoSwapPath(
       fromToken,
       inputAmount

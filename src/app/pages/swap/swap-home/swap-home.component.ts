@@ -162,6 +162,18 @@ export class SwapHomeComponent implements OnInit {
       this.inputAmountError = `You've exceeded the decimal limit.`;
       return false;
     }
+    // neo nneo 互换只能整单位
+    if (
+      this.fromToken &&
+      this.fromToken.symbol === 'nNEO' &&
+      this.toToken &&
+      this.toToken.symbol === 'NEO' &&
+      decimalPart &&
+      decimalPart.length > 0
+    ) {
+      this.inputAmountError = `You've exceeded the decimal limit.`;
+      return false;
+    }
     this.inputAmountError = '';
     return true;
   }

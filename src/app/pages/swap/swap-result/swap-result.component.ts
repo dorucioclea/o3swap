@@ -193,14 +193,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     //   this.nzMessage.error('Please connect wallet to the main net.');
     //   return;
     // }
-    if (
-      new BigNumber(this.inputAmount).comparedTo(
-        new BigNumber(this.fromToken.amount || 0)
-      ) > 0
-    ) {
-      this.nzMessage.error('Insufficient balance');
-      return;
-    }
     this.inquiryInterval.unsubscribe();
     const swapApi =
       this.neoWalletName === 'NeoLine'
@@ -233,14 +225,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     //   this.nzMessage.error('Please connect wallet to the main net.');
     //   return;
     // }
-    if (
-      new BigNumber(this.inputAmount).comparedTo(
-        new BigNumber(this.fromToken.amount || 0)
-      ) > 0
-    ) {
-      this.nzMessage.error('Insufficient balance');
-      return;
-    }
     this.inquiryInterval.unsubscribe();
     const swapApi =
       this.neoWalletName === 'NeoLine'
@@ -272,14 +256,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     //   this.nzMessage.error('Please connect wallet to the main net.');
     //   return;
     // }
-    // if (
-    //   new BigNumber(this.inputAmount).comparedTo(
-    //     new BigNumber(this.fromToken.amount || 0)
-    //   ) > 0
-    // ) {
-    //   this.nzMessage.error('Insufficient balance');
-    //   return;
-    // }
     this.inquiryInterval.unsubscribe();
     const swapApi =
       this.neoWalletName === 'NeoLine'
@@ -304,14 +280,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     //   this.nzMessage.error('Please connect wallet to the main net.');
     //   return;
     // }
-    if (
-      new BigNumber(this.inputAmount).comparedTo(
-        new BigNumber(this.fromToken.amount || 0)
-      ) > 0
-    ) {
-      this.nzMessage.error('Insufficient balance');
-      // return;
-    }
     this.inquiryInterval.unsubscribe();
     const swapApi =
       this.neoWalletName === 'NeoLine'

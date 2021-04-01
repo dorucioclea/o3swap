@@ -69,7 +69,10 @@ export class O3NeoWalletApiService {
       });
   }
 
-  getBalances(): void {
+  getBalances(
+    fromTokenAssetId?: string,
+    inputAmount?: string
+  ): Promise<boolean> {
     this.store.dispatch({
       type: UPDATE_NEO_BALANCES,
       data: {},
@@ -100,6 +103,11 @@ export class O3NeoWalletApiService {
     toToken: Token, // nneo
     inputAmount: string
   ): Promise<string> {
+    const checkBalance = await this.getBalances(fromToken.assetID, inputAmount);
+    if (checkBalance !== true) {
+      this.nzMessage.error('Insufficient balance');
+      return;
+    }
     return o3dapi.NEO.invoke({
       scriptHash: NEO_NNEO_CONTRACT_HASH,
       operation: 'mintTokens',
@@ -146,12 +154,17 @@ export class O3NeoWalletApiService {
     inputAmount: string,
     toAddress: string
   ): Promise<string> {
-    const utxoList = await this.apiService.getUtxo(toAddress, inputAmount);
-    if (utxoList === false) {
+    const checkBalance = await this.getBalances(fromToken.assetID, inputAmount);
+    if (checkBalance !== true) {
+      this.nzMessage.error('Insufficient balance');
+      return;
+    }
+    const utxoRes = await this.apiService.getUtxo(toAddress, inputAmount);
+    if (utxoRes === false) {
       this.nzMessage.error('System busy');
       return;
     }
-    return o3dapi.NEO.invoke({
+    const params = {
       scriptHash: NEO_NNEO_CONTRACT_HASH,
       operation: 'refund',
       args: [
@@ -161,7 +174,7 @@ export class O3NeoWalletApiService {
         },
       ],
       assetIntentOverrides: {
-        inputs: utxoList,
+        inputs: utxoRes.utxoList,
         outputs: [
           {
             address: wallet.getAddressFromScriptHash(NEO_NNEO_CONTRACT_HASH), // 合约地址
@@ -179,7 +192,15 @@ export class O3NeoWalletApiService {
           scriptHash: NEO_NNEO_CONTRACT_HASH,
         },
       ],
-    })
+    };
+    if (utxoRes.sum > inputAmount) {
+      params.assetIntentOverrides.outputs.push({
+        address: wallet.getAddressFromScriptHash(NEO_NNEO_CONTRACT_HASH), // 合约地址
+        asset: toToken.assetID, // neo asset Id
+        value: String(utxoRes.sum - Number(inputAmount)),
+      });
+    }
+    return o3dapi.NEO.invoke(params)
       .then(({ txid }) => {
         const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
         const pendingTx: SwapTransaction = {
@@ -220,6 +241,11 @@ export class O3NeoWalletApiService {
     slipValue: number,
     deadline: number
   ): Promise<string> {
+    const checkBalance = await this.getBalances(fromToken.assetID, inputAmount);
+    if (checkBalance !== true) {
+      this.nzMessage.error('Insufficient balance');
+      return;
+    }
     const toNeoswapPath = await this.swapService.getToNeoSwapPath(
       fromToken,
       inputAmount
@@ -307,6 +333,11 @@ export class O3NeoWalletApiService {
     isMix: boolean = false,
     crossAssetHash: string = ''
   ): Promise<string> {
+    const checkBalance = await this.getBalances(fromToken.assetID, inputAmount);
+    if (checkBalance !== true) {
+      this.nzMessage.error('Insufficient balance');
+      return;
+    }
     const toNeoswapPath = await this.swapService.getToNeoSwapPath(
       fromToken,
       inputAmount
@@ -326,14 +357,14 @@ export class O3NeoWalletApiService {
       },
       {
         type: 'Array',
-        value: chooseSwapPath.swapPath.map((assetName) => ({
-          type: 'Hash160',
-          value: this.swapService.getNeoAssetHashByName(assetName),
-        })),
+        value: this.swapService.getAssetHashPath(chooseSwapPath.swapPath),
       },
       {
         type: 'Array',
-        value: this.swapService.getAssetHashPath(chooseSwapPath.swapPath),
+        value: toNeoswapPath.map((assetName) => ({
+          type: 'Hash160',
+          value: this.swapService.getNeoAssetHashByName(assetName),
+        })),
       },
       {
         type: 'Integer',
@@ -349,11 +380,11 @@ export class O3NeoWalletApiService {
       },
       {
         type: 'Integer',
-        value: 1,
+        value: 2,
       },
       {
         type: 'Integer',
-        value: 56,
+        value: 0,
       },
       {
         type: 'Boolean',
