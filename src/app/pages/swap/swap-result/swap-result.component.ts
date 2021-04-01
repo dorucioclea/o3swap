@@ -117,7 +117,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     } else {
       this.showInquiry = true;
     }
-    this.getSwapPath();
+    this.getSwapPathFun();
     this.setInquiryInterval();
   }
 
@@ -134,7 +134,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         // console.log(time);
         this.inquiryTime = this.seconds - time;
         if (time === this.seconds) {
-          this.getSwapPath();
+          this.getSwapPathFun();
           timer(1000).subscribe(() => {
             this.setInquiryInterval();
           });
@@ -176,7 +176,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
 
   reGetSwapPath(): void {
     this.inquiryInterval.unsubscribe();
-    this.getSwapPath();
+    this.getSwapPathFun();
     this.setInquiryInterval();
   }
 
@@ -263,7 +263,84 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       });
   }
 
+  mintNNeo(): void {
+    if (!this.neoAccountAddress) {
+      this.nzMessage.error('Please connect the NEO wallet first');
+      return;
+    }
+    // if (this.isMainNet === false) {
+    //   this.nzMessage.error('Please connect wallet to the main net.');
+    //   return;
+    // }
+    // if (
+    //   new BigNumber(this.inputAmount).comparedTo(
+    //     new BigNumber(this.fromToken.amount || 0)
+    //   ) > 0
+    // ) {
+    //   this.nzMessage.error('Insufficient balance');
+    //   return;
+    // }
+    this.inquiryInterval.unsubscribe();
+    const swapApi =
+      this.neoWalletName === 'NeoLine'
+        ? this.neolineWalletApiService
+        : this.o3NeoWalletApiService;
+    swapApi
+      .mintNNeo(this.fromToken, this.toToken, this.inputAmount)
+      .then((res) => {
+        console.log(res);
+        if (res) {
+          this.closePage.emit();
+        }
+      });
+  }
+
+  releaseNeo(): void {
+    if (!this.neoAccountAddress) {
+      this.nzMessage.error('Please connect the NEO wallet first');
+      return;
+    }
+    // if (this.isMainNet === false) {
+    //   this.nzMessage.error('Please connect wallet to the main net.');
+    //   return;
+    // }
+    if (
+      new BigNumber(this.inputAmount).comparedTo(
+        new BigNumber(this.fromToken.amount || 0)
+      ) > 0
+    ) {
+      this.nzMessage.error('Insufficient balance');
+      // return;
+    }
+    this.inquiryInterval.unsubscribe();
+    const swapApi =
+      this.neoWalletName === 'NeoLine'
+        ? this.neolineWalletApiService
+        : this.o3NeoWalletApiService;
+    swapApi
+      .releaseNeo(
+        this.fromToken,
+        this.toToken,
+        this.inputAmount,
+        this.neoAccountAddress
+      )
+      .then((res) => {
+        console.log(res);
+        if (res) {
+          this.closePage.emit();
+        }
+      });
+  }
+
   swap(): void {
+    if (this.fromToken.symbol === 'NEO' && this.toToken.symbol === 'nNEO') {
+      this.mintNNeo();
+      return;
+    }
+    if (this.fromToken.symbol === 'nNEO' && this.toToken.symbol === 'NEO') {
+      this.releaseNeo();
+      return;
+    }
     if (this.fromToken.chain === 'NEO' && this.toToken.chain === 'NEO') {
       this.swapNeo();
       return;
@@ -275,13 +352,14 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   //#region
-  getSwapPath(): void {
+  getSwapPathFun(): void {
     this.chooseSwapPath = null;
     this.apiService
       .getSwapPath(
         this.fromToken.symbol,
         this.toToken,
-        this.swapService.getAmountIn(this.fromToken, this.inputAmount)
+        this.swapService.getAmountIn(this.fromToken, this.inputAmount),
+        this.inputAmount
       )
       .subscribe((res) => {
         this.showInquiry = false;

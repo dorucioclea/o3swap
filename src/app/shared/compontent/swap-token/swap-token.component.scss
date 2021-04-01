@@ -43,6 +43,7 @@ section.wrapper {
       cursor: pointer;
       &.disable {
         cursor: default;
+        pointer-events: none;
       }
       &:not(:first-child) {
         margin-top: 24px;

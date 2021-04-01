@@ -21,8 +21,10 @@
     "target": "es5",
     "module": "es2015",
     "lib": [
-      "es2017",
+      "es2018",
       "dom"
-    ]
-  }
+    ],
+    "allowSyntheticDefaultImports": true,
+  },
+  "exclude": ["node_modules"],
 }

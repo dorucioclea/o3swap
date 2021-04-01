@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { SwapService } from '../swap.service';
 import { CommonService } from '../common.service';
+import { ApiService } from '../../api/api.service';
 import {
   NeoWalletName,
   SWAP_CONTRACT_HASH,
@@ -16,8 +17,10 @@ import {
   UPDATE_PENDING_TX,
   SWAP_CROSS_CHAIN_CONTRACT_HASH,
   SwapTransaction,
+  NEO_NNEO_CONTRACT_HASH,
 } from '@lib';
 import { Observable } from 'rxjs';
+import { wallet } from '@cityofzion/neon-js';
 
 interface State {
   swap: SwapStateType;
@@ -38,7 +41,8 @@ export class NeolineWalletApiService {
     private store: Store<State>,
     private nzMessage: NzMessageService,
     private commonService: CommonService,
-    private swapService: SwapService
+    private swapService: SwapService,
+    private apiService: ApiService
   ) {
     this.swap$ = store.select('swap');
     this.swap$.subscribe((state) => {
@@ -95,6 +99,139 @@ export class NeolineWalletApiService {
         });
       })
       .catch((error) => {
+        this.swapService.handleNeoDapiError(error, 'NeoLine');
+      });
+  }
+
+  async mintNNeo(
+    fromToken: Token, // neo
+    toToken: Token, // nneo
+    inputAmount: string
+  ): Promise<string> {
+    console.log(inputAmount);
+    return this.neolineDapi
+      .invoke({
+        scriptHash: NEO_NNEO_CONTRACT_HASH,
+        operation: 'mintTokens',
+        args: [],
+        attachedAssets: {
+          NEO: inputAmount,
+        },
+      })
+      .then(({ txid }) => {
+        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
+        const pendingTx: SwapTransaction = {
+          txid: txHash,
+          isPending: true,
+          min: false,
+          fromTokenName: fromToken.symbol,
+          toToken,
+          amount: inputAmount,
+        };
+        this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
+        window.addEventListener(
+          'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
+          (result: any) => {
+            console.log(result.detail.txid);
+            if (result.detail.txid === txHash) {
+              this.getBalances();
+              this.transaction.isPending = false;
+              this.store.dispatch({
+                type: UPDATE_PENDING_TX,
+                data: this.transaction,
+              });
+            }
+          }
+        );
+        return txHash;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.swapService.handleNeoDapiError(error, 'NeoLine');
+      });
+  }
+
+  async releaseNeo(
+    fromToken: Token, // nneo
+    toToken: Token, // neo
+    inputAmount: string,
+    toAddress: string
+  ): Promise<string> {
+    if (toToken.assetID.startsWith('0x')) {
+      toToken.assetID = toToken.assetID.slice(2);
+    }
+    const utxoRes = await this.apiService.getUtxo(toAddress, inputAmount);
+    if (utxoRes === false) {
+      this.nzMessage.error('System busy');
+      return;
+    }
+    const params = {
+      scriptHash: NEO_NNEO_CONTRACT_HASH,
+      operation: 'refund',
+      args: [
+        {
+          type: 'Address', // 收件人地址
+          value: toAddress,
+        },
+      ],
+      assetIntentOverrides: {
+        inputs: utxoRes.utxoList,
+        outputs: [
+          {
+            address: wallet.getAddressFromScriptHash(NEO_NNEO_CONTRACT_HASH), // 合约地址
+            asset: toToken.assetID, // neo asset Id
+            value: inputAmount,
+          },
+          // 还有可能会有找零。应该是 getUxo得到的 sum - amount
+        ],
+      },
+      triggerContractVerification: false,
+      extra_witness: [
+        {
+          invocationScript: '520131',
+          verificationScript: '',
+          scriptHash: NEO_NNEO_CONTRACT_HASH,
+        },
+      ],
+    };
+    if (utxoRes.sum > inputAmount) {
+      params.assetIntentOverrides.outputs.push({
+        address: wallet.getAddressFromScriptHash(NEO_NNEO_CONTRACT_HASH), // 合约地址
+        asset: toToken.assetID, // neo asset Id
+        value: String(utxoRes.sum - Number(inputAmount)),
+      });
+    }
+    return this.neolineDapi
+      .invoke(params)
+      .then(({ txid }) => {
+        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
+        const pendingTx: SwapTransaction = {
+          txid: txHash,
+          isPending: true,
+          min: false,
+          fromTokenName: fromToken.symbol,
+          toToken,
+          amount: inputAmount,
+        };
+        this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
+        window.addEventListener(
+          'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
+          (result: any) => {
+            console.log(result.detail.txid);
+            if (result.detail.txid === txHash) {
+              this.getBalances();
+              this.transaction.isPending = false;
+              this.store.dispatch({
+                type: UPDATE_PENDING_TX,
+                data: this.transaction,
+              });
+            }
+          }
+        );
+        return txHash;
+      })
+      .catch((error) => {
+        console.log(error);
         this.swapService.handleNeoDapiError(error, 'NeoLine');
       });
   }
@@ -174,7 +311,7 @@ export class NeolineWalletApiService {
         args,
       })
       .then(({ txid }) => {
-        const txHash = '0x' + txid;
+        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
         const pendingTx: SwapTransaction = {
           txid: txHash,
           isPending: true,
@@ -256,7 +393,7 @@ export class NeolineWalletApiService {
         args,
       })
       .then(({ txid }) => {
-        const txHash = '0x' + txid;
+        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
         const pendingTx: SwapTransaction = {
           txid: txHash,
           isPending: true,

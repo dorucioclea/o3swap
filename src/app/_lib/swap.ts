@@ -1,6 +1,18 @@
 import { Token } from '@lib';
 import { NeoWalletName, EthWalletName } from './wallet';
 
+export type TxProgress = {
+  step1: { hash: string; status: 0 | 1 | 2 }; // 0 = 未开始, 1 = 进行中, 2 = 已完成
+  step2: { hash: string; status: 0 | 1 | 2 }; // 0 = 未开始, 1 = 进行中, 2 = 已完成
+  step3: { hash: string; status: 0 | 1 | 2 }; // 0 = 未开始, 1 = 进行中, 2 = 已完成
+};
+
+export class DefaultTxProgress {
+  step1: { hash: ''; status: 1 }; // 0 = 未开始, 1 = 进行中, 2 = 已完成
+  step2: { hash: ''; status: 0 }; // 0 = 未开始, 1 = 进行中, 2 = 已完成
+  step3: { hash: ''; status: 0 }; // 0 = 未开始, 1 = 进行中, 2 = 已完成
+}
+
 export interface SwapTransaction {
   txid: string;
   isPending: boolean;
@@ -8,11 +20,7 @@ export interface SwapTransaction {
   fromTokenName: string;
   toToken: Token;
   amount: string;
-  progress?: {
-    step1: { hash: string; status: 0 | 1 | 2 };
-    step2: { hash: string; status: 0 | 1 | 2 };
-    step3: { hash: string; status: 0 | 1 | 2 };
-  };
+  progress?: TxProgress;
 }
 export interface SwapStateType {
   neoWalletName: NeoWalletName;
@@ -25,9 +33,6 @@ export interface SwapStateType {
   transaction: SwapTransaction;
 }
 
-export const SWAP_CONTRACT_HASH = '0x7a10eeaaf99871fe0a9a39ebd027c97705585666';
-export const SWAP_CROSS_CHAIN_CONTRACT_HASH =
-  '0x812d7291e2f0c89255cf355c1027872257d1ca37';
 export const O3SWAP_FEE_PERCENTAGE = 0.3; // 系统收费 0.3%
 export const ALL_PERCENTAGE = 1.003;
 

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CHAIN_TOKENS, SwapStateType, CHAINS } from '@lib';
+import { CHAIN_TOKENS, SwapStateType, CHAINS, NNEO_TOKEN } from '@lib';
 import { Token } from '@lib';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -14,9 +14,13 @@ interface State {
   styleUrls: ['./swap-token.component.scss'],
 })
 export class SwapTokenComponent implements OnInit {
-  @Input() activeToken: Token;
-  @Input() hideToken: Token;
   @Input() isFrom: boolean;
+  @Input() fromToken: Token;
+  @Input() toToken: Token;
+
+  activeToken: Token;
+  hideToken: Token;
+  showOnlyNNeo = false;
 
   swap$: Observable<any>;
   tokenBalance; // 账户的 tokens
@@ -35,8 +39,11 @@ export class SwapTokenComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.checkShowOnlyNNeo();
+    this.activeToken = this.isFrom ? this.fromToken : this.toToken;
+    this.hideToken = this.isFrom ? this.toToken : this.fromToken;
     this.chain = this.isFrom === true ? 'NEO' : 'ALL';
-    const tokens = CHAIN_TOKENS[this.chain];
+    const tokens = this.showOnlyNNeo ? NNEO_TOKEN : CHAIN_TOKENS[this.chain];
     this.allTokens = this.hideToken
       ? tokens.filter((item) => item.assetID !== this.hideToken.assetID)
       : tokens;
@@ -52,12 +59,26 @@ export class SwapTokenComponent implements OnInit {
     this.modal.close();
   }
 
+  checkShowOnlyNNeo(): void {
+    const showOnlyNNeoTo =
+      this.isFrom === false &&
+      this.fromToken &&
+      this.fromToken.symbol === 'NEO';
+    const showOnlyNNeoFrom =
+      this.isFrom && this.toToken && this.toToken.symbol === 'NEO';
+    if (showOnlyNNeoFrom || showOnlyNNeoTo) {
+      this.showOnlyNNeo = true;
+    } else {
+      this.showOnlyNNeo = false;
+    }
+  }
+
   changeChain(chain: CHAINS): void {
     if (this.isFrom || this.chain === chain) {
       return;
     }
     this.chain = chain;
-    const tokens = CHAIN_TOKENS[this.chain];
+    const tokens = this.showOnlyNNeo ? NNEO_TOKEN : CHAIN_TOKENS[this.chain];
     this.allTokens = this.hideToken
       ? tokens.filter((item) => item.assetID !== this.hideToken.assetID)
       : tokens;
@@ -91,22 +112,25 @@ export class SwapTokenComponent implements OnInit {
 
   //#region
   handleTokenAmount(): void {
-    // CHAIN_TOKENS.ALL.forEach((tokenItem, index) => {
-    //   CHAIN_TOKENS.ALL[index].amount = '0';
-    //   if (this.tokenBalance[tokenItem.assetID]) {
-    //     CHAIN_TOKENS.ALL[index].amount = this.tokenBalance[
-    //       tokenItem.assetID
-    //     ].amount;
-    //   }
-    // });
-    // CHAIN_TOKENS.NEO.forEach((tokenItem, index) => {
-    //   CHAIN_TOKENS.NEO[index].amount = '0';
-    //   if (this.tokenBalance[tokenItem.assetID]) {
-    //     CHAIN_TOKENS.NEO[index].amount = this.tokenBalance[
-    //       tokenItem.assetID
-    //     ].amount;
-    //   }
-    // });
+    if (this.tokenBalance[NNEO_TOKEN[0].assetID]) {
+      NNEO_TOKEN[0].amount = this.tokenBalance[NNEO_TOKEN[0].assetID].amount;
+    }
+    CHAIN_TOKENS.ALL.forEach((tokenItem, index) => {
+      CHAIN_TOKENS.ALL[index].amount = '0';
+      if (this.tokenBalance[tokenItem.assetID]) {
+        CHAIN_TOKENS.ALL[index].amount = this.tokenBalance[
+          tokenItem.assetID
+        ].amount;
+      }
+    });
+    CHAIN_TOKENS.NEO.forEach((tokenItem, index) => {
+      CHAIN_TOKENS.NEO[index].amount = '0';
+      if (this.tokenBalance[tokenItem.assetID]) {
+        CHAIN_TOKENS.NEO[index].amount = this.tokenBalance[
+          tokenItem.assetID
+        ].amount;
+      }
+    });
     this.allTokens.forEach((tokenItem, index) => {
       this.allTokens[index].amount = '0';
       if (this.tokenBalance[tokenItem.assetID]) {
@@ -123,8 +147,8 @@ export class SwapTokenComponent implements OnInit {
         ].amount;
       }
     });
-    // CHAIN_TOKENS.ALL = this.sortTokens(CHAIN_TOKENS.ALL);
-    // CHAIN_TOKENS.NEO = this.sortTokens(CHAIN_TOKENS.NEO);
+    CHAIN_TOKENS.ALL = this.sortTokens(CHAIN_TOKENS.ALL);
+    CHAIN_TOKENS.NEO = this.sortTokens(CHAIN_TOKENS.NEO);
     this.allTokens = this.sortTokens(this.allTokens);
     this.displayTokens = this.sortTokens(this.displayTokens);
   }

@@ -9,14 +9,15 @@ export interface Token {
 }
 
 export const ALL_NEO_TOKENS: Token[] = [
-  // {
-  //   assetID:
-  //     '0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b',
-  //   symbol: 'NEO',
-  //   decimals: 0,
-  //   amount: '0',
-  //   logo: '/assets/images/tokens/NEO.png',
-  // },
+  {
+    assetID:
+      '0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b',
+    symbol: 'NEO',
+    decimals: 0,
+    amount: '0',
+    logo: '/assets/images/tokens/NEO.png',
+    chain: 'NEO',
+  },
   {
     assetID: '17da3881ab2d050fea414c80b3fa8324d756f60e',
     symbol: 'nNEO',
@@ -109,14 +110,15 @@ export const ALL_NEO_TOKENS: Token[] = [
 ];
 
 export const NEO_TOKENS: Token[] = [
-  // {
-  //   assetID:
-  //     '0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b',
-  //   symbol: 'NEO',
-  //   decimals: 0,
-  //   amount: '0',
-  //   logo: '/assets/images/tokens/NEO.png',
-  // },
+  {
+    assetID:
+      '0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b',
+    symbol: 'NEO',
+    decimals: 0,
+    amount: '0',
+    logo: '/assets/images/tokens/NEO.png',
+    chain: 'NEO',
+  },
   {
     assetID: '17da3881ab2d050fea414c80b3fa8324d756f60e',
     symbol: 'nNEO',
@@ -299,3 +301,14 @@ export const CrossChainToToken: Token = {
   chain: 'ETH',
   atNeoAssetName: 'pnWETH',
 };
+
+export const NNEO_TOKEN: Token[] = [
+  {
+    assetID: '17da3881ab2d050fea414c80b3fa8324d756f60e',
+    symbol: 'nNEO',
+    decimals: 8,
+    amount: '0',
+    logo: '/assets/images/tokens/nNEO.png',
+    chain: 'NEO',
+  },
+];

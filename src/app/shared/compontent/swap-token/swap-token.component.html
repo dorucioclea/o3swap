@@ -10,7 +10,7 @@
   <div class="chains">
     <img (click)="changeChain('ALL')" [ngClass]="{active: chain==='ALL', disable: isFrom}"
       src="/assets/images/chains/all.png" alt="">
-    <img (click)="changeChain('ETH')" [ngClass]="{active: chain==='ETH', disable: isFrom}"
+    <img (click)="changeChain('ETH')" [ngClass]="{active: chain==='ETH', disable: isFrom || showOnlyNNeo}"
       src="/assets/images/chains/eth.png" alt="">
     <img (click)="changeChain('NEO')" [ngClass]="{active: chain==='NEO'}" src="/assets/images/chains/neo.png" alt="">
     <!-- <img src="/assets/images/chains/bsc.png" alt="">

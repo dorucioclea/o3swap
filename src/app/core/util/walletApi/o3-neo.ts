@@ -5,6 +5,7 @@ import o3dapi from 'o3-dapi-core';
 import o3dapiNeo from 'o3-dapi-neo';
 import { CommonService } from '../common.service';
 import { SwapService } from '../swap.service';
+import { ApiService } from '../../api/api.service';
 import {
   NeoWalletName,
   SWAP_CONTRACT_HASH,
@@ -17,8 +18,10 @@ import {
   UPDATE_PENDING_TX,
   SWAP_CROSS_CHAIN_CONTRACT_HASH,
   SwapTransaction,
+  NEO_NNEO_CONTRACT_HASH,
 } from '@lib';
 import { Observable } from 'rxjs';
+import { wallet } from '@cityofzion/neon-js';
 
 interface State {
   swap: SwapStateType;
@@ -36,7 +39,8 @@ export class O3NeoWalletApiService {
     private store: Store<State>,
     private nzMessage: NzMessageService,
     private swapService: SwapService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private apiService: ApiService
   ) {
     o3dapi.initPlugins([o3dapiNeo]);
     this.swap$ = store.select('swap');
@@ -88,6 +92,123 @@ export class O3NeoWalletApiService {
       })
       .catch((error) => {
         this.swapService.handleNeoDapiError(error, 'O3');
+      });
+  }
+
+  async mintNNeo(
+    fromToken: Token, // neo
+    toToken: Token, // nneo
+    inputAmount: string
+  ): Promise<string> {
+    return o3dapi.NEO.invoke({
+      scriptHash: NEO_NNEO_CONTRACT_HASH,
+      operation: 'mintTokens',
+      args: [],
+      attachedAssets: {
+        NEO: inputAmount,
+      },
+    })
+      .then(({ txid }) => {
+        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
+        const pendingTx: SwapTransaction = {
+          txid: txHash,
+          isPending: true,
+          min: false,
+          fromTokenName: fromToken.symbol,
+          toToken,
+          amount: inputAmount,
+        };
+        this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
+        o3dapi.NEO.addEventListener(
+          o3dapi.NEO.Constants.EventName.TRANSACTION_CONFIRMED,
+          (result) => {
+            if (result.txid === txHash) {
+              this.getBalances();
+              this.transaction.isPending = false;
+              this.store.dispatch({
+                type: UPDATE_PENDING_TX,
+                data: this.transaction,
+              });
+            }
+          }
+        );
+        return txHash;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.swapService.handleNeoDapiError(error, 'NeoLine');
+      });
+  }
+
+  async releaseNeo(
+    fromToken: Token, // nneo
+    toToken: Token, // neo
+    inputAmount: string,
+    toAddress: string
+  ): Promise<string> {
+    const utxoList = await this.apiService.getUtxo(toAddress, inputAmount);
+    if (utxoList === false) {
+      this.nzMessage.error('System busy');
+      return;
+    }
+    return o3dapi.NEO.invoke({
+      scriptHash: NEO_NNEO_CONTRACT_HASH,
+      operation: 'refund',
+      args: [
+        {
+          type: 'Address', // 收件人地址
+          value: toAddress,
+        },
+      ],
+      assetIntentOverrides: {
+        inputs: utxoList,
+        outputs: [
+          {
+            address: wallet.getAddressFromScriptHash(NEO_NNEO_CONTRACT_HASH), // 合约地址
+            asset: toToken.assetID, // neo asset Id
+            value: inputAmount,
+          },
+          // 还有可能会有找零。应该是 getUxo得到的 sum - amount
+        ],
+      },
+      triggerContractVerification: false,
+      extra_witness: [
+        {
+          invocationScript: '520131',
+          verificationScript: '',
+          scriptHash: NEO_NNEO_CONTRACT_HASH,
+        },
+      ],
+    })
+      .then(({ txid }) => {
+        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
+        const pendingTx: SwapTransaction = {
+          txid: txHash,
+          isPending: true,
+          min: false,
+          fromTokenName: fromToken.symbol,
+          toToken,
+          amount: inputAmount,
+        };
+        this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
+        o3dapi.NEO.addEventListener(
+          o3dapi.NEO.Constants.EventName.TRANSACTION_CONFIRMED,
+          (result) => {
+            if (result.txid === txHash) {
+              this.getBalances();
+              this.transaction.isPending = false;
+              this.store.dispatch({
+                type: UPDATE_PENDING_TX,
+                data: this.transaction,
+              });
+            }
+          }
+        );
+        return txHash;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.swapService.handleNeoDapiError(error, 'NeoLine');
       });
   }
 
@@ -145,7 +266,7 @@ export class O3NeoWalletApiService {
       args,
     })
       .then(({ txid }) => {
-        const txHash = '0x' + txid;
+        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
         const pendingTx: SwapTransaction = {
           txid: txHash,
           isPending: true,
@@ -249,7 +370,7 @@ export class O3NeoWalletApiService {
       args,
     })
       .then(({ txid }) => {
-        const txHash = '0x' + txid;
+        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
         const pendingTx: SwapTransaction = {
           txid: txHash,
           isPending: true,

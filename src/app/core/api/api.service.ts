@@ -1,17 +1,25 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
-import { Observable, forkJoin } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AssetQueryResponse, CommonHttpResponse, Token } from '@lib';
+import {
+  AssetQueryResponse,
+  CommonHttpResponse,
+  CROSS_CHAIN_SWAP_DETAIL_HOST,
+  INQUIRY_HOST,
+  UTXO_HOST,
+  Token,
+  TxProgress,
+  DefaultTxProgress,
+  NNEO_TOKEN,
+} from '@lib';
 import BigNumber from 'bignumber.js';
 
 @Injectable()
 export class ApiService {
   apiDo = environment.apiDomain;
   RATE_HOST = 'https://hub.o3.network/v1';
-  INQUIRY_HOST = 'http://47.110.14.167:5002/AssetQuery';
-  CROSS_CHAIN_SWAP_DETAIL = 'https://explorer.poly.network/testnet';
 
   constructor(private http: HttpClient) {}
 
@@ -19,19 +27,40 @@ export class ApiService {
     return this.http.post(`https://subscribe.o3swap.com/subscribe`, { email });
   }
 
-  getCrossChainSwapDetail(hash: string): Observable<any> {
+  getUtxo(address: string, amount: string): Promise<any> {
+    return this.http
+      .post(`${UTXO_HOST}/utxo`, {
+        address,
+        neoVal: amount,
+      })
+      .pipe(
+        map((res: any) => {
+          if (res.status === 'ok' && res.result) {
+            let sum = 0;
+            const utxoList = res.result.map((item) => {
+              sum += item.amount;
+              return {
+                txid: item.txid,
+                index: item.n,
+              };
+            });
+            return { utxoList, sum };
+          }
+          return false;
+        })
+      )
+      .toPromise();
+  }
+
+  getCrossChainSwapDetail(hash: string): Observable<TxProgress> {
     if (hash.startsWith('0x')) {
       hash = hash.slice(2);
     }
     return this.http
-      .get(`${this.CROSS_CHAIN_SWAP_DETAIL}/api/v1/getcrosstx?txhash=${hash}`)
+      .get(`${CROSS_CHAIN_SWAP_DETAIL_HOST}/api/v1/getcrosstx?txhash=${hash}`)
       .pipe(
         map((res: any) => {
-          const target = {
-            step1: { hash: '', status: 1 }, // 0 = 未开始, 1 = 进行中, 2 = 已完成
-            step2: { hash: '', status: 0 },
-            step3: { hash: '', status: 0 },
-          };
+          const target: TxProgress = new DefaultTxProgress();
           if (res.desc === 'success' && res.result) {
             const data = JSON.parse(res.result);
             if (data.fchaintx && data.fchaintx.txhash) {
@@ -61,8 +90,9 @@ export class ApiService {
   getSwapPath(
     fromAssetName: string,
     toToken: Token | string,
-    amount: string
-  ): Observable<any> {
+    amount: string,
+    inputAmount?: string
+  ): Observable<AssetQueryResponse> {
     let toAssetName: string;
     if (typeof toToken === 'string') {
       toAssetName = toToken;
@@ -72,13 +102,44 @@ export class ApiService {
         toAssetName = toToken.atNeoAssetName;
       }
     }
+    let neoNNeoRes;
+    if (fromAssetName === 'NEO' && (toToken as Token).symbol === 'nNEO') {
+      neoNNeoRes = [
+        {
+          amount: [
+            inputAmount,
+            new BigNumber(inputAmount)
+              .shiftedBy(NNEO_TOKEN[0].decimals)
+              .toFixed(),
+          ],
+          swapPath: ['NEO', 'nNEO'],
+        },
+      ];
+    }
+    if (fromAssetName === 'nNEO' && (toToken as Token).symbol === 'NEO') {
+      neoNNeoRes = [
+        {
+          amount: [
+            new BigNumber(inputAmount)
+              .shiftedBy(NNEO_TOKEN[0].decimals)
+              .toFixed(),
+            inputAmount,
+          ],
+          swapPath: ['nNEO', 'NEO'],
+        },
+      ];
+    }
+    console.log(neoNNeoRes);
+    if (neoNNeoRes) {
+      return of(this.handleReceiveSwapPathFiat(neoNNeoRes, toToken));
+    }
     return this.http
       .post(
-        `${this.INQUIRY_HOST}?StartAsset=${fromAssetName}&EndAsset=${toAssetName}&amount=${amount}`,
+        `${INQUIRY_HOST}?StartAsset=${fromAssetName}&EndAsset=${toAssetName}&amount=${amount}`,
         null
       )
       .pipe(
-        map((res: any) => {
+        map((res: AssetQueryResponse) => {
           if (res.length > 0) {
             return this.handleReceiveSwapPathFiat(res, toToken);
           } else {
@@ -91,13 +152,16 @@ export class ApiService {
   getRates(): Observable<any> {
     return this.http.get(`${this.RATE_HOST}/crypto/rates`).pipe(
       map((res: CommonHttpResponse) => {
-        const rates: any = { pnUSDT: 1, USDT: 1 };
+        const rates: any = { pnUSDT: 1, USDT: 1, fUSD: 1, BUSD: 1, HUSD: 1 };
         if (res.status === 'success') {
+          rates.NEO = res.data.neo2.neo.price;
           rates.nNEO = res.data.neo2.neo.price;
           rates.FLM = res.data.neo2.flm.price;
           rates.SWTH = res.data.neo2.swth.price;
           rates.ETH = res.data.eth.eth.price;
           rates.fWETH = res.data.eth.eth.price;
+          rates.pnWETH = res.data.eth.eth.price;
+          rates.fWBTC = res.data.btc.btc.price;
           rates.pnWBTC = res.data.btc.btc.price;
           rates.pONT = res.data.ont.ont.price;
         }

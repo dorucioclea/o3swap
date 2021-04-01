@@ -1,6 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ApiService, CommonService } from '@core';
-import { SwapStateType, SwapTransaction, Token, UPDATE_PENDING_TX } from '@lib';
+import {
+  SwapStateType,
+  SwapTransaction,
+  Token,
+  UPDATE_PENDING_TX,
+  ETH_TX_PAGES_PREFIX,
+  POLY_TX_PAGES_PREFIX,
+  NEO_TX_PAGES_PREFIX,
+  TxProgress,
+  DefaultTxProgress,
+} from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AnimationOptions } from 'ngx-lottie';
@@ -16,6 +26,9 @@ interface State {
   styleUrls: ['./swap.component.scss'],
 })
 export class SwapComponent implements OnInit, OnDestroy {
+  ETH_TX_PAGES_PREFIX = ETH_TX_PAGES_PREFIX;
+  NEO_TX_PAGES_PREFIX = NEO_TX_PAGES_PREFIX;
+  POLY_TX_PAGES_PREFIX = POLY_TX_PAGES_PREFIX;
   successOptions: AnimationOptions = {
     path: '/assets/json/success.json',
     loop: false,
@@ -33,9 +46,6 @@ export class SwapComponent implements OnInit, OnDestroy {
   txPendingOptions = {
     path: '/assets/json/tx-waiting.json',
   };
-  NEO_TX_PAGES_PREFIX = 'https://testnet.neotube.io/transaction';
-  POLY_TX_PAGES_PREFIX = 'https://explorer.poly.network/testnet/tx';
-  ETH_TX_PAGES_PREFIX = 'https://ropsten.etherscan.io/tx';
   showTxModal = false;
   showTxDetail = false;
 
@@ -51,11 +61,6 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   initResultData;
 
-  crossRequestResult = {
-    step1: { hash: '', status: 1 }, // 0 = 未开始, 1 = 进行中, 2 = 已完成
-    step2: { hash: '', status: 0 },
-    step3: { hash: '', status: 0 },
-  };
   requestCrossInterval: Unsubscribable;
   swapProgress = 20;
 
@@ -111,22 +116,21 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.requestCrossInterval = interval(5000).subscribe(() => {
       this.apiService
         .getCrossChainSwapDetail(this.transaction.txid)
-        .subscribe((res) => {
-          this.crossRequestResult = res;
+        .subscribe((res: TxProgress) => {
           console.log(res);
           this.transaction.progress = res;
-          this.store.dispatch({
-            type: UPDATE_PENDING_TX,
-            data: this.transaction,
-          });
           if (
-            this.crossRequestResult.step1.status === 2 &&
-            this.crossRequestResult.step2.status === 2 &&
-            this.crossRequestResult.step3.status === 2
+            res.step1.status === 2 &&
+            res.step2.status === 2 &&
+            res.step3.status === 2
           ) {
             this.transaction.isPending = false;
             this.requestCrossInterval.unsubscribe();
           }
+          this.store.dispatch({
+            type: UPDATE_PENDING_TX,
+            data: this.transaction,
+          });
         });
     });
   }

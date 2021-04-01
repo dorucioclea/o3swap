@@ -60,9 +60,9 @@ export class SwapHomeComponent implements OnInit {
       nzClosable: false,
       nzClassName: 'custom-modal',
       nzComponentParams: {
-        activeToken: type === 'from' ? this.fromToken : this.toToken,
-        hideToken: type === 'from' ? this.toToken : this.fromToken,
         isFrom: type === 'from' ? true : false,
+        fromToken: this.fromToken,
+        toToken: this.toToken,
       },
     });
     modal.afterClose.subscribe((res) => {
@@ -84,6 +84,7 @@ export class SwapHomeComponent implements OnInit {
       const temp = this.fromToken;
       this.fromToken = this.toToken;
       this.toToken = temp;
+      this.changeData = true;
       this.checkInputAmountDecimal();
       this.calcutionInputAmountFiat();
     }
