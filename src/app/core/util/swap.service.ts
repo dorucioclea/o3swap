@@ -26,7 +26,7 @@ export class SwapService {
     private nzMessage: NzMessageService
   ) {}
 
-  getToStandSwapPath(fromToken: Token, inputAmount: string): Promise<string[]> {
+  getToStandardSwapPath(fromToken: Token, inputAmount: string): Promise<string[]> {
     if (NEOLINE_NETWORK === 'MainNet') {
       return this.getToFusdtSwapPath(fromToken, inputAmount);
     } else {
