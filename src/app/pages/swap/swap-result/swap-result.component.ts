@@ -120,7 +120,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.inquiryInterval.unsubscribe();
+    if (this.inquiryInterval !== null && this.inquiryInterval !== undefined) {
+      this.inquiryInterval.unsubscribe();
+    }
   }
 
   setInquiryInterval(): void {

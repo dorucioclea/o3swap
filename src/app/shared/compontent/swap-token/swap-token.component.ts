@@ -49,7 +49,9 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     this.swap$ = store.select('swap');
   }
   ngOnDestroy(): void {
-    this.swapUnScribe.unsubscribe();
+    if (this.swapUnScribe !== null && this.swapUnScribe !== undefined) {
+      this.swapUnScribe.unsubscribe();
+    }
   }
 
   ngOnInit(): void {
