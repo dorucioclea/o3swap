@@ -25,6 +25,28 @@ export class SwapService {
     private nzMessage: NzMessageService
   ) {}
 
+  getToFusdtSwapPath(fromToken: Token, inputAmount: string): Promise<string[]> {
+    if (fromToken.symbol === 'fUSDT') {
+      return of(['fUSDT']).toPromise();
+    }
+    return this.apiService
+      .getSwapPath(
+        fromToken.symbol,
+        'fUSDT',
+        this.getAmountIn(fromToken, inputAmount)
+      )
+      .pipe(
+        map((res: AssetQueryResponse) => {
+          if (res.length > 0) {
+            return res[0].swapPath;
+          } else {
+            return [];
+          }
+        })
+      )
+      .toPromise();
+  }
+
   getToNeoSwapPath(fromToken: Token, inputAmount: string): Promise<string[]> {
     if (fromToken.symbol === 'nNEO') {
       return of(['nNEO']).toPromise();

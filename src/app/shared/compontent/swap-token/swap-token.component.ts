@@ -42,7 +42,7 @@ export class SwapTokenComponent implements OnInit {
     this.checkShowOnlyNNeo();
     this.activeToken = this.isFrom ? this.fromToken : this.toToken;
     this.hideToken = this.isFrom ? this.toToken : this.fromToken;
-    this.chain = this.isFrom === true ? 'NEO' : 'ALL';
+    this.chain = this.isFrom === true ? 'NEO' : 'NEO';
     const tokens = this.showOnlyNNeo ? NNEO_TOKEN : CHAIN_TOKENS[this.chain];
     this.allTokens = this.hideToken
       ? tokens.filter((item) => item.assetID !== this.hideToken.assetID)

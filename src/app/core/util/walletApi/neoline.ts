@@ -292,7 +292,7 @@ export class NeolineWalletApiService {
       this.nzMessage.error('Insufficient balance');
       return;
     }
-    const toNeoswapPath = await this.swapService.getToNeoSwapPath(
+    const toNeoswapPath = await this.swapService.getToFusdtSwapPath(
       fromToken,
       inputAmount
     );
@@ -390,7 +390,7 @@ export class NeolineWalletApiService {
       this.nzMessage.error('Insufficient balance');
       return;
     }
-    const toNeoswapPath = await this.swapService.getToNeoSwapPath(
+    const toNeoswapPath = await this.swapService.getToFusdtSwapPath(
       fromToken,
       inputAmount
     );
