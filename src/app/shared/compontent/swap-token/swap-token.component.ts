@@ -29,6 +29,7 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
 
   activeToken: Token;
   hideToken: Token;
+  hideNeoToken = false;
   showOnlyNNeo = false;
 
   swap$: Observable<any>;
@@ -60,6 +61,12 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     this.checkShowOnlyNNeo();
     this.activeToken = this.isFrom ? this.fromToken : this.toToken;
     this.hideToken = this.isFrom ? this.toToken : this.fromToken;
+    if (this.isFrom && this.toToken && this.toToken.symbol !== 'nNEO') {
+      this.hideNeoToken = true;
+    }
+    if (!this.isFrom && this.fromToken && this.fromToken.symbol !== 'nNEO') {
+      this.hideNeoToken = true;
+    }
     this.chain = this.isFrom === true ? 'NEO' : 'NEO';
     const tokens = this.showOnlyNNeo
       ? this.myNNEO_TOKEN
@@ -67,6 +74,9 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     this.allTokens = this.hideToken
       ? tokens.filter((item) => item.assetID !== this.hideToken.assetID)
       : tokens;
+    this.allTokens = this.hideNeoToken
+      ? this.allTokens.filter((item) => item.symbol !== 'NEO')
+      : this.allTokens;
     this.displayTokens = this.allTokens;
     this.swapUnScribe = this.swap$.subscribe((state) => {
       if (
