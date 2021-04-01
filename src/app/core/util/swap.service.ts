@@ -80,6 +80,10 @@ export class SwapService {
     const token = ALL_NEO_TOKENS.find((item) => item.symbol === name);
     return (token && token.assetID) || '';
   }
+  getNeoAssetLogoByName(name: string): string {
+    const token = ALL_NEO_TOKENS.find((item) => item.symbol === name);
+    return (token && token.logo) || '';
+  }
   getHash160FromAddress(text: string): any {
     if (text.startsWith('0x')) {
       text = text.slice(2);

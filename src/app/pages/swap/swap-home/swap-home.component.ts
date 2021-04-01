@@ -185,7 +185,7 @@ export class SwapHomeComponent implements OnInit {
     if (!this.fromToken) {
       return;
     }
-    const price = this.rates[this.fromToken.symbol];
+    const price = this.rates[this.fromToken.rateName];
     if (this.inputAmount && price) {
       this.inputAmountFiat = new BigNumber(this.inputAmount)
         .multipliedBy(new BigNumber(price))

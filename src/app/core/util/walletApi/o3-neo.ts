@@ -16,7 +16,6 @@ import {
   AssetQueryResponseItem,
   SwapStateType,
   UPDATE_PENDING_TX,
-  SWAP_CROSS_CHAIN_CONTRACT_HASH,
   SwapTransaction,
   NEO_NNEO_CONTRACT_HASH,
   NEOLINE_NETWORK,
@@ -410,7 +409,7 @@ export class O3NeoWalletApiService {
       },
     ];
     return o3dapi.NEO.invoke({
-      scriptHash: SWAP_CROSS_CHAIN_CONTRACT_HASH,
+      scriptHash: SWAP_CONTRACT_HASH,
       operation: 'DelegateSwapTokenInForTokenOutNCrossChain',
       args,
     })

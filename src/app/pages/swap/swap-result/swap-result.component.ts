@@ -328,7 +328,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         .shiftedBy(-this.toToken.decimals)
         .toFixed();
       // 计算法币价格
-      const price = this.rates[this.toToken.symbol];
+      const price = this.rates[this.toToken.rateName];
       if (price) {
         item.fiat = new BigNumber(item.receiveAmount)
           .multipliedBy(new BigNumber(price))
