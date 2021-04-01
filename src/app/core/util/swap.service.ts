@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import BigNumber from 'bignumber.js';
-import { of } from 'rxjs';
+import { from, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
   AssetQueryResponse,
@@ -10,6 +10,7 @@ import {
   Token,
   WalletName,
   NeoWalletName,
+  NEOLINE_NETWORK,
 } from '@lib';
 import { ApiService } from '../api/api.service';
 import { CommonService } from './common.service';
@@ -25,7 +26,18 @@ export class SwapService {
     private nzMessage: NzMessageService
   ) {}
 
-  getToFusdtSwapPath(fromToken: Token, inputAmount: string): Promise<string[]> {
+  getToStandSwapPath(fromToken: Token, inputAmount: string): Promise<string[]> {
+    if (NEOLINE_NETWORK === 'MainNet') {
+      return this.getToFusdtSwapPath(fromToken, inputAmount);
+    } else {
+      return this.getToNeoSwapPath(fromToken, inputAmount);
+    }
+  }
+
+  private getToFusdtSwapPath(
+    fromToken: Token,
+    inputAmount: string
+  ): Promise<string[]> {
     if (fromToken.symbol === 'fUSDT') {
       return of(['fUSDT']).toPromise();
     }
@@ -47,7 +59,10 @@ export class SwapService {
       .toPromise();
   }
 
-  getToNeoSwapPath(fromToken: Token, inputAmount: string): Promise<string[]> {
+  private getToNeoSwapPath(
+    fromToken: Token,
+    inputAmount: string
+  ): Promise<string[]> {
     if (fromToken.symbol === 'nNEO') {
       return of(['nNEO']).toPromise();
     }
