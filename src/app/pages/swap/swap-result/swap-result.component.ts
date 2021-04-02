@@ -181,15 +181,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   swapCrossChain(): void {
-    if (!this.neoAccountAddress) {
-      this.nzMessage.error('Please connect the NEO wallet first');
-      return;
-    }
-    if (!this.ethAccountAddress) {
-      this.nzMessage.error('Please connect the ETH wallet first');
-      return;
-    }
-    this.inquiryInterval.unsubscribe();
     const swapApi =
       this.neoWalletName === 'NeoLine'
         ? this.neolineWalletApiService
@@ -213,11 +204,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   swapNeo(): void {
-    if (!this.neoAccountAddress) {
-      this.nzMessage.error('Please connect the NEO wallet first');
-      return;
-    }
-    this.inquiryInterval.unsubscribe();
     const swapApi =
       this.neoWalletName === 'NeoLine'
         ? this.neolineWalletApiService
@@ -240,11 +226,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   mintNNeo(): void {
-    if (!this.neoAccountAddress) {
-      this.nzMessage.error('Please connect the NEO wallet first');
-      return;
-    }
-    this.inquiryInterval.unsubscribe();
     const swapApi =
       this.neoWalletName === 'NeoLine'
         ? this.neolineWalletApiService
@@ -260,11 +241,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   releaseNeo(): void {
-    if (!this.neoAccountAddress) {
-      this.nzMessage.error('Please connect the NEO wallet first');
-      return;
-    }
-    this.inquiryInterval.unsubscribe();
     const swapApi =
       this.neoWalletName === 'NeoLine'
         ? this.neolineWalletApiService
@@ -285,6 +261,19 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   swap(): void {
+    if (this.fromToken.chain === 'NEO') {
+      if (!this.neoAccountAddress) {
+        this.nzMessage.error('Please connect the NEO wallet first');
+        return;
+      }
+    }
+    if (this.toToken.chain !== 'NEO') {
+      if (!this.ethAccountAddress) {
+        this.nzMessage.error('Please connect the ETH wallet first');
+        return;
+      }
+    }
+    this.inquiryInterval.unsubscribe();
     if (this.fromToken.symbol === 'NEO' && this.toToken.symbol === 'nNEO') {
       this.mintNNeo();
       return;
