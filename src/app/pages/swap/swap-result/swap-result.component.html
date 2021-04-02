@@ -27,13 +27,13 @@
     <div class="fee-item">
       <p class="label">From</p>
       <p class="value">
-        {{ neoAccountAddress | shortAddress: 10 }}
+        {{ fromAddress | shortAddress: 10 }}
       </p>
     </div>
     <div class="fee-item">
       <p class="label">To</p>
       <p class="value">
-        {{ toToken.chain==='NEO' ? (neoAccountAddress | shortAddress: 10) : (ethAccountAddress | shortAddress: 10) }}
+        {{ toAddress | shortAddress: 10 }}
       </p>
     </div>
     <div class="fee-item" [ngClass]="{route: chooseSwapPath?.swapPath.length > 4}">
