@@ -36,7 +36,7 @@ export class O3EthWalletApiService {
   connect(): void {
     o3dapi.ETH.request({ method: 'eth_requestAccounts' })
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         this.accountAddress = res.result[0];
         this.store.dispatch({
           type: UPDATE_ETH_ACCOUNT,

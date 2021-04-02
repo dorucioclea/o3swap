@@ -67,7 +67,7 @@ export class SwapHomeComponent implements OnInit {
     });
     modal.afterClose.subscribe((res) => {
       if (res) {
-        this.changeData = true;
+        this.resetSwapData();
         if (type === 'from') {
           this.fromToken = res;
           this.checkInputAmountDecimal();
@@ -84,7 +84,7 @@ export class SwapHomeComponent implements OnInit {
       const temp = this.fromToken;
       this.fromToken = this.toToken;
       this.toToken = temp;
-      this.changeData = true;
+      this.resetSwapData();
       this.checkInputAmountDecimal();
       this.calcutionInputAmountFiat();
     }
@@ -92,7 +92,7 @@ export class SwapHomeComponent implements OnInit {
 
   changeInputAmount($event): void {
     this.inputAmount = $event.target.value;
-    this.changeData = true;
+    this.resetSwapData();
     this.checkInputAmountDecimal();
     this.resetSwapData();
     this.calcutionInputAmountFiat();
@@ -101,7 +101,7 @@ export class SwapHomeComponent implements OnInit {
   allInputAmount(): void {
     this.inputAmountError = '';
     this.inputAmount = (this.fromToken && this.fromToken.amount) || '0';
-    this.changeData = true;
+    this.resetSwapData();
     this.resetSwapData();
     this.calcutionInputAmountFiat();
   }
@@ -185,7 +185,7 @@ export class SwapHomeComponent implements OnInit {
     if (!this.fromToken) {
       return;
     }
-    const price = this.rates[this.fromToken.symbol];
+    const price = this.rates[this.fromToken.rateName];
     if (this.inputAmount && price) {
       this.inputAmountFiat = new BigNumber(this.inputAmount)
         .multipliedBy(new BigNumber(price))

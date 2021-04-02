@@ -16,7 +16,6 @@ import {
   AssetQueryResponseItem,
   SwapStateType,
   UPDATE_PENDING_TX,
-  SWAP_CROSS_CHAIN_CONTRACT_HASH,
   SwapTransaction,
   NEO_NNEO_CONTRACT_HASH,
   NEOLINE_NETWORK,
@@ -82,7 +81,7 @@ export class O3NeoWalletApiService {
       });
       return;
     }
-    o3dapi.NEO.getBalance({
+    return o3dapi.NEO.getBalance({
       params: [{ address: this.accountAddress }],
       network: NEOLINE_NETWORK,
     })
@@ -144,7 +143,7 @@ export class O3NeoWalletApiService {
         o3dapi.NEO.addEventListener(
           o3dapi.NEO.Constants.EventName.TRANSACTION_CONFIRMED,
           (result) => {
-            if (result.txid === txHash) {
+            if ((txHash as string).includes(result.txid)) {
               this.getBalances();
               this.transaction.isPending = false;
               this.store.dispatch({
@@ -229,7 +228,7 @@ export class O3NeoWalletApiService {
         o3dapi.NEO.addEventListener(
           o3dapi.NEO.Constants.EventName.TRANSACTION_CONFIRMED,
           (result) => {
-            if (result.txid === txHash) {
+            if ((txHash as string).includes(result.txid)) {
               this.getBalances();
               this.transaction.isPending = false;
               this.store.dispatch({
@@ -260,7 +259,7 @@ export class O3NeoWalletApiService {
       this.nzMessage.error('Insufficient balance');
       return;
     }
-    const toNeoswapPath = await this.swapService.getToNeoSwapPath(
+    const toNeoswapPath = await this.swapService.getToStandardSwapPath(
       fromToken,
       inputAmount
     );
@@ -319,7 +318,7 @@ export class O3NeoWalletApiService {
         o3dapi.NEO.addEventListener(
           o3dapi.NEO.Constants.EventName.TRANSACTION_CONFIRMED,
           (result) => {
-            if (result.txid === txHash) {
+            if ((txHash as string).includes(result.txid)) {
               this.getBalances();
               this.transaction.isPending = false;
               this.store.dispatch({
@@ -352,7 +351,7 @@ export class O3NeoWalletApiService {
       this.nzMessage.error('Insufficient balance');
       return;
     }
-    const toNeoswapPath = await this.swapService.getToNeoSwapPath(
+    const toNeoswapPath = await this.swapService.getToStandardSwapPath(
       fromToken,
       inputAmount
     );
@@ -410,7 +409,7 @@ export class O3NeoWalletApiService {
       },
     ];
     return o3dapi.NEO.invoke({
-      scriptHash: SWAP_CROSS_CHAIN_CONTRACT_HASH,
+      scriptHash: SWAP_CONTRACT_HASH,
       operation: 'DelegateSwapTokenInForTokenOutNCrossChain',
       args,
     })
@@ -428,7 +427,7 @@ export class O3NeoWalletApiService {
         o3dapi.NEO.addEventListener(
           o3dapi.NEO.Constants.EventName.TRANSACTION_CONFIRMED,
           (result) => {
-            if (result.txid === txHash) {
+            if ((txHash as string).includes(result.txid)) {
               this.getBalances();
             }
           }

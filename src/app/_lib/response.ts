@@ -10,5 +10,6 @@ export interface AssetQueryResponseItem {
   swapPath: string[];
   fiat?: string;
   receiveAmount?: number | string;
+  swapPathLogo?: string[];
 }
 export type AssetQueryResponse = AssetQueryResponseItem[];

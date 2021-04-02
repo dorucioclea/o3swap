@@ -13,6 +13,7 @@ import {
   TxProgress,
   DefaultTxProgress,
   NNEO_TOKEN,
+  ALL_NEO_TOKENS,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 
@@ -129,7 +130,7 @@ export class ApiService {
         },
       ];
     }
-    console.log(neoNNeoRes);
+    // console.log(neoNNeoRes);
     if (neoNNeoRes) {
       return of(this.handleReceiveSwapPathFiat(neoNNeoRes, toToken));
     }
@@ -152,22 +153,22 @@ export class ApiService {
   getRates(): Observable<any> {
     return this.http.get(`${this.RATE_HOST}/crypto/rates`).pipe(
       map((res: CommonHttpResponse) => {
-        const rates: any = { pnUSDT: 1, USDT: 1, fUSD: 1, BUSD: 1, HUSD: 1 };
+        const rates: any = { usdt: 1 };
         if (res.status === 'success') {
-          rates.NEO = res.data.neo2.neo.price;
-          rates.nNEO = res.data.neo2.neo.price;
-          rates.FLM = res.data.neo2.flm.price;
-          rates.SWTH = res.data.neo2.swth.price;
-          rates.ETH = res.data.eth.eth.price;
-          rates.fWETH = res.data.eth.eth.price;
-          rates.pnWETH = res.data.eth.eth.price;
-          rates.fWBTC = res.data.btc.btc.price;
-          rates.pnWBTC = res.data.btc.btc.price;
-          rates.pONT = res.data.ont.ont.price;
+          rates.neo = res.data.neo2.neo.price;
+          rates.flm = res.data.neo2.flm.price;
+          rates.swth = res.data.neo2.swth.price;
+          rates.eth = res.data.eth.eth.price;
+          rates.ont = res.data.ont.ont.price;
         }
         return rates;
       })
     );
+  }
+
+  getNeoAssetLogoByName(name: string): string {
+    const token = ALL_NEO_TOKENS.find((item) => item.symbol === name);
+    return (token && token.logo) || '';
   }
 
   handleReceiveSwapPathFiat(
@@ -180,6 +181,10 @@ export class ApiService {
       if (typeof toToken !== 'string' && endTokenName !== toToken.symbol) {
         item.swapPath.push(toToken.symbol);
       }
+      item.swapPathLogo = [];
+      item.swapPath.forEach((name) => {
+        item.swapPathLogo.push(this.getNeoAssetLogoByName(name));
+      });
     });
     return this.shellSortSwapPath(swapPathArr);
   }

@@ -40,7 +40,7 @@ section.wrapper {
       width: 40px;
       border-radius: 10px;
       opacity: 0.2;
-      cursor: pointer;
+      // cursor: pointer;
       &.disable {
         cursor: default;
         pointer-events: none;

@@ -120,7 +120,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.inquiryInterval.unsubscribe();
+    if (this.inquiryInterval !== null && this.inquiryInterval !== undefined) {
+      this.inquiryInterval.unsubscribe();
+    }
   }
 
   setInquiryInterval(): void {
@@ -203,7 +205,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.ethAccountAddress
       )
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         if (res) {
           this.closePage.emit();
         }
@@ -230,7 +232,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.deadline
       )
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         if (res) {
           this.closePage.emit();
         }
@@ -250,7 +252,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     swapApi
       .mintNNeo(this.fromToken, this.toToken, this.inputAmount)
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         if (res) {
           this.closePage.emit();
         }
@@ -275,7 +277,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.neoAccountAddress
       )
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         if (res) {
           this.closePage.emit();
         }
@@ -328,7 +330,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         .shiftedBy(-this.toToken.decimals)
         .toFixed();
       // 计算法币价格
-      const price = this.rates[this.toToken.symbol];
+      const price = this.rates[this.toToken.rateName];
       if (price) {
         item.fiat = new BigNumber(item.receiveAmount)
           .multipliedBy(new BigNumber(price))

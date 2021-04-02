@@ -66,7 +66,7 @@ export class MetaMaskWalletApiService {
     this.ethereum
       .request({ method: 'net_version' })
       .then((chainId) => {
-        console.log('chainId: ' + chainId);
+        // console.log('chainId: ' + chainId);
         this.store.dispatch({
           type: UPDATE_METAMASK_NETWORK_ID,
           data: chainId,
@@ -92,7 +92,7 @@ export class MetaMaskWalletApiService {
       }
     });
     this.ethereum.on('chainChanged', (chainId) => {
-      console.log('chainId: ' + chainId);
+      // console.log('chainId: ' + chainId);
       this.store.dispatch({
         type: UPDATE_METAMASK_NETWORK_ID,
         data: chainId,

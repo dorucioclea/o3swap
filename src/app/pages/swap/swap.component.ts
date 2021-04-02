@@ -109,7 +109,9 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.requestCrossInterval.unsubscribe();
+    if (this.requestCrossInterval !== null && this.requestCrossInterval !== undefined) {
+      this.requestCrossInterval.unsubscribe();
+    }
   }
 
   setRequestCrossInterval(): void {

@@ -15,11 +15,10 @@ import {
   AssetQueryResponseItem,
   SwapStateType,
   UPDATE_PENDING_TX,
-  SWAP_CROSS_CHAIN_CONTRACT_HASH,
   SwapTransaction,
   NEO_NNEO_CONTRACT_HASH,
-  NEOLINE_NETWORK,
   NeolineNetwork,
+  NEOLINE_NETWORK,
 } from '@lib';
 import { Observable } from 'rxjs';
 import { wallet } from '@cityofzion/neon-js';
@@ -67,7 +66,7 @@ export class NeolineWalletApiService {
     this.neolineDapi
       .getAccount()
       .then((result) => {
-        console.log(result);
+        // console.log(result);
         this.accountAddress = result.address;
         this.store.dispatch({
           type: UPDATE_NEO_ACCOUNT,
@@ -96,12 +95,12 @@ export class NeolineWalletApiService {
       })
       .then((addressTokens: any[]) => {
         const tokens = addressTokens[this.accountAddress];
-        console.log(tokens);
+        // console.log(tokens);
         const tempTokenBalance = {};
         tokens.forEach((tokenItem: any) => {
           tempTokenBalance[tokenItem.asset_id || tokenItem.assetID] = tokenItem;
         });
-        console.log('temp: ' + tempTokenBalance);
+        // console.log('temp: ' + tempTokenBalance);
         this.store.dispatch({
           type: UPDATE_NEO_BALANCES,
           data: tempTokenBalance,
@@ -168,7 +167,7 @@ export class NeolineWalletApiService {
         window.addEventListener(
           'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
           (result: any) => {
-            console.log(result.detail.txid);
+            // console.log(result.detail.txid);
             if (result.detail.txid === txHash) {
               this.getBalances();
               this.transaction.isPending = false;
@@ -258,7 +257,7 @@ export class NeolineWalletApiService {
         window.addEventListener(
           'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
           (result: any) => {
-            console.log(result.detail.txid);
+            // console.log(result.detail.txid);
             if (result.detail.txid === txHash) {
               this.getBalances();
               this.transaction.isPending = false;
@@ -293,7 +292,7 @@ export class NeolineWalletApiService {
       this.nzMessage.error('Insufficient balance');
       return;
     }
-    const toNeoswapPath = await this.swapService.getToNeoSwapPath(
+    const toNeoswapPath = await this.swapService.getToStandardSwapPath(
       fromToken,
       inputAmount
     );
@@ -353,7 +352,7 @@ export class NeolineWalletApiService {
         window.addEventListener(
           'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
           (result: any) => {
-            console.log(result.detail.txid);
+            // console.log(result.detail.txid);
             if (result.detail.txid === txHash) {
               this.getBalances();
               this.transaction.isPending = false;
@@ -391,7 +390,7 @@ export class NeolineWalletApiService {
       this.nzMessage.error('Insufficient balance');
       return;
     }
-    const toNeoswapPath = await this.swapService.getToNeoSwapPath(
+    const toNeoswapPath = await this.swapService.getToStandardSwapPath(
       fromToken,
       inputAmount
     );
@@ -450,7 +449,7 @@ export class NeolineWalletApiService {
     ];
     return this.neolineDapi
       .invoke({
-        scriptHash: SWAP_CROSS_CHAIN_CONTRACT_HASH,
+        scriptHash: SWAP_CONTRACT_HASH,
         operation: 'DelegateSwapTokenInForTokenOutNCrossChain',
         args,
       })
@@ -468,7 +467,7 @@ export class NeolineWalletApiService {
         window.addEventListener(
           'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
           (result: any) => {
-            console.log(result.detail.txid);
+            // console.log(result.detail.txid);
             if (result.detail.txid === txHash) {
               this.getBalances();
             }

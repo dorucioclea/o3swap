@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import BigNumber from 'bignumber.js';
-import { of } from 'rxjs';
+import { from, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
   AssetQueryResponse,
@@ -10,6 +10,7 @@ import {
   Token,
   WalletName,
   NeoWalletName,
+  NEOLINE_NETWORK,
 } from '@lib';
 import { ApiService } from '../api/api.service';
 import { CommonService } from './common.service';
@@ -25,7 +26,43 @@ export class SwapService {
     private nzMessage: NzMessageService
   ) {}
 
-  getToNeoSwapPath(fromToken: Token, inputAmount: string): Promise<string[]> {
+  getToStandardSwapPath(fromToken: Token, inputAmount: string): Promise<string[]> {
+    if (NEOLINE_NETWORK === 'MainNet') {
+      return this.getToFusdtSwapPath(fromToken, inputAmount);
+    } else {
+      return this.getToNeoSwapPath(fromToken, inputAmount);
+    }
+  }
+
+  private getToFusdtSwapPath(
+    fromToken: Token,
+    inputAmount: string
+  ): Promise<string[]> {
+    if (fromToken.symbol === 'fUSDT') {
+      return of(['fUSDT']).toPromise();
+    }
+    return this.apiService
+      .getSwapPath(
+        fromToken.symbol,
+        'fUSDT',
+        this.getAmountIn(fromToken, inputAmount)
+      )
+      .pipe(
+        map((res: AssetQueryResponse) => {
+          if (res.length > 0) {
+            return res[0].swapPath;
+          } else {
+            return [];
+          }
+        })
+      )
+      .toPromise();
+  }
+
+  private getToNeoSwapPath(
+    fromToken: Token,
+    inputAmount: string
+  ): Promise<string[]> {
     if (fromToken.symbol === 'nNEO') {
       return of(['nNEO']).toPromise();
     }
@@ -80,6 +117,10 @@ export class SwapService {
     const token = ALL_NEO_TOKENS.find((item) => item.symbol === name);
     return (token && token.assetID) || '';
   }
+  getNeoAssetLogoByName(name: string): string {
+    const token = ALL_NEO_TOKENS.find((item) => item.symbol === name);
+    return (token && token.logo) || '';
+  }
   getHash160FromAddress(text: string): any {
     if (text.startsWith('0x')) {
       text = text.slice(2);
@@ -104,7 +145,11 @@ export class SwapService {
         );
         break;
       default:
-        this.nzMessage.error(error.type);
+        if (typeof error === 'string') {
+          this.nzMessage.error(error);
+        } else {
+          this.nzMessage.error(error.type || 'Unknown error');
+        }
         break;
     }
   }

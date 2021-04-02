@@ -12,7 +12,7 @@
       </div>
       <ul class="routes">
         <li *ngFor="let name of swapItem.swapPath; index as index">
-          <img src="/assets/images/tokens/{{name}}.png" alt="">{{ name }}<span
+          <img [src]="swapItem.swapPathLogo[index]" alt="">{{ name }}<span
             *ngIf="index!==swapItem.swapPath.length-1">></span>
         </li>
       </ul>

@@ -24,11 +24,8 @@
           <a href="https://medium.com/o3-labs-o3-wallet" target="_blank">Blog</a>
         </li>
         <li>
-          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Doc</a>
-        </li>
-        <!-- <li>
           <a href="https://docs.o3swap.com/" target="_blank">Doc</a>
-        </li> -->
+        </li>
       </ul>
       <div *ngIf="isHome===false" class="connect">
         <div class="wallet" *ngIf="ethWalletName">
@@ -73,7 +70,7 @@
             <button class="disconnect" (click)="disConnect('NEO')">Disconnect</button>
           </div>
         </div>
-        <div class="connect-btn" *ngIf="!neoWalletName||!ethWalletName" (click)="showConnect()">
+        <div class="connect-btn" *ngIf="!neoWalletName" (click)="showConnect()">
           <img src="/assets/images/swap/link.png" alt="">
           <span>Connect Wallet</span>
         </div>
@@ -91,8 +88,7 @@
     </div>
     <p class="title">Connect wallet</p>
     <div class="chains">
-      <img [ngClass]="{active: connectWalletType==='ETH'}" (click)="connectWalletType='ETH'"
-        src="/assets/images/chains/eth.png" alt="">
+      <img [ngClass]="{active: connectWalletType==='ETH'}" src="/assets/images/chains/eth.png" alt="">
       <img [ngClass]="{active: connectWalletType==='NEO'}" (click)="connectWalletType='NEO'"
         src="/assets/images/chains/neo.png" alt="">
     </div>
