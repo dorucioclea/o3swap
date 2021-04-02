@@ -9,3 +9,8 @@ export const SWAP_CONTRACT_HASH =
   NEOLINE_NETWORK === 'MainNet'
     ? '0x89fa00d894c9a1475f8f94e84c79724b3faf64db'
     : '0x812d7291e2f0c89255cf355c1027872257d1ca37';
+
+export const ETH_SWAP_CONTRACT_HASH =
+  NEOLINE_NETWORK === 'MainNet'
+    ? ''
+    : '0x77F3A156e8E597C64d4a12d62f20a0d2ff839dD5';

@@ -13,6 +13,10 @@ import {
   UPDATE_ETH_WALLET_NAME,
   AssetQueryResponseItem,
   SwapStateType,
+  UPDATE_BSC_ACCOUNT,
+  UPDATE_BSC_WALLET_NAME,
+  UPDATE_HECO_ACCOUNT,
+  UPDATE_HECO_WALLET_NAME,
 } from '@lib';
 
 interface State {
@@ -33,17 +37,34 @@ export class O3EthWalletApiService {
     o3dapi.initPlugins([o3dapiEth]);
   }
 
-  connect(): void {
+  connect(chain: string): void {
     o3dapi.ETH.request({ method: 'eth_requestAccounts' })
       .then((res) => {
         this.commonService.log(res);
         this.accountAddress = res.result[0];
+        let dispatchAccountType;
+        let dispatchWalletNameType;
+        console.log(chain);
+        switch (chain) {
+          case 'ETH':
+            dispatchAccountType = UPDATE_ETH_ACCOUNT;
+            dispatchWalletNameType = UPDATE_ETH_WALLET_NAME;
+            break;
+          case 'BSC':
+            dispatchAccountType = UPDATE_BSC_ACCOUNT;
+            dispatchWalletNameType = UPDATE_BSC_WALLET_NAME;
+            break;
+          case 'HECO':
+            dispatchAccountType = UPDATE_HECO_ACCOUNT;
+            dispatchWalletNameType = UPDATE_HECO_WALLET_NAME;
+            break;
+        }
         this.store.dispatch({
-          type: UPDATE_ETH_ACCOUNT,
+          type: dispatchAccountType,
           data: this.accountAddress,
         });
         this.store.dispatch({
-          type: UPDATE_ETH_WALLET_NAME,
+          type: dispatchWalletNameType,
           data: this.walletName,
         });
         this.addListener();

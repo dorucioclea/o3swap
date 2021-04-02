@@ -20,6 +20,7 @@ import {
   SwapService,
   NeolineWalletApiService,
   O3NeoWalletApiService,
+  MetaMaskWalletApiService,
 } from '@core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import BigNumber from 'bignumber.js';
@@ -89,6 +90,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     private swapService: SwapService,
     private neolineWalletApiService: NeolineWalletApiService,
     private o3NeoWalletApiService: O3NeoWalletApiService,
+    private metaMaskWalletApiService: MetaMaskWalletApiService,
     private modal: NzModalService
   ) {
     this.swap$ = store.select('swap');
@@ -259,6 +261,16 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       });
   }
 
+  swapCrossChainEth(): void {
+    this.metaMaskWalletApiService.swapCrossChain(
+      this.fromToken,
+      this.toToken,
+      this.inputAmount,
+      this.ethAccountAddress,
+      this.ethAccountAddress
+    );
+  }
+
   swap(): void {
     if (this.fromToken.chain === 'NEO') {
       if (!this.neoAccountAddress) {
@@ -287,6 +299,10 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     }
     if (this.fromToken.chain === 'NEO' && this.toToken.chain !== 'NEO') {
       this.swapCrossChain();
+      return;
+    }
+    if (this.fromToken.chain !== 'NEO' && this.toToken.chain === 'NEO') {
+      this.swapCrossChainEth();
       return;
     }
   }

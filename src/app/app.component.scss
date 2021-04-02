@@ -82,7 +82,7 @@ header {
     }
   }
   .connect {
-    min-width: 190px;
+    min-width: 310px;
     display: flex;
     .wallet {
       position: relative;
@@ -223,6 +223,20 @@ footer {
         &:hover,
         &.active {
           background-image: url("/assets/images/chains/neo-active.png");
+        }
+      }
+      &.bsc {
+        background-image: url("/assets/images/chains/bsc.png");
+        &:hover,
+        &.active {
+          background-image: url("/assets/images/chains/bsc-active.png");
+        }
+      }
+      &.heco {
+        background-image: url("/assets/images/chains/heco.png");
+        &:hover,
+        &.active {
+          background-image: url("/assets/images/chains/heco-active.png");
         }
       }
     }

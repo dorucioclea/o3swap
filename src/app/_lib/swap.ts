@@ -22,8 +22,12 @@ export type NeolineNetwork = 'MainNet' | 'TestNet';
 export interface SwapStateType {
   neoWalletName: NeoWalletName;
   ethWalletName: EthWalletName;
+  bscWalletName: EthWalletName;
+  hecoWalletName: EthWalletName;
   neoAccountAddress: string;
   ethAccountAddress: string;
+  bscAccountAddress: string;
+  hecoAccountAddress: string;
   balances: object;
   neolineNetwork: NeolineNetwork;
   metamaskNetworkId: number;

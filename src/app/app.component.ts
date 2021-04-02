@@ -13,6 +13,10 @@ import {
   UPDATE_ETH_WALLET_NAME,
   NeoWallet,
   EthWallet,
+  UPDATE_BSC_ACCOUNT,
+  UPDATE_BSC_WALLET_NAME,
+  UPDATE_HECO_ACCOUNT,
+  UPDATE_HECO_WALLET_NAME,
 } from '@lib';
 import {
   CommonService,
@@ -25,7 +29,7 @@ import {
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
-export type ConnectWalletType = 'ETH' | 'NEO';
+export type ConnectChainType = 'ETH' | 'NEO' | 'BSC' | 'HECO';
 interface State {
   swap: SwapStateType;
 }
@@ -40,19 +44,27 @@ export class AppComponent implements OnInit {
   ETH_WALLETS = ETH_WALLETS;
   currentPage = this.router.url;
   isHome = true;
-  connectWalletType: ConnectWalletType = 'NEO';
+  connectChainType: ConnectChainType = 'NEO';
   showConnectModal = false; // connect wallet modal
   // account modal
   showNeoAccountModal = false;
   showEthAccountModal = false;
+  showBscAccountModal = false;
+  showHecoAccountModal = false;
   showNeoAccountModalTimeOut;
   showEthAccountModalTimeOut;
+  showBscAccountModalTimeOut;
+  showHecoAccountModalTimeOut;
 
   swap$: Observable<any>;
   neoAccountAddress: string;
   ethAccountAddress: string;
+  bscAccountAddress: string;
+  hecoAccountAddress: string;
   neoWalletName: NeoWalletName;
   ethWalletName: EthWalletName;
+  bscWalletName: EthWalletName;
+  hecoWalletName: EthWalletName;
 
   constructor(
     private store: Store<State>,
@@ -78,8 +90,12 @@ export class AppComponent implements OnInit {
     this.swap$.subscribe((state) => {
       this.neoAccountAddress = state.neoAccountAddress;
       this.ethAccountAddress = state.ethAccountAddress;
+      this.bscAccountAddress = state.bscAccountAddress;
+      this.hecoAccountAddress = state.hecoAccountAddress;
       this.neoWalletName = state.neoWalletName;
       this.ethWalletName = state.ethWalletName;
+      this.bscWalletName = state.bscWalletName;
+      this.hecoWalletName = state.hecoWalletName;
       this.changeDetectorRef.detectChanges();
     });
   }
@@ -95,7 +111,7 @@ export class AppComponent implements OnInit {
     this.showConnectModal = true;
   }
 
-  showAccountModal(type: ConnectWalletType): void {
+  showAccountModal(type: ConnectChainType): void {
     switch (type) {
       case 'ETH':
         clearTimeout(this.showEthAccountModalTimeOut);
@@ -105,10 +121,18 @@ export class AppComponent implements OnInit {
         clearTimeout(this.showNeoAccountModalTimeOut);
         this.showNeoAccountModal = true;
         break;
+      case 'BSC':
+        clearTimeout(this.showBscAccountModalTimeOut);
+        this.showBscAccountModal = true;
+        break;
+      case 'HECO':
+        clearTimeout(this.showHecoAccountModalTimeOut);
+        this.showHecoAccountModal = true;
+        break;
     }
   }
 
-  hideAccountModal(type: ConnectWalletType): void {
+  hideAccountModal(type: ConnectChainType): void {
     switch (type) {
       case 'ETH':
         this.showEthAccountModalTimeOut = setTimeout(() => {
@@ -120,6 +144,16 @@ export class AppComponent implements OnInit {
           this.showNeoAccountModal = false;
         }, 200);
         break;
+      case 'BSC':
+        this.showBscAccountModalTimeOut = setTimeout(() => {
+          this.showBscAccountModal = false;
+        }, 200);
+        break;
+      case 'HECO':
+        this.showHecoAccountModalTimeOut = setTimeout(() => {
+          this.showHecoAccountModal = false;
+        }, 200);
+        break;
     }
   }
 
@@ -128,7 +162,7 @@ export class AppComponent implements OnInit {
   }
 
   //#region account modal
-  disConnect(type: ConnectWalletType): void {
+  disConnect(type: ConnectChainType): void {
     switch (type) {
       case 'ETH':
         this.showEthAccountModal = false;
@@ -145,11 +179,25 @@ export class AppComponent implements OnInit {
         this.store.dispatch({ type: UPDATE_NEO_WALLET_NAME, data: null });
         this.store.dispatch({ type: RESET_NEO_BALANCES });
         break;
+      case 'BSC':
+        this.showBscAccountModal = false;
+        this.bscWalletName = null;
+        this.bscAccountAddress = null;
+        this.store.dispatch({ type: UPDATE_BSC_ACCOUNT, data: null });
+        this.store.dispatch({ type: UPDATE_BSC_WALLET_NAME, data: null });
+        break;
+      case 'HECO':
+        this.showHecoAccountModal = false;
+        this.hecoWalletName = null;
+        this.hecoAccountAddress = null;
+        this.store.dispatch({ type: UPDATE_HECO_ACCOUNT, data: null });
+        this.store.dispatch({ type: UPDATE_HECO_WALLET_NAME, data: null });
+        break;
     }
   }
 
-  changeWallet(type: ConnectWalletType): void {
-    this.connectWalletType = type;
+  changeWallet(type: ConnectChainType): void {
+    this.connectChainType = type;
     this.showConnectModal = true;
     switch (type) {
       case 'ETH':
@@ -157,6 +205,12 @@ export class AppComponent implements OnInit {
         break;
       case 'NEO':
         this.showNeoAccountModal = false;
+        break;
+      case 'BSC':
+        this.showBscAccountModal = false;
+        break;
+      case 'HECO':
+        this.showHecoAccountModal = false;
         break;
     }
   }
@@ -177,10 +231,10 @@ export class AppComponent implements OnInit {
   connectEthWallet(wallet: EthWallet): void {
     switch (wallet.name) {
       case 'MetaMask':
-        this.metaMaskWalletApiService.connect();
+        this.metaMaskWalletApiService.connect(this.connectChainType);
         break;
       case 'O3':
-        this.o3EthWalletApiService.connect();
+        this.o3EthWalletApiService.connect(this.connectChainType);
         break;
     }
   }
