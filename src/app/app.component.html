@@ -17,6 +17,9 @@
         <li class="add-width">
           <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Buy Crypto</a>
         </li>
+        <li [ngClass]="{active: currentPage==='/dashboard'}" (click)="menuType='dashboard'">
+          <a nz-tooltip nzTooltipTitle="Dashboard..." nzTooltipPlacement="bottom">Dashboard</a>
+        </li>
         <li>
           <a href="https://medium.com/o3-labs-o3-wallet" target="_blank">Blog</a>
         </li>

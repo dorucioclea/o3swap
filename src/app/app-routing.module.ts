@@ -1,12 +1,13 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { HomeComponent, SwapComponent } from './pages';
+import { HomeComponent, SwapComponent, DashboardComponent } from './pages';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'home', component: HomeComponent },
   { path: 'swap', component: SwapComponent },
+  { path: 'dashboard', component: DashboardComponent },
   { path: '**', redirectTo: '/home' },
 ];
 

@@ -17,6 +17,7 @@ import {
   SwapComponent,
   SwapHomeComponent,
   SwapResultComponent,
+  DashboardComponent,
 } from './pages';
 
 const PAGECOMPONENTS = [
@@ -24,6 +25,7 @@ const PAGECOMPONENTS = [
   SwapComponent,
   SwapHomeComponent,
   SwapResultComponent,
+  DashboardComponent,
 ];
 
 //#region ng-zorro-antd

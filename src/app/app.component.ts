@@ -25,7 +25,7 @@ import {
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
-type MenuType = 'home' | 'swap';
+type MenuType = 'home' | 'swap' | 'dashboard';
 export type ConnectWalletType = 'ETH' | 'NEO';
 interface State {
   swap: SwapStateType;
