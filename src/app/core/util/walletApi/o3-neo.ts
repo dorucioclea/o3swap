@@ -115,7 +115,8 @@ export class O3NeoWalletApiService {
     fromToken: Token,
     toToken: Token,
     inputAmount: string,
-    txHash: string
+    txHash: string,
+    addLister = true
   ): void {
     const pendingTx: SwapTransaction = {
       txid: txHash,
@@ -126,19 +127,21 @@ export class O3NeoWalletApiService {
       amount: inputAmount,
     };
     this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
-    o3dapi.NEO.addEventListener(
-      o3dapi.NEO.Constants.EventName.TRANSACTION_CONFIRMED,
-      (result) => {
-        if ((txHash as string).includes(result.txid)) {
-          this.getBalances();
-          this.transaction.isPending = false;
-          this.store.dispatch({
-            type: UPDATE_PENDING_TX,
-            data: this.transaction,
-          });
+    if (addLister) {
+      o3dapi.NEO.addEventListener(
+        o3dapi.NEO.Constants.EventName.TRANSACTION_CONFIRMED,
+        (result) => {
+          if ((txHash as string).includes(result.txid)) {
+            this.getBalances();
+            this.transaction.isPending = false;
+            this.store.dispatch({
+              type: UPDATE_PENDING_TX,
+              data: this.transaction,
+            });
+          }
         }
-      }
-    );
+      );
+    }
   }
 
   async mintNNeo(
@@ -324,54 +327,56 @@ export class O3NeoWalletApiService {
     );
     const args = [
       {
-        type: 'Address',
+        type: 'Address', // sender (用户小端序Hash)
         value: this.accountAddress,
       },
       {
-        type: 'Integer',
+        type: 'Integer', // amountIn (用户的输入额度， 不包含聚合swap的手续费)
         value: this.swapService.getAmountIn(fromToken, inputAmount),
       },
       {
-        type: 'Integer',
+        type: 'Integer', // amountOutMin (用户允许获得的代币数量最小值)
         value: this.swapService.getAmountOutMin(chooseSwapPath, slipValue),
       },
       {
-        type: 'Array',
+        type: 'Array', // paths (输入资产 到 输出资产 的路径)
         value: this.swapService.getAssetHashPath(chooseSwapPath.swapPath),
       },
       {
-        type: 'Array',
+        type: 'Array', // toStandardTokenPaths (输入资产 到 nNeo(fUSDT) 的路径， 如输入资产为nNeo, 则仅为 nNeo)
         value: toNeoswapPath.map((assetName) => ({
           type: 'Hash160',
           value: this.swapService.getNeoAssetHashByName(assetName),
         })),
       },
       {
-        type: 'Integer',
+        type: 'Integer', // deadline (交易有效的截止时间戳)
         value: Math.floor(Date.now() / 1000 + deadline * 60),
       },
       {
-        type: 'Integer',
+        type: 'Integer', // SwapWayIndex (采取Swap的交易平台序列号)
         value: 0,
       },
       {
-        type: 'Hash160',
+        type: 'Hash160', // receiver (目标链收款地址)
         value: this.swapService.getHash160FromAddress(toAddress),
       },
       {
-        type: 'Integer',
+        type: 'Integer', // toChainID (目标链id)
         value: 2,
       },
       {
-        type: 'Integer',
+        type: 'Integer', // ProjectIndex (项目序列号)
         value: 0,
       },
+      // IsMix 表示是否swap 后得到的资产通过混币器后跨链， 例如 nNeo -> fWETH, 但fWETH无法跨链，通过混币器转换 fWETH -> pxWETH
+      // 如果使用混币器， 则填入跨链资产Hash, 如果不使用， 内容可以任意填写
       {
-        type: 'Boolean',
+        type: 'Boolean', // IsMix （是否通过混币器）
         value: isMix,
       },
       {
-        type: 'Hash160',
+        type: 'Hash160', // CrossAssetHash （混币原资产Hash）
         value: crossAssetHash,
       },
     ];
@@ -382,7 +387,7 @@ export class O3NeoWalletApiService {
     })
       .then(({ txid }) => {
         const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
-        this.handleTx(fromToken, toToken, inputAmount, txHash);
+        this.handleTx(fromToken, toToken, inputAmount, txHash, false);
         return txHash;
       })
       .catch((error) => {

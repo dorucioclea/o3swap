@@ -11,9 +11,9 @@ import {
   UTXO_HOST,
   Token,
   TxProgress,
-  DefaultTxProgress,
   NNEO_TOKEN,
   ALL_NEO_TOKENS,
+  CHAIN_TOKENS,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { CommonService } from '../util/common.service';
@@ -62,7 +62,11 @@ export class ApiService {
       .get(`${CROSS_CHAIN_SWAP_DETAIL_HOST}/api/v1/getcrosstx?txhash=${hash}`)
       .pipe(
         map((res: any) => {
-          const target: TxProgress = new DefaultTxProgress();
+          const target: TxProgress = {
+            step1: { hash: '', status: 1 },
+            step2: { hash: '', status: 0 },
+            step3: { hash: '', status: 0 },
+          };
           if (res.desc === 'success' && res.result) {
             const data = JSON.parse(res.result);
             if (data.fchaintx && data.fchaintx.txhash) {
@@ -167,9 +171,13 @@ export class ApiService {
     );
   }
 
-  getNeoAssetLogoByName(name: string): string {
-    const token = ALL_NEO_TOKENS.find((item) => item.symbol === name);
-    return (token && token.logo) || '';
+  private getNeoAssetLogoByName(name: string): string {
+    const token1 = ALL_NEO_TOKENS.find((item) => item.symbol === name);
+    const token2 = CHAIN_TOKENS.ETH.find((item) => item.symbol === name);
+    const token3 = CHAIN_TOKENS.BSC.find((item) => item.symbol === name);
+    const token4 = CHAIN_TOKENS.HECO.find((item) => item.symbol === name);
+    const token = token1 || token2 || token3 || token4;
+    return token && token.logo;
   }
 
   handleReceiveSwapPathFiat(

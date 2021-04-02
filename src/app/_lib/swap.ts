@@ -7,12 +7,6 @@ export type TxProgress = {
   step3: { hash: string; status: 0 | 1 | 2 }; // 0 = 未开始, 1 = 进行中, 2 = 已完成
 };
 
-export class DefaultTxProgress {
-  step1: { hash: ''; status: 1 }; // 0 = 未开始, 1 = 进行中, 2 = 已完成
-  step2: { hash: ''; status: 0 }; // 0 = 未开始, 1 = 进行中, 2 = 已完成
-  step3: { hash: ''; status: 0 }; // 0 = 未开始, 1 = 进行中, 2 = 已完成
-}
-
 export interface SwapTransaction {
   txid: string;
   isPending: boolean;

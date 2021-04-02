@@ -131,7 +131,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       .pipe(take(this.seconds))
       .subscribe((time) => {
         time++;
-        this.commonService.log(time);
         this.inquiryTime = this.seconds - time;
         if (time === this.seconds) {
           this.getSwapPathFun();
@@ -308,6 +307,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
           this.swapFail.emit();
         }
         if (res.length > 0) {
+          this.commonService.log(res);
           this.receiveSwapPathArray = res;
           this.handleReceiveSwapPathFiat();
         }

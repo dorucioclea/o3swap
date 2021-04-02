@@ -41,7 +41,7 @@
       <ul class="value routes">
         <li *ngFor="let name of chooseSwapPath?.swapPath; index as index">
           <span *ngIf="index!==0">></span>
-          <img [src]="chooseSwapPath.swapPathLogo[index]" alt="">{{ name }}
+          <img [src]="chooseSwapPath?.swapPathLogo[index]" alt="">{{ name }}
         </li>
       </ul>
     </div>
