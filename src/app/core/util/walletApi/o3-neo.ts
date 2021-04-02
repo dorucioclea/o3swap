@@ -53,7 +53,7 @@ export class O3NeoWalletApiService {
   connect(): void {
     o3dapi.NEO.getAccount()
       .then((result) => {
-        // console.log(result);
+        this.commonService.log(result);
         this.accountAddress = result.address;
         this.store.dispatch({
           type: UPDATE_NEO_ACCOUNT,
@@ -156,7 +156,7 @@ export class O3NeoWalletApiService {
         return txHash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.swapService.handleNeoDapiError(error, 'NeoLine');
       });
   }
@@ -241,7 +241,7 @@ export class O3NeoWalletApiService {
         return txHash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.swapService.handleNeoDapiError(error, 'NeoLine');
       });
   }
@@ -435,7 +435,7 @@ export class O3NeoWalletApiService {
         return txHash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.swapService.handleNeoDapiError(error, 'O3');
       });
   }

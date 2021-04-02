@@ -131,7 +131,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       .pipe(take(this.seconds))
       .subscribe((time) => {
         time++;
-        // console.log(time);
+        this.commonService.log(time);
         this.inquiryTime = this.seconds - time;
         if (time === this.seconds) {
           this.getSwapPathFun();
@@ -205,7 +205,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.ethAccountAddress
       )
       .then((res) => {
-        // console.log(res);
+        this.commonService.log(res);
         if (res) {
           this.closePage.emit();
         }
@@ -232,7 +232,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.deadline
       )
       .then((res) => {
-        // console.log(res);
+        this.commonService.log(res);
         if (res) {
           this.closePage.emit();
         }
@@ -252,7 +252,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     swapApi
       .mintNNeo(this.fromToken, this.toToken, this.inputAmount)
       .then((res) => {
-        // console.log(res);
+        this.commonService.log(res);
         if (res) {
           this.closePage.emit();
         }
@@ -277,7 +277,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.neoAccountAddress
       )
       .then((res) => {
-        // console.log(res);
+        this.commonService.log(res);
         if (res) {
           this.closePage.emit();
         }

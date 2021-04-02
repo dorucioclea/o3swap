@@ -109,7 +109,10 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.requestCrossInterval !== null && this.requestCrossInterval !== undefined) {
+    if (
+      this.requestCrossInterval !== null &&
+      this.requestCrossInterval !== undefined
+    ) {
       this.requestCrossInterval.unsubscribe();
     }
   }
@@ -119,7 +122,7 @@ export class SwapComponent implements OnInit, OnDestroy {
       this.apiService
         .getCrossChainSwapDetail(this.transaction.txid)
         .subscribe((res: TxProgress) => {
-          console.log(res);
+          this.commonService.log(res);
           this.transaction.progress = res;
           if (
             res.step1.status === 2 &&

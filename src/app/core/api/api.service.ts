@@ -16,13 +16,14 @@ import {
   ALL_NEO_TOKENS,
 } from '@lib';
 import BigNumber from 'bignumber.js';
+import { CommonService } from '../util/common.service';
 
 @Injectable()
 export class ApiService {
   apiDo = environment.apiDomain;
   RATE_HOST = 'https://hub.o3.network/v1';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private commonService: CommonService) {}
 
   postEmail(email: string): Observable<any> {
     return this.http.post(`https://subscribe.o3swap.com/subscribe`, { email });
@@ -130,7 +131,7 @@ export class ApiService {
         },
       ];
     }
-    // console.log(neoNNeoRes);
+    this.commonService.log(neoNNeoRes);
     if (neoNNeoRes) {
       return of(this.handleReceiveSwapPathFiat(neoNNeoRes, toToken));
     }

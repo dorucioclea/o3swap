@@ -1,10 +1,19 @@
 import { Injectable } from '@angular/core';
+import { environment } from '@env/environment';
 import BigNumber from 'bignumber.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Injectable()
 export class CommonService {
+  isProduction = environment.production;
+
   constructor(private nzMessage: NzMessageService) {}
+
+  log(value: any): void {
+    if (this.isProduction === false) {
+      console.log(value);
+    }
+  }
 
   copy(value: string): void {
     const input = document.createElement('input');

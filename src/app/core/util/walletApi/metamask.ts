@@ -10,6 +10,7 @@ import { Store } from '@ngrx/store';
 import BigNumber from 'bignumber.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Observable } from 'rxjs';
+import { CommonService } from '../common.service';
 import { SwapService } from '../swap.service';
 interface State {
   swap: SwapStateType;
@@ -28,7 +29,8 @@ export class MetaMaskWalletApiService {
   constructor(
     private store: Store<State>,
     private nzMessage: NzMessageService,
-    private swapService: SwapService
+    private swapService: SwapService,
+    private commonService: CommonService
   ) {
     this.swap$ = store.select('swap');
     this.swap$.subscribe((state) => {
@@ -45,7 +47,7 @@ export class MetaMaskWalletApiService {
     this.ethereum
       .request({ method: 'eth_requestAccounts' })
       .then((result) => {
-        // console.log(result);
+        this.commonService.log(result);
         this.accountAddress = result[0];
         this.store.dispatch({
           type: UPDATE_ETH_ACCOUNT,
@@ -66,7 +68,7 @@ export class MetaMaskWalletApiService {
     this.ethereum
       .request({ method: 'net_version' })
       .then((chainId) => {
-        // console.log('chainId: ' + chainId);
+        this.commonService.log('chainId: ' + chainId);
         this.store.dispatch({
           type: UPDATE_METAMASK_NETWORK_ID,
           data: chainId,
@@ -92,7 +94,7 @@ export class MetaMaskWalletApiService {
       }
     });
     this.ethereum.on('chainChanged', (chainId) => {
-      // console.log('chainId: ' + chainId);
+      this.commonService.log('chainId: ' + chainId);
       this.store.dispatch({
         type: UPDATE_METAMASK_NETWORK_ID,
         data: chainId,

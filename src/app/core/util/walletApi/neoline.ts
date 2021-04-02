@@ -66,7 +66,7 @@ export class NeolineWalletApiService {
     this.neolineDapi
       .getAccount()
       .then((result) => {
-        // console.log(result);
+        this.commonService.log(result);
         this.accountAddress = result.address;
         this.store.dispatch({
           type: UPDATE_NEO_ACCOUNT,
@@ -95,12 +95,12 @@ export class NeolineWalletApiService {
       })
       .then((addressTokens: any[]) => {
         const tokens = addressTokens[this.accountAddress];
-        // console.log(tokens);
+        this.commonService.log(tokens);
         const tempTokenBalance = {};
         tokens.forEach((tokenItem: any) => {
           tempTokenBalance[tokenItem.asset_id || tokenItem.assetID] = tokenItem;
         });
-        // console.log('temp: ' + tempTokenBalance);
+        this.commonService.log('temp: ' + tempTokenBalance);
         this.store.dispatch({
           type: UPDATE_NEO_BALANCES,
           data: tempTokenBalance,
@@ -167,7 +167,7 @@ export class NeolineWalletApiService {
         window.addEventListener(
           'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
           (result: any) => {
-            // console.log(result.detail.txid);
+            this.commonService.log(result.detail.txid);
             if (result.detail.txid === txHash) {
               this.getBalances();
               this.transaction.isPending = false;
@@ -181,7 +181,7 @@ export class NeolineWalletApiService {
         return txHash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.swapService.handleNeoDapiError(error, 'NeoLine');
       });
   }
@@ -257,7 +257,7 @@ export class NeolineWalletApiService {
         window.addEventListener(
           'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
           (result: any) => {
-            // console.log(result.detail.txid);
+            this.commonService.log(result.detail.txid);
             if (result.detail.txid === txHash) {
               this.getBalances();
               this.transaction.isPending = false;
@@ -271,7 +271,7 @@ export class NeolineWalletApiService {
         return txHash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.swapService.handleNeoDapiError(error, 'NeoLine');
       });
   }
@@ -352,7 +352,7 @@ export class NeolineWalletApiService {
         window.addEventListener(
           'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
           (result: any) => {
-            // console.log(result.detail.txid);
+            this.commonService.log(result.detail.txid);
             if (result.detail.txid === txHash) {
               this.getBalances();
               this.transaction.isPending = false;
@@ -366,7 +366,7 @@ export class NeolineWalletApiService {
         return txHash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.swapService.handleNeoDapiError(error, 'NeoLine');
       });
   }
@@ -467,7 +467,7 @@ export class NeolineWalletApiService {
         window.addEventListener(
           'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
           (result: any) => {
-            // console.log(result.detail.txid);
+            this.commonService.log(result.detail.txid);
             if (result.detail.txid === txHash) {
               this.getBalances();
             }
@@ -476,7 +476,7 @@ export class NeolineWalletApiService {
         return txHash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.swapService.handleNeoDapiError(error, 'NeoLine');
       });
   }

@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { DEFAULT_DEADLINE, DEFAULT_SLIPVALUE } from '@lib';
 import { NzModalRef } from 'ng-zorro-antd/modal';
+import { CommonService } from '@core';
 
 @Component({
   selector: 'app-swap-setting',
@@ -16,7 +17,10 @@ export class SwapSettingComponent implements OnInit {
   slipValueGroup = [0.1, 0.5, 1, 2];
   slipValueError: string;
 
-  constructor(private modal: NzModalRef) {}
+  constructor(
+    private modal: NzModalRef,
+    private commonService: CommonService
+  ) {}
 
   ngOnInit(): void {
     this.checkSlipValue();
@@ -45,7 +49,7 @@ export class SwapSettingComponent implements OnInit {
       slipValue: this.slipValue,
       isCustomSlip: this.isCustomSlip,
     };
-    // console.log(settingObj);
+    this.commonService.log(settingObj);
     this.modal.close(settingObj);
   }
 
