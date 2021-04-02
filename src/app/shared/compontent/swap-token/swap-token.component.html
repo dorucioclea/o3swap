@@ -8,13 +8,14 @@
       [ngClass]="{focus: isfocusSearchInput}" (input)="search($event)" placeholder="Search token name">
   </div>
   <div class="chains">
-    <img [ngClass]="{active: chain==='ALL', disable: isFrom}"
-      src="/assets/images/chains/all.png" alt="">
-    <img [ngClass]="{active: chain==='ETH', disable: isFrom || showOnlyNNeo}"
-      src="/assets/images/chains/eth.png" alt="">
-    <img (click)="changeChain('NEO')" [ngClass]="{active: chain==='NEO'}" src="/assets/images/chains/neo.png" alt="">
-    <!-- <img src="/assets/images/chains/bsc.png" alt="">
-    <img src="/assets/images/chains/heco.png" alt=""> -->
+    <span (click)="changeChain('ALL')" [ngClass]="{active: chain==='ALL', disable: isFrom}" class="all"></span>
+    <span (click)="changeChain('ETH')" [ngClass]="{active: chain==='ETH', disable: isFrom || showOnlyNNeo}"
+      class="eth"></span>
+    <span (click)="changeChain('NEO')" [ngClass]="{active: chain==='NEO'}" class="neo"></span>
+    <span (click)="changeChain('BSC')" [ngClass]="{active: chain==='BSC', disable: isFrom || showOnlyNNeo}"
+      class="bsc"></span>
+    <span (click)="changeChain('HECO')" [ngClass]="{active: chain==='HECO', disable: isFrom || showOnlyNNeo}"
+      class="heco"></span>
   </div>
   <ul class="tokens scroll">
     <li class="token" *ngFor="let tokenItem of displayTokens"

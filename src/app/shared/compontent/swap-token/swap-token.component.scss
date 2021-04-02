@@ -36,20 +36,57 @@ section.wrapper {
     border-top-right-radius: 20px;
     border-bottom-left-radius: 40px;
     padding: 30px 15px;
-    img {
+    span {
+      display: inline-block;
       width: 40px;
+      height: 40px;
+      background: #ffffff1a;
       border-radius: 10px;
-      opacity: 0.2;
-      // cursor: pointer;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 100% auto;
+      cursor: pointer;
+      &:not(:first-child) {
+        margin-top: 16px;
+      }
       &.disable {
         cursor: default;
         pointer-events: none;
       }
-      &:not(:first-child) {
-        margin-top: 24px;
+      &.all {
+        background-image: url("/assets/images/chains/all.png");
+        &:hover,
+        &.active {
+          background-image: url("/assets/images/chains/all-active.png");
+        }
       }
-      &.active {
-        opacity: 1;
+      &.eth {
+        background-image: url("/assets/images/chains/eth.png");
+        &:hover,
+        &.active {
+          background-image: url("/assets/images/chains/eth-active.png");
+        }
+      }
+      &.neo {
+        background-image: url("/assets/images/chains/neo.png");
+        &:hover,
+        &.active {
+          background-image: url("/assets/images/chains/neo-active.png");
+        }
+      }
+      &.bsc {
+        background-image: url("/assets/images/chains/bsc.png");
+        &:hover,
+        &.active {
+          background-image: url("/assets/images/chains/bsc-active.png");
+        }
+      }
+      &.heco {
+        background-image: url("/assets/images/chains/heco.png");
+        &:hover,
+        &.active {
+          background-image: url("/assets/images/chains/heco-active.png");
+        }
       }
     }
   }

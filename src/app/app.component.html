@@ -33,7 +33,7 @@
       <div *ngIf="isHome===false" class="connect">
         <div class="wallet" *ngIf="ethWalletName">
           <img (mouseenter)="showAccountModal('ETH')" (mouseleave)="hideAccountModal('ETH')"
-            src="/assets/images/chains/eth.png" alt="">
+            src="/assets/images/chains/eth-active.png" alt="">
           <div class="dropdown" *ngIf="showEthAccountModal" (mouseenter)="showAccountModal('ETH')"
             (mouseleave)="hideAccountModal('ETH')">
             <div class="title">
@@ -54,7 +54,7 @@
         </div>
         <div class="wallet" *ngIf="neoWalletName">
           <img (mouseenter)="showAccountModal('NEO')" (mouseleave)="hideAccountModal('NEO')"
-            src="/assets/images/chains/neo.png" alt="">
+            src="/assets/images/chains/neo-active.png" alt="">
           <div class="dropdown" *ngIf="showNeoAccountModal" (mouseenter)="showAccountModal('NEO')"
             (mouseleave)="hideAccountModal('NEO')">
             <div class="title">
@@ -73,7 +73,7 @@
             <button class="disconnect" (click)="disConnect('NEO')">Disconnect</button>
           </div>
         </div>
-        <div class="connect-btn" *ngIf="!neoWalletName" (click)="showConnect()">
+        <div class="connect-btn" *ngIf="!neoWalletName||!ethWalletName" (click)="showConnect()">
           <img src="/assets/images/swap/link.png" alt="">
           <span>Connect Wallet</span>
         </div>
@@ -91,9 +91,8 @@
     </div>
     <p class="title">Connect wallet</p>
     <div class="chains">
-      <img [ngClass]="{active: connectWalletType==='ETH'}" src="/assets/images/chains/eth.png" alt="">
-      <img [ngClass]="{active: connectWalletType==='NEO'}" (click)="connectWalletType='NEO'"
-        src="/assets/images/chains/neo.png" alt="">
+      <span class="eth" [ngClass]="{active: connectWalletType==='ETH'}" (click)="connectWalletType='ETH'"></span>
+      <span class="neo" [ngClass]="{active: connectWalletType==='NEO'}" (click)="connectWalletType='NEO'"></span>
     </div>
     <p class="wallet-type">{{ connectWalletType }} Wallet</p>
     <ul class="wallets" *ngIf="connectWalletType==='ETH'">

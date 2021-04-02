@@ -88,8 +88,10 @@ header {
       position: relative;
       margin-right: 14px;
       & > img {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
+        background: #2b312d;
+        border-radius: 50%;
         cursor: pointer;
       }
       .dropdown {
@@ -197,16 +199,31 @@ footer {
     background: #222222;
     border-top-right-radius: 20px;
     border-bottom-left-radius: 40px;
-    padding: 3px 15px;
-    img {
-      // cursor: pointer;
+    padding: 10px 15px;
+    span {
+      display: inline-block;
       width: 40px;
-      margin-top: 24px;
+      height: 40px;
+      background: #ffffff1a;
       border-radius: 10px;
-      opacity: 0.2;
-      border-radius: 10px;
-      &.active {
-        opacity: 1;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 100% auto;
+      cursor: pointer;
+      margin-top: 16px;
+      &.eth {
+        background-image: url("/assets/images/chains/eth.png");
+        &:hover,
+        &.active {
+          background-image: url("/assets/images/chains/eth-active.png");
+        }
+      }
+      &.neo {
+        background-image: url("/assets/images/chains/neo.png");
+        &:hover,
+        &.active {
+          background-image: url("/assets/images/chains/neo-active.png");
+        }
       }
     }
   }
