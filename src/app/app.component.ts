@@ -25,7 +25,6 @@ import {
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
-type MenuType = 'home' | 'swap' | 'dashboard';
 export type ConnectWalletType = 'ETH' | 'NEO';
 interface State {
   swap: SwapStateType;
@@ -39,7 +38,6 @@ interface State {
 export class AppComponent implements OnInit {
   NEO_WALLETS = NEO_WALLETS;
   ETH_WALLETS = ETH_WALLETS;
-  menuType: MenuType = 'home';
   currentPage = this.router.url;
   isHome = true;
   connectWalletType: ConnectWalletType = 'NEO';

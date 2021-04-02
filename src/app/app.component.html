@@ -5,10 +5,10 @@
         <img class="logo" src="/assets/images/logo.png" alt="">
       </a>
       <ul class="menu flex-1">
-        <li [ngClass]="{active: isHome}" (click)="menuType='home'">
+        <li [ngClass]="{active: isHome}">
           <a routerLink="/">Home</a>
         </li>
-        <li [ngClass]="{active: currentPage==='/swap'}" (click)="menuType='swap'">
+        <li [ngClass]="{active: currentPage==='/swap'}">
           <a routerLink="/swap">Swap</a>
         </li>
         <!-- <li>
@@ -17,9 +17,12 @@
         <li class="add-width">
           <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Buy Crypto</a>
         </li>
-        <li [ngClass]="{active: currentPage==='/dashboard'}" (click)="menuType='dashboard'">
-          <a nz-tooltip nzTooltipTitle="Dashboard..." nzTooltipPlacement="bottom">Dashboard</a>
-        </li>
+        <!-- <li class="add-width" [ngClass]="{active: currentPage==='/dashboard'}">
+          <a routerLink="/dashboard">Dashboard</a>
+        </li> -->
+        <!-- <li class="add-width">
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Dashboard</a>
+        </li> -->
         <li>
           <a href="https://medium.com/o3-labs-o3-wallet" target="_blank">Blog</a>
         </li>

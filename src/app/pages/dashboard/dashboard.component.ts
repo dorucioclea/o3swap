@@ -9,13 +9,10 @@ import { CommonHttpResponse } from '@lib';
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
-  lang = 'en';
-  copyRightYear = new Date().getFullYear();
   constructor(
     private nzMessage: NzMessageService,
     private apiService: ApiService
   ) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 }
