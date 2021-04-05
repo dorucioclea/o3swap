@@ -19,7 +19,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { Observable } from 'rxjs';
 import { CommonService } from '../common.service';
 import { SwapService } from '../swap.service';
-// import Web3 from 'web3';
+import Web3 from 'web3';
 import * as SwapperJson from 'src/assets/contracts-json/eth-swapper.json';
 
 interface State {
@@ -58,7 +58,7 @@ export class MetaMaskWalletApiService {
       this.swapService.toDownloadWallet(this.myWalletName);
       return;
     }
-    // this.web3 = new Web3((window as any).ethereum);
+    this.web3 = new Web3((window as any).ethereum);
     this.ethereum = (window as any).ethereum;
     this.ethereum
       .request({ method: 'eth_requestAccounts' })
@@ -156,6 +156,7 @@ export class MetaMaskWalletApiService {
     });
   }
 
+  //#region
   updateAccount(data: string): void {
     if (this.ethWalletName === 'MetaMask') {
       this.store.dispatch({
@@ -197,4 +198,5 @@ export class MetaMaskWalletApiService {
       });
     }
   }
+  //#endregion
 }

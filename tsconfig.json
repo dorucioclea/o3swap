@@ -25,7 +25,8 @@
       "es2018",
       "dom"
     ],
-    "allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": true,  // ts 文件 import json
+    // "esModuleInterop": true,
   },
   "exclude": ["node_modules"],
 }
