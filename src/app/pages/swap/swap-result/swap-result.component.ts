@@ -107,7 +107,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.getFromAndToAddress();
     this.swap$.subscribe((state) => {
       this.neoAccountAddress = state.neoAccountAddress;
       this.ethAccountAddress = state.ethAccountAddress;
@@ -117,6 +116,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.ethWalletName = state.ethWalletName;
       this.bscWalletName = state.bscWalletName;
       this.hecoWalletName = state.hecoWalletName;
+      this.getFromAndToAddress();
     });
     this.setting$.subscribe((state) => {
       this.slipValue = state.slipValue;
