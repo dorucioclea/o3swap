@@ -207,8 +207,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.swapNeo();
       return;
     }
-    if (this.fromToken.chain === 'NEO' && this.toToken.chain !== 'NEO') {
-      this.swapCrossChain();
+    if (this.fromToken.chain === 'NEO' && this.toToken.chain === 'ETH') {
+      this.swapNeoCrossChainEth();
       return;
     }
     if (this.fromToken.chain !== 'NEO' && this.toToken.chain !== 'NEO') {
@@ -224,7 +224,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     this.setInquiryInterval();
   }
 
-  swapCrossChain(): void {
+  swapNeoCrossChainEth(): void {
     const swapApi =
       this.neoWalletName === 'NeoLine'
         ? this.neolineWalletApiService

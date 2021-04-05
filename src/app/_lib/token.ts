@@ -6,6 +6,7 @@ export interface Token {
   amount: string;
   decimals: number;
   chain: CHAINS;
+  chainId?: number;
   rateName: string;
   atNeoAssetName?: string;
 }
@@ -165,6 +166,7 @@ const ETH_TOKENS: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'ETH',
+    chainId: 2,
     rateName: 'eth',
     logo: '/assets/images/tokens/eth.png',
     atNeoAssetName: 'pnWETH',
@@ -176,6 +178,7 @@ const ETH_TOKENS: Token[] = [
     amount: '0',
     rateName: 'usdt',
     chain: 'ETH',
+    chainId: 2,
     logo: '/assets/images/tokens/usdt.png',
     atNeoAssetName: 'pnUSDT',
   },
@@ -191,6 +194,7 @@ const BSC_TOKENS: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'BSC',
+    chainId: 79,
     rateName: 'eth',
     logo: '/assets/images/tokens/eth.png',
   },
@@ -203,6 +207,7 @@ const BSC_TOKENS: Token[] = [
     decimals: 6,
     amount: '0',
     chain: 'BSC',
+    chainId: 79,
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
   },
@@ -220,6 +225,7 @@ const HECO_TOKENS: Token[] = [
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
+    chainId: 7,
   },
 ];
 
@@ -230,6 +236,7 @@ const ALL: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'ETH',
+    chainId: 2,
     rateName: 'eth',
     logo: '/assets/images/tokens/eth.png',
     atNeoAssetName: 'pnWETH',
@@ -241,6 +248,7 @@ const ALL: Token[] = [
     amount: '0',
     rateName: 'usdt',
     chain: 'ETH',
+    chainId: 2,
     logo: '/assets/images/tokens/usdt.png',
     atNeoAssetName: 'pnUSDT',
   },
@@ -265,6 +273,7 @@ const ALL: Token[] = [
     decimals: 6,
     amount: '0',
     chain: 'BSC',
+    chainId: 79,
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
   },
@@ -279,6 +288,7 @@ const ALL: Token[] = [
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
+    chainId: 7,
   },
 ];
 

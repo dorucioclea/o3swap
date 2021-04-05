@@ -112,7 +112,7 @@ export class MetaMaskWalletApiService {
       .swap(
         fromToken.assetID, // fromAssetHash
         1, // toPoolId
-        7, // toChainId
+        toToken.chainId, // toChainId
         toAddress, // toAddress
         inputAmount, // amount
         0, // fee
