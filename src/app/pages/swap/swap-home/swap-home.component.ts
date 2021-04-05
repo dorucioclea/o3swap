@@ -1,13 +1,21 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Token, UPDATE_SETTING } from '@lib';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
+import { SwapStateType, Token, UPDATE_SETTING } from '@lib';
 import BigNumber from 'bignumber.js';
 import { SwapSettingComponent, SwapTokenComponent } from '@shared';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, Unsubscribable } from 'rxjs';
 
 interface State {
   setting: any;
+  swap: SwapStateType;
 }
 
 @Component({
@@ -15,7 +23,7 @@ interface State {
   templateUrl: './swap-home.component.html',
   styleUrls: ['../common.scss', './swap-home.component.scss'],
 })
-export class SwapHomeComponent implements OnInit {
+export class SwapHomeComponent implements OnInit, OnDestroy {
   @Input() rates = {};
   @Input() fromToken: Token;
   @Input() toToken: Token;
@@ -27,6 +35,10 @@ export class SwapHomeComponent implements OnInit {
     toToken: Token;
   }>();
   @Output() toResultPage = new EventEmitter();
+
+  swap$: Observable<any>;
+  tokenBalance; // 账户的 tokens
+  swapUnScribe: Unsubscribable;
 
   // setting modal
   setting$: Observable<any>;
@@ -40,6 +52,7 @@ export class SwapHomeComponent implements OnInit {
 
   constructor(private modal: NzModalService, public store: Store<State>) {
     this.setting$ = store.select('setting');
+    this.swap$ = store.select('swap');
   }
 
   ngOnInit(): void {
@@ -50,6 +63,26 @@ export class SwapHomeComponent implements OnInit {
     });
     this.checkInputAmountDecimal();
     this.calcutionInputAmountFiat();
+    this.swapUnScribe = this.swap$.subscribe((state) => {
+      if (
+        this.fromToken &&
+        JSON.stringify(state.balances) !== JSON.stringify(this.tokenBalance)
+      ) {
+        this.tokenBalance = JSON.parse(JSON.stringify(state.balances));
+        if (this.tokenBalance[this.fromToken.assetID]) {
+          this.fromToken.amount = this.tokenBalance[
+            this.fromToken.assetID
+          ].amount;
+        }
+      }
+      // this.changeDetectorRef.detectChanges();
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.swapUnScribe !== null && this.swapUnScribe !== undefined) {
+      this.swapUnScribe.unsubscribe();
+    }
   }
 
   showTokens(type: 'from' | 'to'): void {
