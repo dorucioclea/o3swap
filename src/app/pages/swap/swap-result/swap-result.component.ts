@@ -320,9 +320,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     this.chooseSwapPath = null;
     this.apiService
       .getSwapPath(
-        this.fromToken.symbol,
+        this.fromToken,
         this.toToken,
-        this.swapService.getAmountIn(this.fromToken, this.inputAmount),
         this.inputAmount
       )
       .subscribe((res) => {

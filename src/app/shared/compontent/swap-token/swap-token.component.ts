@@ -117,7 +117,10 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
   }
 
   changeChain(chain: CHAINS): void {
-    if (this.isFrom || this.chain === chain) {
+    // if (this.isFrom) {
+    //   return;
+    // }
+    if (this.chain === chain) {
       return;
     }
     this.chain = chain;

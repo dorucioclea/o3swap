@@ -126,6 +126,13 @@ export class O3NeoWalletApiService {
       toToken,
       amount: inputAmount,
     };
+    if (addLister === false) {
+      pendingTx.progress = {
+        step1: { hash: '', status: 1 },
+        step2: { hash: '', status: 0 },
+        step3: { hash: '', status: 0 },
+      };
+    }
     this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
     if (addLister) {
       o3dapi.NEO.addEventListener(
@@ -250,7 +257,7 @@ export class O3NeoWalletApiService {
       this.nzMessage.error('Insufficient balance');
       return;
     }
-    const toNeoswapPath = await this.swapService.getToStandardSwapPath(
+    const toNeoswapPath = await this.apiService.getToStandardSwapPath(
       fromToken,
       inputAmount
     );
@@ -321,7 +328,7 @@ export class O3NeoWalletApiService {
       this.nzMessage.error('Insufficient balance');
       return;
     }
-    const toNeoswapPath = await this.swapService.getToStandardSwapPath(
+    const toNeoswapPath = await this.apiService.getToStandardSwapPath(
       fromToken,
       inputAmount
     );

@@ -1,89 +1,23 @@
 import { Injectable } from '@angular/core';
 import BigNumber from 'bignumber.js';
-import { of } from 'rxjs';
-import { map } from 'rxjs/operators';
 import {
-  AssetQueryResponse,
   ALL_PERCENTAGE,
   AssetQueryResponseItem,
   ALL_NEO_TOKENS,
   Token,
   WalletName,
   NeoWalletName,
-  NEOLINE_NETWORK,
 } from '@lib';
-import { ApiService } from '../api/api.service';
 import { CommonService } from './common.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Injectable()
 export class SwapService {
   constructor(
-    private apiService: ApiService,
     private commonService: CommonService,
     private nzMessage: NzMessageService
   ) {}
 
-  getToStandardSwapPath(
-    fromToken: Token,
-    inputAmount: string
-  ): Promise<string[]> {
-    if (NEOLINE_NETWORK === 'MainNet') {
-      return this.getToFusdtSwapPath(fromToken, inputAmount);
-    } else {
-      return this.getToNeoSwapPath(fromToken, inputAmount);
-    }
-  }
-
-  private getToFusdtSwapPath(
-    fromToken: Token,
-    inputAmount: string
-  ): Promise<string[]> {
-    if (fromToken.symbol === 'fUSDT') {
-      return of(['fUSDT']).toPromise();
-    }
-    return this.apiService
-      .getSwapPath(
-        fromToken.symbol,
-        'fUSDT',
-        this.getAmountIn(fromToken, inputAmount)
-      )
-      .pipe(
-        map((res: AssetQueryResponse) => {
-          if (res.length > 0) {
-            return res[0].swapPath;
-          } else {
-            return [];
-          }
-        })
-      )
-      .toPromise();
-  }
-
-  private getToNeoSwapPath(
-    fromToken: Token,
-    inputAmount: string
-  ): Promise<string[]> {
-    if (fromToken.symbol === 'nNEO') {
-      return of(['nNEO']).toPromise();
-    }
-    return this.apiService
-      .getSwapPath(
-        fromToken.symbol,
-        'nNEO',
-        this.getAmountIn(fromToken, inputAmount)
-      )
-      .pipe(
-        map((res: AssetQueryResponse) => {
-          if (res.length > 0) {
-            return res[0].swapPath;
-          } else {
-            return [];
-          }
-        })
-      )
-      .toPromise();
-  }
   getAmountIn(fromToken: Token, inputAmount: string): string {
     const factAmount = new BigNumber(inputAmount)
       .dividedBy(ALL_PERCENTAGE)

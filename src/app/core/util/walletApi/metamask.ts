@@ -16,11 +16,12 @@ import {
 import { Store } from '@ngrx/store';
 import BigNumber from 'bignumber.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { CommonService } from '../common.service';
 import { SwapService } from '../swap.service';
 import Web3 from 'web3';
-import * as SwapperJson from 'src/assets/contracts-json/eth-swapper.json';
+import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 
 interface State {
   swap: SwapStateType;
@@ -38,8 +39,10 @@ export class MetaMaskWalletApiService {
   ethereum;
   isConnected: boolean;
   web3;
+  SwapperJson;
 
   constructor(
+    private http: HttpClient,
     private store: Store<State>,
     private nzMessage: NzMessageService,
     private swapService: SwapService,
@@ -60,6 +63,7 @@ export class MetaMaskWalletApiService {
     }
     this.web3 = new Web3((window as any).ethereum);
     this.ethereum = (window as any).ethereum;
+    this.getSwapperJson();
     this.ethereum
       .request({ method: 'eth_requestAccounts' })
       .then((result) => {
@@ -97,24 +101,25 @@ export class MetaMaskWalletApiService {
       });
   }
 
-  swapCrossChain(
+  async swapCrossChain(
     fromToken: Token,
     toToken: Token,
     inputAmount: string,
     fromAddress: string,
     toAddress: string
-  ): void {
+  ): Promise<void> {
+    const json = await this.getSwapperJson();
     const swapContract = new this.web3.eth.Contract(
-      SwapperJson,
+      json,
       ETH_SWAP_CONTRACT_HASH
     );
     swapContract.methods
       .swap(
-        fromToken.assetID, // fromAssetHash
+        `0x${fromToken.assetID}`, // fromAssetHash
         1, // toPoolId
         toToken.chainId, // toChainId
         toAddress, // toAddress
-        inputAmount, // amount
+        new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
         0, // fee
         1 // id
       )
@@ -157,7 +162,23 @@ export class MetaMaskWalletApiService {
   }
 
   //#region
-  updateAccount(data: string): void {
+  private getSwapperJson(): Promise<any> {
+    if (this.SwapperJson) {
+      return of(this.SwapperJson).toPromise();
+    }
+    return this.http
+      .get('assets/contracts-json/eth-swapper.json')
+      .pipe(
+        map((res) => {
+          console.log(res);
+          this.SwapperJson = res;
+          return res;
+        })
+      )
+      .toPromise();
+  }
+
+  private updateAccount(data: string): void {
     if (this.ethWalletName === 'MetaMask') {
       this.store.dispatch({
         type: UPDATE_ETH_ACCOUNT,
@@ -178,7 +199,7 @@ export class MetaMaskWalletApiService {
     }
   }
 
-  updateWalletName(data: string): void {
+  private updateWalletName(data: string): void {
     if (this.ethWalletName === 'MetaMask') {
       this.store.dispatch({
         type: UPDATE_ETH_WALLET_NAME,

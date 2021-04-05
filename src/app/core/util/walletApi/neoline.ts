@@ -146,6 +146,13 @@ export class NeolineWalletApiService {
       toToken,
       amount: inputAmount,
     };
+    if (addLister === false) {
+      pendingTx.progress = {
+        step1: { hash: '', status: 1 },
+        step2: { hash: '', status: 0 },
+        step3: { hash: '', status: 0 },
+      };
+    }
     this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
     if (addLister) {
       window.addEventListener(
@@ -282,7 +289,7 @@ export class NeolineWalletApiService {
       this.nzMessage.error('Insufficient balance');
       return;
     }
-    const toNeoswapPath = await this.swapService.getToStandardSwapPath(
+    const toNeoswapPath = await this.apiService.getToStandardSwapPath(
       fromToken,
       inputAmount
     );
@@ -358,7 +365,7 @@ export class NeolineWalletApiService {
       this.nzMessage.error('Insufficient balance');
       return;
     }
-    const toNeoswapPath = await this.swapService.getToStandardSwapPath(
+    const toNeoswapPath = await this.apiService.getToStandardSwapPath(
       fromToken,
       inputAmount
     );
@@ -400,7 +407,7 @@ export class NeolineWalletApiService {
       },
       {
         type: 'Integer', // toChainID (目标链id)
-        value: 7,
+        value: 2,
       },
       {
         type: 'Integer',

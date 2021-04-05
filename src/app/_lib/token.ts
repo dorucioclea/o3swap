@@ -172,7 +172,7 @@ const ETH_TOKENS: Token[] = [
     atNeoAssetName: 'pnWETH',
   },
   {
-    assetID: '6ee856ae55b6e1a249f04cd3b947141bc146273c',
+    assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
     symbol: 'USDT',
     decimals: 6,
     amount: '0',
@@ -202,7 +202,7 @@ const BSC_TOKENS: Token[] = [
     assetID:
       NEOLINE_NETWORK === 'MainNet'
         ? ''
-        : '8301f2213c0eed49a7e28ae4c3e91722919b8b47',
+        : '74A7f2A3aFa8B0CB577985663B5811901A860619',
     symbol: 'BUSD',
     decimals: 6,
     amount: '0',
@@ -218,7 +218,7 @@ const HECO_TOKENS: Token[] = [
     assetID:
       NEOLINE_NETWORK === 'MainNet'
         ? ''
-        : 'f58e4a9d111fba6f74f0eedaa275fb5a6806d67b',
+        : '77e8eBD5B2D7cD984e6Ae05a809409c795Bf9b04',
     symbol: 'HUSD',
     decimals: 8,
     amount: '0',
