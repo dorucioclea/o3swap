@@ -45,7 +45,7 @@ section.wrapper {
       background-position: center;
       background-repeat: no-repeat;
       background-size: 100% auto;
-      cursor: pointer;
+      // cursor: pointer;
       &:not(:first-child) {
         margin-top: 16px;
       }
@@ -55,17 +55,17 @@ section.wrapper {
       }
       &.all {
         background-image: url("/assets/images/chains/all.png");
-        &:hover,
-        &.active {
-          background-image: url("/assets/images/chains/all-active.png");
-        }
+        // &:hover,
+        // &.active {
+        //   background-image: url("/assets/images/chains/all-active.png");
+        // }
       }
       &.eth {
         background-image: url("/assets/images/chains/eth.png");
-        &:hover,
-        &.active {
-          background-image: url("/assets/images/chains/eth-active.png");
-        }
+        // &:hover,
+        // &.active {
+        //   background-image: url("/assets/images/chains/eth-active.png");
+        // }
       }
       &.neo {
         background-image: url("/assets/images/chains/neo.png");
@@ -76,17 +76,17 @@ section.wrapper {
       }
       &.bsc {
         background-image: url("/assets/images/chains/bsc.png");
-        &:hover,
-        &.active {
-          background-image: url("/assets/images/chains/bsc-active.png");
-        }
+        // &:hover,
+        // &.active {
+        //   background-image: url("/assets/images/chains/bsc-active.png");
+        // }
       }
       &.heco {
         background-image: url("/assets/images/chains/heco.png");
-        &:hover,
-        &.active {
-          background-image: url("/assets/images/chains/heco-active.png");
-        }
+        // &:hover,
+        // &.active {
+        //   background-image: url("/assets/images/chains/heco-active.png");
+        // }
       }
     }
   }

@@ -82,7 +82,8 @@ header {
     }
   }
   .connect {
-    min-width: 310px;
+    min-width: 190px;
+    // min-width: 310px;
     display: flex;
     .wallet {
       position: relative;
@@ -209,14 +210,14 @@ footer {
       background-position: center;
       background-repeat: no-repeat;
       background-size: 100% auto;
-      cursor: pointer;
+      // cursor: pointer;
       margin-top: 16px;
       &.eth {
         background-image: url("/assets/images/chains/eth.png");
-        &:hover,
-        &.active {
-          background-image: url("/assets/images/chains/eth-active.png");
-        }
+        // &:hover,
+        // &.active {
+        //   background-image: url("/assets/images/chains/eth-active.png");
+        // }
       }
       &.neo {
         background-image: url("/assets/images/chains/neo.png");
@@ -227,17 +228,17 @@ footer {
       }
       &.bsc {
         background-image: url("/assets/images/chains/bsc.png");
-        &:hover,
-        &.active {
-          background-image: url("/assets/images/chains/bsc-active.png");
-        }
+        // &:hover,
+        // &.active {
+        //   background-image: url("/assets/images/chains/bsc-active.png");
+        // }
       }
       &.heco {
         background-image: url("/assets/images/chains/heco.png");
-        &:hover,
-        &.active {
-          background-image: url("/assets/images/chains/heco-active.png");
-        }
+        // &:hover,
+        // &.active {
+        //   background-image: url("/assets/images/chains/heco-active.png");
+        // }
       }
     }
   }

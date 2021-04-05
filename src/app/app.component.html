@@ -8,12 +8,12 @@
         <li [ngClass]="{active: isHome}">
           <a routerLink="/">Home</a>
         </li>
-        <!-- <li [ngClass]="{active: currentPage==='/swap'}">
+        <li [ngClass]="{active: currentPage==='/swap'}">
           <a routerLink="/swap">Swap</a>
-        </li> -->
-        <li>
-          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Swap</a>
         </li>
+        <!-- <li>
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Swap</a>
+        </li> -->
         <li class="add-width">
           <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Buy Crypto</a>
         </li>
@@ -115,8 +115,7 @@
             <button class="disconnect" (click)="disConnect('HECO')">Disconnect</button>
           </div>
         </div>
-        <div class="connect-btn" *ngIf="!neoWalletName||!ethWalletName||!bscWalletName||!hecoWalletName"
-          (click)="showConnect()">
+        <div class="connect-btn" *ngIf="!neoWalletName" (click)="showConnect()">
           <img src="/assets/images/swap/link.png" alt="">
           <span>Connect Wallet</span>
         </div>
@@ -134,10 +133,10 @@
     </div>
     <p class="title">Connect wallet</p>
     <div class="chains">
-      <span class="eth" [ngClass]="{active: connectChainType==='ETH'}" (click)="connectChainType='ETH'"></span>
+      <span class="eth" [ngClass]="{active: connectChainType==='ETH'}"></span>
       <span class="neo" [ngClass]="{active: connectChainType==='NEO'}" (click)="connectChainType='NEO'"></span>
-      <span class="bsc" [ngClass]="{active: connectChainType==='BSC'}" (click)="connectChainType='BSC'"></span>
-      <span class="heco" [ngClass]="{active: connectChainType==='HECO'}" (click)="connectChainType='HECO'"></span>
+      <span class="bsc" [ngClass]="{active: connectChainType==='BSC'}"></span>
+      <span class="heco" [ngClass]="{active: connectChainType==='HECO'}"></span>
     </div>
     <p class="wallet-type">{{ connectChainType }} Wallet</p>
     <ul class="wallets" *ngIf="connectChainType==='ETH'">
