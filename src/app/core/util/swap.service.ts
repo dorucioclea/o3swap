@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import BigNumber from 'bignumber.js';
-import { from, of } from 'rxjs';
+import { of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
   AssetQueryResponse,
@@ -15,8 +15,6 @@ import {
 import { ApiService } from '../api/api.service';
 import { CommonService } from './common.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import * as crypto from 'crypto-js';
-import { ethers } from 'ethers';
 
 @Injectable()
 export class SwapService {
@@ -26,7 +24,10 @@ export class SwapService {
     private nzMessage: NzMessageService
   ) {}
 
-  getToStandardSwapPath(fromToken: Token, inputAmount: string): Promise<string[]> {
+  getToStandardSwapPath(
+    fromToken: Token,
+    inputAmount: string
+  ): Promise<string[]> {
     if (NEOLINE_NETWORK === 'MainNet') {
       return this.getToFusdtSwapPath(fromToken, inputAmount);
     } else {
@@ -116,10 +117,6 @@ export class SwapService {
   getNeoAssetHashByName(name: string): string {
     const token = ALL_NEO_TOKENS.find((item) => item.symbol === name);
     return (token && token.assetID) || '';
-  }
-  getNeoAssetLogoByName(name: string): string {
-    const token = ALL_NEO_TOKENS.find((item) => item.symbol === name);
-    return (token && token.logo) || '';
   }
   getHash160FromAddress(text: string): any {
     if (text.startsWith('0x')) {

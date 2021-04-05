@@ -6,6 +6,7 @@ export interface Token {
   amount: string;
   decimals: number;
   chain: CHAINS;
+  chainId?: number;
   rateName: string;
   atNeoAssetName?: string;
 }
@@ -165,6 +166,7 @@ const ETH_TOKENS: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'ETH',
+    chainId: 2,
     rateName: 'eth',
     logo: '/assets/images/tokens/eth.png',
     atNeoAssetName: 'pnWETH',
@@ -174,8 +176,9 @@ const ETH_TOKENS: Token[] = [
     symbol: 'USDT',
     decimals: 6,
     amount: '0',
-    rateName: 'eth',
+    rateName: 'usdt',
     chain: 'ETH',
+    chainId: 2,
     logo: '/assets/images/tokens/usdt.png',
     atNeoAssetName: 'pnUSDT',
   },
@@ -191,6 +194,7 @@ const BSC_TOKENS: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'BSC',
+    chainId: 79,
     rateName: 'eth',
     logo: '/assets/images/tokens/eth.png',
   },
@@ -203,7 +207,8 @@ const BSC_TOKENS: Token[] = [
     decimals: 6,
     amount: '0',
     chain: 'BSC',
-    rateName: 'eth',
+    chainId: 79,
+    rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
   },
 ];
@@ -217,44 +222,41 @@ const HECO_TOKENS: Token[] = [
     symbol: 'HUSD',
     decimals: 8,
     amount: '0',
-    rateName: 'eth',
+    rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
+    chainId: 7,
   },
 ];
 
 const ALL: Token[] = [
   {
-    assetID:
-      NEOLINE_NETWORK === 'MainNet'
-        ? ''
-        : '0000000000000000000000000000000000000000',
+    assetID: '0000000000000000000000000000000000000000',
     symbol: 'ETH',
     decimals: 18,
     amount: '0',
-    logo: '/assets/images/tokens/eth.png',
-    rateName: 'eth',
     chain: 'ETH',
+    chainId: 2,
+    rateName: 'eth',
+    logo: '/assets/images/tokens/eth.png',
     atNeoAssetName: 'pnWETH',
   },
   {
-    assetID:
-      NEOLINE_NETWORK === 'MainNet'
-        ? ''
-        : '6ee856ae55b6e1a249f04cd3b947141bc146273c',
+    assetID: '6ee856ae55b6e1a249f04cd3b947141bc146273c',
     symbol: 'USDT',
     decimals: 6,
     amount: '0',
-    logo: '/assets/images/tokens/usdt.png',
     rateName: 'usdt',
     chain: 'ETH',
+    chainId: 2,
+    logo: '/assets/images/tokens/usdt.png',
     atNeoAssetName: 'pnUSDT',
   },
   {
     assetID:
       NEOLINE_NETWORK === 'MainNet'
-        ? ''
-        : 'f46719e2d16bf50cddcef9d4bbfece901f73cbb6',
+        ? 'f46719e2d16bf50cddcef9d4bbfece901f73cbb6'
+        : '17da3881ab2d050fea414c80b3fa8324d756f60e',
     symbol: 'nNEO',
     decimals: 8,
     amount: '0',
@@ -270,9 +272,10 @@ const ALL: Token[] = [
     symbol: 'BUSD',
     decimals: 6,
     amount: '0',
-    rateName: '',
     chain: 'BSC',
-    logo: '/assets/images/tokens/BUSD.png',
+    chainId: 79,
+    rateName: 'usdt',
+    logo: '/assets/images/tokens/usdt.png',
   },
   {
     assetID:
@@ -282,9 +285,10 @@ const ALL: Token[] = [
     symbol: 'HUSD',
     decimals: 8,
     amount: '0',
-    rateName: '',
+    rateName: 'usdt',
+    logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
-    logo: '/assets/images/tokens/HUSD.png',
+    chainId: 7,
   },
 ];
 

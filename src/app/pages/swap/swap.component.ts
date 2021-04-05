@@ -9,7 +9,6 @@ import {
   POLY_TX_PAGES_PREFIX,
   NEO_TX_PAGES_PREFIX,
   TxProgress,
-  DefaultTxProgress,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';

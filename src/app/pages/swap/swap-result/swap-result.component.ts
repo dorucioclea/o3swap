@@ -13,6 +13,7 @@ import {
   AssetQueryResponse,
   AssetQueryResponseItem,
   SwapStateType,
+  EthWalletName,
 } from '@lib';
 import {
   ApiService,
@@ -20,6 +21,7 @@ import {
   SwapService,
   NeolineWalletApiService,
   O3NeoWalletApiService,
+  MetaMaskWalletApiService,
 } from '@core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import BigNumber from 'bignumber.js';
@@ -66,7 +68,12 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   swap$: Observable<any>;
   neoAccountAddress: string;
   ethAccountAddress: string;
+  bscAccountAddress: string;
+  hecoAccountAddress: string;
   neoWalletName: NeoWalletName;
+  ethWalletName: EthWalletName;
+  bscWalletName: EthWalletName;
+  hecoWalletName: EthWalletName;
 
   TOKENS: Token[] = []; // 所有的 tokens
   o3SwapFee = O3SWAP_FEE_PERCENTAGE;
@@ -81,6 +88,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   price: string; // swap 比
   lnversePrice: string; // swap 反比
 
+  fromAddress: string;
+  toAddress: string;
+
   constructor(
     public store: Store<State>,
     private apiService: ApiService,
@@ -89,6 +99,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     private swapService: SwapService,
     private neolineWalletApiService: NeolineWalletApiService,
     private o3NeoWalletApiService: O3NeoWalletApiService,
+    private metaMaskWalletApiService: MetaMaskWalletApiService,
     private modal: NzModalService
   ) {
     this.swap$ = store.select('swap');
@@ -96,10 +107,16 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.getFromAndToAddress();
     this.swap$.subscribe((state) => {
       this.neoAccountAddress = state.neoAccountAddress;
       this.ethAccountAddress = state.ethAccountAddress;
+      this.bscAccountAddress = state.bscAccountAddress;
+      this.hecoAccountAddress = state.hecoAccountAddress;
       this.neoWalletName = state.neoWalletName;
+      this.ethWalletName = state.ethWalletName;
+      this.bscWalletName = state.bscWalletName;
+      this.hecoWalletName = state.hecoWalletName;
     });
     this.setting$.subscribe((state) => {
       this.slipValue = state.slipValue;
@@ -131,7 +148,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       .pipe(take(this.seconds))
       .subscribe((time) => {
         time++;
-        this.commonService.log(time);
         this.inquiryTime = this.seconds - time;
         if (time === this.seconds) {
           this.getSwapPathFun();
@@ -174,22 +190,41 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     });
   }
 
+  swap(): void {
+    if (this.checkWalletConnect() === false) {
+      return;
+    }
+    this.inquiryInterval.unsubscribe();
+    if (this.fromToken.symbol === 'NEO' && this.toToken.symbol === 'nNEO') {
+      this.mintNNeo();
+      return;
+    }
+    if (this.fromToken.symbol === 'nNEO' && this.toToken.symbol === 'NEO') {
+      this.releaseNeo();
+      return;
+    }
+    if (this.fromToken.chain === 'NEO' && this.toToken.chain === 'NEO') {
+      this.swapNeo();
+      return;
+    }
+    if (this.fromToken.chain === 'NEO' && this.toToken.chain === 'ETH') {
+      this.swapNeoCrossChainEth();
+      return;
+    }
+    if (this.fromToken.chain !== 'NEO' && this.toToken.chain !== 'NEO') {
+      this.swapCrossChainEth();
+      return;
+    }
+  }
+
+  //#region 合约调用
   reGetSwapPath(): void {
     this.inquiryInterval.unsubscribe();
     this.getSwapPathFun();
     this.setInquiryInterval();
   }
 
-  swapCrossChain(): void {
-    if (!this.neoAccountAddress) {
-      this.nzMessage.error('Please connect the NEO wallet first');
-      return;
-    }
-    if (!this.ethAccountAddress) {
-      this.nzMessage.error('Please connect the ETH wallet first');
-      return;
-    }
-    this.inquiryInterval.unsubscribe();
+  swapNeoCrossChainEth(): void {
     const swapApi =
       this.neoWalletName === 'NeoLine'
         ? this.neolineWalletApiService
@@ -213,11 +248,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   swapNeo(): void {
-    if (!this.neoAccountAddress) {
-      this.nzMessage.error('Please connect the NEO wallet first');
-      return;
-    }
-    this.inquiryInterval.unsubscribe();
     const swapApi =
       this.neoWalletName === 'NeoLine'
         ? this.neolineWalletApiService
@@ -240,11 +270,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   mintNNeo(): void {
-    if (!this.neoAccountAddress) {
-      this.nzMessage.error('Please connect the NEO wallet first');
-      return;
-    }
-    this.inquiryInterval.unsubscribe();
     const swapApi =
       this.neoWalletName === 'NeoLine'
         ? this.neolineWalletApiService
@@ -260,11 +285,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   releaseNeo(): void {
-    if (!this.neoAccountAddress) {
-      this.nzMessage.error('Please connect the NEO wallet first');
-      return;
-    }
-    this.inquiryInterval.unsubscribe();
     const swapApi =
       this.neoWalletName === 'NeoLine'
         ? this.neolineWalletApiService
@@ -284,24 +304,16 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       });
   }
 
-  swap(): void {
-    if (this.fromToken.symbol === 'NEO' && this.toToken.symbol === 'nNEO') {
-      this.mintNNeo();
-      return;
-    }
-    if (this.fromToken.symbol === 'nNEO' && this.toToken.symbol === 'NEO') {
-      this.releaseNeo();
-      return;
-    }
-    if (this.fromToken.chain === 'NEO' && this.toToken.chain === 'NEO') {
-      this.swapNeo();
-      return;
-    }
-    if (this.fromToken.chain === 'NEO' && this.toToken.chain !== 'NEO') {
-      this.swapCrossChain();
-      return;
-    }
+  swapCrossChainEth(): void {
+    this.metaMaskWalletApiService.swapCrossChain(
+      this.fromToken,
+      this.toToken,
+      this.inputAmount,
+      this.fromAddress,
+      this.toAddress
+    );
   }
+  //#endregion
 
   //#region
   getSwapPathFun(): void {
@@ -319,6 +331,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
           this.swapFail.emit();
         }
         if (res.length > 0) {
+          this.commonService.log(res);
           this.receiveSwapPathArray = res;
           this.handleReceiveSwapPathFiat();
         }
@@ -351,6 +364,67 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       .dividedBy(new BigNumber(this.chooseSwapPath.receiveAmount))
       .dp(7)
       .toFixed();
+  }
+  getFromAndToAddress(): void {
+    switch (this.fromToken.chain) {
+      case 'NEO':
+        this.fromAddress = this.neoAccountAddress;
+        break;
+      case 'ETH':
+        this.fromAddress = this.ethAccountAddress;
+        break;
+      case 'BSC':
+        this.fromAddress = this.bscAccountAddress;
+        break;
+      case 'HECO':
+        this.fromAddress = this.hecoAccountAddress;
+        break;
+    }
+    switch (this.toToken.chain) {
+      case 'NEO':
+        this.toAddress = this.neoAccountAddress;
+        break;
+      case 'ETH':
+        this.toAddress = this.ethAccountAddress;
+        break;
+      case 'BSC':
+        this.toAddress = this.bscAccountAddress;
+        break;
+      case 'HECO':
+        this.toAddress = this.hecoAccountAddress;
+        break;
+    }
+  }
+  checkWalletConnect(): boolean {
+    if (
+      (this.fromToken.chain === 'NEO' || this.toToken.chain === 'NEO') &&
+      !this.neoAccountAddress
+    ) {
+      this.nzMessage.error('Please connect the NEO wallet first');
+      return false;
+    }
+    if (
+      (this.fromToken.chain === 'ETH' || this.toToken.chain === 'ETH') &&
+      !this.ethAccountAddress
+    ) {
+      this.nzMessage.error('Please connect the ETH wallet first');
+      return false;
+    }
+    if (
+      (this.fromToken.chain === 'BSC' || this.toToken.chain === 'BSC') &&
+      !this.bscAccountAddress
+    ) {
+      this.nzMessage.error('Please connect the BSC wallet first');
+      return false;
+    }
+    if (
+      (this.fromToken.chain === 'HECO' || this.toToken.chain === 'HECO') &&
+      !this.hecoAccountAddress
+    ) {
+      this.nzMessage.error('Please connect the HECO wallet first');
+      return false;
+    }
+    return true;
   }
   //#endregion
 }

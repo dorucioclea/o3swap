@@ -3,7 +3,8 @@ export type NeoWalletName = 'O3' | 'NeoLine';
 export type EthWalletName = 'O3' | 'MetaMask';
 
 export const CHAIN_ID_ETHEREUM = 2;
-export const CHAIN_ID_ONTOLOGY = 3;
+export const CHAIN_ID_BSC = 79;
+export const CHAIN_ID_HECO = 7;
 export const CHAIN_ID_NEO = 4;
 
 export interface Wallet {
@@ -38,7 +39,39 @@ export const NEO_WALLETS: NeoWallet[] = [
 export const ETH_WALLETS: EthWallet[] = [
   {
     name: 'O3',
-    chainId: CHAIN_ID_NEO,
+    chainId: CHAIN_ID_ETHEREUM,
+    logo: '/assets/images/logo-O3.png',
+    downloadUrl: 'https://o3.network/#download',
+  },
+  {
+    name: 'MetaMask',
+    chainId: CHAIN_ID_ETHEREUM,
+    logo: '/assets/images/logo-MetaMask.png',
+    downloadUrl:
+      'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
+  },
+];
+
+export const BSC_WALLETS: EthWallet[] = [
+  {
+    name: 'O3',
+    chainId: CHAIN_ID_ETHEREUM,
+    logo: '/assets/images/logo-O3.png',
+    downloadUrl: 'https://o3.network/#download',
+  },
+  {
+    name: 'MetaMask',
+    chainId: CHAIN_ID_ETHEREUM,
+    logo: '/assets/images/logo-MetaMask.png',
+    downloadUrl:
+      'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
+  },
+];
+
+export const HECO_WALLETS: EthWallet[] = [
+  {
+    name: 'O3',
+    chainId: CHAIN_ID_ETHEREUM,
     logo: '/assets/images/logo-O3.png',
     downloadUrl: 'https://o3.network/#download',
   },

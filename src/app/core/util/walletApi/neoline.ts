@@ -131,6 +131,40 @@ export class NeolineWalletApiService {
     return true;
   }
 
+  handleTx(
+    fromToken: Token,
+    toToken: Token,
+    inputAmount: string,
+    txHash: string,
+    addLister = true
+  ): void {
+    const pendingTx: SwapTransaction = {
+      txid: txHash,
+      isPending: true,
+      min: false,
+      fromTokenName: fromToken.symbol,
+      toToken,
+      amount: inputAmount,
+    };
+    this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
+    if (addLister) {
+      window.addEventListener(
+        'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
+        (result: any) => {
+          this.commonService.log(result.detail.txid);
+          if (result.detail.txid === txHash) {
+            this.getBalances();
+            this.transaction.isPending = false;
+            this.store.dispatch({
+              type: UPDATE_PENDING_TX,
+              data: this.transaction,
+            });
+          }
+        }
+      );
+    }
+  }
+
   async mintNNeo(
     fromToken: Token, // neo
     toToken: Token, // nneo
@@ -155,29 +189,7 @@ export class NeolineWalletApiService {
       })
       .then(({ txid }) => {
         const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
-        const pendingTx: SwapTransaction = {
-          txid: txHash,
-          isPending: true,
-          min: false,
-          fromTokenName: fromToken.symbol,
-          toToken,
-          amount: inputAmount,
-        };
-        this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
-        window.addEventListener(
-          'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
-          (result: any) => {
-            this.commonService.log(result.detail.txid);
-            if (result.detail.txid === txHash) {
-              this.getBalances();
-              this.transaction.isPending = false;
-              this.store.dispatch({
-                type: UPDATE_PENDING_TX,
-                data: this.transaction,
-              });
-            }
-          }
-        );
+        this.handleTx(fromToken, toToken, inputAmount, txHash);
         return txHash;
       })
       .catch((error) => {
@@ -245,29 +257,7 @@ export class NeolineWalletApiService {
       .invoke(params)
       .then(({ txid }) => {
         const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
-        const pendingTx: SwapTransaction = {
-          txid: txHash,
-          isPending: true,
-          min: false,
-          fromTokenName: fromToken.symbol,
-          toToken,
-          amount: inputAmount,
-        };
-        this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
-        window.addEventListener(
-          'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
-          (result: any) => {
-            this.commonService.log(result.detail.txid);
-            if (result.detail.txid === txHash) {
-              this.getBalances();
-              this.transaction.isPending = false;
-              this.store.dispatch({
-                type: UPDATE_PENDING_TX,
-                data: this.transaction,
-              });
-            }
-          }
-        );
+        this.handleTx(fromToken, toToken, inputAmount, txHash);
         return txHash;
       })
       .catch((error) => {
@@ -340,29 +330,7 @@ export class NeolineWalletApiService {
       })
       .then(({ txid }) => {
         const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
-        const pendingTx: SwapTransaction = {
-          txid: txHash,
-          isPending: true,
-          min: false,
-          fromTokenName: fromToken.symbol,
-          toToken,
-          amount: inputAmount,
-        };
-        this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
-        window.addEventListener(
-          'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
-          (result: any) => {
-            this.commonService.log(result.detail.txid);
-            if (result.detail.txid === txHash) {
-              this.getBalances();
-              this.transaction.isPending = false;
-              this.store.dispatch({
-                type: UPDATE_PENDING_TX,
-                data: this.transaction,
-              });
-            }
-          }
-        );
+        this.handleTx(fromToken, toToken, inputAmount, txHash);
         return txHash;
       })
       .catch((error) => {
@@ -431,8 +399,8 @@ export class NeolineWalletApiService {
         value: this.swapService.getHash160FromAddress(toAddress),
       },
       {
-        type: 'Integer',
-        value: 2,
+        type: 'Integer', // toChainID (目标链id)
+        value: 7,
       },
       {
         type: 'Integer',
@@ -455,24 +423,7 @@ export class NeolineWalletApiService {
       })
       .then(({ txid }) => {
         const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
-        const pendingTx: SwapTransaction = {
-          txid: txHash,
-          isPending: true,
-          min: false,
-          fromTokenName: fromToken.symbol,
-          toToken,
-          amount: inputAmount,
-        };
-        this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
-        window.addEventListener(
-          'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
-          (result: any) => {
-            this.commonService.log(result.detail.txid);
-            if (result.detail.txid === txHash) {
-              this.getBalances();
-            }
-          }
-        );
+        this.handleTx(fromToken, toToken, inputAmount, txHash, false);
         return txHash;
       })
       .catch((error) => {
