@@ -44,7 +44,6 @@ export class O3EthWalletApiService {
         this.accountAddress = res.result[0];
         let dispatchAccountType;
         let dispatchWalletNameType;
-        console.log(chain);
         switch (chain) {
           case 'ETH':
             dispatchAccountType = UPDATE_ETH_ACCOUNT;
