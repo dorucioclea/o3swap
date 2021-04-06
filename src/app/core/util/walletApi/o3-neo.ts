@@ -392,6 +392,7 @@ export class O3NeoWalletApiService {
       o3dapi.NEO.addEventListener(
         o3dapi.NEO.Constants.EventName.TRANSACTION_CONFIRMED,
         (result) => {
+          console.log(result);
           if ((txHash as string).includes(result.txid)) {
             this.getBalances();
             this.transaction.isPending = false;
