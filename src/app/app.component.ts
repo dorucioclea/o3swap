@@ -3,6 +3,8 @@ import { Router, RouterEvent, NavigationEnd } from '@angular/router';
 import {
   ETH_WALLETS,
   NEO_WALLETS,
+  BSC_WALLETS,
+  HECO_WALLETS,
   NeoWalletName,
   EthWalletName,
   UPDATE_NEO_ACCOUNT,
@@ -42,6 +44,8 @@ interface State {
 export class AppComponent implements OnInit {
   NEO_WALLETS = NEO_WALLETS;
   ETH_WALLETS = ETH_WALLETS;
+  BSC_WALLETS = BSC_WALLETS;
+  HECO_WALLETS = HECO_WALLETS;
   currentPage = this.router.url;
   isHome = true;
   connectChainType: ConnectChainType = 'NEO';

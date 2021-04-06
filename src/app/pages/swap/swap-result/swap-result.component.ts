@@ -305,13 +305,20 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   swapCrossChainEth(): void {
-    this.metaMaskWalletApiService.swapCrossChain(
-      this.fromToken,
-      this.toToken,
-      this.inputAmount,
-      this.fromAddress,
-      this.toAddress
-    );
+    this.metaMaskWalletApiService
+      .swapCrossChain(
+        this.fromToken,
+        this.toToken,
+        this.inputAmount,
+        this.fromAddress,
+        this.toAddress
+      )
+      .then((res) => {
+        console.log(res);
+        if (res) {
+          this.closePage.emit();
+        }
+      });
   }
   //#endregion
 
@@ -319,12 +326,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   getSwapPathFun(): void {
     this.chooseSwapPath = null;
     this.apiService
-      .getSwapPath(
-        this.fromToken.symbol,
-        this.toToken,
-        this.swapService.getAmountIn(this.fromToken, this.inputAmount),
-        this.inputAmount
-      )
+      .getSwapPath(this.fromToken, this.toToken, this.inputAmount)
       .subscribe((res) => {
         this.showInquiry = false;
         if (res.length === 0) {

@@ -1,17 +1,18 @@
+import { NETWORK } from './network';
+
 export type WalletName = 'O3' | 'NeoLine' | 'MetaMask';
 export type NeoWalletName = 'O3' | 'NeoLine';
 export type EthWalletName = 'O3' | 'MetaMask';
 
-export const CHAIN_ID_ETHEREUM = 2;
-export const CHAIN_ID_BSC = 79;
-export const CHAIN_ID_HECO = 7;
-export const CHAIN_ID_NEO = 4;
+export const METAMASK_CHAIN_ID = {
+  BSC: NETWORK === 'MainNet' ? 56 : 97,
+  HECO: NETWORK === 'MainNet' ? 128 : 256,
+  ETH: NETWORK === 'MainNet' ? 1 : 3,
+};
 
 export interface Wallet {
   name: WalletName;
-  chainId: number;
   logo: string;
-  downloadUrl: string;
 }
 
 export interface NeoWallet extends Wallet {
@@ -23,63 +24,35 @@ export interface EthWallet extends Wallet {
 export const NEO_WALLETS: NeoWallet[] = [
   {
     name: 'O3',
-    chainId: CHAIN_ID_NEO,
     logo: '/assets/images/logo-O3.png',
-    downloadUrl: 'https://o3.network/#download',
   },
   {
     name: 'NeoLine',
-    chainId: CHAIN_ID_NEO,
     logo: '/assets/images/logo-NeoLine.png',
-    downloadUrl:
-      'https://chrome.google.com/webstore/detail/neoline/cphhlgmgameodnhkjdmkpanlelnlohao',
   },
 ];
 
 export const ETH_WALLETS: EthWallet[] = [
   {
     name: 'O3',
-    chainId: CHAIN_ID_ETHEREUM,
     logo: '/assets/images/logo-O3.png',
-    downloadUrl: 'https://o3.network/#download',
   },
   {
     name: 'MetaMask',
-    chainId: CHAIN_ID_ETHEREUM,
     logo: '/assets/images/logo-MetaMask.png',
-    downloadUrl:
-      'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
   },
 ];
 
 export const BSC_WALLETS: EthWallet[] = [
   {
-    name: 'O3',
-    chainId: CHAIN_ID_ETHEREUM,
-    logo: '/assets/images/logo-O3.png',
-    downloadUrl: 'https://o3.network/#download',
-  },
-  {
     name: 'MetaMask',
-    chainId: CHAIN_ID_ETHEREUM,
     logo: '/assets/images/logo-MetaMask.png',
-    downloadUrl:
-      'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
   },
 ];
 
 export const HECO_WALLETS: EthWallet[] = [
   {
-    name: 'O3',
-    chainId: CHAIN_ID_ETHEREUM,
-    logo: '/assets/images/logo-O3.png',
-    downloadUrl: 'https://o3.network/#download',
-  },
-  {
     name: 'MetaMask',
-    chainId: CHAIN_ID_ETHEREUM,
     logo: '/assets/images/logo-MetaMask.png',
-    downloadUrl:
-      'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
   },
 ];

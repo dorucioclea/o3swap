@@ -14,16 +14,22 @@ import {
   NNEO_TOKEN,
   ALL_NEO_TOKENS,
   CHAIN_TOKENS,
+  NETWORK,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { CommonService } from '../util/common.service';
+import { SwapService } from '../util/swap.service';
 
 @Injectable()
 export class ApiService {
   apiDo = environment.apiDomain;
   RATE_HOST = 'https://hub.o3.network/v1';
 
-  constructor(private http: HttpClient, private commonService: CommonService) {}
+  constructor(
+    private http: HttpClient,
+    private commonService: CommonService,
+    private swapService: SwapService
+  ) {}
 
   postEmail(email: string): Observable<any> {
     return this.http.post(`https://subscribe.o3swap.com/subscribe`, { email });
@@ -94,23 +100,14 @@ export class ApiService {
   }
 
   getSwapPath(
-    fromAssetName: string,
-    toToken: Token | string,
-    amount: string,
-    inputAmount?: string
+    fromToken: Token,
+    toToken: Token,
+    inputAmount: string
   ): Observable<AssetQueryResponse> {
-    let toAssetName: string;
-    if (typeof toToken === 'string') {
-      toAssetName = toToken;
-    } else {
-      toAssetName = toToken.symbol;
-      if (toToken.chain !== 'NEO') {
-        toAssetName = toToken.atNeoAssetName;
-      }
-    }
-    let neoNNeoRes;
-    if (fromAssetName === 'NEO' && (toToken as Token).symbol === 'nNEO') {
-      neoNNeoRes = [
+    let noRequestRes;
+    // neo => nneo
+    if (fromToken.symbol === 'NEO' && toToken.symbol === 'nNEO') {
+      noRequestRes = [
         {
           amount: [
             inputAmount,
@@ -122,8 +119,9 @@ export class ApiService {
         },
       ];
     }
-    if (fromAssetName === 'nNEO' && (toToken as Token).symbol === 'NEO') {
-      neoNNeoRes = [
+    // nneo => neo
+    if (fromToken.symbol === 'nNEO' && toToken.symbol === 'NEO') {
+      noRequestRes = [
         {
           amount: [
             new BigNumber(inputAmount)
@@ -135,13 +133,31 @@ export class ApiService {
         },
       ];
     }
-    this.commonService.log(neoNNeoRes);
-    if (neoNNeoRes) {
-      return of(this.handleReceiveSwapPathFiat(neoNNeoRes, toToken));
+    if (fromToken.chain !== 'NEO' && toToken.chain !== 'NEO') {
+      noRequestRes = [
+        {
+          amount: [
+            new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed(),
+            new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed(),
+          ],
+          swapPath: [fromToken.symbol, toToken.symbol],
+        },
+      ];
     }
+    this.commonService.log(noRequestRes);
+    if (noRequestRes) {
+      return of(this.handleReceiveSwapPathFiat(noRequestRes, toToken));
+    }
+    // swap from neo
+    let toAssetName: string;
+    toAssetName = toToken.symbol;
+    if (toToken.chain !== 'NEO') {
+      toAssetName = toToken.atNeoAssetName;
+    }
+    const amount = this.swapService.getAmountIn(fromToken, inputAmount);
     return this.http
       .post(
-        `${INQUIRY_HOST}?StartAsset=${fromAssetName}&EndAsset=${toAssetName}&amount=${amount}`,
+        `${INQUIRY_HOST}?StartAsset=${fromToken.symbol}&EndAsset=${toAssetName}&amount=${amount}`,
         null
       )
       .pipe(
@@ -153,6 +169,23 @@ export class ApiService {
           }
         })
       );
+  }
+
+  getToStandardSwapPath(
+    fromToken: Token,
+    inputAmount: string
+  ): Promise<string[]> {
+    if (NETWORK === 'MainNet') {
+      if (fromToken.symbol === 'fUSDT') {
+        return of(['fUSDT']).toPromise();
+      }
+      return this.getToStandardSwapPathReq(fromToken, 'fUSDT', inputAmount);
+    } else {
+      if (fromToken.symbol === 'nNEO') {
+        return of(['nNEO']).toPromise();
+      }
+      return this.getToStandardSwapPathReq(fromToken, 'nNEO', inputAmount);
+    }
   }
 
   getRates(): Observable<any> {
@@ -171,6 +204,30 @@ export class ApiService {
     );
   }
 
+  //#region
+  private getToStandardSwapPathReq(
+    fromToken: Token,
+    toAssetName: string,
+    inputAmount: string
+  ): Promise<string[]> {
+    const amount = this.swapService.getAmountIn(fromToken, inputAmount);
+    return this.http
+      .post(
+        `${INQUIRY_HOST}?StartAsset=${fromToken.symbol}&EndAsset=${toAssetName}&amount=${amount}`,
+        null
+      )
+      .pipe(
+        map((res: AssetQueryResponse) => {
+          if (res.length > 0) {
+            return res[0].swapPath;
+          } else {
+            return [];
+          }
+        })
+      )
+      .toPromise();
+  }
+
   private getNeoAssetLogoByName(name: string): string {
     const token1 = ALL_NEO_TOKENS.find((item) => item.symbol === name);
     const token2 = CHAIN_TOKENS.ETH.find((item) => item.symbol === name);
@@ -180,7 +237,7 @@ export class ApiService {
     return token && token.logo;
   }
 
-  handleReceiveSwapPathFiat(
+  private handleReceiveSwapPathFiat(
     swapPathArr: AssetQueryResponse,
     toToken: Token | string
   ): AssetQueryResponse {
@@ -198,7 +255,7 @@ export class ApiService {
     return this.shellSortSwapPath(swapPathArr);
   }
 
-  shellSortSwapPath(arr: any[]): any[] {
+  private shellSortSwapPath(arr: any[]): any[] {
     const len = arr.length;
     let temp;
     let gap = 1;
@@ -225,4 +282,5 @@ export class ApiService {
     }
     return arr;
   }
+  //#endregion
 }

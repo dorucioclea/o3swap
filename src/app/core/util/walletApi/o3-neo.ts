@@ -18,7 +18,8 @@ import {
   UPDATE_PENDING_TX,
   SwapTransaction,
   NEO_NNEO_CONTRACT_HASH,
-  NEOLINE_NETWORK,
+  NETWORK,
+  SWAP_CONTRACT_CHAIN_ID,
 } from '@lib';
 import { Observable } from 'rxjs';
 import { wallet } from '@cityofzion/neon-js';
@@ -68,80 +69,6 @@ export class O3NeoWalletApiService {
       .catch((error) => {
         this.swapService.handleNeoDapiError(error, 'O3');
       });
-  }
-
-  getBalances(
-    fromTokenAssetId?: string,
-    inputAmount?: string
-  ): Promise<boolean> {
-    if (NEOLINE_NETWORK === 'TestNet') {
-      this.store.dispatch({
-        type: UPDATE_NEO_BALANCES,
-        data: {},
-      });
-      return;
-    }
-    return o3dapi.NEO.getBalance({
-      params: [{ address: this.accountAddress }],
-      network: NEOLINE_NETWORK,
-    })
-      .then((addressTokens: any[]) => {
-        const tokens = addressTokens[this.accountAddress];
-        const tempTokenBalance = {};
-        tokens.forEach((tokenItem: any) => {
-          tempTokenBalance[tokenItem.asset_id || tokenItem.assetID] = tokenItem;
-        });
-        this.store.dispatch({
-          type: UPDATE_NEO_BALANCES,
-          data: tempTokenBalance,
-        });
-        if (
-          tempTokenBalance[fromTokenAssetId] &&
-          new BigNumber(tempTokenBalance[fromTokenAssetId].amount).comparedTo(
-            new BigNumber(inputAmount)
-          ) >= 0
-        ) {
-          return true;
-        } else {
-          return false;
-        }
-      })
-      .catch((error) => {
-        this.swapService.handleNeoDapiError(error, 'O3');
-      });
-  }
-
-  handleTx(
-    fromToken: Token,
-    toToken: Token,
-    inputAmount: string,
-    txHash: string,
-    addLister = true
-  ): void {
-    const pendingTx: SwapTransaction = {
-      txid: txHash,
-      isPending: true,
-      min: false,
-      fromTokenName: fromToken.symbol,
-      toToken,
-      amount: inputAmount,
-    };
-    this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
-    if (addLister) {
-      o3dapi.NEO.addEventListener(
-        o3dapi.NEO.Constants.EventName.TRANSACTION_CONFIRMED,
-        (result) => {
-          if ((txHash as string).includes(result.txid)) {
-            this.getBalances();
-            this.transaction.isPending = false;
-            this.store.dispatch({
-              type: UPDATE_PENDING_TX,
-              data: this.transaction,
-            });
-          }
-        }
-      );
-    }
   }
 
   async mintNNeo(
@@ -250,7 +177,7 @@ export class O3NeoWalletApiService {
       this.nzMessage.error('Insufficient balance');
       return;
     }
-    const toNeoswapPath = await this.swapService.getToStandardSwapPath(
+    const toNeoswapPath = await this.apiService.getToStandardSwapPath(
       fromToken,
       inputAmount
     );
@@ -321,7 +248,7 @@ export class O3NeoWalletApiService {
       this.nzMessage.error('Insufficient balance');
       return;
     }
-    const toNeoswapPath = await this.swapService.getToStandardSwapPath(
+    const toNeoswapPath = await this.apiService.getToStandardSwapPath(
       fromToken,
       inputAmount
     );
@@ -363,7 +290,7 @@ export class O3NeoWalletApiService {
       },
       {
         type: 'Integer', // toChainID (目标链id)
-        value: 2,
+        value: SWAP_CONTRACT_CHAIN_ID[toToken.chain],
       },
       {
         type: 'Integer', // ProjectIndex (项目序列号)
@@ -395,4 +322,88 @@ export class O3NeoWalletApiService {
         this.swapService.handleNeoDapiError(error, 'O3');
       });
   }
+
+  //#region
+  private getBalances(
+    fromTokenAssetId?: string,
+    inputAmount?: string
+  ): Promise<boolean> {
+    if (NETWORK === 'TestNet') {
+      this.store.dispatch({
+        type: UPDATE_NEO_BALANCES,
+        data: {},
+      });
+      return;
+    }
+    return o3dapi.NEO.getBalance({
+      params: [{ address: this.accountAddress }],
+      network: NETWORK,
+    })
+      .then((addressTokens: any[]) => {
+        const tokens = addressTokens[this.accountAddress];
+        const tempTokenBalance = {};
+        tokens.forEach((tokenItem: any) => {
+          tempTokenBalance[tokenItem.asset_id || tokenItem.assetID] = tokenItem;
+        });
+        this.store.dispatch({
+          type: UPDATE_NEO_BALANCES,
+          data: tempTokenBalance,
+        });
+        if (
+          tempTokenBalance[fromTokenAssetId] &&
+          new BigNumber(tempTokenBalance[fromTokenAssetId].amount).comparedTo(
+            new BigNumber(inputAmount)
+          ) >= 0
+        ) {
+          return true;
+        } else {
+          return false;
+        }
+      })
+      .catch((error) => {
+        this.swapService.handleNeoDapiError(error, 'O3');
+      });
+  }
+
+  private handleTx(
+    fromToken: Token,
+    toToken: Token,
+    inputAmount: string,
+    txHash: string,
+    addLister = true
+  ): void {
+    const pendingTx: SwapTransaction = {
+      txid: txHash,
+      isPending: true,
+      min: false,
+      fromTokenName: fromToken.symbol,
+      toToken,
+      amount: inputAmount,
+    };
+    if (addLister === false) {
+      pendingTx.progress = {
+        step1: { hash: '', status: 1 },
+        step2: { hash: '', status: 0 },
+        step3: { hash: '', status: 0 },
+      };
+    }
+    this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
+    if (addLister) {
+      o3dapi.NEO.addEventListener(
+        o3dapi.NEO.Constants.EventName.TRANSACTION_CONFIRMED,
+        (result) => {
+          this.commonService.log(result);
+          if ((txHash as string).includes(result.txid)) {
+            this.getBalances();
+            this.transaction.isPending = false;
+            this.store.dispatch({
+              type: UPDATE_PENDING_TX,
+              data: this.transaction,
+            });
+          }
+        }
+      );
+    }
+  }
+  //#endregion
 }

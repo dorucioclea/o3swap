@@ -1,4 +1,4 @@
-import { NEOLINE_NETWORK } from './network';
+import { NETWORK } from './network';
 export interface Token {
   symbol: string;
   logo: string;
@@ -6,7 +6,6 @@ export interface Token {
   amount: string;
   decimals: number;
   chain: CHAINS;
-  chainId?: number;
   rateName: string;
   atNeoAssetName?: string;
 }
@@ -14,7 +13,7 @@ export interface Token {
 const MIX_NEO_TOKENS: Token[] = [
   {
     assetID:
-      NEOLINE_NETWORK === 'MainNet'
+      NETWORK === 'MainNet'
         ? '0df563008be710f3e0130208f8adc95ed7e5518d'
         : '23535b6fd46b8f867ed010bab4c2bd8ef0d0c64f',
     symbol: 'pnWETH',
@@ -26,7 +25,7 @@ const MIX_NEO_TOKENS: Token[] = [
   },
   {
     assetID:
-      NEOLINE_NETWORK === 'MainNet'
+      NETWORK === 'MainNet'
         ? '282e3340d5a1cd6a461d5f558d91bc1dbc02a07b'
         : 'b8f78d43ea9fe006c85a26b9aff67bcf69dd4fe1',
     symbol: 'pnUSDT',
@@ -38,7 +37,7 @@ const MIX_NEO_TOKENS: Token[] = [
   },
   {
     assetID:
-      NEOLINE_NETWORK === 'MainNet'
+      NETWORK === 'MainNet'
         ? '534dcac35b0dfadc7b2d716a7a73a7067c148b37'
         : '69c57a716567a0f6910a0b3c1d4508fa163eb927',
     symbol: 'pnWBTC',
@@ -63,7 +62,7 @@ export const NEO_TOKENS: Token[] = [
   },
   {
     assetID:
-      NEOLINE_NETWORK === 'MainNet'
+      NETWORK === 'MainNet'
         ? 'f46719e2d16bf50cddcef9d4bbfece901f73cbb6'
         : '17da3881ab2d050fea414c80b3fa8324d756f60e',
     symbol: 'nNEO',
@@ -75,7 +74,7 @@ export const NEO_TOKENS: Token[] = [
   },
   {
     assetID:
-      NEOLINE_NETWORK === 'MainNet'
+      NETWORK === 'MainNet'
         ? '179a0db04a130dec6060cd9569d7ee7d7e8eccdc'
         : '9b2446d658859a96a7c40204d027bf5f9ca896e5',
     symbol: 'fWETH',
@@ -87,7 +86,7 @@ export const NEO_TOKENS: Token[] = [
   },
   {
     assetID:
-      NEOLINE_NETWORK === 'MainNet'
+      NETWORK === 'MainNet'
         ? '1aa893170b1babfefba973e9a9183990d792c2a7'
         : 'b55026d49bb5b585e1d2f9820efdc969f4b8cde6',
     symbol: 'fUSDT',
@@ -109,7 +108,7 @@ export const NEO_TOKENS: Token[] = [
   // },
   {
     assetID:
-      NEOLINE_NETWORK === 'MainNet'
+      NETWORK === 'MainNet'
         ? '3e09e602eeeb401a2fec8e8ea137d59aae54a139'
         : '806f018810c6f74c22d1b27fe4da2feec7298c58',
     symbol: 'SWTH',
@@ -121,7 +120,7 @@ export const NEO_TOKENS: Token[] = [
   },
   {
     assetID:
-      NEOLINE_NETWORK === 'MainNet'
+      NETWORK === 'MainNet'
         ? '4d9eab13620fe3569ba3b0e56e2877739e4145e3'
         : '083ea8071188c7fe5b5e4af96ded222670d76663',
     symbol: 'FLM',
@@ -133,7 +132,7 @@ export const NEO_TOKENS: Token[] = [
   },
   {
     assetID:
-      NEOLINE_NETWORK === 'MainNet'
+      NETWORK === 'MainNet'
         ? 'c277117879af3197fbef92c71e95800aa3b89d9a'
         : '658cabf9c1f71ba0fa64098a7c17e52b94046ece',
     symbol: 'pONT',
@@ -145,7 +144,7 @@ export const NEO_TOKENS: Token[] = [
   },
   {
     assetID:
-      NEOLINE_NETWORK === 'MainNet'
+      NETWORK === 'MainNet'
         ? '36a8f669d55bbfe99a3e9f7953745736bfa5453c'
         : 'aa94bb6ff87660da94bbe57c34e0373163b7ac93',
     symbol: 'fWBTC',
@@ -166,19 +165,17 @@ const ETH_TOKENS: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'ETH',
-    chainId: 2,
     rateName: 'eth',
     logo: '/assets/images/tokens/eth.png',
     atNeoAssetName: 'pnWETH',
   },
   {
-    assetID: '6ee856ae55b6e1a249f04cd3b947141bc146273c',
+    assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
     symbol: 'USDT',
     decimals: 6,
     amount: '0',
     rateName: 'usdt',
     chain: 'ETH',
-    chainId: 2,
     logo: '/assets/images/tokens/usdt.png',
     atNeoAssetName: 'pnUSDT',
   },
@@ -187,27 +184,21 @@ const ETH_TOKENS: Token[] = [
 const BSC_TOKENS: Token[] = [
   {
     assetID:
-      NEOLINE_NETWORK === 'MainNet'
-        ? ''
-        : '163f9d7a590e1921c1461bf6ed455b67e7877e95',
+      NETWORK === 'MainNet' ? '' : '163f9d7a590e1921c1461bf6ed455b67e7877e95',
     symbol: 'BETH',
     decimals: 18,
     amount: '0',
     chain: 'BSC',
-    chainId: 79,
     rateName: 'eth',
     logo: '/assets/images/tokens/eth.png',
   },
   {
     assetID:
-      NEOLINE_NETWORK === 'MainNet'
-        ? ''
-        : '8301f2213c0eed49a7e28ae4c3e91722919b8b47',
+      NETWORK === 'MainNet' ? '' : '74A7f2A3aFa8B0CB577985663B5811901A860619',
     symbol: 'BUSD',
     decimals: 6,
     amount: '0',
     chain: 'BSC',
-    chainId: 79,
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
   },
@@ -216,16 +207,13 @@ const BSC_TOKENS: Token[] = [
 const HECO_TOKENS: Token[] = [
   {
     assetID:
-      NEOLINE_NETWORK === 'MainNet'
-        ? ''
-        : 'f58e4a9d111fba6f74f0eedaa275fb5a6806d67b',
+      NETWORK === 'MainNet' ? '' : '77e8eBD5B2D7cD984e6Ae05a809409c795Bf9b04',
     symbol: 'HUSD',
     decimals: 8,
     amount: '0',
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
-    chainId: 7,
   },
 ];
 
@@ -236,7 +224,6 @@ const ALL: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'ETH',
-    chainId: 2,
     rateName: 'eth',
     logo: '/assets/images/tokens/eth.png',
     atNeoAssetName: 'pnWETH',
@@ -248,13 +235,12 @@ const ALL: Token[] = [
     amount: '0',
     rateName: 'usdt',
     chain: 'ETH',
-    chainId: 2,
     logo: '/assets/images/tokens/usdt.png',
     atNeoAssetName: 'pnUSDT',
   },
   {
     assetID:
-      NEOLINE_NETWORK === 'MainNet'
+      NETWORK === 'MainNet'
         ? 'f46719e2d16bf50cddcef9d4bbfece901f73cbb6'
         : '17da3881ab2d050fea414c80b3fa8324d756f60e',
     symbol: 'nNEO',
@@ -266,29 +252,23 @@ const ALL: Token[] = [
   },
   {
     assetID:
-      NEOLINE_NETWORK === 'MainNet'
-        ? ''
-        : '8301f2213c0eed49a7e28ae4c3e91722919b8b47',
+      NETWORK === 'MainNet' ? '' : '8301f2213c0eed49a7e28ae4c3e91722919b8b47',
     symbol: 'BUSD',
     decimals: 6,
     amount: '0',
     chain: 'BSC',
-    chainId: 79,
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
   },
   {
     assetID:
-      NEOLINE_NETWORK === 'MainNet'
-        ? ''
-        : 'f58e4a9d111fba6f74f0eedaa275fb5a6806d67b',
+      NETWORK === 'MainNet' ? '' : 'f58e4a9d111fba6f74f0eedaa275fb5a6806d67b',
     symbol: 'HUSD',
     decimals: 8,
     amount: '0',
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
-    chainId: 7,
   },
 ];
 
@@ -316,7 +296,7 @@ export const CrossChainToToken: Token = {
 export const NNEO_TOKEN: Token[] = [
   {
     assetID:
-      NEOLINE_NETWORK === 'MainNet'
+      NETWORK === 'MainNet'
         ? 'f46719e2d16bf50cddcef9d4bbfece901f73cbb6'
         : '17da3881ab2d050fea414c80b3fa8324d756f60e',
     symbol: 'nNEO',
