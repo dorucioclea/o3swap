@@ -17,8 +17,9 @@ import {
   UPDATE_PENDING_TX,
   SwapTransaction,
   NEO_NNEO_CONTRACT_HASH,
-  NeolineNetwork,
-  NEOLINE_NETWORK,
+  Network,
+  NETWORK,
+  SWAP_CONTRACT_CHAIN_ID,
 } from '@lib';
 import { Observable } from 'rxjs';
 import { wallet } from '@cityofzion/neon-js';
@@ -36,7 +37,7 @@ export class NeolineWalletApiService {
   swap$: Observable<any>;
   neoWalletName: NeoWalletName;
   transaction: SwapTransaction;
-  neolineNetwork: NeolineNetwork;
+  neolineNetwork: Network;
 
   neolineDapi;
 
@@ -91,7 +92,7 @@ export class NeolineWalletApiService {
     return this.neolineDapi
       .getBalance({
         params: [{ address: this.accountAddress }],
-        network: NEOLINE_NETWORK,
+        network: NETWORK,
       })
       .then((addressTokens: any[]) => {
         const tokens = addressTokens[this.accountAddress];
@@ -122,9 +123,9 @@ export class NeolineWalletApiService {
   }
 
   checkNetwork(): boolean {
-    if (this.neolineNetwork !== NEOLINE_NETWORK) {
+    if (this.neolineNetwork !== NETWORK) {
       this.nzMessage.error(
-        `Please switch network to ${NEOLINE_NETWORK} on NeoLine wallet.`
+        `Please switch network to ${NETWORK} on NeoLine wallet.`
       );
       return false;
     }
@@ -407,7 +408,7 @@ export class NeolineWalletApiService {
       },
       {
         type: 'Integer', // toChainID (目标链id)
-        value: 2,
+        value: SWAP_CONTRACT_CHAIN_ID[toToken.chain],
       },
       {
         type: 'Integer',
@@ -459,9 +460,9 @@ export class NeolineWalletApiService {
         type: UPDATE_NEOLINE_NETWORK,
         data: this.neolineNetwork,
       });
-      if (NEOLINE_NETWORK !== this.neolineNetwork) {
+      if (NETWORK !== this.neolineNetwork) {
         this.nzMessage.error(
-          `Please switch network to ${NEOLINE_NETWORK} on NeoLine wallet.`
+          `Please switch network to ${NETWORK} on NeoLine wallet.`
         );
       } else {
         this.getBalances();
@@ -475,9 +476,9 @@ export class NeolineWalletApiService {
           type: UPDATE_NEOLINE_NETWORK,
           data: this.neolineNetwork,
         });
-        if (NEOLINE_NETWORK !== this.neolineNetwork) {
+        if (NETWORK !== this.neolineNetwork) {
           this.nzMessage.error(
-            `Please switch network to ${NEOLINE_NETWORK} on NeoLine wallet.`
+            `Please switch network to ${NETWORK} on NeoLine wallet.`
           );
         } else {
           this.getBalances();

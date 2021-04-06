@@ -14,7 +14,7 @@ import {
   NNEO_TOKEN,
   ALL_NEO_TOKENS,
   CHAIN_TOKENS,
-  NEOLINE_NETWORK,
+  NETWORK,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { CommonService } from '../util/common.service';
@@ -175,7 +175,7 @@ export class ApiService {
     fromToken: Token,
     inputAmount: string
   ): Promise<string[]> {
-    if (NEOLINE_NETWORK === 'MainNet') {
+    if (NETWORK === 'MainNet') {
       if (fromToken.symbol === 'fUSDT') {
         return of(['fUSDT']).toPromise();
       }

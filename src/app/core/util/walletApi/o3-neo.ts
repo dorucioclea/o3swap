@@ -18,7 +18,8 @@ import {
   UPDATE_PENDING_TX,
   SwapTransaction,
   NEO_NNEO_CONTRACT_HASH,
-  NEOLINE_NETWORK,
+  NETWORK,
+  SWAP_CONTRACT_CHAIN_ID,
 } from '@lib';
 import { Observable } from 'rxjs';
 import { wallet } from '@cityofzion/neon-js';
@@ -74,7 +75,7 @@ export class O3NeoWalletApiService {
     fromTokenAssetId?: string,
     inputAmount?: string
   ): Promise<boolean> {
-    if (NEOLINE_NETWORK === 'TestNet') {
+    if (NETWORK === 'TestNet') {
       this.store.dispatch({
         type: UPDATE_NEO_BALANCES,
         data: {},
@@ -83,7 +84,7 @@ export class O3NeoWalletApiService {
     }
     return o3dapi.NEO.getBalance({
       params: [{ address: this.accountAddress }],
-      network: NEOLINE_NETWORK,
+      network: NETWORK,
     })
       .then((addressTokens: any[]) => {
         const tokens = addressTokens[this.accountAddress];
@@ -370,7 +371,7 @@ export class O3NeoWalletApiService {
       },
       {
         type: 'Integer', // toChainID (目标链id)
-        value: 2,
+        value: SWAP_CONTRACT_CHAIN_ID[toToken.chain],
       },
       {
         type: 'Integer', // ProjectIndex (项目序列号)

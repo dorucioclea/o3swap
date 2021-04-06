@@ -1,4 +1,5 @@
-import { Token } from '@lib';
+import { Network } from './network';
+import { Token } from './token';
 import { NeoWalletName, EthWalletName } from './wallet';
 
 export type TxProgress = {
@@ -17,8 +18,6 @@ export interface SwapTransaction {
   progress?: TxProgress;
 }
 
-export type NeolineNetwork = 'MainNet' | 'TestNet';
-
 export interface SwapStateType {
   neoWalletName: NeoWalletName;
   ethWalletName: EthWalletName;
@@ -29,7 +28,7 @@ export interface SwapStateType {
   bscAccountAddress: string;
   hecoAccountAddress: string;
   balances: object;
-  neolineNetwork: NeolineNetwork;
+  neolineNetwork: Network;
   metamaskNetworkId: number;
   transaction: SwapTransaction;
 }

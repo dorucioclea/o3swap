@@ -3,6 +3,7 @@ import {
   EthWalletName,
   ETH_SWAP_CONTRACT_HASH,
   SwapStateType,
+  SWAP_CONTRACT_CHAIN_ID,
   SWAP_CONTRACT_HASH,
   Token,
   UPDATE_BSC_ACCOUNT,
@@ -117,7 +118,7 @@ export class MetaMaskWalletApiService {
       .swap(
         `0x${fromToken.assetID}`, // fromAssetHash
         1, // toPoolId
-        toToken.chainId, // toChainId
+        SWAP_CONTRACT_CHAIN_ID[toToken.chain], // toChainId
         toAddress, // toAddress
         new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
         0, // fee

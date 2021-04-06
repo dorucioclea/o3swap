@@ -1,3 +1,3 @@
-import { NeolineNetwork } from './swap';
+export type Network = 'MainNet' | 'TestNet';
 
-export const NEOLINE_NETWORK: NeolineNetwork = 'TestNet';
+export const NETWORK: Network = 'TestNet';
