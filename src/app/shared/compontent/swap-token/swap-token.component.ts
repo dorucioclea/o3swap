@@ -72,7 +72,7 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
       ? this.myNNEO_TOKEN
       : this.myCHAIN_TOKENS[this.chain];
     this.allTokens = this.hideToken
-      ? tokens.filter((item) => item.assetID !== this.hideToken.assetID)
+      ? tokens.filter((item) => item.symbol !== this.hideToken.symbol)
       : tokens;
     this.allTokens = this.hideNeoToken
       ? this.allTokens.filter((item) => item.symbol !== 'NEO')
@@ -128,7 +128,7 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
       ? this.myNNEO_TOKEN
       : this.myCHAIN_TOKENS[this.chain];
     this.allTokens = this.hideToken
-      ? tokens.filter((item) => item.assetID !== this.hideToken.assetID)
+      ? tokens.filter((item) => item.symbol !== this.hideToken.symbol)
       : tokens;
     this.displayTokens = this.allTokens;
   }

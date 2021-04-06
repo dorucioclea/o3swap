@@ -2,9 +2,11 @@ import { Injectable } from '@angular/core';
 import {
   EthWalletName,
   ETH_SWAP_CONTRACT_HASH,
+  METAMASK_CHAIN_ID,
+  NETWORK,
   SwapStateType,
+  SwapTransaction,
   SWAP_CONTRACT_CHAIN_ID,
-  SWAP_CONTRACT_HASH,
   Token,
   UPDATE_BSC_ACCOUNT,
   UPDATE_BSC_WALLET_NAME,
@@ -13,11 +15,12 @@ import {
   UPDATE_HECO_ACCOUNT,
   UPDATE_HECO_WALLET_NAME,
   UPDATE_METAMASK_NETWORK_ID,
+  UPDATE_PENDING_TX,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import BigNumber from 'bignumber.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Unsubscribable } from 'rxjs';
 import { CommonService } from '../common.service';
 import { SwapService } from '../swap.service';
 import Web3 from 'web3';
@@ -31,11 +34,13 @@ interface State {
 export class MetaMaskWalletApiService {
   myWalletName: EthWalletName = 'MetaMask';
   accountAddress: string;
+  requestTxStatusInterval: Unsubscribable;
 
   swap$: Observable<any>;
   ethWalletName: EthWalletName;
   bscWalletName: EthWalletName;
   hecoWalletName: EthWalletName;
+  metamaskNetworkId: number;
 
   ethereum;
   isConnected: boolean;
@@ -54,6 +59,7 @@ export class MetaMaskWalletApiService {
       this.ethWalletName = state.ethWalletName;
       this.bscWalletName = state.bscWalletName;
       this.hecoWalletName = state.hecoWalletName;
+      this.metamaskNetworkId = state.metamaskNetworkId;
     });
   }
 
@@ -108,36 +114,85 @@ export class MetaMaskWalletApiService {
     inputAmount: string,
     fromAddress: string,
     toAddress: string
-  ): Promise<void> {
+  ): Promise<string> {
+    if (this.checkNetwork(fromToken) === false) {
+      return;
+    }
     const json = await this.getSwapperJson();
     const swapContract = new this.web3.eth.Contract(
       json,
       ETH_SWAP_CONTRACT_HASH
     );
-    swapContract.methods
-      .swap(
-        `0x${fromToken.assetID}`, // fromAssetHash
-        1, // toPoolId
-        SWAP_CONTRACT_CHAIN_ID[toToken.chain], // toChainId
-        toAddress, // toAddress
-        new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
-        0, // fee
-        1 // id
-      )
-      .send({ from: fromAddress })
-      .on('transactionHash', (hash) => {
-        console.log(hash);
+    try {
+      const hash: string = await new Promise((resolve, reject) => {
+        swapContract.methods
+          .swap(
+            `0x${fromToken.assetID}`, // fromAssetHash
+            1, // toPoolId
+            SWAP_CONTRACT_CHAIN_ID[toToken.chain], // toChainId
+            toAddress, // toAddress
+            new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
+            0, // fee
+            1 // id
+          )
+          .send({ from: fromAddress })
+          .on('error', reject)
+          .on('transactionHash', resolve);
       });
+      this.handleTx(fromToken, toToken, inputAmount, hash);
+      return hash;
+    } catch (error) {
+      console.error(error);
+      this.handleDapiError(error);
+      // this.nzMessage.error(error.message);
+    }
   }
 
-  addListener(): void {
+  //#region
+  private handleTx(
+    fromToken: Token,
+    toToken: Token,
+    inputAmount: string,
+    txHash: string
+  ): void {
+    const pendingTx: SwapTransaction = {
+      txid: txHash,
+      isPending: true,
+      min: false,
+      fromTokenName: fromToken.symbol,
+      toToken,
+      amount: inputAmount,
+      progress: {
+        step1: { hash: '', status: 1 },
+        step2: { hash: '', status: 0 },
+        step3: { hash: '', status: 0 },
+      },
+    };
+    this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
+  }
+
+  private handleDapiError(error): void {
+    switch (error.code) {
+      case 4001:
+        this.nzMessage.error('The request was rejected by the user');
+        break;
+      case -32602:
+        this.nzMessage.error('The parameters were invalid');
+        break;
+      case -32603:
+        this.nzMessage.error('Internal error'); // transaction underpriced
+        break;
+    }
+  }
+
+  private addListener(): void {
     this.ethereum
       .request({ method: 'net_version' })
       .then((chainId) => {
         this.commonService.log('chainId: ' + chainId);
         this.store.dispatch({
           type: UPDATE_METAMASK_NETWORK_ID,
-          data: chainId,
+          data: Number(chainId),
         });
       })
       .catch((error) => {
@@ -157,12 +212,21 @@ export class MetaMaskWalletApiService {
       this.commonService.log('chainId: ' + chainId);
       this.store.dispatch({
         type: UPDATE_METAMASK_NETWORK_ID,
-        data: chainId,
+        data: Number(chainId),
       });
     });
   }
 
-  //#region
+  private checkNetwork(fromToken: Token): boolean {
+    if (this.metamaskNetworkId !== METAMASK_CHAIN_ID[fromToken.chain]) {
+      this.nzMessage.error(
+        `Please switch network to ${fromToken.chain} ${NETWORK} on MetaMask wallet.`
+      );
+      return false;
+    }
+    return true;
+  }
+
   private getSwapperJson(): Promise<any> {
     if (this.SwapperJson) {
       return of(this.SwapperJson).toPromise();

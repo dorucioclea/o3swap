@@ -77,7 +77,9 @@ export class O3EthWalletApiService {
         }
       });
   }
-  addListener(): void {
+
+  //#region
+  private addListener(): void {
     // o3dapi.ETH.addEventListener(
     //   o3dapi.ETH.Constants.EventName.CONNECTED,
     //   (res) => {
@@ -95,7 +97,8 @@ export class O3EthWalletApiService {
     //   }
     // );
   }
-  handleDapiError(error): void {
+
+  private handleDapiError(error): void {
     switch (error.type) {
       case 'NO_PROVIDER':
         this.swapService.toDownloadWallet(this.walletName);
@@ -110,4 +113,5 @@ export class O3EthWalletApiService {
         break;
     }
   }
+  //#endregion
 }
