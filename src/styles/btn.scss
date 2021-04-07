@@ -1,0 +1,42 @@
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 90px;
+  height: 36px;
+  background-color: #46B069;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #ffffff;
+  &.unstake {
+    background-color: #6162ef;
+  }
+  &.receive {
+    width: 90px;
+    height: 30px;
+    background-color: #202020;
+    border: 1px solid #46b069;
+    border-radius: 10px;
+    color: #46b069;
+    &:hover {
+      background-color: #1e2621;
+    }
+  }
+  &.btn-liquidity {
+    height: 100%;
+    color: #6162EF;
+    background-color: #2A2A2A;
+    &:hover {
+      background-color: #6162EF;
+      color: #fff;
+    }
+  }
+  &.big {
+    width: 400px;
+    height: 60px;
+    line-height: 60px;
+    background: #46B069;
+    border-radius: 20px;
+    text-align: center;
+  }
+}
