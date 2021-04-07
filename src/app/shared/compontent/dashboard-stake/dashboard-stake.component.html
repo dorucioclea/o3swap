@@ -1,0 +1,25 @@
+<section class="wrapper modal-content">
+  <div class="close-group">
+    <img (click)="close()" class="close" src="/assets/images/swap/close.png" alt="">
+  </div>
+  <p class="title">Stake</p>
+  <div class="token-amount-container">
+    <div class="content">
+      <div class="top">Amount</div>
+      <div class="asset">
+        <img src="" alt="" class="asset-img">
+        <div class="asset-name">
+          pnUNI_V2_ETH_WBTC
+        </div>
+        <div class="amount">
+          <input type="number" (focus)="isfocusSearchInput=true" (blur)="isfocusSearchInput=false"
+            [ngClass]="{focus: isfocusSearchInput}" (input)="amount" placeholder="0">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="balance">
+    Balance: {{amount}} USDT
+  </div>
+  <div class="btn">Confirm</div>
+</section>
