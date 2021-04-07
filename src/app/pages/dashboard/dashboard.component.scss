@@ -84,7 +84,7 @@
         flex: 1;
         margin-right: 30px;
         font-size: 14px;
-        .right .unstake {
+        .right .unstake-btn {
           margin-left: 20px;
         }
         .detail-item {
@@ -199,32 +199,6 @@
           color: #46b069;
         }
       }
-    }
-  }
-}
-
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 90px;
-  height: 36px;
-  background-color: hsl(140, 43%, 48%);
-  border-radius: 10px;
-  font-size: 14px;
-  color: #ffffff;
-  &.unstake {
-    background-color: #6162ef;
-  }
-  &.receive {
-    width: 90px;
-    height: 30px;
-    background-color: #202020;
-    border: 1px solid #46b069;
-    border-radius: 10px;
-    color: #46b069;
-    &:hover {
-      background-color: #1e2621;
     }
   }
 }

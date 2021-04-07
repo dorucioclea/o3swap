@@ -4,3 +4,4 @@ export { SwapHomeComponent } from './swap/swap-home/swap-home.component';
 export { SwapResultComponent } from './swap/swap-result/swap-result.component';
 export { DashboardComponent } from './dashboard/dashboard.component';
 export { BridgeComponent } from './bridge/bridge.component';
+export { LiquidityComponent } from './bridge/liquidity/liquidity.component';

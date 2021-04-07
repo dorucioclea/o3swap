@@ -8,10 +8,11 @@
   border-radius: 10px;
   font-size: 14px;
   color: #ffffff;
-  &.unstake {
+  cursor: pointer;
+  &.unstake-btn {
     background-color: #6162ef;
   }
-  &.receive {
+  &.receive-btn {
     width: 90px;
     height: 30px;
     background-color: #202020;
@@ -31,12 +32,12 @@
       color: #fff;
     }
   }
-  &.big {
+  &.remove-btn {
+    background-color: #6162EF;
+  }
+  &.big-btn {
     width: 400px;
     height: 60px;
-    line-height: 60px;
-    background: #46B069;
     border-radius: 20px;
-    text-align: center;
   }
 }

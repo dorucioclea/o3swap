@@ -5,8 +5,7 @@ import {
   ChangeDetectorRef,
   OnDestroy,
 } from '@angular/core';
-import { CHAIN_TOKENS, SwapStateType, CHAINS, NNEO_TOKEN } from '@lib';
-import { Observable, Unsubscribable } from 'rxjs';
+import { SwapStateType } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { CommonService } from '@core';
