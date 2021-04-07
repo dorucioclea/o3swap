@@ -1,0 +1,188 @@
+.page-container {
+  .row1 {
+    margin-top: 40px!important;
+  }
+  .group-container {
+    position: relative;
+    padding: 50px 40px 68px;
+    margin: auto;
+    width: 1000px;
+    background: #1e1e1e;
+    border-radius: 20px;
+    .token-select-container {
+      margin-bottom: 20px;
+      position: relative;
+      display: flex;
+      border-radius: 20px;
+      background-color: #2a2a2a;
+      img.transform {
+        position: absolute;
+        top: 50%;
+        right: 50%;
+        width: 45px;
+        height: 45px;
+        transform: translate(50%, -50%) rotate(90deg);
+      }
+      .left-container,
+      .right-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 25px 0;
+        padding-left: 30px;
+        padding-right: 50px;
+        flex: 1;
+        height: 140px;
+        .header {
+          display: flex;
+          justify-content: space-between;
+          color: #8AA1A1;
+          span {
+            color: #6162EF;
+          }
+        }
+        .content {
+          display: flex;
+          align-items: center;
+          .token-logo {
+            width: 32px;
+            height: 32px;
+            background: #FFFFFF;
+            opacity: 0.1;
+            border-radius: 50%;
+          }
+          .token-name {
+            margin: 0 10px;
+          }
+          .token-amount {
+            height: 60px;
+            flex: 1;
+            text-align: right;
+            font-size: 22px;
+            line-height: 60px;
+          }
+        }
+        .asset {
+          text-align: right;
+          color: #4A4A4A;
+        }
+      }
+      .right-container {
+        padding-left: 50px;
+        padding-right: 30px;
+        background: #303030;
+        border-radius: 20px;
+        .content .token-amount {
+          color: #8AA1A1;
+        }
+      }
+    }
+    .detail {
+      color: #8AA1A1;
+      span {
+        color: #46B069;
+      }
+      &:nth-child(3) {
+        margin: 5px 0 ;
+      }
+    }
+    .btn-primary {
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translate(-50%);
+      width: 400px;
+      height: 60px;
+      line-height: 60px;
+      background: #46B069;
+      border-radius: 20px;
+      text-align: center;
+    }
+  }
+  .pool {
+    padding: 30px 30px;
+    .header {
+      height: 30px;
+      font-size: 20px;
+      font-weight: 600;
+      color: #FFFFFF;
+      line-height: 30px;
+    }
+    .group-item {
+      margin-top: 15px;
+      padding: 0 40px;
+      width: 940px;
+      background: #252525;
+      border-radius: 20px;
+      .pool-detail {
+        padding: 24px 0;
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #353535;
+        .list {
+          display: flex;
+          .item {
+            width: 150px;
+            .value {
+              height: 36px;
+              line-height: 36px;
+            }
+            .name {
+              color: #8AA1A1;
+            }
+          }
+        }
+        .right {
+          display: flex;
+          .btn {
+            width: 90px;
+            height: 36px;
+            border-radius: 10px;
+            line-height: 36px;
+            text-align: center;
+            font-size: 14px;
+            &.deposit {
+              margin-right: 17px;
+              background-color: #2B312D;
+              color: #46B069;
+              &:hover {
+                background-color: #46B069;
+                color: #fff;
+              }
+            }
+            &.withdrawal {
+              background-color: #2F2F3B;
+              color: #6162EF;
+              &:hover {
+                background-color: #6162EF;
+                color: #fff;
+              }
+            }
+          }
+        }
+      }
+      .token-detail {
+        display: flex;
+        align-items: center;
+        height: 56px;
+        .token-logo {
+          margin-right: 13px;
+          width: 26px;
+          height: 26px;
+          background: #FFFFFF;
+          border-radius: 50%;
+        }
+        .token-name {
+          color: #8AA1A1;
+          font-size: 14px;
+          color: #46B069;
+          span {
+            height: 28px;
+            line-height: 28px;
+            color: #8AA1A1;
+          }
+        }
+      }
+    }
+  }
+}
