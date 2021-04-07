@@ -150,9 +150,6 @@ export class MetaMaskWalletApiService {
   }
 
   async getAllowance(fromToken: Token, fromAddress: string): Promise<string> {
-    if (this.checkNetwork(fromToken) === false) {
-      return;
-    }
     const json = await this.getEthErc20Json();
     const ethErc20Contract = new this.web3.eth.Contract(
       json,
