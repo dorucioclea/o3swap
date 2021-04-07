@@ -8,6 +8,7 @@ import {
   SwapTransaction,
   SWAP_CONTRACT_CHAIN_ID,
   Token,
+  UNI_SWAP_CONTRACT_HASH,
   UPDATE_BSC_ACCOUNT,
   UPDATE_BSC_WALLET_NAME,
   UPDATE_ETH_ACCOUNT,
@@ -47,6 +48,7 @@ export class MetaMaskWalletApiService {
   web3;
   swapperJson;
   ethErc20Json;
+  uniswapJson;
 
   constructor(
     private http: HttpClient,
@@ -107,6 +109,137 @@ export class MetaMaskWalletApiService {
       .catch((error) => {
         this.nzMessage.error(error.message);
       });
+  }
+
+  async uniSwapExactTokensForETH(): Promise<any> {
+    // if (this.checkNetwork(fromToken) === false) {
+    //   return;
+    // }
+    const json = await this.getUniSwapJson();
+    const uniswapContract = new this.web3.eth.Contract(
+      json,
+      UNI_SWAP_CONTRACT_HASH
+    );
+    try {
+      await new Promise((resolve, reject) => {
+        uniswapContract.methods
+          .swapExactTokensForETHSupportingFeeOnTransferTokens(
+            new BigNumber(1).shiftedBy(18),
+            0,
+            [
+              '0xaD6D458402F60fD3Bd25163575031ACDce07538D', // dai
+              '0xc778417E063141139Fce010982780140Aa0cD5Ab', // weth
+            ],
+            '0xd34E3B073a484823058Ab76fc2304D5394beafE4',
+            Math.floor(Date.now() / 1000 + 600)
+          )
+          .send({ from: '0xd34E3B073a484823058Ab76fc2304D5394beafE4' })
+          .on('error', (error) => {
+            console.log(error);
+          })
+          .on('transactionHash', (hash) => {
+            console.log(hash);
+          })
+          .on('confirmation', (message, receipt) => {
+            console.log(message);
+            console.log(receipt);
+          });
+      });
+      // this.handleTx(fromToken, toToken, inputAmount, hash);
+      // return hash;
+    } catch (error) {
+      console.error(error);
+      this.handleDapiError(error);
+      // this.nzMessage.error(error.message);
+    }
+  }
+
+  async uniSwapExactETHForTokens(): Promise<any> {
+    // if (this.checkNetwork(fromToken) === false) {
+    //   return;
+    // }
+    const json = await this.getUniSwapJson();
+    const uniswapContract = new this.web3.eth.Contract(
+      json,
+      UNI_SWAP_CONTRACT_HASH
+    );
+    try {
+      await new Promise((resolve, reject) => {
+        uniswapContract.methods
+          .swapExactETHForTokensSupportingFeeOnTransferTokens(
+            0,
+            [
+              '0xc778417E063141139Fce010982780140Aa0cD5Ab', // weth
+              '0xaD6D458402F60fD3Bd25163575031ACDce07538D', // dai
+            ],
+            '0xd34E3B073a484823058Ab76fc2304D5394beafE4',
+            Math.floor(Date.now() / 1000 + 600)
+          )
+          .send({
+            from: '0xd34E3B073a484823058Ab76fc2304D5394beafE4',
+            value: new BigNumber(0.001).shiftedBy(18),
+          })
+          .on('error', (error) => {
+            console.log(error);
+          })
+          .on('transactionHash', (hash) => {
+            console.log(hash);
+          })
+          .on('confirmation', (message, receipt) => {
+            console.log(message);
+            console.log(receipt);
+          });
+      });
+      // this.handleTx(fromToken, toToken, inputAmount, hash);
+      // return hash;
+    } catch (error) {
+      console.error(error);
+      this.handleDapiError(error);
+      // this.nzMessage.error(error.message);
+    }
+  }
+
+  async uniSwapExactTokensForTokens(): Promise<any> {
+    // if (this.checkNetwork(fromToken) === false) {
+    //   return;
+    // }
+    const json = await this.getUniSwapJson();
+    const uniswapContract = new this.web3.eth.Contract(
+      json,
+      UNI_SWAP_CONTRACT_HASH
+    );
+    try {
+      await new Promise((resolve, reject) => {
+        uniswapContract.methods
+          .swapExactTokensForTokensSupportingFeeOnTransferTokens(
+            new BigNumber(0.0000001).shiftedBy(18),
+            0,
+            [
+              '0xc778417E063141139Fce010982780140Aa0cD5Ab', // weth
+              '0xaD6D458402F60fD3Bd25163575031ACDce07538D', // dai
+            ],
+            '0xd34E3B073a484823058Ab76fc2304D5394beafE4',
+            Math.floor(Date.now() / 1000 + 600)
+          )
+          .send({ from: '0xd34E3B073a484823058Ab76fc2304D5394beafE4' })
+          .on('error', (error) => {
+            console.log(error);
+          })
+          .on('transactionHash', (hash) => {
+            console.log(hash);
+          })
+          .on('confirmation', (message, receipt) => {
+            console.log(message);
+            console.log(receipt);
+          });
+      });
+      // this.handleTx(fromToken, toToken, inputAmount, hash);
+      // return hash;
+    } catch (error) {
+      console.error(error);
+      this.handleDapiError(error);
+      // this.nzMessage.error(error.message);
+    }
   }
 
   async swapCrossChain(
@@ -267,6 +400,21 @@ export class MetaMaskWalletApiService {
       return false;
     }
     return true;
+  }
+
+  private getUniSwapJson(): Promise<any> {
+    if (this.uniswapJson) {
+      return of(this.uniswapJson).toPromise();
+    }
+    return this.http
+      .get('assets/contracts-json/UniswapV2Router02.json')
+      .pipe(
+        map((res) => {
+          this.uniswapJson = res;
+          return res;
+        })
+      )
+      .toPromise();
   }
 
   private getEthErc20Json(): Promise<any> {
