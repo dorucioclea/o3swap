@@ -12,6 +12,7 @@ import { SwapSettingComponent, SwapTokenComponent } from '@shared';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { Store } from '@ngrx/store';
 import { Observable, Unsubscribable } from 'rxjs';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 interface State {
   setting: any;
@@ -37,6 +38,10 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
   @Output() toResultPage = new EventEmitter();
 
   swap$: Observable<any>;
+  neoAccountAddress: string;
+  ethAccountAddress: string;
+  bscAccountAddress: string;
+  hecoAccountAddress: string;
   tokenBalance; // 账户的 tokens
   swapUnScribe: Unsubscribable;
 
@@ -50,7 +55,11 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
   inputAmountFiat: string; // 支付的 token 美元价值
   inputAmountError: string;
 
-  constructor(private modal: NzModalService, public store: Store<State>) {
+  constructor(
+    private modal: NzModalService,
+    public store: Store<State>,
+    private nzMessage: NzMessageService
+  ) {
     this.setting$ = store.select('setting');
     this.swap$ = store.select('swap');
   }
@@ -64,6 +73,10 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
     this.checkInputAmountDecimal();
     this.calcutionInputAmountFiat();
     this.swapUnScribe = this.swap$.subscribe((state) => {
+      this.neoAccountAddress = state.neoAccountAddress;
+      this.ethAccountAddress = state.ethAccountAddress;
+      this.bscAccountAddress = state.bscAccountAddress;
+      this.hecoAccountAddress = state.hecoAccountAddress;
       if (
         this.fromToken &&
         JSON.stringify(state.balances) !== JSON.stringify(this.tokenBalance)
@@ -143,6 +156,9 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
     if (this.checkCanInquiry() === false) {
       return;
     }
+    if (this.checkWalletConnect() === false) {
+      return;
+    }
     this.toInquiryPage.emit({
       inputAmount: this.inputAmount,
       fromToken: this.fromToken,
@@ -181,6 +197,37 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
       return false;
     }
     if (this.checkInputAmountDecimal() === false) {
+      return false;
+    }
+    return true;
+  }
+  checkWalletConnect(): boolean {
+    if (
+      (this.fromToken.chain === 'NEO' || this.toToken.chain === 'NEO') &&
+      !this.neoAccountAddress
+    ) {
+      this.nzMessage.error('Please connect the NEO wallet first');
+      return false;
+    }
+    if (
+      (this.fromToken.chain === 'ETH' || this.toToken.chain === 'ETH') &&
+      !this.ethAccountAddress
+    ) {
+      this.nzMessage.error('Please connect the ETH wallet first');
+      return false;
+    }
+    if (
+      (this.fromToken.chain === 'BSC' || this.toToken.chain === 'BSC') &&
+      !this.bscAccountAddress
+    ) {
+      this.nzMessage.error('Please connect the BSC wallet first');
+      return false;
+    }
+    if (
+      (this.fromToken.chain === 'HECO' || this.toToken.chain === 'HECO') &&
+      !this.hecoAccountAddress
+    ) {
+      this.nzMessage.error('Please connect the HECO wallet first');
       return false;
     }
     return true;
