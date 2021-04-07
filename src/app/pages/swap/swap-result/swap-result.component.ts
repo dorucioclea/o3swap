@@ -90,6 +90,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
 
   fromAddress: string;
   toAddress: string;
+  showApprove = false;
+  hasApprove = false;
+  isApproveLoading = false;
 
   constructor(
     public store: Store<State>,
@@ -117,6 +120,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.bscWalletName = state.bscWalletName;
       this.hecoWalletName = state.hecoWalletName;
       this.getFromAndToAddress();
+      this.checkShowApprove();
     });
     this.setting$.subscribe((state) => {
       this.slipValue = state.slipValue;
@@ -188,6 +192,20 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.calculationPrice();
       }
     });
+  }
+
+  approve(): void {
+    this.inquiryInterval.unsubscribe();
+    this.isApproveLoading = true;
+    this.metaMaskWalletApiService
+      .approve(this.fromToken, this.fromAddress)
+      .then((res) => {
+        console.log(res);
+        this.isApproveLoading = false;
+        if (res !== undefined) {
+          this.hasApprove = true;
+        }
+      });
   }
 
   swap(): void {
@@ -323,6 +341,36 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   //#endregion
 
   //#region
+  checkShowApprove(): void {
+    console.log(this.fromAddress);
+    console.log(this.toAddress);
+    if (!this.fromAddress || !this.toAddress) {
+      this.showApprove = false;
+      return;
+    }
+    if (
+      this.fromToken.chain !== 'NEO' &&
+      this.toToken.chain !== 'NEO' &&
+      this.fromToken.chain !== this.toToken.chain
+    ) {
+      this.metaMaskWalletApiService
+        .getAllowance(this.fromToken, this.fromAddress)
+        .then((balance) => {
+          console.log(balance);
+          if (
+            new BigNumber(balance).comparedTo(
+              new BigNumber(this.inputAmount)
+            ) >= 0
+          ) {
+            this.showApprove = false;
+          } else {
+            this.showApprove = true;
+          }
+        });
+    } else {
+      this.showApprove = false;
+    }
+  }
   getSwapPathFun(): void {
     this.chooseSwapPath = null;
     this.apiService

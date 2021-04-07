@@ -45,7 +45,8 @@ export class MetaMaskWalletApiService {
   ethereum;
   isConnected: boolean;
   web3;
-  SwapperJson;
+  swapperJson;
+  ethErc20Json;
 
   constructor(
     private http: HttpClient,
@@ -148,6 +149,50 @@ export class MetaMaskWalletApiService {
     }
   }
 
+  async getAllowance(fromToken: Token, fromAddress: string): Promise<string> {
+    if (this.checkNetwork(fromToken) === false) {
+      return;
+    }
+    const json = await this.getEthErc20Json();
+    const ethErc20Contract = new this.web3.eth.Contract(
+      json,
+      fromToken.assetID
+    );
+    const result = await ethErc20Contract.methods
+      .allowance(fromAddress, ETH_SWAP_CONTRACT_HASH)
+      .call();
+    console.log(result);
+    return new BigNumber(result).shiftedBy(-fromToken.decimals).toFixed();
+  }
+
+  async approve(fromToken: Token, fromAddress: string): Promise<any> {
+    if (this.checkNetwork(fromToken) === false) {
+      return;
+    }
+    const json = await this.getEthErc20Json();
+    const ethErc20Contract = new this.web3.eth.Contract(
+      json,
+      fromToken.assetID
+    );
+    try {
+      const result = await new Promise((resolve, reject) => {
+        ethErc20Contract.methods
+          .approve(
+            ETH_SWAP_CONTRACT_HASH,
+            '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+          )
+          .send({ from: fromAddress })
+          .on('error', reject)
+          .on('confirmation', resolve);
+      });
+      console.log(result);
+      return result;
+    } catch (error) {
+      console.error(error);
+      this.handleDapiError(error);
+    }
+  }
+
   //#region
   private handleTx(
     fromToken: Token,
@@ -227,16 +272,30 @@ export class MetaMaskWalletApiService {
     return true;
   }
 
+  private getEthErc20Json(): Promise<any> {
+    if (this.ethErc20Json) {
+      return of(this.ethErc20Json).toPromise();
+    }
+    return this.http
+      .get('assets/contracts-json/eth-erc20.json')
+      .pipe(
+        map((res) => {
+          this.ethErc20Json = res;
+          return res;
+        })
+      )
+      .toPromise();
+  }
+
   private getSwapperJson(): Promise<any> {
-    if (this.SwapperJson) {
-      return of(this.SwapperJson).toPromise();
+    if (this.swapperJson) {
+      return of(this.swapperJson).toPromise();
     }
     return this.http
       .get('assets/contracts-json/eth-swapper.json')
       .pipe(
         map((res) => {
-          console.log(res);
-          this.SwapperJson = res;
+          this.swapperJson = res;
           return res;
         })
       )

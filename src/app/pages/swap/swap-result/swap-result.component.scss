@@ -129,6 +129,31 @@ section.result-wrapper {
     margin-top: 20px;
     border-radius: 30px;
   }
+  .btn-group {
+    margin-top: 20px;
+    button {
+      width: 46%;
+      height: 60px;
+      background: #46b069;
+      border-radius: 20px;
+      border: none;
+      font-size: 18px;
+      color: #fff;
+      cursor: pointer;
+      &.approve {
+        background: #6162ef;
+      }
+      &:first-child {
+        margin-right: 8%;
+      }
+      &.disable {
+        background: #353535;
+        color: #4A4A4A;
+        pointer-events: none;
+        cursor: default;
+      }
+    }
+  }
   .setting-group {
     .refresh {
       width: 120px;

@@ -61,7 +61,12 @@
       <p class="label">Quote includes a {{ o3SwapFee }}% O3Swap fee</p>
     </div> -->
   </div>
-  <button class="confirm" (click)="swap()">Confirm</button>
+  <div class="btn-group" *ngIf="showApprove">
+    <button class="approve" nz-button [ngClass]="{disable: hasApprove===true}" [nzLoading]="isApproveLoading"
+      (click)="approve()">Approve</button>
+    <button [ngClass]="{disable: hasApprove===false}" (click)="swap()">Confirm</button>
+  </div>
+  <button *ngIf="!showApprove" class="confirm" (click)="swap()">Confirm</button>
   <div class="setting-group">
     <div class="refresh">
       After<span>{{ inquiryTime }}</span>s
