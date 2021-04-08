@@ -71,8 +71,8 @@
                   <input type="number" (input)="changeInputAmount($event)" [ngModel]="inputAmount" placeholder="0.0">
                 </div>
                 <div class="max-status">MAX</div>
-                <div class="balance">
-                  <span>Balance</span>1000
+                <div class="balance" nz-tooltip nzTooltipTitle="10000000000000000">
+                  <span>Balance</span>{{wordlimit(10000000000000000)}}
                 </div>
               </div>
             </div>

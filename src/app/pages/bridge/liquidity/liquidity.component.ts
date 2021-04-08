@@ -6,7 +6,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { ApiService } from '@core';
+import { ApiService, CommonService } from '@core';
 
 type LiquidityType = 'add' | 'remove';
 
@@ -24,6 +24,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
 
   constructor(
     private apiService: ApiService,
+    private commonService: CommonService,
   ) {
     this.liquidityType = 'add';
   }
@@ -40,6 +41,10 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     this.apiService.getRates().subscribe((res) => {
       this.rates = res;
     });
+  }
+
+  wordlimit(value: string | number): string {
+    return this.commonService.wordlimit(value);
   }
 
   changeInputAmount($event): void {
