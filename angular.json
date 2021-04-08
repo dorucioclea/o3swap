@@ -73,7 +73,7 @@
           "builder": "ngx-build-plus:dev-server",
           "options": {
             "browserTarget": "o3swap:build",
-            "extraWebpackConfig": "webpack.config.js",
+            "extraWebpackConfig": "webpack.config.js"
           },
           "configurations": {
             "production": {
