@@ -38,7 +38,6 @@ export class LiquidityComponent implements OnInit, OnDestroy {
 
   getRates(): void {
     this.apiService.getRates().subscribe((res) => {
-      console.log(res)
       this.rates = res;
     });
   }
