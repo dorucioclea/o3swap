@@ -19,6 +19,8 @@ import {
   UPDATE_BSC_WALLET_NAME,
   UPDATE_HECO_ACCOUNT,
   UPDATE_HECO_WALLET_NAME,
+  RESET_BSC_BALANCES,
+  RESET_HECO_BALANCES,
 } from '@lib';
 import {
   CommonService,
@@ -190,6 +192,7 @@ export class AppComponent implements OnInit {
         this.bscAccountAddress = null;
         this.store.dispatch({ type: UPDATE_BSC_ACCOUNT, data: null });
         this.store.dispatch({ type: UPDATE_BSC_WALLET_NAME, data: null });
+        this.store.dispatch({ type: RESET_BSC_BALANCES });
         break;
       case 'HECO':
         this.showHecoAccountModal = false;
@@ -197,6 +200,7 @@ export class AppComponent implements OnInit {
         this.hecoAccountAddress = null;
         this.store.dispatch({ type: UPDATE_HECO_ACCOUNT, data: null });
         this.store.dispatch({ type: UPDATE_HECO_WALLET_NAME, data: null });
+        this.store.dispatch({ type: RESET_HECO_BALANCES });
         break;
     }
   }

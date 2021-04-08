@@ -1,1 +1,75 @@
-<div>bridge</div>
+<section class="page-container">
+  <div class="group-container row1">
+    <div class="token-select-container">
+      <div class="left-container">
+        <div class="header">
+          <div class="left">You pay</div>
+          <div class="right">Balance: 1000 USDT <span>Max</span></div>
+        </div>
+        <div class="content">
+          <img src="" alt="" class="token-logo">
+          <div class="token-name">nUSDT</div>
+          <div class="input-container">
+            <input type="number" (input)="changeInputAmount($event)" [ngModel]="inputAmount" placeholder="0">
+          </div>
+        </div>
+        <div class="asset">≈ $ 10000.000</div>
+      </div>
+      <img class="transform" src="/assets/images/swap/exchange-home.png" alt="">
+      <div class="right-container">
+        <div class="header">
+          <div class="left">You will receive</div>
+        </div>
+        <div class="content">
+          <img src="" alt="" class="token-logo">
+          <div class="token-name">nUSDT</div>
+          <div class="token-amount">{{inputAmount || 0}}</div>
+        </div>
+        <div class="asset">≈ $ 10000.000</div>
+      </div>
+    </div>
+    <p class="detail">Exchange Rate BUSD/USDT (including fees): <span>1: 0.9984</span></p>
+    <p class="detail">Trading routed through: <span>Venus</span></p>
+    <p class="detail">Max slippage: <span>1%</span></p>
+    <div class="btn-primary big-btn">Swap</div>
+  </div>
+  <div class="group-container row1 pool">
+    <div class="header">Pool</div>
+    <div class="group-item">
+      <div class="pool-detail">
+        <div class="list">
+          <div class="item">
+            <div class="value">$1,071,909,102</div>
+            <div class="name">TVL</div>
+          </div>
+          <div class="item">
+            <div class="value">$7,225,526</div>
+            <div class="name">VOL</div>
+          </div>
+          <div class="item">
+            <div class="value">66.81%</div>
+            <div class="name">APR</div>
+          </div>
+          <div class="item">
+            <div class="value">0.18%</div>
+            <div class="name">DAILY</div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="btn-primary deposit-btn" routerLink="/bridge/liquidity">
+            Deposit
+          </div>
+          <div class="btn-primary withdrawal-btn">
+            Withdrawal
+          </div>
+        </div>
+      </div>
+      <div class="token-detail">
+        <img src="" alt="" class="token-logo">
+        <div class="token-name">
+          nUSDT <span>(DAI+USDC+USDT)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

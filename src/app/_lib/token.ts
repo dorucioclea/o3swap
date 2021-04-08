@@ -272,12 +272,77 @@ const ALL: Token[] = [
   },
 ];
 
+const USD_TOKENS: Token[] = [
+  {
+    assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
+    symbol: 'USDT',
+    decimals: 6,
+    amount: '0',
+    rateName: 'usdt',
+    chain: 'ETH',
+    logo: '/assets/images/tokens/usdt.png',
+    atNeoAssetName: 'pnUSDT',
+  },
+  {
+    assetID:
+      NETWORK === 'MainNet' ? '' : '74A7f2A3aFa8B0CB577985663B5811901A860619',
+    symbol: 'BUSD',
+    decimals: 18,
+    amount: '0',
+    chain: 'BSC',
+    rateName: 'usdt',
+    logo: '/assets/images/tokens/usdt.png',
+  },
+  {
+    assetID:
+      NETWORK === 'MainNet' ? '' : '77e8eBD5B2D7cD984e6Ae05a809409c795Bf9b04',
+    symbol: 'HUSD',
+    decimals: 18,
+    amount: '0',
+    rateName: 'usdt',
+    logo: '/assets/images/tokens/usdt.png',
+    chain: 'HECO',
+  }
+];
+
+const LP_TOKENS: Token[] = [
+  {
+    assetID: '0xD5d63Dce45E0275Ca76a8b2e9BD8C11679A57D0D',
+    symbol: 'pLP',
+    decimals: 18,
+    amount: '0',
+    rateName: 'pLP',
+    chain: 'ETH',
+    logo: '/assets/images/tokens/lp.png',
+  },
+  {
+    assetID: '0xD5d63Dce45E0275Ca76a8b2e9BD8C11679A57D0D',
+    symbol: 'pLP',
+    decimals: 18,
+    amount: '0',
+    rateName: 'pLP',
+    chain: 'BSC',
+    logo: '/assets/images/tokens/lp.png',
+  },
+  {
+    assetID: '0x74A7f2A3aFa8B0CB577985663B5811901A860619',
+    symbol: 'pLP',
+    decimals: 18,
+    amount: '0',
+    rateName: 'pLP',
+    chain: 'HECO',
+    logo: '/assets/images/tokens/lp.png',
+  },
+];
+
 export const CHAIN_TOKENS = {
   ALL,
   NEO: NEO_TOKENS,
   ETH: ETH_TOKENS,
   BSC: BSC_TOKENS,
   HECO: HECO_TOKENS,
+  USD: USD_TOKENS,
+  LP: LP_TOKENS
 };
 
 export type CHAINS = 'ALL' | 'NEO' | 'ETH' | 'BSC' | 'HECO';

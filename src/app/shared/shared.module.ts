@@ -6,6 +6,7 @@ import { LoadingComponent } from './compontent/loading/loading.component';
 import { SwapSettingComponent } from './compontent/swap-setting/swap-setting.component';
 import { SwapExchangeComponent } from './compontent/swap-exchange/swap-exchange.component';
 import { SwapTokenComponent } from './compontent/swap-token/swap-token.component';
+import { DashboardStakeComponent } from './compontent/dashboard-stake/dashboard-stake.component';
 
 import { ShortAddressPipe } from './pipes/short-address.pipe';
 import { TransNumberPipe } from './pipes/trans-number.pipe';
@@ -25,6 +26,7 @@ const COMPONENTS = [
   SwapSettingComponent,
   SwapExchangeComponent,
   SwapTokenComponent,
+  DashboardStakeComponent,
 ];
 const PIPES = [ShortAddressPipe, TransNumberPipe, TranslatePipe];
 const DIRECTIVES = [ErrSrcDirective];

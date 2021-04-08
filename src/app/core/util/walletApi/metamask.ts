@@ -8,6 +8,7 @@ import {
   SwapTransaction,
   SWAP_CONTRACT_CHAIN_ID,
   Token,
+  UPDATE_ETH_BALANCES,
   UNI_SWAP_CONTRACT_HASH,
   UPDATE_BSC_ACCOUNT,
   UPDATE_BSC_WALLET_NAME,
@@ -17,6 +18,9 @@ import {
   UPDATE_HECO_WALLET_NAME,
   UPDATE_METAMASK_NETWORK_ID,
   UPDATE_PENDING_TX,
+  CHAIN_TOKENS,
+  UPDATE_BSC_BALANCES,
+  UPDATE_HECO_BALANCES,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import BigNumber from 'bignumber.js';
@@ -73,6 +77,7 @@ export class MetaMaskWalletApiService {
     }
     this.web3 = new Web3((window as any).ethereum);
     this.ethereum = (window as any).ethereum;
+    this.metamaskNetworkId = new BigNumber(this.ethereum.chainId, 16).toNumber();
     this.getSwapperJson();
     this.ethereum
       .request({ method: 'eth_requestAccounts' })
@@ -81,6 +86,8 @@ export class MetaMaskWalletApiService {
         this.accountAddress = result[0];
         let dispatchAccountType;
         let dispatchWalletNameType;
+        this.getBalance(chain);
+        console.log(chain);
         switch (chain) {
           case 'ETH':
             dispatchAccountType = UPDATE_ETH_ACCOUNT;
@@ -108,6 +115,117 @@ export class MetaMaskWalletApiService {
       .catch((error) => {
         this.nzMessage.error(error.message);
       });
+  }
+
+  async getBalance(chain: string, token?: Token): Promise<boolean> {
+    if (this.metamaskNetworkId !== METAMASK_CHAIN_ID[chain]) {
+      return;
+    }
+    const json = await this.getEthErc20Json();
+    let dispatchBalanceType;
+    let tempTokenBalance: Token[];
+    return new Promise(async (resolve, reject) => {
+      switch (chain) {
+        case 'ETH':
+          dispatchBalanceType = UPDATE_ETH_BALANCES;
+          tempTokenBalance = JSON.parse(JSON.stringify(CHAIN_TOKENS.ETH));
+          break;
+        case 'BSC':
+          dispatchBalanceType = UPDATE_BSC_BALANCES;
+          tempTokenBalance = JSON.parse(JSON.stringify(CHAIN_TOKENS.BSC));
+          break;
+        case 'HECO':
+          dispatchBalanceType = UPDATE_HECO_BALANCES;
+          tempTokenBalance = JSON.parse(JSON.stringify(CHAIN_TOKENS.HECO));
+          break;
+      }
+      const result = {};
+      for (const item of tempTokenBalance) {
+        result[item.assetID] = JSON.parse(JSON.stringify(item));
+        if (item.assetID !== '0000000000000000000000000000000000000000') {
+          const ethErc20Contract = new this.web3.eth.Contract(
+            json,
+            item.assetID
+          );
+          try {
+            const balance = await ethErc20Contract.methods
+              .balanceOf(
+                this.accountAddress
+              ).call();
+            result[item.assetID].amount = new BigNumber(balance)
+              .shiftedBy(-item.decimals)
+              .toFixed();
+          } catch (error) {
+            console.error(error);
+            this.handleDapiError(error);
+            // this.nzMessage.error(error.message);
+          }
+        } else {
+          try {
+            let balance = await (window as any).ethereum.request({
+              method: 'eth_getBalance',
+              params: [
+                this.accountAddress,
+                'latest',
+              ]
+            });
+            balance = new BigNumber(item.amount, 16)
+              .shiftedBy(-item.decimals)
+              .toFixed();
+            result[item.assetID].amount = balance;
+          } catch (error) {
+            console.error(error);
+            this.handleDapiError(error);
+          }
+        }
+      }
+      this.store.dispatch({
+        type: dispatchBalanceType,
+        data: result,
+      });
+      resolve(true);
+    });
+  }
+
+  async getBalancByHash(token: Token): Promise<string> {
+    const json = await this.getEthErc20Json();
+    return new Promise(async (resolve, reject) => {
+      if (token.assetID !== '0000000000000000000000000000000000000000') {
+        const ethErc20Contract = new this.web3.eth.Contract(
+          json,
+          token.assetID
+        );
+        try {
+          const balance = await ethErc20Contract.methods
+            .balanceOf(
+              this.accountAddress
+            ).call();
+          resolve(new BigNumber(balance)
+            .shiftedBy(-token.decimals)
+            .toFixed());
+        } catch (error) {
+          console.error(error);
+          this.handleDapiError(error);
+          // this.nzMessage.error(error.message);
+        }
+      } else {
+        try {
+          const balance = await (window as any).ethereum.request({
+            method: 'eth_getBalance',
+            params: [
+              this.accountAddress,
+              'latest',
+            ]
+          });
+          resolve(new BigNumber(token.amount, 16)
+            .shiftedBy(-token.decimals)
+            .toFixed());
+        } catch (error) {
+          console.error(error);
+          this.handleDapiError(error);
+        }
+      }
+    });
   }
 
   async uniSwapExactTokensForETH(): Promise<any> {
@@ -290,6 +408,86 @@ export class MetaMaskWalletApiService {
       });
       console.log(hash);
       this.handleTx(fromToken, toToken, inputAmount, hash);
+      return hash;
+    } catch (error) {
+      console.error(error);
+      this.handleDapiError(error);
+      // this.nzMessage.error(error.message);
+    }
+  }
+
+  async addLiquidity(
+    fromToken: Token,
+    inputAmount: string,
+    fromAddress: string,
+    toAddress: string,
+    toChainId: number
+  ): Promise<string> {
+    if (this.checkNetwork(fromToken) === false) {
+      return;
+    }
+    const json = await this.getSwapperJson();
+    const swapContract = new this.web3.eth.Contract(
+      json,
+      ETH_CROSS_SWAP_CONTRACT_HASH
+    );
+    try {
+      const hash: string = await new Promise((resolve, reject) => {
+        swapContract.methods
+          .add_liquidity(
+            `0x${fromToken.assetID}`, // fromAssetHash
+            1, // toPoolId
+            toChainId, // toChainId
+            toAddress, // toAddress
+            new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
+            0, // fee
+            1 // id
+          )
+          .send({ from: fromAddress })
+          .on('error', reject)
+          .on('transactionHash', resolve);
+      });
+      this.handleTx(fromToken, null, inputAmount, hash);
+      return hash;
+    } catch (error) {
+      console.error(error);
+      this.handleDapiError(error);
+      // this.nzMessage.error(error.message);
+    }
+  }
+
+  async removeLiquidity(
+    fromToken: Token,
+    inputAmount: string,
+    fromAddress: string,
+    toAddress: string,
+    toChainId: number
+  ): Promise<string> {
+    if (this.checkNetwork(fromToken) === false) {
+      return;
+    }
+    const json = await this.getSwapperJson();
+    const swapContract = new this.web3.eth.Contract(
+      json,
+      ETH_CROSS_SWAP_CONTRACT_HASH
+    );
+    try {
+      const hash: string = await new Promise((resolve, reject) => {
+        swapContract.methods
+          .remove_liquidity(
+            `0x${fromToken.assetID}`, // fromAssetHash
+            1, // toPoolId
+            toChainId, // toChainId
+            toAddress, // toAddress
+            new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
+            0, // fee
+            1 // id
+          )
+          .send({ from: fromAddress })
+          .on('error', reject)
+          .on('transactionHash', resolve);
+      });
+      // this.handleTx(fromToken, null, inputAmount, hash);
       return hash;
     } catch (error) {
       console.error(error);

@@ -43,6 +43,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
   bscAccountAddress: string;
   hecoAccountAddress: string;
   tokenBalance; // 账户的 tokens
+  ethTokenBalance: Token[];
   swapUnScribe: Unsubscribable;
 
   // setting modal
@@ -84,6 +85,17 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
         this.tokenBalance = JSON.parse(JSON.stringify(state.balances));
         if (this.tokenBalance[this.fromToken.assetID]) {
           this.fromToken.amount = this.tokenBalance[
+            this.fromToken.assetID
+          ].amount;
+        }
+      }
+      if (
+        this.fromToken &&
+        JSON.stringify(state.ethBalances) !== JSON.stringify(this.ethTokenBalance)
+      ) {
+        this.ethTokenBalance = JSON.parse(JSON.stringify(state.ethBalances));
+        if (this.ethTokenBalance[this.fromToken.assetID]) {
+          this.fromToken.amount = this.ethTokenBalance[
             this.fromToken.assetID
           ].amount;
         }
