@@ -203,23 +203,31 @@
     .right {
       padding: 30px 50px;
       flex: 1;
-    }
-    .list {
-      li {
-        display: flex;
-        align-items: center;
-        height: 30px;
-        color: #8aa1a1;
-      }
-      &.left li {
-        .value {
-          color: #ffffff;
+      &.left {
+        .item-list, .progress-container{
+          color: #8AA1A1;
+          height:20px;
+        }
+        .progress-container {
+          display: flex;
+          width: 100%;
+          & > .progress{
+            height: 6px;
+            width: 300px;
+          }
         }
       }
-      &.right li {
+      &.right .item-list {
+        color: #46b069;
         justify-content: space-between;
+        height: 30px;
+      }
+      .item-list {
+        display: flex;
+        align-items: center;
         .value {
-          color: #46b069;
+          color: #ffffff;
+          justify-content: space-between;
         }
       }
     }
