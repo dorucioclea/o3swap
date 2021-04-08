@@ -83,7 +83,7 @@
         color: #46B069;
       }
       &:nth-child(3) {
-        margin: 5px 0 ;
+        margin: 5px 0;
       }
     }
     .big-btn {
@@ -128,30 +128,8 @@
         }
         .right {
           display: flex;
-          .btn {
-            width: 90px;
-            height: 36px;
-            border-radius: 10px;
-            line-height: 36px;
-            text-align: center;
-            font-size: 14px;
-            &.deposit {
-              margin-right: 17px;
-              background-color: #2B312D;
-              color: #46B069;
-              &:hover {
-                background-color: #46B069;
-                color: #fff;
-              }
-            }
-            &.withdrawal {
-              background-color: #2F2F3B;
-              color: #6162EF;
-              &:hover {
-                background-color: #6162EF;
-                color: #fff;
-              }
-            }
+          .deposit-btn {
+            margin-right: 17px;
           }
         }
       }
