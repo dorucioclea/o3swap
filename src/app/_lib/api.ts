@@ -7,10 +7,13 @@ export const INQUIRY_HOST =
 
 export const CROSS_CHAIN_SWAP_DETAIL_HOST =
   NETWORK === 'MainNet'
-    ? 'https://explorer.poly.network'
-    : 'https://explorer.poly.network/testnet';
+    ? ''
+    : 'https://bridge.poly.network/testnet/v1';
 
 export const UTXO_HOST =
   NETWORK === 'MainNet'
     ? 'https://fapi.ngd.network/api/web'
     : 'http://52.230.21.178:10020/web';
+
+export const POLY_HOST =
+  NETWORK === 'MainNet' ? '' : 'http://138.91.6.226:9999';

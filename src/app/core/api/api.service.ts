@@ -15,6 +15,9 @@ import {
   ALL_NEO_TOKENS,
   CHAIN_TOKENS,
   NETWORK,
+  POLY_HOST,
+  ETH_PUSDT,
+  SWAP_CONTRACT_CHAIN_ID,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { CommonService } from '../util/common.service';
@@ -33,6 +36,36 @@ export class ApiService {
 
   postEmail(email: string): Observable<any> {
     return this.http.post(`https://subscribe.o3swap.com/subscribe`, { email });
+  }
+
+  getFromEthPoolFee(): Promise<string> {
+    return this.http
+      .get(`${POLY_HOST}/swapFee/0x16a3Ac9d6682dc4b1bfC02da254379E9F4b37Fed`)
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200) {
+            return new BigNumber(res.fee).shiftedBy(-18).toFixed();
+          }
+        })
+      )
+      .toPromise();
+  }
+
+  getFromEthPolyFee(fromToken: Token, toToken: Token): Promise<string> {
+    return this.http
+      .post(`${CROSS_CHAIN_SWAP_DETAIL_HOST}/getfee`, {
+        SrcChainId: SWAP_CONTRACT_CHAIN_ID[fromToken.chain],
+        Hash: fromToken.assetID,
+        DstChainId: SWAP_CONTRACT_CHAIN_ID[toToken.chain],
+      })
+      .pipe(
+        map((res: any) => {
+          if (res.UsdtAmount) {
+            return res.UsdtAmount;
+          }
+        })
+      )
+      .toPromise();
   }
 
   getUtxo(address: string, amount: string): Promise<any> {
@@ -65,7 +98,7 @@ export class ApiService {
       hash = hash.slice(2);
     }
     return this.http
-      .get(`${CROSS_CHAIN_SWAP_DETAIL_HOST}/api/v1/getcrosstx?txhash=${hash}`)
+      .post(`${CROSS_CHAIN_SWAP_DETAIL_HOST}/transactionofhash`, { hash })
       .pipe(
         map((res: any) => {
           const target: TxProgress = {
@@ -73,18 +106,18 @@ export class ApiService {
             step2: { hash: '', status: 0 },
             step3: { hash: '', status: 0 },
           };
-          if (res.desc === 'success' && res.result) {
-            const data = JSON.parse(res.result);
-            if (data.fchaintx && data.fchaintx.txhash) {
-              target.step1.hash = data.fchaintx.txhash;
+          if (res.TransactionState) {
+            const data = res.TransactionState;
+            if (data[0].Hash) {
+              target.step1.hash = data[0].Hash;
               target.step1.status = 2;
             }
-            if (data.mchaintx && data.mchaintx.txhash) {
-              target.step2.hash = data.mchaintx.txhash;
+            if (data[1].Hash) {
+              target.step2.hash = data[1].Hash;
               target.step2.status = 2;
             }
-            if (data.tchaintx && data.tchaintx.txhash) {
-              target.step3.hash = data.tchaintx.txhash;
+            if (data[2].Hash) {
+              target.step3.hash = data[2].Hash;
               target.step3.status = 2;
             }
             if (target.step1.status === 2 && target.step2.status === 0) {
@@ -104,71 +137,18 @@ export class ApiService {
     toToken: Token,
     inputAmount: string
   ): Observable<AssetQueryResponse> {
-    let noRequestRes;
-    // neo => nneo
-    if (fromToken.symbol === 'NEO' && toToken.symbol === 'nNEO') {
-      noRequestRes = [
-        {
-          amount: [
-            inputAmount,
-            new BigNumber(inputAmount)
-              .shiftedBy(NNEO_TOKEN[0].decimals)
-              .toFixed(),
-          ],
-          swapPath: ['NEO', 'nNEO'],
-        },
-      ];
-    }
-    // nneo => neo
-    if (fromToken.symbol === 'nNEO' && toToken.symbol === 'NEO') {
-      noRequestRes = [
-        {
-          amount: [
-            new BigNumber(inputAmount)
-              .shiftedBy(NNEO_TOKEN[0].decimals)
-              .toFixed(),
-            inputAmount,
-          ],
-          swapPath: ['nNEO', 'NEO'],
-        },
-      ];
+    if (
+      (fromToken.symbol === 'NEO' && toToken.symbol === 'nNEO') ||
+      (fromToken.symbol === 'nNEO' && toToken.symbol === 'NEO')
+    ) {
+      return this.getNeoNNeoSwapPath(fromToken, toToken, inputAmount);
     }
     if (fromToken.chain !== 'NEO' && toToken.chain !== 'NEO') {
-      noRequestRes = [
-        {
-          amount: [
-            new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed(),
-            new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed(),
-          ],
-          swapPath: [fromToken.symbol, toToken.symbol],
-        },
-      ];
+      return this.getFromEthCrossChainSwapPath(fromToken, toToken, inputAmount);
     }
-    this.commonService.log(noRequestRes);
-    if (noRequestRes) {
-      return of(this.handleReceiveSwapPathFiat(noRequestRes, toToken));
+    if (fromToken.chain === 'NEO') {
+      return this.getFromNeoSwapPath(fromToken, toToken, inputAmount);
     }
-    // swap from neo
-    let toAssetName: string;
-    toAssetName = toToken.symbol;
-    if (toToken.chain !== 'NEO') {
-      toAssetName = toToken.atNeoAssetName;
-    }
-    const amount = this.swapService.getAmountIn(fromToken, inputAmount);
-    return this.http
-      .post(
-        `${INQUIRY_HOST}?StartAsset=${fromToken.symbol}&EndAsset=${toAssetName}&amount=${amount}`,
-        null
-      )
-      .pipe(
-        map((res: AssetQueryResponse) => {
-          if (res.length > 0) {
-            return this.handleReceiveSwapPathFiat(res, toToken);
-          } else {
-            return [];
-          }
-        })
-      );
   }
 
   getToStandardSwapPath(
@@ -205,6 +185,109 @@ export class ApiService {
   }
 
   //#region
+  private getNeoNNeoSwapPath(
+    fromToken: Token,
+    toToken: Token,
+    inputAmount: string
+  ): Observable<AssetQueryResponse> {
+    let result;
+    // neo => nneo
+    if (fromToken.symbol === 'NEO' && toToken.symbol === 'nNEO') {
+      result = [
+        {
+          amount: [
+            inputAmount,
+            new BigNumber(inputAmount)
+              .shiftedBy(NNEO_TOKEN[0].decimals)
+              .toFixed(),
+          ],
+          swapPath: ['NEO', 'nNEO'],
+        },
+      ];
+    }
+    // nneo => neo
+    if (fromToken.symbol === 'nNEO' && toToken.symbol === 'NEO') {
+      result = [
+        {
+          amount: [
+            new BigNumber(inputAmount)
+              .shiftedBy(NNEO_TOKEN[0].decimals)
+              .toFixed(),
+            inputAmount,
+          ],
+          swapPath: ['nNEO', 'NEO'],
+        },
+      ];
+    }
+    this.commonService.log(result);
+    if (result) {
+      return of(this.handleReceiveSwapPathFiat(result, toToken));
+    }
+  }
+
+  private getFromNeoSwapPath(
+    fromToken: Token,
+    toToken: Token,
+    inputAmount: string
+  ): Observable<AssetQueryResponse> {
+    // swap from neo
+    let toAssetName: string;
+    toAssetName = toToken.symbol;
+    if (toToken.chain !== 'NEO') {
+      toAssetName = toToken.atNeoAssetName;
+    }
+    const amount = this.swapService.getAmountIn(fromToken, inputAmount);
+    return this.http
+      .post(
+        `${INQUIRY_HOST}?StartAsset=${fromToken.symbol}&EndAsset=${toAssetName}&amount=${amount}`,
+        null
+      )
+      .pipe(
+        map((res: AssetQueryResponse) => {
+          if (res.length > 0) {
+            return this.handleReceiveSwapPathFiat(res, toToken);
+          } else {
+            return [];
+          }
+        })
+      );
+  }
+
+  private getFromEthCrossChainSwapPath(
+    fromToken: Token,
+    toToken: Token,
+    inputAmount: string
+  ): Observable<AssetQueryResponse> {
+    const fromPUsdt = ETH_PUSDT[fromToken.chain];
+    const toPUsdt = ETH_PUSDT[toToken.chain];
+    const amount = this.commonService.decimalToInteger(
+      inputAmount,
+      fromToken.decimals
+    );
+    return this.http
+      .get(
+        `${POLY_HOST}/calcOutGivenIn/0x16a3Ac9d6682dc4b1bfC02da254379E9F4b37Fed/${fromPUsdt}/${toPUsdt}/${amount}`
+      )
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200) {
+            const result: AssetQueryResponse = [
+              {
+                amount: [
+                  new BigNumber(inputAmount)
+                    .shiftedBy(fromToken.decimals)
+                    .toFixed(),
+                  res.amount_out,
+                ],
+                swapPath: [fromToken.symbol, toToken.symbol],
+              },
+            ];
+            return this.handleReceiveSwapPathFiat(result, toToken);
+          }
+        })
+      );
+  }
+
   private getToStandardSwapPathReq(
     fromToken: Token,
     toAssetName: string,

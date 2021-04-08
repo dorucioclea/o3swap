@@ -196,7 +196,7 @@ const BSC_TOKENS: Token[] = [
     assetID:
       NETWORK === 'MainNet' ? '' : '74A7f2A3aFa8B0CB577985663B5811901A860619',
     symbol: 'BUSD',
-    decimals: 6,
+    decimals: 18,
     amount: '0',
     chain: 'BSC',
     rateName: 'usdt',
@@ -209,7 +209,7 @@ const HECO_TOKENS: Token[] = [
     assetID:
       NETWORK === 'MainNet' ? '' : '77e8eBD5B2D7cD984e6Ae05a809409c795Bf9b04',
     symbol: 'HUSD',
-    decimals: 8,
+    decimals: 18,
     amount: '0',
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
@@ -229,7 +229,7 @@ const ALL: Token[] = [
     atNeoAssetName: 'pnWETH',
   },
   {
-    assetID: '6ee856ae55b6e1a249f04cd3b947141bc146273c',
+    assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
     symbol: 'USDT',
     decimals: 6,
     amount: '0',
@@ -252,9 +252,9 @@ const ALL: Token[] = [
   },
   {
     assetID:
-      NETWORK === 'MainNet' ? '' : '8301f2213c0eed49a7e28ae4c3e91722919b8b47',
+      NETWORK === 'MainNet' ? '' : '74A7f2A3aFa8B0CB577985663B5811901A860619',
     symbol: 'BUSD',
-    decimals: 6,
+    decimals: 18,
     amount: '0',
     chain: 'BSC',
     rateName: 'usdt',
@@ -262,9 +262,9 @@ const ALL: Token[] = [
   },
   {
     assetID:
-      NETWORK === 'MainNet' ? '' : 'f58e4a9d111fba6f74f0eedaa275fb5a6806d67b',
+      NETWORK === 'MainNet' ? '' : '77e8eBD5B2D7cD984e6Ae05a809409c795Bf9b04',
     symbol: 'HUSD',
-    decimals: 8,
+    decimals: 18,
     amount: '0',
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
@@ -307,3 +307,9 @@ export const NNEO_TOKEN: Token[] = [
     logo: '/assets/images/tokens/neo.png',
   },
 ];
+
+export const ETH_PUSDT = {
+  ETH: '0x76D56873426CEe920F9e8c439Ee0a2CeCf50d979',
+  BSC: '0x2e6c7cD9C98373C9bB74817b2a78E94C73E38BC9',
+  HECO: '0x6F2383Cb1495E85Af95C0f9701215D9BFFA77FD7',
+};

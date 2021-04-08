@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {
   EthWalletName,
-  ETH_SWAP_CONTRACT_HASH,
+  ETH_CROSS_SWAP_CONTRACT_HASH,
   METAMASK_CHAIN_ID,
   NETWORK,
   SwapStateType,
@@ -81,7 +81,6 @@ export class MetaMaskWalletApiService {
         this.accountAddress = result[0];
         let dispatchAccountType;
         let dispatchWalletNameType;
-        console.log(chain);
         switch (chain) {
           case 'ETH':
             dispatchAccountType = UPDATE_ETH_ACCOUNT;
@@ -138,11 +137,14 @@ export class MetaMaskWalletApiService {
             console.log(error);
           })
           .on('transactionHash', (hash) => {
-            console.log(hash);
+            console.log('hash: ' + hash);
           })
-          .on('confirmation', (message, receipt) => {
-            console.log(message);
+          .on('receipt', (receipt) => {
             console.log(receipt);
+            if (receipt.status === false) {
+              this.nzMessage.error('Transaction failed');
+              this.store.dispatch({ type: UPDATE_PENDING_TX, data: null });
+            }
           });
       });
       // this.handleTx(fromToken, toToken, inputAmount, hash);
@@ -185,9 +187,12 @@ export class MetaMaskWalletApiService {
           .on('transactionHash', (hash) => {
             console.log(hash);
           })
-          .on('confirmation', (message, receipt) => {
-            console.log(message);
+          .on('receipt', (receipt) => {
             console.log(receipt);
+            if (receipt.status === false) {
+              this.nzMessage.error('Transaction failed');
+              this.store.dispatch({ type: UPDATE_PENDING_TX, data: null });
+            }
           });
       });
       // this.handleTx(fromToken, toToken, inputAmount, hash);
@@ -228,9 +233,12 @@ export class MetaMaskWalletApiService {
           .on('transactionHash', (hash) => {
             console.log(hash);
           })
-          .on('confirmation', (message, receipt) => {
-            console.log(message);
+          .on('receipt', (receipt) => {
             console.log(receipt);
+            if (receipt.status === false) {
+              this.nzMessage.error('Transaction failed');
+              this.store.dispatch({ type: UPDATE_PENDING_TX, data: null });
+            }
           });
       });
       // this.handleTx(fromToken, toToken, inputAmount, hash);
@@ -255,7 +263,7 @@ export class MetaMaskWalletApiService {
     const json = await this.getSwapperJson();
     const swapContract = new this.web3.eth.Contract(
       json,
-      ETH_SWAP_CONTRACT_HASH
+      ETH_CROSS_SWAP_CONTRACT_HASH
     );
     try {
       const hash: string = await new Promise((resolve, reject) => {
@@ -271,8 +279,16 @@ export class MetaMaskWalletApiService {
           )
           .send({ from: fromAddress })
           .on('error', reject)
-          .on('transactionHash', resolve);
+          .on('transactionHash', resolve)
+          .on('receipt', (receipt) => {
+            console.log(receipt);
+            if (receipt.status === false) {
+              this.nzMessage.error('Transaction failed');
+              this.store.dispatch({ type: UPDATE_PENDING_TX, data: null });
+            }
+          });
       });
+      console.log(hash);
       this.handleTx(fromToken, toToken, inputAmount, hash);
       return hash;
     } catch (error) {
@@ -289,9 +305,9 @@ export class MetaMaskWalletApiService {
       fromToken.assetID
     );
     const result = await ethErc20Contract.methods
-      .allowance(fromAddress, ETH_SWAP_CONTRACT_HASH)
+      .allowance(fromAddress, ETH_CROSS_SWAP_CONTRACT_HASH)
       .call();
-    console.log(result);
+    console.log('allowance: ' + result);
     return new BigNumber(result).shiftedBy(-fromToken.decimals).toFixed();
   }
 
@@ -308,14 +324,14 @@ export class MetaMaskWalletApiService {
       const result = await new Promise((resolve, reject) => {
         ethErc20Contract.methods
           .approve(
-            ETH_SWAP_CONTRACT_HASH,
+            ETH_CROSS_SWAP_CONTRACT_HASH,
             '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
           )
           .send({ from: fromAddress })
           .on('error', reject)
-          .on('confirmation', resolve);
+          .on('receipt', resolve);
       });
-      console.log(result);
+      console.log('approve result: ' + result);
       return result;
     } catch (error) {
       console.error(error);
@@ -334,7 +350,7 @@ export class MetaMaskWalletApiService {
       txid: txHash,
       isPending: true,
       min: false,
-      fromTokenName: fromToken.symbol,
+      fromToken,
       toToken,
       amount: inputAmount,
       progress: {

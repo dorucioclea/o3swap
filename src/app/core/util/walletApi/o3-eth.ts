@@ -7,11 +7,8 @@ import { CommonService } from '../common.service';
 import { SwapService } from '../swap.service';
 import {
   NeoWalletName,
-  SWAP_CONTRACT_HASH,
-  Token,
   UPDATE_ETH_ACCOUNT,
   UPDATE_ETH_WALLET_NAME,
-  AssetQueryResponseItem,
   SwapStateType,
   UPDATE_BSC_ACCOUNT,
   UPDATE_BSC_WALLET_NAME,

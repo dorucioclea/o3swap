@@ -23,7 +23,7 @@
       </div>
       <p class="status">{{ transaction?.isPending ? 'Pending' : 'Success' }}</p>
       <div class="desc">
-        Swap {{ transaction?.amount }} {{ transaction?.fromTokenName }} for {{ transaction?.toToken?.symbol }}
+        Swap {{ transaction?.amount }} {{ transaction?.fromToken?.symbol }} for {{ transaction?.toToken?.symbol }}
       </div>
       <nz-progress [nzPercent]="swapProgress" [nzShowInfo]="false" nzStrokeWidth="6" nzStrokeColor="#46B069">
       </nz-progress>
@@ -64,14 +64,16 @@
             <p class="name">{{ transaction?.toToken.atNeoAssetName }}</p>
             <div class="hash" *ngIf="transaction?.progress.step1.status===2">
               <span>Hash</span>
-              {{ transaction?.txid | shortAddress: 6 }}
-              <img class="copy" (click)="copy(transaction?.txid)" src="/assets/images/swap/copy.png" alt="">
+              {{ transaction?.progress.step1.hash | shortAddress: 6 }}
+              <img class="copy" (click)="copy(transaction?.progress.step1.hash)" src="/assets/images/swap/copy.png"
+                alt="">
             </div>
             <div class="hash" *ngIf="transaction?.progress.step1.status===1">
               In progress
             </div>
             <div class="link" *ngIf="transaction?.progress.step1.status===2">
-              <a target="_blank" href="{{NEO_TX_PAGES_PREFIX}}/{{transaction?.txid}}">
+              <a target="_blank"
+                href="{{ETH_TX_PAGES_PREFIX[transaction?.fromToken.chain]}}{{transaction?.progress.step1.hash}}">
                 <span></span>
               </a>
             </div>
@@ -129,7 +131,8 @@
               Waiting
             </div>
             <div class="link" *ngIf="transaction?.progress.step3.status===2">
-              <a target="_blank" href="{{ETH_TX_PAGES_PREFIX}}/{{transaction?.progress.step3.hash}}">
+              <a target="_blank"
+                href="{{ETH_TX_PAGES_PREFIX[transaction?.toToken.chain]}}{{transaction?.progress.step3.hash}}">
                 <span></span>
               </a>
             </div>

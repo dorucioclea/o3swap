@@ -6,7 +6,7 @@ import { CommonService } from '../common.service';
 import { ApiService } from '../../api/api.service';
 import {
   NeoWalletName,
-  SWAP_CONTRACT_HASH,
+  NEO_SWAP_CONTRACT_HASH,
   Token,
   UPDATE_NEO_ACCOUNT,
   UPDATE_NEO_BALANCES,
@@ -244,7 +244,7 @@ export class NeolineWalletApiService {
     ];
     return this.neolineDapi
       .invoke({
-        scriptHash: SWAP_CONTRACT_HASH,
+        scriptHash: NEO_SWAP_CONTRACT_HASH,
         operation: 'DelegateSwapTokenInForTokenOut',
         args,
       })
@@ -337,7 +337,7 @@ export class NeolineWalletApiService {
     ];
     return this.neolineDapi
       .invoke({
-        scriptHash: SWAP_CONTRACT_HASH,
+        scriptHash: NEO_SWAP_CONTRACT_HASH,
         operation: 'DelegateSwapTokenInForTokenOutNCrossChain',
         args,
       })
@@ -411,7 +411,7 @@ export class NeolineWalletApiService {
       txid: txHash,
       isPending: true,
       min: false,
-      fromTokenName: fromToken.symbol,
+      fromToken,
       toToken,
       amount: inputAmount,
     };
