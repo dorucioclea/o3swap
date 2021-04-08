@@ -25,6 +25,7 @@ import { SwapService } from '../util/swap.service';
 
 @Injectable()
 export class ApiService {
+  CHAIN_TOKENS: any = CHAIN_TOKENS;
   apiDo = environment.apiDomain;
   RATE_HOST = 'https://hub.o3.network/v1';
 
@@ -36,6 +37,24 @@ export class ApiService {
 
   postEmail(email: string): Observable<any> {
     return this.http.post(`https://subscribe.o3swap.com/subscribe`, { email });
+  }
+
+  getTokens(): void {
+    this.http.get('https://o3swap.com/pairs.json').subscribe((res) => {
+      Object.keys(res).forEach((key) => {
+        res[key] = res[key].map((item) => {
+          return {
+            symbol: item.symbol,
+            logo: item.url,
+            assetID: item.contract,
+            amount: '0',
+            decimals: item.decimals,
+            chain: item.tag,
+          };
+        });
+      });
+      this.CHAIN_TOKENS = res;
+    });
   }
 
   getFromEthPoolFee(): Promise<string> {
