@@ -12,13 +12,13 @@
           pnUNI_V2_ETH_WBTC
         </div>
         <div class="amount">
-          <input type="number" (input)="amount" placeholder="0">
+          <input type="number" (input)="changeInputAmount($event)" [ngModel]="inputAmount" placeholder="0">
         </div>
       </div>
     </div>
   </div>
   <div class="balance">
-    Balance: {{amount}} USDT
+    Balance: {{inputAmount}} USDT
   </div>
   <div class="btn">Confirm</div>
 </section>

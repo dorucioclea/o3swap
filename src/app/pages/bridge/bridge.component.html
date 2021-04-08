@@ -9,7 +9,9 @@
         <div class="content">
           <img src="" alt="" class="token-logo">
           <div class="token-name">nUSDT</div>
-          <div class="token-amount">10000</div>
+          <div class="input-container">
+            <input type="number" (input)="changeInputAmount($event)" [ngModel]="inputAmount" placeholder="0">
+          </div>
         </div>
         <div class="asset">≈ $ 10000.000</div>
       </div>
@@ -21,7 +23,7 @@
         <div class="content">
           <img src="" alt="" class="token-logo">
           <div class="token-name">nUSDT</div>
-          <div class="token-amount">10000</div>
+          <div class="token-amount">{{inputAmount || 0}}</div>
         </div>
         <div class="asset">≈ $ 10000.000</div>
       </div>

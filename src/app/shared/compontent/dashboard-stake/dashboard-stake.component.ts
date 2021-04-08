@@ -20,7 +20,7 @@ interface State {
 })
 export class DashboardStakeComponent implements OnInit, OnDestroy {
   @Input() isFrom: boolean;
-  @Input() amount = 0;
+  @Input() inputAmount: number = 0;
 
   hideNeoToken = false;
   showOnlyNNeo = false;
@@ -39,8 +39,8 @@ export class DashboardStakeComponent implements OnInit, OnDestroy {
 
   }
 
-  cloneChainTokens(): void {
-
+  changeInputAmount($event): void {
+    this.inputAmount = $event.target.value;
   }
 
   close(): void {

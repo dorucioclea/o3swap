@@ -6,6 +6,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
+import { ApiService } from '@core';
 
 type LiquidityType = 'add' | 'remove';
 
@@ -17,17 +18,35 @@ type LiquidityType = 'add' | 'remove';
 export class LiquidityComponent implements OnInit, OnDestroy {
   swapProgress = 20;
   liquidityType: LiquidityType = 'add';
+  rates = {};
 
-  constructor() {
+  inputAmount = '';
+
+  constructor(
+    private apiService: ApiService,
+  ) {
     this.liquidityType = 'add';
   }
 
   ngOnInit() {
+    this.getRates()
   }
 
   ngOnDestroy(): void {
 
   }
+
+  getRates(): void {
+    this.apiService.getRates().subscribe((res) => {
+      console.log(res)
+      this.rates = res;
+    });
+  }
+
+  changeInputAmount($event): void {
+    this.inputAmount = $event.target.value;
+  }
+
   changeLiquidityType(params: LiquidityType): void {
     this.liquidityType = params;
   }

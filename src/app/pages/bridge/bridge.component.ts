@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ApiService, CommonService } from '@core';
 import {
   SwapStateType,
@@ -14,6 +14,7 @@ import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AnimationOptions } from 'ngx-lottie';
 import { interval, Observable, Unsubscribable } from 'rxjs';
+import { SwapSettingComponent, SwapTokenComponent } from '@shared';
 
 type PageStatus = 'home' | 'result';
 interface State {
@@ -25,6 +26,9 @@ interface State {
   styleUrls: ['./bridge.component.scss'],
 })
 export class BridgeComponent implements OnInit, OnDestroy {
+  @Input() inputAmount: number = 0;
+  rates = {};
+
 
   constructor(
     public store: Store<State>,
@@ -35,10 +39,21 @@ export class BridgeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.getRates()
   }
 
   ngOnDestroy(): void {
 
   }
 
+  changeInputAmount($event): void {
+    this.inputAmount = $event.target.value;
+  }
+
+  getRates(): void {
+    this.apiService.getRates().subscribe((res) => {
+      console.log(res)
+      this.rates = res;
+    });
+  }
 }
