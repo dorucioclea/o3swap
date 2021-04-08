@@ -2,18 +2,18 @@
   <div class="group-container row1">
     <div class="item">
       <div class="header">
-        BLP <span>BALANCE</span>
+        {{LPToken ? LPToken.symbol : '--' }} <span>BALANCE</span>
       </div>
       <div class="content">
         <div class="value">
-          <span class="amount">1.67376139</span>
-          <span class="rate">≈￥1.67376139</span>
+          <span class="amount">{{LPToken ?  LPToken.amount : '--' }}</span>
+          <span class="rate">--</span>
         </div>
       </div>
     </div>
     <div class="item">
       <div class="header">
-        BLP <span>STAKED</span>
+        {{LPToken ? LPToken.symbol : '--' }} <span>STAKED</span>
       </div>
       <div class="content">
         <div class="value">
@@ -27,7 +27,7 @@
     </div>
     <div class="item">
       <div class="header">
-        BLP <span>EARNED</span>
+        {{LPToken ? LPToken.symbol : '--' }} <span>EARNED</span>
       </div>
       <div class="content">
         <div class="value">
@@ -43,66 +43,42 @@
   <div class="group-container tab-container row2">
     <div class="tab-wrap">
       <div class="tab-nav-scroll">
-          <div
-            class="tabs tabs-add"
-            [ngClass]="{addActive: liquidityType === 'add'}"
-            (click)="changeLiquidityType('add')"
-          >
-            Add Liquidity
-          </div>
-          <div
-            class="tabs tabs-remove"
-            [ngClass]="{removeActive: liquidityType === 'remove'}"
-            (click)="changeLiquidityType('remove')"
-          >
-            Remove Liquidity
-          </div>
+        <div class="tabs tabs-add" [ngClass]="{addActive: liquidityType === 'add'}"
+          (click)="changeLiquidityType('add')">
+          Add Liquidity
+        </div>
+        <div class="tabs tabs-remove" [ngClass]="{removeActive: liquidityType === 'remove'}"
+          (click)="changeLiquidityType('remove')">
+          Remove Liquidity
+        </div>
       </div>
       <div class="tab-content">
         <ul class="list-wrap">
-          <li>
+          <li *ngFor="let tokenItem  of addLiquidityTokens; let i = index ">
             <div class="detail">
               <div class="left">
                 <img src="" alt="" class="token-logo">
-                <div class="token-name">nUSDT</div>
+                <div class="token-name">{{ tokenItem.symbol }}</div>
               </div>
               <div class="right">
                 <div class="input-container">
-                  <input type="number" (input)="changeInputAmount($event)" [ngModel]="inputAmount" placeholder="0.0">
+                  <input type="number" [(ngModel)]="inputAmount[i]" placeholder="0.0">
                 </div>
                 <div class="max-status">MAX</div>
-                <div class="balance" nz-tooltip nzTooltipTitle="10000000000000000">
-                  <span>Balance</span>{{wordlimit(10000000000000000)}}
+                <div class="balance" nz-tooltip [nzTooltipTitle]="tokenItem.amount">
+                  <span>Balance</span><span>{{tokenItem.amount}}</span>
                 </div>
               </div>
             </div>
-            <div class="btn-primary btn-liquidity">
-              Deposit
-            </div>
-          </li>
-          <li>
-            <div class="detail">
-              <div class="left">
-                <img src="" alt="" class="token-logo">
-                <div class="token-name">nUSDT</div>
-              </div>
-              <div class="right">
-                <div class="input-container">
-                  <input type="number" (input)="changeInputAmount($event)" [ngModel]="inputAmount" placeholder="0.0">
-                </div>
-                <div class="max-status">MAX</div>
-                <div class="balance">
-                  <span>Balance</span>1000
-                </div>
-              </div>
-            </div>
-            <div class="btn-primary btn-liquidity">
-              Deposit
+            <div class="btn-primary btn-liquidity"
+              (click)="liquidityType === 'add' ? depost(tokenItem, i) : withdrawal(tokenItem, i)">
+              {{ liquidityType == 'add' ? 'Deposit' : 'Withdrawal' }}
             </div>
           </li>
         </ul>
         <div class="btn-primary big-btn" [ngClass]="{active: liquidityType === 'add'}">Add Liquidity</div>
-        <div class="btn-primary remove-btn big-btn" [ngClass]="{active: liquidityType === 'remove'}">Remove Liquidity</div>
+        <div class="btn-primary remove-btn big-btn" [ngClass]="{active: liquidityType === 'remove'}">Remove Liquidity
+        </div>
       </div>
     </div>
   </div>
@@ -115,27 +91,30 @@
         <div>DAI: <span class="value">986,389,258.14</span> (30.1%)</div>
       </div>
       <div class="progress-container">
-        <nz-progress class="progress" [nzPercent]="swapProgress" [nzShowInfo]="false" nzStrokeWidth="6" nzStrokeColor="#46B069">
+        <nz-progress class="progress" [nzPercent]="swapProgress" [nzShowInfo]="false" nzStrokeWidth="6"
+          nzStrokeColor="#46B069">
         </nz-progress>
       </div>
       <div class="item-list">
         <div>USDC: <span class="value">986,389,258.14</span> (30.1%)</div>
       </div>
       <div class="progress-container">
-        <nz-progress class="progress" [nzPercent]="swapProgress" [nzShowInfo]="false" nzStrokeWidth="6" nzStrokeColor="#46B069">
+        <nz-progress class="progress" [nzPercent]="swapProgress" [nzShowInfo]="false" nzStrokeWidth="6"
+          nzStrokeColor="#46B069">
         </nz-progress>
       </div>
       <div class="item-list">
         <div>USDT: <span class="value">986,389,258.14</span> (30.1%)</div>
       </div>
       <div class="progress-container">
-        <nz-progress class="progress" [nzPercent]="swapProgress" [nzShowInfo]="false" nzStrokeWidth="6" nzStrokeColor="#46B069">
+        <nz-progress class="progress" [nzPercent]="swapProgress" [nzShowInfo]="false" nzStrokeWidth="6"
+          nzStrokeColor="#46B069">
         </nz-progress>
       </div>
     </div>
     <div class="right">
       <div class="item-list">
-        <span class="name">Receive</span>
+        <span class="name">{{ liquidityType == 'add' ? 'Receive' : 'PayAmount' }}</span>
         <span class="value">0.0</span>
       </div>
       <div class="item-list">

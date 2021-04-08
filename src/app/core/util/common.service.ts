@@ -7,7 +7,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 export class CommonService {
   isProduction = environment.production;
 
-  constructor(private nzMessage: NzMessageService) {}
+  constructor(private nzMessage: NzMessageService) { }
 
   log(value: any): void {
     if (this.isProduction === false) {
@@ -41,7 +41,7 @@ export class CommonService {
 
   wordlimit(value: number | string): string {
     let data = value.toString();
-    if(value && data.length > 13) {
+    if (value && data.length > 13) {
       data = data.substring(0, 10) + '...';
     }
     return data;

@@ -14,6 +14,12 @@ import {
   UPDATE_BSC_WALLET_NAME,
   UPDATE_HECO_ACCOUNT,
   UPDATE_HECO_WALLET_NAME,
+  RESET_ETH_BALANCES,
+  UPDATE_ETH_BALANCES,
+  RESET_BSC_BALANCES,
+  RESET_HECO_BALANCES,
+  UPDATE_BSC_BALANCES,
+  UPDATE_HECO_BALANCES,
 } from '@lib';
 
 const initialState: SwapStateType = {
@@ -26,6 +32,9 @@ const initialState: SwapStateType = {
   bscAccountAddress: null,
   hecoAccountAddress: null,
   balances: {}, // neo 链连接钱包的balances
+  ethBalances: {},
+  bscBalances: {},
+  hecoBalances: {},
   neolineNetwork: null,
   metamaskNetworkId: null,
   transaction: null,
@@ -63,6 +72,21 @@ export default function swap(state = initialState, action): any {
       return { ...state, balances: action.data };
     case RESET_NEO_BALANCES:
       return { ...state, balances: {} };
+
+    case UPDATE_ETH_BALANCES:
+      return { ...state, ethBalances: action.data };
+    case RESET_ETH_BALANCES:
+      return { ...state, ethBalances: {} };
+
+    case UPDATE_BSC_BALANCES:
+      return { ...state, bscBalances: action.data };
+    case RESET_BSC_BALANCES:
+      return { ...state, bscBalances: {} };
+
+    case UPDATE_HECO_BALANCES:
+      return { ...state, hecoBalances: action.data };
+    case RESET_HECO_BALANCES:
+      return { ...state, hecoBalances: {} };
 
     case UPDATE_NEOLINE_NETWORK:
       return { ...state, neolineNetwork: action.data };

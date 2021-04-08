@@ -28,6 +28,9 @@ export interface SwapStateType {
   bscAccountAddress: string;
   hecoAccountAddress: string;
   balances: object;
+  ethBalances: object;
+  bscBalances: object;
+  hecoBalances: object;
   neolineNetwork: Network;
   metamaskNetworkId: number;
   transaction: SwapTransaction;

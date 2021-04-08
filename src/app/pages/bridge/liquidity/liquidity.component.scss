@@ -191,6 +191,11 @@
                     height: 20px;
                     background: #353535;
                   }
+                  span {
+                    width: 100%;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  }
                 }
               }
             }
