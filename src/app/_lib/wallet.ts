@@ -45,12 +45,20 @@ export const ETH_WALLETS: EthWallet[] = [
 
 export const BSC_WALLETS: EthWallet[] = [
   {
+    name: 'O3',
+    logo: '/assets/images/logo-O3.png',
+  },
+  {
     name: 'MetaMask',
     logo: '/assets/images/logo-MetaMask.png',
   },
 ];
 
 export const HECO_WALLETS: EthWallet[] = [
+  {
+    name: 'O3',
+    logo: '/assets/images/logo-O3.png',
+  },
   {
     name: 'MetaMask',
     logo: '/assets/images/logo-MetaMask.png',
