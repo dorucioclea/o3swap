@@ -9,9 +9,6 @@
   font-size: 14px;
   color: #ffffff;
   cursor: pointer;
-  &:focus {
-    outline: none;
-  }
   &.unstake-btn {
     background-color: #6162ef;
   }
@@ -63,4 +60,8 @@
       color: #fff;
     }
   }
+}
+
+:focus {
+  outline: none;
 }

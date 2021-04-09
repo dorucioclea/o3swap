@@ -9,7 +9,7 @@ const routes: Routes = [
   { path: 'swap', component: SwapComponent },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'bridge', component: BridgeComponent },
-  { path: 'bridge/liquidity', component: LiquidityComponent },
+  { path: 'bridge/liquidity/:type', component: LiquidityComponent },
   { path: '**', redirectTo: '/home' },
 ];
 

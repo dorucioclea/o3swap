@@ -14,7 +14,7 @@
         <!-- <li>
           <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Swap</a>
         </li> -->
-        <li class="add-width" [ngClass]="{active: currentPage==='/bridge'}">
+        <li class="add-width" [ngClass]="{active: currentPage.startsWith('/bridge')}">
           <a routerLink="/bridge">Bridge</a>
         </li>
         <li class="add-width">
