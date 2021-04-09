@@ -20,6 +20,7 @@ import {
   RESET_HECO_BALANCES,
   UPDATE_BSC_BALANCES,
   UPDATE_HECO_BALANCES,
+  NNEO_TOKEN,
 } from '@lib';
 
 const initialState: SwapStateType = {
@@ -42,7 +43,7 @@ const initialState: SwapStateType = {
   //   txid: '0f4787014a5442fc02843dc376548fa7a4dd400a92850f783873b034d84dccd5',
   //   isPending: true,
   //   min: false,
-  //   fromTokenName: 'nNEO',
+  //   fromToken: NNEO_TOKEN[0],
   //   toToken: CrossChainToToken,
   //   amount: '100',
   // },

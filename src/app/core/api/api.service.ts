@@ -57,6 +57,33 @@ export class ApiService {
     });
   }
 
+  getBridgeAmountOut(
+    fromToken: Token,
+    toToken: Token,
+    inputAmount: string
+  ): Promise<string> {
+    const fromPUsdt = ETH_PUSDT[fromToken.chain];
+    const toPUsdt = ETH_PUSDT[toToken.chain];
+    const amount = this.commonService.decimalToInteger(
+      inputAmount,
+      fromToken.decimals
+    );
+    return this.http
+      .get(
+        `${POLY_HOST}/calcOutGivenIn/0x16a3Ac9d6682dc4b1bfC02da254379E9F4b37Fed/${fromPUsdt}/${toPUsdt}/${amount}`
+      )
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200 && res.amount_out) {
+            return new BigNumber(res.amount_out)
+              .shiftedBy(-toToken.decimals)
+              .toFixed();
+          }
+        })
+      )
+      .toPromise();
+  }
+
   getFromEthPoolFee(): Promise<string> {
     return this.http
       .get(`${POLY_HOST}/swapFee/0x16a3Ac9d6682dc4b1bfC02da254379E9F4b37Fed`)
