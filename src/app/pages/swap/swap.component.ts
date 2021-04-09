@@ -76,9 +76,8 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.swap$.subscribe((state) => {
       if (
         state.transaction &&
-        state.transaction.txid !== this.transaction.txid &&
-        state.transaction.toToken &&
-        state.transaction.toToken.chain !== 'NEO' &&
+        state.transaction.txid !== this.transaction?.txid &&
+        state.transaction.fromToken.chain !== state.transaction.toToken.chain &&
         state.transaction.isPending
       ) {
         this.transaction = Object.assign({}, state.transaction);
