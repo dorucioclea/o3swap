@@ -68,9 +68,18 @@
                 <div class="input-container">
                   <input type="number" [(ngModel)]="inputAmount[i]" placeholder="0.0">
                 </div>
-                <div class="max-status">MAX</div>
-                <div class="balance" nz-tooltip [nzTooltipTitle]="tokenItem.amount">
-                  <span>Balance</span><span>{{tokenItem.amount}}</span>
+                <div
+                  class="max-status"
+                  [ngClass]="{active: tokenItem.amount === inputAmount[i]}"
+                  (click)="inputAmount[i] = tokenItem.amount">MAX</div>
+                <div class="balance">
+                  <span>Balance</span>
+                  <span
+                    nz-tooltip
+                    nzTooltipPlacement="bottom"
+                    [nzTooltipTitle]="tokenItem.amount"
+                    *ngIf="tokenItem.amount.length > 13">{{ wordlimit(tokenItem.amount) }}</span>
+                  <span *ngIf="tokenItem.amount.length <= 13">{{ tokenItem.amount }}</span>
                 </div>
               </div>
             </div>
@@ -80,9 +89,9 @@
             </div>
           </li>
         </ul>
-        <div class="btn-primary big-btn" [ngClass]="{active: liquidityType === 'add'}">Add Liquidity</div>
+        <!-- <div class="btn-primary big-btn" [ngClass]="{active: liquidityType === 'add'}">Add Liquidity</div>
         <div class="btn-primary remove-btn big-btn" [ngClass]="{active: liquidityType === 'remove'}">Remove Liquidity
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
