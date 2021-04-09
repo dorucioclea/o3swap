@@ -31,7 +31,6 @@ import { SwapService } from '../swap.service';
 import Web3 from 'web3';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
-
 interface State {
   swap: SwapStateType;
 }
@@ -142,42 +141,7 @@ export class MetaMaskWalletApiService {
       const result = {};
       for (const item of tempTokenBalance) {
         result[item.assetID] = JSON.parse(JSON.stringify(item));
-        if (item.assetID !== '0000000000000000000000000000000000000000') {
-          const ethErc20Contract = new this.web3.eth.Contract(
-            json,
-            item.assetID
-          );
-          try {
-            const balance = await ethErc20Contract.methods
-              .balanceOf(
-                this.accountAddress
-              ).call();
-            result[item.assetID].amount = new BigNumber(balance)
-              .shiftedBy(-item.decimals)
-              .toFixed();
-          } catch (error) {
-            console.error(error);
-            this.handleDapiError(error);
-            // this.nzMessage.error(error.message);
-          }
-        } else {
-          try {
-            let balance = await (window as any).ethereum.request({
-              method: 'eth_getBalance',
-              params: [
-                this.accountAddress,
-                'latest',
-              ]
-            });
-            balance = new BigNumber(item.amount, 16)
-              .shiftedBy(-item.decimals)
-              .toFixed();
-            result[item.assetID].amount = balance;
-          } catch (error) {
-            console.error(error);
-            this.handleDapiError(error);
-          }
-        }
+        result[item.assetID].amount = await this.getBalancByHash(item);
       }
       this.store.dispatch({
         type: dispatchBalanceType,
@@ -238,8 +202,8 @@ export class MetaMaskWalletApiService {
       UNI_SWAP_CONTRACT_HASH
     );
     try {
-      await new Promise((resolve, reject) => {
-        uniswapContract.methods
+      await new Promise(async (resolve, reject) => {
+        const data = uniswapContract.methods
           .swapExactTokensForETHSupportingFeeOnTransferTokens(
             new BigNumber(1).shiftedBy(18),
             0,
@@ -249,21 +213,27 @@ export class MetaMaskWalletApiService {
             ],
             '0xd34E3B073a484823058Ab76fc2304D5394beafE4',
             Math.floor(Date.now() / 1000 + 600)
-          )
-          .send({ from: '0xd34E3B073a484823058Ab76fc2304D5394beafE4' })
-          .on('error', (error) => {
-            console.log(error);
-          })
-          .on('transactionHash', (hash) => {
-            console.log('hash: ' + hash);
-          })
-          .on('receipt', (receipt) => {
-            console.log(receipt);
-            if (receipt.status === false) {
+          ).encodeABI();
+        const txHash = await this.ethereum
+          .request({
+            method: 'eth_sendTransaction',
+            params: [this.getSendTransactionParams('0xd34E3B073a484823058Ab76fc2304D5394beafE4', UNI_SWAP_CONTRACT_HASH, data, '0')]
+          });
+        // resolve(txHash);
+        const timer = setInterval(async () => {
+          const receipt = await this.ethereum
+            .request({
+              method: 'eth_getTransactionReceipt',
+              params: [txHash]
+            });
+          if (receipt) {
+            if (new BigNumber(receipt.status, 16).isZero()) {
               this.nzMessage.error('Transaction failed');
               this.store.dispatch({ type: UPDATE_PENDING_TX, data: null });
             }
-          });
+            clearInterval(timer);
+          }
+        }, 5000);
       });
       // this.handleTx(fromToken, toToken, inputAmount, hash);
       // return hash;
@@ -284,8 +254,8 @@ export class MetaMaskWalletApiService {
       UNI_SWAP_CONTRACT_HASH
     );
     try {
-      await new Promise((resolve, reject) => {
-        uniswapContract.methods
+      await new Promise(async (resolve, reject) => {
+        const data = uniswapContract.methods
           .swapExactETHForTokensSupportingFeeOnTransferTokens(
             0,
             [
@@ -294,24 +264,28 @@ export class MetaMaskWalletApiService {
             ],
             '0xd34E3B073a484823058Ab76fc2304D5394beafE4',
             Math.floor(Date.now() / 1000 + 600)
-          )
-          .send({
-            from: '0xd34E3B073a484823058Ab76fc2304D5394beafE4',
-            value: new BigNumber(0.001).shiftedBy(18),
-          })
-          .on('error', (error) => {
-            console.log(error);
-          })
-          .on('transactionHash', (hash) => {
-            console.log(hash);
-          })
-          .on('receipt', (receipt) => {
-            console.log(receipt);
-            if (receipt.status === false) {
+          ).encodeABI();
+        const txHash = await this.ethereum
+          .request({
+            method: 'eth_sendTransaction',
+            params: [this.getSendTransactionParams('0xd34E3B073a484823058Ab76fc2304D5394beafE4',
+              UNI_SWAP_CONTRACT_HASH, data, new BigNumber(0.001).shiftedBy(18).toFixed())]
+          });
+        // resolve(txHash);
+        const timer = setInterval(async () => {
+          const receipt = await this.ethereum
+            .request({
+              method: 'eth_getTransactionReceipt',
+              params: [txHash]
+            });
+          if (receipt) {
+            if (new BigNumber(receipt.status, 16).isZero()) {
               this.nzMessage.error('Transaction failed');
               this.store.dispatch({ type: UPDATE_PENDING_TX, data: null });
             }
-          });
+            clearInterval(timer);
+          }
+        }, 5000);
       });
       // this.handleTx(fromToken, toToken, inputAmount, hash);
       // return hash;
@@ -332,8 +306,8 @@ export class MetaMaskWalletApiService {
       UNI_SWAP_CONTRACT_HASH
     );
     try {
-      await new Promise((resolve, reject) => {
-        uniswapContract.methods
+      await new Promise(async (resolve, reject) => {
+        const data = uniswapContract.methods
           .swapExactTokensForTokensSupportingFeeOnTransferTokens(
             new BigNumber(0.0000001).shiftedBy(18),
             0,
@@ -343,21 +317,27 @@ export class MetaMaskWalletApiService {
             ],
             '0xd34E3B073a484823058Ab76fc2304D5394beafE4',
             Math.floor(Date.now() / 1000 + 600)
-          )
-          .send({ from: '0xd34E3B073a484823058Ab76fc2304D5394beafE4' })
-          .on('error', (error) => {
-            console.log(error);
-          })
-          .on('transactionHash', (hash) => {
-            console.log(hash);
-          })
-          .on('receipt', (receipt) => {
-            console.log(receipt);
-            if (receipt.status === false) {
+          ).encodeABI();
+        const txHash = await this.ethereum
+          .request({
+            method: 'eth_sendTransaction',
+            params: [this.getSendTransactionParams('0xd34E3B073a484823058Ab76fc2304D5394beafE4', UNI_SWAP_CONTRACT_HASH, data, '0')]
+          });
+        // resolve(txHash);
+        const timer = setInterval(async () => {
+          const receipt = await this.ethereum
+            .request({
+              method: 'eth_getTransactionReceipt',
+              params: [txHash]
+            });
+          if (receipt) {
+            if (new BigNumber(receipt.status, 16).isZero()) {
               this.nzMessage.error('Transaction failed');
               this.store.dispatch({ type: UPDATE_PENDING_TX, data: null });
             }
-          });
+            clearInterval(timer);
+          }
+        }, 5000);
       });
       // this.handleTx(fromToken, toToken, inputAmount, hash);
       // return hash;
@@ -384,8 +364,8 @@ export class MetaMaskWalletApiService {
       ETH_CROSS_SWAP_CONTRACT_HASH
     );
     try {
-      const hash: string = await new Promise((resolve, reject) => {
-        swapContract.methods
+      const hash: string = await new Promise(async (resolve, reject) => {
+        const data = swapContract.methods
           .swap(
             `0x${fromToken.assetID}`, // fromAssetHash
             1, // toPoolId
@@ -394,19 +374,29 @@ export class MetaMaskWalletApiService {
             new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
             0, // fee
             1 // id
-          )
-          .send({ from: fromAddress })
-          .on('error', reject)
-          .on('transactionHash', resolve)
-          .on('receipt', (receipt) => {
-            console.log(receipt);
-            if (receipt.status === false) {
+          ).encodeABI();
+        const txHash = await this.ethereum
+          .request({
+            method: 'eth_sendTransaction',
+            params: [this.getSendTransactionParams(fromAddress, ETH_CROSS_SWAP_CONTRACT_HASH, data, '0')]
+          });
+        resolve(txHash);
+        const timer = setInterval(async () => {
+          const receipt = await this.ethereum
+            .request({
+              method: 'eth_getTransactionReceipt',
+              params: [hash]
+            });
+          console.log(receipt);
+          if (receipt) {
+            if (new BigNumber(receipt.status, 16).isZero()) {
               this.nzMessage.error('Transaction failed');
               this.store.dispatch({ type: UPDATE_PENDING_TX, data: null });
             }
-          });
+            clearInterval(timer);
+          }
+        }, 5000);
       });
-      console.log(hash);
       this.handleTx(fromToken, toToken, inputAmount, hash);
       return hash;
     } catch (error) {
@@ -421,7 +411,8 @@ export class MetaMaskWalletApiService {
     inputAmount: string,
     fromAddress: string,
     toAddress: string,
-    toChainId: number
+    toChainId: number,
+    fee?: string
   ): Promise<string> {
     if (this.checkNetwork(fromToken) === false) {
       return;
@@ -432,21 +423,21 @@ export class MetaMaskWalletApiService {
       ETH_CROSS_SWAP_CONTRACT_HASH
     );
     try {
-      const hash: string = await new Promise((resolve, reject) => {
-        swapContract.methods
-          .add_liquidity(
-            `0x${fromToken.assetID}`, // fromAssetHash
-            1, // toPoolId
-            toChainId, // toChainId
-            toAddress, // toAddress
-            new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
-            0, // fee
-            1 // id
-          )
-          .send({ from: fromAddress })
-          .on('error', reject)
-          .on('transactionHash', resolve);
-      });
+      const data = swapContract.methods
+        .add_liquidity(
+          fromToken.assetID.startsWith('0x') ? fromToken.assetID : `0x${fromToken.assetID}`, // fromAssetHash
+          1, // toPoolId
+          toChainId, // toChainId
+          toAddress, // toAddress
+          new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
+          0, // fee
+          1 // id
+        ).encodeABI();
+      const hash = await this.ethereum
+        .request({
+          method: 'eth_sendTransaction',
+          params: [this.getSendTransactionParams(fromAddress, ETH_CROSS_SWAP_CONTRACT_HASH, data, '0')]
+        });
       this.handleTx(fromToken, null, inputAmount, hash);
       return hash;
     } catch (error) {
@@ -461,7 +452,8 @@ export class MetaMaskWalletApiService {
     inputAmount: string,
     fromAddress: string,
     toAddress: string,
-    toChainId: number
+    toChainId: number,
+    fee?: string
   ): Promise<string> {
     if (this.checkNetwork(fromToken) === false) {
       return;
@@ -472,22 +464,22 @@ export class MetaMaskWalletApiService {
       ETH_CROSS_SWAP_CONTRACT_HASH
     );
     try {
-      const hash: string = await new Promise((resolve, reject) => {
-        swapContract.methods
-          .remove_liquidity(
-            `0x${fromToken.assetID}`, // fromAssetHash
-            1, // toPoolId
-            toChainId, // toChainId
-            toAddress, // toAddress
-            new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
-            0, // fee
-            1 // id
-          )
-          .send({ from: fromAddress })
-          .on('error', reject)
-          .on('transactionHash', resolve);
-      });
-      // this.handleTx(fromToken, null, inputAmount, hash);
+      const data = swapContract.methods
+        .remove_liquidity(
+          fromToken.assetID.startsWith('0x') ? fromToken.assetID : `0x${fromToken.assetID}`, // fromAssetHash
+          1, // toPoolId
+          toChainId, // toChainId
+          toAddress, // toAddress
+          new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
+          0, // fee
+          1 // id
+        ).encodeABI();
+      const hash = await this.ethereum
+        .request({
+          method: 'eth_sendTransaction',
+          params: [this.getSendTransactionParams(fromAddress, ETH_CROSS_SWAP_CONTRACT_HASH, data, '0')]
+        });
+      this.handleTx(fromToken, null, inputAmount, hash);
       return hash;
     } catch (error) {
       console.error(error);
@@ -502,9 +494,14 @@ export class MetaMaskWalletApiService {
       json,
       fromToken.assetID
     );
-    const result = await ethErc20Contract.methods
+    const data = ethErc20Contract.methods
       .allowance(fromAddress, ETH_CROSS_SWAP_CONTRACT_HASH)
-      .call();
+      .encodeABI();
+    const result = await this.ethereum
+      .request({
+        method: 'eth_call',
+        params: [this.getSendTransactionParams(fromAddress, fromToken.assetID, data)]
+      });
     console.log('allowance: ' + result);
     return new BigNumber(result).shiftedBy(-fromToken.decimals).toFixed();
   }
@@ -519,15 +516,30 @@ export class MetaMaskWalletApiService {
       fromToken.assetID
     );
     try {
-      const result = await new Promise((resolve, reject) => {
-        ethErc20Contract.methods
+      const result = await new Promise(async (resolve, reject) => {
+        const data = ethErc20Contract.methods
           .approve(
             ETH_CROSS_SWAP_CONTRACT_HASH,
             '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-          )
-          .send({ from: fromAddress })
-          .on('error', reject)
-          .on('receipt', resolve);
+          ).encodeABI();
+        const hash = await this.ethereum
+          .request({
+            method: 'eth_sendTransaction',
+            params: [this.getSendTransactionParams(fromAddress, fromToken.assetID, data)]
+          });
+        resolve(hash);
+        // const timer = setInterval(async () => {
+        //   const receipt = await this.ethereum
+        //     .request({
+        //       method: 'eth_getTransactionReceipt',
+        //       params: [hash]
+        //     });
+        //   console.log(receipt);
+        //   if (receipt) {
+        //     resolve(resolve);
+        //     clearInterval(timer);
+        //   }
+        // }, 1000);
       });
       console.log('approve result: ' + result);
       return result;
@@ -558,6 +570,23 @@ export class MetaMaskWalletApiService {
       },
     };
     this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
+  }
+
+  private getSendTransactionParams(from: string, to: string, data: string, value?: string, gas?: string, gasPrice?: string): object {
+    if (value && !value.startsWith('0x')) {
+      value = '0x' + new BigNumber(value).toString(16);
+    }
+    if (!to.startsWith('0x')) {
+      to = '0x' + to;
+    }
+    return {
+      from,
+      to,
+      value,
+      gas,
+      gasPrice,
+      data
+    };
   }
 
   private handleDapiError(error): void {

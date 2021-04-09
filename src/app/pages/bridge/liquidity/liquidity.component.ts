@@ -215,7 +215,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     }
     const allowance = await this.metaMaskWalletApiService.getAllowance(this.LPToken, this.currentAddress);
     if (new BigNumber(allowance).comparedTo(lpPayAmount) < 0) {
-      this.metaMaskWalletApiService.approve(this.LPToken, this.currentAddress);
+      await this.metaMaskWalletApiService.approve(this.LPToken, this.currentAddress);
     }
     this.metaMaskWalletApiService.removeLiquidity(
       this.LPToken,
