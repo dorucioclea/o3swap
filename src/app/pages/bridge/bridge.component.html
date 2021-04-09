@@ -19,7 +19,7 @@
         </div>
         <div class="asset">≈ $ {{ inputAmountFiat || '0.00' }}</div>
       </div>
-      <img class="transform" src="/assets/images/swap/exchange-home.png" alt="">
+      <img class="transform" (click)="exchangeToken()" src="/assets/images/swap/exchange-home.png" alt="">
       <div class="right-container">
         <div class="header">
           <div class="left">You will receive</div>
@@ -35,7 +35,8 @@
         <div class="asset">≈ $ {{ receiveAmountFiat || '0.00' }}</div>
       </div>
     </div>
-    <p class="detail">Exchange Rate BUSD/USDT (including fees): <span>1: 0.9984</span></p>
+    <p class="detail">Exchange Rate {{ fromToken?.symbol || '--' }}/{{ toToken?.symbol || '--' }} (including fees):
+      <span>{{ bridgeRate }}</span></p>
     <p class="detail">Max slippage: <span>1%</span></p>
     <div class="btn-primary big-btn swap-btn" [ngClass]="{active: checkCanInquiry()}" (click)="swap()">Swap</div>
   </div>

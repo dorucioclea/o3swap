@@ -270,6 +270,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
   }
   calcutionInputAmountFiat(): void {
     if (!this.fromToken) {
+      this.inputAmountFiat = '';
       return;
     }
     const price = this.rates[this.fromToken.rateName];

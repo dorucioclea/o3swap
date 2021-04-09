@@ -43,6 +43,7 @@ export class BridgeComponent implements OnInit {
   showApprove = false;
   hasApprove = false;
   isApproveLoading = false;
+  bridgeRate: string;
 
   constructor(
     public store: Store<State>,
@@ -92,9 +93,22 @@ export class BridgeComponent implements OnInit {
         } else {
           this.toToken = res;
         }
+        this.getBridgeRate();
         this.calcutionReceiveAmount();
       }
     });
+  }
+
+  exchangeToken(): void {
+    if (this.toToken || this.fromToken) {
+      const temp = this.fromToken;
+      this.fromToken = this.toToken;
+      this.toToken = temp;
+      this.checkInputAmountDecimal();
+      this.calcutionInputAmountFiat();
+      this.calcutionReceiveAmount();
+      this.getBridgeRate();
+    }
   }
 
   allInputAmount(): void {
@@ -125,7 +139,6 @@ export class BridgeComponent implements OnInit {
   }
 
   swap(): void {
-    console.log('++++++++')
     if (this.checkWalletConnect() === false) {
       return;
     }
@@ -145,7 +158,7 @@ export class BridgeComponent implements OnInit {
 
   //#region
   checkWalletConnect(): boolean {
-    console.log(this.fromToken)
+    console.log(this.fromToken);
     console.log(this.toToken);
     if (
       (this.fromToken.chain === 'NEO' || this.toToken.chain === 'NEO') &&
@@ -257,6 +270,7 @@ export class BridgeComponent implements OnInit {
 
   calcutionInputAmountFiat(): void {
     if (!this.fromToken) {
+      this.inputAmountFiat = '';
       return;
     }
     const price = this.rates[this.fromToken.rateName];
@@ -272,6 +286,7 @@ export class BridgeComponent implements OnInit {
 
   calcutionReceiveAmountFiat(): void {
     if (!this.toToken) {
+      this.receiveAmountFiat = '';
       return;
     }
     const price = this.rates[this.toToken.rateName];
@@ -300,6 +315,17 @@ export class BridgeComponent implements OnInit {
       this.inputAmount
     );
     this.calcutionReceiveAmountFiat();
+  }
+
+  async getBridgeRate(): Promise<void> {
+    if (this.fromToken && this.toToken) {
+      this.bridgeRate = await this.apiService.getBridgeRate(
+        this.fromToken,
+        this.toToken
+      );
+    } else {
+      this.bridgeRate = '';
+    }
   }
 
   getRates(): void {

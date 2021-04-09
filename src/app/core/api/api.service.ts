@@ -57,6 +57,25 @@ export class ApiService {
     });
   }
 
+  getBridgeRate(fromToken: Token, toToken: Token): Promise<string> {
+    const fromPUsdt = ETH_PUSDT[fromToken.chain];
+    const toPUsdt = ETH_PUSDT[toToken.chain];
+    return this.http
+      .get(
+        `${POLY_HOST}/spotPriceSansFee/0x16a3Ac9d6682dc4b1bfC02da254379E9F4b37Fed/${fromPUsdt}/${toPUsdt}`
+      )
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200 && res.price) {
+            return new BigNumber(res.price)
+              .shiftedBy(-fromToken.decimals)
+              .toFixed();
+          }
+        })
+      )
+      .toPromise();
+  }
+
   getBridgeAmountOut(
     fromToken: Token,
     toToken: Token,
