@@ -302,7 +302,7 @@ const USD_TOKENS: Token[] = [
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
-  }
+  },
 ];
 
 const LP_TOKENS: Token[] = [
@@ -342,7 +342,8 @@ export const CHAIN_TOKENS = {
   BSC: BSC_TOKENS,
   HECO: HECO_TOKENS,
   USD: USD_TOKENS,
-  LP: LP_TOKENS
+  LP: LP_TOKENS,
+  MIX_NEO_TOKENS,
 };
 
 export type CHAINS = 'ALL' | 'NEO' | 'ETH' | 'BSC' | 'HECO';

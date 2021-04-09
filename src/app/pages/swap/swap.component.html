@@ -61,7 +61,7 @@
             </ng-lottie>
           </div>
           <div class="right">
-            <p class="name">{{ transaction?.toToken.atNeoAssetName }}</p>
+            <p class="name">{{ transaction?.fromToken.chain }}</p>
             <div class="hash" *ngIf="transaction?.progress.step1.status===2">
               <span>Hash</span>
               {{ transaction?.progress.step1.hash | shortAddress: 6 }}
@@ -117,7 +117,7 @@
             </ng-lottie>
           </div>
           <div class="right">
-            <p class="name">{{ transaction?.toToken.symbol }}</p>
+            <p class="name">{{ transaction?.toToken.chain }}</p>
             <div class="hash" *ngIf="transaction?.progress.step3.status===2">
               <span>Hash</span>
               {{ transaction?.progress.step3.hash | shortAddress: 6 }}

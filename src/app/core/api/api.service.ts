@@ -330,12 +330,17 @@ export class ApiService {
       .toPromise();
   }
 
-  private getNeoAssetLogoByName(name: string): string {
-    const token1 = ALL_NEO_TOKENS.find((item) => item.symbol === name);
-    const token2 = CHAIN_TOKENS.ETH.find((item) => item.symbol === name);
-    const token3 = CHAIN_TOKENS.BSC.find((item) => item.symbol === name);
-    const token4 = CHAIN_TOKENS.HECO.find((item) => item.symbol === name);
-    const token = token1 || token2 || token3 || token4;
+  private getAssetLogoByName(name: string): string {
+    let token;
+    for (const key in CHAIN_TOKENS) {
+      if (CHAIN_TOKENS.hasOwnProperty(key)) {
+        const tokenList = CHAIN_TOKENS[key];
+        token = tokenList.find((item) => item.symbol === name);
+        if (token) {
+          break;
+        }
+      }
+    }
     return token && token.logo;
   }
 
@@ -351,7 +356,7 @@ export class ApiService {
       }
       item.swapPathLogo = [];
       item.swapPath.forEach((name) => {
-        item.swapPathLogo.push(this.getNeoAssetLogoByName(name));
+        item.swapPathLogo.push(this.getAssetLogoByName(name));
       });
     });
     return this.shellSortSwapPath(swapPathArr);
