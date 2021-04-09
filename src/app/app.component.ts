@@ -93,6 +93,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.apiService.getTokens();
     this.swap$.subscribe((state) => {
       this.neoAccountAddress = state.neoAccountAddress;
       this.ethAccountAddress = state.ethAccountAddress;

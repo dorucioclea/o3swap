@@ -12,7 +12,7 @@ export interface SwapTransaction {
   txid: string;
   isPending: boolean;
   min: boolean;
-  fromTokenName: string;
+  fromToken: Token;
   toToken: Token;
   amount: string;
   progress?: TxProgress;
@@ -36,7 +36,7 @@ export interface SwapStateType {
   transaction: SwapTransaction;
 }
 
-export const O3SWAP_FEE_PERCENTAGE = 0.3; // 系统收费 0.3%
+export const O3SWAP_FEE_PERCENTAGE = 0.003; // 系统收费 0.3%
 export const ALL_PERCENTAGE = 1.003;
 
 // export const NEO_SCRIPTHASH =

@@ -84,6 +84,11 @@ export class SwapComponent implements OnInit, OnDestroy {
         this.transaction = Object.assign({}, state.transaction);
         this.setRequestCrossInterval();
       }
+      // if (交易失败) {
+      //   if (this.requestCrossInterval) {
+      //     this.requestCrossInterval.unsubscribe();
+      //   }
+      // }
       this.transaction = Object.assign({}, state.transaction);
       this.showTxModal = this.transaction.min === false ? true : false;
       if (this.transaction.isPending === false) {

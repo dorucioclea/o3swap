@@ -168,9 +168,9 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
     if (this.checkCanInquiry() === false) {
       return;
     }
-    if (this.checkWalletConnect() === false) {
-      return;
-    }
+    // if (this.checkWalletConnect() === false) {
+    //   return;
+    // }
     this.toInquiryPage.emit({
       inputAmount: this.inputAmount,
       fromToken: this.fromToken,

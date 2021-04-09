@@ -87,6 +87,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   receiveSwapPathArray: AssetQueryResponse;
   price: string; // swap 比
   lnversePrice: string; // swap 反比
+  netWorkFee;
 
   fromAddress: string;
   toAddress: string;
@@ -120,7 +121,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.bscWalletName = state.bscWalletName;
       this.hecoWalletName = state.hecoWalletName;
       this.getFromAndToAddress();
-      this.checkShowApprove();
     });
     this.setting$.subscribe((state) => {
       this.slipValue = state.slipValue;
@@ -132,11 +132,13 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.receiveSwapPathArray = this.initData.receiveSwapPathArray;
       this.price = this.initData.price;
       this.lnversePrice = this.initData.lnversePrice;
+      this.netWorkFee = this.initData.netWorkFee;
       this.showInquiry = false;
     } else {
       this.showInquiry = true;
     }
     this.getSwapPathFun();
+    this.getNetworkFee();
     this.setInquiryInterval();
   }
 
@@ -155,6 +157,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.inquiryTime = this.seconds - time;
         if (time === this.seconds) {
           this.getSwapPathFun();
+          this.getNetworkFee();
           timer(1000).subscribe(() => {
             this.setInquiryInterval();
           });
@@ -169,6 +172,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       receiveSwapPathArray: this.receiveSwapPathArray,
       price: this.price,
       lnversePrice: this.lnversePrice,
+      netWorkFee: this.netWorkFee,
     };
     this.closePage.emit(initData);
   }
@@ -200,7 +204,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     this.metaMaskWalletApiService
       .approve(this.fromToken, this.fromAddress)
       .then((res) => {
-        console.log(res);
         this.isApproveLoading = false;
         if (res !== undefined) {
           this.hasApprove = true;
@@ -239,6 +242,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   reGetSwapPath(): void {
     this.inquiryInterval.unsubscribe();
     this.getSwapPathFun();
+    this.getNetworkFee();
     this.setInquiryInterval();
   }
 
@@ -332,7 +336,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.toAddress
       )
       .then((res) => {
-        console.log(res);
         if (res) {
           this.closePage.emit();
         }
@@ -342,10 +345,11 @@ export class SwapResultComponent implements OnInit, OnDestroy {
 
   //#region
   checkShowApprove(): void {
-    console.log(this.fromAddress);
-    console.log(this.toAddress);
+    console.log(this.fromAddress)
+    console.log(this.toAddress)
     if (!this.fromAddress || !this.toAddress) {
       this.showApprove = false;
+      console.log('000000')
       return;
     }
     if (
@@ -353,10 +357,10 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.toToken.chain !== 'NEO' &&
       this.fromToken.chain !== this.toToken.chain
     ) {
+      console.log('-----------')
       this.metaMaskWalletApiService
         .getAllowance(this.fromToken, this.fromAddress)
         .then((balance) => {
-          console.log(balance);
           if (
             new BigNumber(balance).comparedTo(
               new BigNumber(this.inputAmount)
@@ -405,6 +409,26 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     this.chooseSwapPath = this.receiveSwapPathArray[0];
     this.calculationPrice();
   }
+  async getNetworkFee(): Promise<void> {
+    this.netWorkFee = '';
+    if (this.fromToken.chain === 'NEO') {
+      this.netWorkFee = new BigNumber(this.inputAmount)
+        .times(this.o3SwapFee)
+        .dp(this.fromToken.decimals)
+        .toFixed();
+    } else {
+      const polyFee = await this.apiService.getFromEthPolyFee(
+        this.fromToken,
+        this.toToken
+      );
+      const poolFeeRate = await this.apiService.getFromEthPoolFee();
+      this.netWorkFee = new BigNumber(this.inputAmount)
+        .times(new BigNumber(poolFeeRate))
+        .plus(new BigNumber(polyFee))
+        .dp(this.fromToken.decimals)
+        .toFixed();
+    }
+  }
   calculationPrice(): void {
     this.price = new BigNumber(this.chooseSwapPath.receiveAmount)
       .dividedBy(new BigNumber(this.inputAmount))
@@ -416,18 +440,19 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       .toFixed();
   }
   getFromAndToAddress(): void {
+    let tempFromAddress;
     switch (this.fromToken.chain) {
       case 'NEO':
-        this.fromAddress = this.neoAccountAddress;
+        tempFromAddress = this.neoAccountAddress;
         break;
       case 'ETH':
-        this.fromAddress = this.ethAccountAddress;
+        tempFromAddress = this.ethAccountAddress;
         break;
       case 'BSC':
-        this.fromAddress = this.bscAccountAddress;
+        tempFromAddress = this.bscAccountAddress;
         break;
       case 'HECO':
-        this.fromAddress = this.hecoAccountAddress;
+        tempFromAddress = this.hecoAccountAddress;
         break;
     }
     switch (this.toToken.chain) {
@@ -444,6 +469,11 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.toAddress = this.hecoAccountAddress;
         break;
     }
+    if (tempFromAddress !== this.fromAddress) {
+      this.fromAddress = tempFromAddress;
+      this.checkShowApprove();
+    }
+    this.fromAddress = tempFromAddress;
   }
   checkWalletConnect(): boolean {
     if (
