@@ -1,0 +1,24 @@
+<section class="wrapper modal-content">
+  <div class="close-group">
+    <img (click)="close()" class="close" src="/assets/images/swap/close.png" alt="">
+  </div>
+  <p class="title">Choose</p>
+  <div class="search">
+    <input type="text" (focus)="isfocusSearchInput=true" (blur)="isfocusSearchInput=false"
+      [ngClass]="{focus: isfocusSearchInput}" (input)="search($event)" placeholder="Search token name">
+  </div>
+  <div class="chains">
+    <span (click)="changeChain('ALL')" [ngClass]="{active: chain==='ALL'}" class="all"></span>
+    <span (click)="changeChain('ETH')" [ngClass]="{active: chain==='ETH'}" class="eth"></span>
+    <span (click)="changeChain('BSC')" [ngClass]="{active: chain==='BSC'}" class="bsc"></span>
+    <span (click)="changeChain('HECO')" [ngClass]="{active: chain==='HECO'}" class="heco"></span>
+  </div>
+  <ul class="tokens scroll">
+    <li class="token" *ngFor="let tokenItem of displayTokens"
+      [ngClass]="{active: activeToken?.assetID===tokenItem?.assetID}" (click)="selectThisToken(tokenItem)">
+      <img [src]="tokenItem?.logo" alt="">
+      <span class="name flex-1">{{ tokenItem?.symbol }}</span>
+      <span class="amount">{{ tokenItem?.amount | number: '1.0-8' }}</span>
+    </li>
+  </ul>
+</section>
