@@ -10,6 +10,15 @@ export const METAMASK_CHAIN_ID = {
   ETH: NETWORK === 'MainNet' ? 1 : 3,
 };
 
+export const METAMASK_CHAIN = {
+  56: 'BSC',
+  97: 'BSC',
+  128: 'HECO',
+  256: 'HECO',
+  1: 'ETH',
+  3: 'ETH',
+};
+
 export interface Wallet {
   name: WalletName;
   logo: string;
