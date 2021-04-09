@@ -81,6 +81,46 @@ header {
       }
     }
   }
+  ul.is-home-menu {
+    padding: 10px 0;
+    position: absolute;
+    left: 40px;
+    top: 130px;
+    bottom: 0;
+    width: 220px;
+    background-color: #202020;
+    border-radius: 20px 20px 0 0;
+    li {
+      padding-left: 50px;
+      height: 60px;
+      font-size: 14px;
+      a {
+        height: 100%;
+        line-height: 60px;
+        width: 100%;
+        text-align: center;
+        color: #fff;
+        &:hover {
+          color: #46b069;
+        }
+      }
+      &.active {
+        background: linear-gradient(90deg, rgba(18, 18, 18, 0.2), rgba(70, 176, 105, 0.2));
+        a {
+          color: #46b069;
+        }
+      }
+    }
+  }
+  @media screen and (min-width: 1680px) {
+    ul.is-home-menu {
+      left: 20px;
+      width: 180px;
+      li {
+        padding-left: 40px;
+      }
+    }
+  }
   .connect {
     min-width: 310px;
     display: flex;

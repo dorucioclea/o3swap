@@ -4,7 +4,7 @@
       <a routerLink="/">
         <img class="logo" src="/assets/images/logo.png" alt="">
       </a>
-      <ul class="menu flex-1">
+      <ul [ngClass]="{ 'menu flex-1': isHome!==false, 'is-home-menu': isHome===false }">
         <li [ngClass]="{active: isHome}">
           <a routerLink="/">Home</a>
         </li>
