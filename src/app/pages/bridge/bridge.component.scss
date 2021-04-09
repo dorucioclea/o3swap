@@ -47,12 +47,18 @@
           .token-logo {
             width: 32px;
             height: 32px;
-            background: #FFFFFF;
-            opacity: 0.1;
-            border-radius: 50%;
           }
           .token-name {
             margin: 0 10px;
+            font-size: 18px;
+            color: #4A4A4A;
+            &.active {
+              color: #fff;
+            }
+            img.arrow {
+              width: 12px;
+              margin-left: 14px;
+            }
           }
           .token-amount {
             height: 60px;
