@@ -9,6 +9,7 @@ import { SwapTokenComponent } from './compontent/swap-token/swap-token.component
 import { DashboardStakeComponent } from './compontent/dashboard-stake/dashboard-stake.component';
 import { TxProgressComponent } from './compontent/tx-progress/tx-progress.component';
 import { BridgeTokenComponent } from './compontent/bridge-token/bridge-token.component';
+import { WalletConnectComponent } from './compontent/wallet-connect/wallet-connect.component';
 
 import { ShortAddressPipe } from './pipes/short-address.pipe';
 import { TransNumberPipe } from './pipes/trans-number.pipe';
@@ -32,6 +33,7 @@ const COMPONENTS = [
   DashboardStakeComponent,
   TxProgressComponent,
   BridgeTokenComponent,
+  WalletConnectComponent,
 ];
 const PIPES = [ShortAddressPipe, TransNumberPipe, TranslatePipe];
 const DIRECTIVES = [ErrSrcDirective];
@@ -42,7 +44,7 @@ const THIRD_MODULES = [
   NzButtonModule,
   NzModalModule,
   NzProgressModule,
-  LottieModule
+  LottieModule,
 ];
 
 @NgModule({
