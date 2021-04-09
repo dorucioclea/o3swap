@@ -63,10 +63,10 @@
           </div>
         </div>
         <div class="right">
-          <div class="btn-primary deposit-btn" routerLink="/bridge/liquidity">
+          <div class="btn-primary deposit-btn" [routerLink]="['/bridge/liquidity', 'add']">
             Deposit
           </div>
-          <div class="btn-primary withdrawal-btn">
+          <div class="btn-primary withdrawal-btn" [routerLink]="['/bridge/liquidity', 'remove']">
             Withdrawal
           </div>
         </div>

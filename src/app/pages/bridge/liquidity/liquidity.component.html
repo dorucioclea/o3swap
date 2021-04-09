@@ -43,13 +43,17 @@
   <div class="group-container tab-container row2">
     <div class="tab-wrap">
       <div class="tab-nav-scroll">
-        <div class="tabs tabs-add" [ngClass]="{addActive: liquidityType === 'add'}"
-          (click)="changeLiquidityType('add')">
-          Add Liquidity
+        <div
+          class="tabs tabs-add"
+          [ngClass]="{addActive: liquidityType === 'add'}"
+          [routerLink]="['/bridge/liquidity', 'add']">
+            Add Liquidity
         </div>
-        <div class="tabs tabs-remove" [ngClass]="{removeActive: liquidityType === 'remove'}"
-          (click)="changeLiquidityType('remove')">
-          Remove Liquidity
+        <div
+          class="tabs tabs-remove"
+          [ngClass]="{removeActive: liquidityType === 'remove'}"
+          [routerLink]="['/bridge/liquidity', 'remove']">
+            Remove Liquidity
         </div>
       </div>
       <div class="tab-content">

@@ -15,6 +15,7 @@ import { CHAIN_TOKENS, Token } from 'src/app/_lib/token';
 import BigNumber from 'bignumber.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { SWAP_CONTRACT_CHAIN_ID } from '@lib';
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
 
 type LiquidityType = 'add' | 'remove';
 interface State {
@@ -48,13 +49,19 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     private commonService: CommonService,
     public store: Store<State>,
     private metaMaskWalletApiService: MetaMaskWalletApiService,
-    private nzMessage: NzMessageService
+    private nzMessage: NzMessageService,
+    private router: Router,
 
   ) {
     this.swap$ = store.select('swap');
     this.liquidityType = 'add';
     this.addLiquidityTokens.forEach((item, index) => {
       this.inputAmount.push('');
+    });
+    this.router.events.subscribe((res: RouterEvent) => {
+      if (res instanceof NavigationEnd) {
+        this.liquidityType = res.url.indexOf('/remove') > 0 ? 'remove' : 'add';
+      }
     });
   }
 
@@ -129,10 +136,6 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     this.apiService.getRates().subscribe((res) => {
       this.rates = res;
     });
-  }
-
-  changeLiquidityType(params: LiquidityType): void {
-    this.liquidityType = params;
   }
 
   depost(token: Token, index: number): void {
