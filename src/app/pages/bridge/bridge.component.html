@@ -7,8 +7,8 @@
           <div class="right">Balance: 1000 USDT <span>Max</span></div>
         </div>
         <div class="content">
-          <img [src]="fromToken?.logo" alt="" class="token-logo">
           <div class="token-name" [ngClass]="{active: fromToken?.symbol}" (click)="showTokens('from')">
+            <img *ngIf="fromToken?.logo" [src]="fromToken?.logo" alt="" class="token-logo">
             {{ fromToken?.symbol || 'SELECT' }}
             <img _ngcontent-may-c99="" src="/assets/images/swap/arrow-down.png" alt="" class="arrow">
           </div>
@@ -16,7 +16,7 @@
             <input type="number" (input)="changeInputAmount($event)" [ngModel]="inputAmount" placeholder="0">
           </div>
         </div>
-        <div class="asset">≈ $ 10000.000</div>
+        <div class="asset">≈ $ {{ inputAmountFiat || '0.00' }}</div>
       </div>
       <img class="transform" src="/assets/images/swap/exchange-home.png" alt="">
       <div class="right-container">
@@ -24,14 +24,14 @@
           <div class="left">You will receive</div>
         </div>
         <div class="content">
-          <img [src]="toToken?.logo" alt="" class="token-logo">
           <div class="token-name" [ngClass]="{active: toToken?.symbol}" (click)="showTokens('to')">
+            <img *ngIf="toToken?.logo" [src]="toToken?.logo" alt="" class="token-logo">
             {{ toToken?.symbol || 'SELECT' }}
             <img _ngcontent-may-c99="" src="/assets/images/swap/arrow-down.png" alt="" class="arrow">
           </div>
           <div class="token-amount">{{inputAmount || 0}}</div>
         </div>
-        <div class="asset">≈ $ 10000.000</div>
+        <div class="asset">≈ $ {{ inputAmountFiat || '0.00' }}</div>
       </div>
     </div>
     <p class="detail">Exchange Rate BUSD/USDT (including fees): <span>1: 0.9984</span></p>
