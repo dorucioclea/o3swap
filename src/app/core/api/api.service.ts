@@ -33,7 +33,7 @@ export class ApiService {
     private http: HttpClient,
     private commonService: CommonService,
     private swapService: SwapService
-  ) {}
+  ) { }
 
   postEmail(email: string): Observable<any> {
     return this.http.post(`https://subscribe.o3swap.com/subscribe`, { email });
@@ -352,6 +352,70 @@ export class ApiService {
         })
       );
   }
+
+  /**
+   * @description:
+   * @param fromToken fromToken
+   * @param amount amount
+   * @return Promise
+   */
+  getPoolOutGivenSingleIn(fromToken: Token, amount: string): Promise<string> {
+    const poolUsdtHash = ETH_PUSDT[fromToken.chain];
+    amount = new BigNumber(amount).multipliedBy(new BigNumber(10).pow(fromToken.decimals)).toFixed();
+    return this.http
+      .get(`${POLY_HOST}/calcPoolOutGivenSingleIn/0x16a3Ac9d6682dc4b1bfC02da254379E9F4b37Fed/${poolUsdtHash}/${amount}`)
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200) {
+            return new BigNumber(res.pool_amount_out).shiftedBy(-18).toFixed();
+          }
+        })
+      )
+      .toPromise();
+  }
+
+  /**
+   * @description: Input USDT get LP
+   * @param fromTokenn fromToken
+   * @param amount USDT amount
+   * @return Promise Out
+   */
+  getPoolOutGivenSingleOut(fromToken: Token, amount: string): Promise<string> {
+    const poolUsdtHash = ETH_PUSDT[fromToken.chain];
+    amount = new BigNumber(amount).multipliedBy(new BigNumber(10).pow(fromToken.decimals)).toFixed();
+    return this.http
+      .get(`${POLY_HOST}/calcPoolInGivenSingleOut/0x16a3Ac9d6682dc4b1bfC02da254379E9F4b37Fed/${poolUsdtHash}/${amount}`)
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200) {
+            return new BigNumber(res.pool_amount_out).shiftedBy(-18).toFixed();
+          }
+        })
+      )
+      .toPromise();
+  }
+
+  /**
+   * @description: Input USDT get LP
+   * @param fromToken fromToken
+   * @param amount LP amount
+   * @return promise
+   */
+  getSingleInGivenPoolIn(fromToken: Token, amount: string): Promise<string> {
+    const poolUsdtHash = ETH_PUSDT[fromToken.chain];
+    amount = new BigNumber(amount).multipliedBy(new BigNumber(10).pow(fromToken.decimals)).toFixed();
+    return this.http
+      .get(`${POLY_HOST}/calcSingleOutGivenPoolIn/0x16a3Ac9d6682dc4b1bfC02da254379E9F4b37Fed/${poolUsdtHash}/${amount}`)
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200) {
+            return new BigNumber(res.token_amount_out).shiftedBy(-fromToken.decimals).toFixed();
+          }
+        })
+      )
+      .toPromise();
+  }
+
 
   private getToStandardSwapPathReq(
     fromToken: Token,

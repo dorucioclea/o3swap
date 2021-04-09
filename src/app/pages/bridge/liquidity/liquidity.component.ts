@@ -35,7 +35,10 @@ export class LiquidityComponent implements OnInit, OnDestroy {
 
   LPToken: Token;
   LPTokens: Token[];
-  inputAmount = [];
+  addLiquidityInputAmount = [];
+  removeLiquidityInputAmount = [];
+  receiveAmount: string;
+  payAmount: string;
   currentChain: string;
   swap$: Observable<any>;
   neoAccountAddress: string;
@@ -56,7 +59,8 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     this.swap$ = store.select('swap');
     this.liquidityType = 'add';
     this.addLiquidityTokens.forEach((item, index) => {
-      this.inputAmount.push('');
+      this.addLiquidityInputAmount.push('');
+      this.removeLiquidityInputAmount.push('');
     });
     this.router.events.subscribe((res: RouterEvent) => {
       if (res instanceof NavigationEnd) {
@@ -78,7 +82,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
             item.amount = state.ethBalances[item.assetID].amount;
             this.currentChain = 'ETH';
           } else {
-            item.amount = '0';
+            item.amount = '--';
           }
         });
       }
@@ -88,7 +92,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
             item.amount = state.bscBalances[item.assetID].amount;
             this.currentChain = 'BSC';
           } else {
-            item.amount = '0';
+            item.amount = '--';
           }
         });
       }
@@ -98,7 +102,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
             item.amount = state.hecoBalances[item.assetID].amount;
             this.currentChain = 'HECO';
           } else {
-            item.amount = '0';
+            item.amount = '--';
           }
         });
       }
@@ -131,27 +135,64 @@ export class LiquidityComponent implements OnInit, OnDestroy {
 
   }
 
-
   getRates(): void {
     this.apiService.getRates().subscribe((res) => {
       this.rates = res;
     });
   }
 
-  depost(token: Token, index: number): void {
+  changeLiquidityType(params: LiquidityType): void {
+    this.liquidityType = params;
+  }
+
+  async changeInAmount(token: Token, index: number): Promise<void> {
+    if (!new BigNumber(this.addLiquidityInputAmount[index]).isNaN()) {
+      this.receiveAmount = await this.apiService.getPoolOutGivenSingleIn(token, this.addLiquidityInputAmount[index]);
+    } else {
+      this.receiveAmount = '';
+    }
+  }
+
+  async changeOutAmount(token: Token, index: number): Promise<void> {
+    if (!new BigNumber(this.removeLiquidityInputAmount[index]).isNaN()) {
+      this.payAmount = await this.apiService.getPoolOutGivenSingleOut(token, this.removeLiquidityInputAmount[index]);
+    } else {
+      this.payAmount = '';
+    }
+  }
+
+  maxAddLiquidityInput(index: number): void {
+    if (!new BigNumber(this.addLiquidityTokens[index].amount).isNaN()) {
+      this.addLiquidityInputAmount[index] = this.addLiquidityTokens[index].amount;
+    }
+  }
+
+  async maxRemoveLiquidityInput(index: number): Promise<void> {
+    if (!new BigNumber(this.LPToken.amount).isNaN()) {
+      this.removeLiquidityInputAmount[index] =
+        await this.apiService.getSingleInGivenPoolIn(this.addLiquidityTokens[index], this.LPToken.amount);
+      this.payAmount = this.LPToken.amount;
+    }
+  }
+
+  async depost(token: Token, index: number): Promise<void> {
     if (token.amount === '--') {
       this.nzMessage.error(`Please connect the ${token.chain} wallet first`);
       return;
     }
     const tokenBalance = new BigNumber(token.amount);
-    const inputAmount = new BigNumber(this.inputAmount[index]);
-    if (tokenBalance.comparedTo(inputAmount) < 0) {
+    const tokenAmount = new BigNumber(this.addLiquidityInputAmount[index]);
+    if (tokenBalance.comparedTo(tokenAmount) < 0) {
       this.nzMessage.error('Insufficient balance');
       return;
     }
+    const allowance = await this.metaMaskWalletApiService.getAllowance(token, this.currentAddress);
+    if (new BigNumber(allowance).comparedTo(tokenAmount) < 0) {
+      await this.metaMaskWalletApiService.approve(token, this.currentAddress);
+    }
     this.metaMaskWalletApiService.addLiquidity(
       token,
-      this.inputAmount[index],
+      this.addLiquidityInputAmount[index],
       this.metaMaskWalletApiService.accountAddress,
       this.metaMaskWalletApiService.accountAddress,
       SWAP_CONTRACT_CHAIN_ID[token.chain]).then(res => {
@@ -161,20 +202,24 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       });
   }
 
-  withdrawal(token: Token, index: number): void {
-    if (token.amount === '--') {
+  async withdrawal(token: Token, index: number): Promise<void> {
+    if (this.LPToken.amount === '--') {
       this.nzMessage.error(`Please connect the ${token.chain} wallet first`);
       return;
     }
-    const tokenBalance = new BigNumber(token.amount);
-    const inputAmount = new BigNumber(this.inputAmount[index]);
-    if (tokenBalance.comparedTo(inputAmount) < 0) {
+    const lpBalance = new BigNumber(this.LPToken.amount);
+    const lpPayAmount = new BigNumber(this.payAmount);
+    if (lpBalance.comparedTo(lpPayAmount) < 0) {
       this.nzMessage.error('Insufficient balance');
       return;
     }
+    const allowance = await this.metaMaskWalletApiService.getAllowance(this.LPToken, this.currentAddress);
+    if (new BigNumber(allowance).comparedTo(lpPayAmount) < 0) {
+      this.metaMaskWalletApiService.approve(this.LPToken, this.currentAddress);
+    }
     this.metaMaskWalletApiService.removeLiquidity(
-      token,
-      this.inputAmount[index],
+      this.LPToken,
+      lpPayAmount.toFixed(),
       this.metaMaskWalletApiService.accountAddress,
       this.metaMaskWalletApiService.accountAddress,
       SWAP_CONTRACT_CHAIN_ID[token.chain]).then(res => {

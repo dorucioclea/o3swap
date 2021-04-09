@@ -172,6 +172,14 @@
                   background: #303030;
                   border-radius: 10px;
                   color: #6162ef;
+                  cursor: not-allowed;
+                  &.active {
+                    cursor: pointer;
+                    &:hover {
+                      background-color: #6162EF;
+                      color: #fff;
+                    }
+                  }
                 }
                 .balance {
                   width: 150px;
