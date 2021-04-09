@@ -112,7 +112,7 @@ header {
       }
     }
   }
-  @media screen and (min-width: 1680px) {
+  @media screen and (max-width: 1680px) {
     ul.is-home-menu {
       left: 20px;
       width: 180px;
