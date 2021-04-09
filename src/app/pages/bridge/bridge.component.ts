@@ -4,7 +4,7 @@ import { EthWalletName, NeoWalletName, SwapStateType, Token, USD_TOKENS } from '
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { SwapTokenComponent } from '@shared';
+import { BridgeTokenComponent } from '@shared';
 import BigNumber from 'bignumber.js';
 import { Observable } from 'rxjs';
 
@@ -72,7 +72,7 @@ export class BridgeComponent implements OnInit {
 
   showTokens(type: 'from' | 'to'): void {
     const modal = this.modal.create({
-      nzContent: SwapTokenComponent,
+      nzContent: BridgeTokenComponent,
       nzFooter: null,
       nzTitle: null,
       nzClosable: false,

@@ -199,11 +199,11 @@
                     height: 20px;
                     background: #353535;
                   }
-                  span {
-                    width: 100%;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                  }
+                  // span {
+                  //   width: 100%;
+                  //   overflow: hidden;
+                  //   text-overflow: ellipsis;
+                  // }
                 }
               }
             }
@@ -222,19 +222,19 @@
   }
   .blp-detail {
     display: flex;
-    .left,
-    .right {
+    .left, .right {
       padding: 30px 50px;
       flex: 1;
       &.left {
-        .item-list, .progress-container{
-          color: #8AA1A1;
-          height:20px;
+        .item-list:nth-child(1) {
+          height: 30px;
         }
-        .progress-container {
+        .item-list, .progress-container{
           display: flex;
           width: 100%;
-          & > .progress{
+          height:20px;
+          color: #8AA1A1;
+          .progress{
             height: 6px;
             width: 300px;
           }

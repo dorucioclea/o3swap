@@ -4,7 +4,7 @@
       <a routerLink="/">
         <img class="logo" src="/assets/images/logo.png" alt="">
       </a>
-      <ul [ngClass]="{ 'menu flex-1': isHome!==false, 'is-home-menu': isHome===false }">
+      <ul *ngIf="isHome !== false" [ngClass]="{ 'menu flex-1': isHome !== false }">
         <li [ngClass]="{active: isHome}">
           <a routerLink="/">Home</a>
         </li>
@@ -19,6 +19,35 @@
         </li>
         <li class="add-width">
           <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Buy Crypto</a>
+        </li>
+        <li class="add-width" [ngClass]="{active: currentPage==='/dashboard'}">
+          <a routerLink="/dashboard">Dashboard</a>
+        </li>
+        <!-- <li class="add-width">
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Dashboard</a>
+        </li> -->
+        <li>
+          <a href="https://medium.com/o3-labs-o3-wallet" target="_blank">Blog</a>
+        </li>
+        <li>
+          <a href="https://docs.o3swap.com/" target="_blank">Doc</a>
+        </li>
+      </ul>
+      <ul *ngIf="isHome === false" [ngClass]="{ 'left-menu': isHome === false }">
+        <li [ngClass]="{active: isHome}">
+          <a routerLink="/">Home</a>
+        </li>
+        <li [ngClass]="{active: currentPage==='/swap'}">
+          <a routerLink="/swap">Swap</a>
+        </li>
+        <!-- <li>
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Swap</a>
+        </li> -->
+        <li class="add-width" [ngClass]="{active: currentPage.startsWith('/bridge')}">
+          <a routerLink="/bridge">Bridge</a>
+        </li>
+        <li class="add-width">
+          <a>Buy Crypto</a>
         </li>
         <li class="add-width" [ngClass]="{active: currentPage==='/dashboard'}">
           <a routerLink="/dashboard">Dashboard</a>
