@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService, MetaMaskWalletApiService } from '@core';
-import { EthWalletName, NeoWalletName, SwapStateType, Token } from '@lib';
+import { EthWalletName, NeoWalletName, SwapStateType, Token, USD_TOKENS } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
@@ -17,7 +17,7 @@ interface State {
   styleUrls: ['./bridge.component.scss'],
 })
 export class BridgeComponent implements OnInit {
-  fromToken: Token;
+  fromToken: Token = USD_TOKENS[0];
   toToken: Token;
 
   inputAmount: string;
@@ -87,7 +87,6 @@ export class BridgeComponent implements OnInit {
       if (res) {
         if (type === 'from') {
           this.fromToken = res;
-          console.log(res);
           this.checkInputAmountDecimal();
           this.calcutionInputAmountFiat();
         } else {
@@ -158,8 +157,6 @@ export class BridgeComponent implements OnInit {
 
   //#region
   checkWalletConnect(): boolean {
-    console.log(this.fromToken);
-    console.log(this.toToken);
     if (
       (this.fromToken.chain === 'NEO' || this.toToken.chain === 'NEO') &&
       !this.neoAccountAddress
@@ -236,7 +233,6 @@ export class BridgeComponent implements OnInit {
       this.toToken.chain !== 'NEO' &&
       this.fromToken.chain !== this.toToken.chain
     ) {
-      console.log('-----------');
       this.metaMaskWalletApiService
         .getAllowance(this.fromToken, this.fromAddress)
         .then((balance) => {
@@ -330,7 +326,6 @@ export class BridgeComponent implements OnInit {
 
   getRates(): void {
     this.apiService.getRates().subscribe((res) => {
-      console.log(res);
       this.rates = res;
     });
   }

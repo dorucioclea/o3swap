@@ -345,11 +345,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
 
   //#region
   checkShowApprove(): void {
-    console.log(this.fromAddress)
-    console.log(this.toAddress)
     if (!this.fromAddress || !this.toAddress) {
       this.showApprove = false;
-      console.log('000000')
       return;
     }
     if (
@@ -357,7 +354,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.toToken.chain !== 'NEO' &&
       this.fromToken.chain !== this.toToken.chain
     ) {
-      console.log('-----------')
       this.metaMaskWalletApiService
         .getAllowance(this.fromToken, this.fromAddress)
         .then((balance) => {

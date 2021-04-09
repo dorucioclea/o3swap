@@ -272,7 +272,7 @@ const ALL: Token[] = [
   },
 ];
 
-const USD_TOKENS: Token[] = [
+export const USD_TOKENS: Token[] = [
   {
     assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
     symbol: 'USDT',

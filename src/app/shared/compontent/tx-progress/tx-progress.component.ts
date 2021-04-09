@@ -70,7 +70,7 @@ export class TxProgressComponent implements OnInit, OnDestroy {
         state.transaction.isPending
       ) {
         this.transaction = Object.assign({}, state.transaction);
-        // this.setRequestCrossInterval();
+        this.setRequestCrossInterval();
       }
       // if (交易失败) {
       //   if (this.requestCrossInterval) {
