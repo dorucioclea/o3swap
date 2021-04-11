@@ -75,17 +75,17 @@ export default function swap(state = initialState, action): any {
       return { ...state, balances: {} };
 
     case UPDATE_ETH_BALANCES:
-      return { ...state, ethBalances: action.data };
+      return { ...state, ethBalances: action.data, bscBalances: {}, hecoBalances: {} };
     case RESET_ETH_BALANCES:
       return { ...state, ethBalances: {} };
 
     case UPDATE_BSC_BALANCES:
-      return { ...state, bscBalances: action.data };
+      return { ...state, ethBalances: {}, bscBalances: action.data, hecoBalances: {} };
     case RESET_BSC_BALANCES:
       return { ...state, bscBalances: {} };
 
     case UPDATE_HECO_BALANCES:
-      return { ...state, hecoBalances: action.data };
+      return { ...state, ethBalances: {}, bscBalances: {}, hecoBalances: action.data };
     case RESET_HECO_BALANCES:
       return { ...state, hecoBalances: {} };
 

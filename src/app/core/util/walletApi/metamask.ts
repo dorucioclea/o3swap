@@ -22,6 +22,7 @@ import {
   UPDATE_BSC_BALANCES,
   UPDATE_HECO_BALANCES,
   ETH_SOURCE_CONTRACT_HASH,
+  METAMASK_CHAIN,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import BigNumber from 'bignumber.js';
@@ -77,10 +78,6 @@ export class MetaMaskWalletApiService {
     }
     this.web3 = new Web3((window as any).ethereum);
     this.ethereum = (window as any).ethereum;
-    this.metamaskNetworkId = new BigNumber(
-      this.ethereum.chainId,
-      16
-    ).toNumber();
     // console.log(this.ethereum.isConnected());
     // this.ethereum
     //   .request({ method: 'eth_accounts' })
@@ -95,7 +92,6 @@ export class MetaMaskWalletApiService {
         this.accountAddress = result[0];
         let dispatchAccountType;
         let dispatchWalletNameType;
-        this.getBalance(chain);
         console.log(chain);
         switch (chain) {
           case 'ETH':
@@ -126,11 +122,10 @@ export class MetaMaskWalletApiService {
       });
   }
 
-  async getBalance(chain: string, token?: Token): Promise<boolean> {
-    if (this.metamaskNetworkId !== METAMASK_CHAIN_ID[chain]) {
-      return;
-    }
-    const json = await this.getEthErc20Json();
+  async getBalance(): Promise<boolean> {
+    console.log('getBalance-----------');
+    const chainId = new BigNumber(this.ethereum.chainId, 16).toNumber();
+    const chain = METAMASK_CHAIN[chainId];
     let dispatchBalanceType;
     let tempTokenBalance: Token[];
     return new Promise(async (resolve, reject) => {
@@ -621,10 +616,15 @@ export class MetaMaskWalletApiService {
       .request({ method: 'net_version' })
       .then((chainId) => {
         this.commonService.log('chainId: ' + chainId);
-        this.store.dispatch({
-          type: UPDATE_METAMASK_NETWORK_ID,
-          data: Number(chainId),
-        });
+        const id = Number(chainId);
+        if (this.metamaskNetworkId !== id) {
+          this.metamaskNetworkId = id;
+          this.store.dispatch({
+            type: UPDATE_METAMASK_NETWORK_ID,
+            data: id,
+          });
+          this.getBalance();
+        }
       })
       .catch((error) => {
         this.nzMessage.error(error.message);
@@ -638,13 +638,20 @@ export class MetaMaskWalletApiService {
       ) {
         this.updateWalletName(null);
       }
+      if (this.accountAddress) {
+        this.getBalance();
+      }
     });
     this.ethereum.on('chainChanged', (chainId) => {
-      this.commonService.log('chainId: ' + chainId);
-      this.store.dispatch({
-        type: UPDATE_METAMASK_NETWORK_ID,
-        data: Number(chainId),
-      });
+      const id = Number(chainId);
+      if (this.metamaskNetworkId !== id) {
+        this.metamaskNetworkId = id;
+        this.store.dispatch({
+          type: UPDATE_METAMASK_NETWORK_ID,
+          data: id,
+        });
+        this.getBalance();
+      }
     });
   }
 

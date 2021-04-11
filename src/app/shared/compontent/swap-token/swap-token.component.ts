@@ -214,9 +214,8 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     // chainType tokens
     this.myCHAIN_TOKENS[chainType].forEach((tokenItem, index) => {
       if (chainBalance[tokenItem.assetID]) {
-        this.myCHAIN_TOKENS[chainType][index].amount = this.tokenBalance[
-          chainType
-        ][tokenItem.assetID].amount;
+        this.myCHAIN_TOKENS[chainType][index].amount =
+          chainBalance[tokenItem.assetID].amount;
       }
     });
     this.myCHAIN_TOKENS[chainType] = this.sortTokens(
@@ -224,17 +223,24 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     );
     // alltokens
     this.allTokens.forEach((tokenItem, index) => {
-      if (chainBalance[tokenItem.assetID]) {
+      if (
+        chainBalance[tokenItem.assetID] &&
+        chainBalance[tokenItem.assetID].symbol === // 资产id相同且symbol相同
+          tokenItem.symbol
+      ) {
         this.allTokens[index].amount = chainBalance[tokenItem.assetID].amount;
       }
     });
     this.allTokens = this.sortTokens(this.allTokens);
     // display tokens
     this.displayTokens.forEach((tokenItem, index) => {
-      if (this.tokenBalance[chainType][tokenItem.assetID]) {
-        this.displayTokens[index].amount = this.tokenBalance[chainType][
-          tokenItem.assetID
-        ].amount;
+      if (
+        chainBalance[tokenItem.assetID] &&
+        chainBalance[tokenItem.assetID].symbol === // 资产id相同且symbol相同
+          tokenItem.symbol
+      ) {
+        this.displayTokens[index].amount =
+          chainBalance[tokenItem.assetID].amount;
       }
     });
     this.displayTokens = this.sortTokens(this.displayTokens);

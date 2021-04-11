@@ -19,7 +19,7 @@
       [ngClass]="{active: activeToken?.symbol===tokenItem?.symbol}" (click)="selectThisToken(tokenItem)">
       <img [src]="tokenItem?.logo" alt="">
       <span class="name flex-1">{{ tokenItem?.symbol }}</span>
-      <span class="amount">{{ tokenItem?.amount | number: '1.0-8' }}</span>
+      <span class="amount">{{ tokenItem?.amount | transNumber | number: '1.0-8' }}</span>
     </li>
   </ul>
 </section>
