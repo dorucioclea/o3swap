@@ -38,6 +38,16 @@ export class SwapService {
       .toFixed();
     return factAmount;
   }
+  getAmountOutMinWithAmountOut(amountOut: string, slipValue: number): string {
+    const factPercentage = new BigNumber(1).minus(
+      new BigNumber(slipValue).shiftedBy(-2)
+    );
+    const factAmount = new BigNumber(amountOut)
+      .times(factPercentage)
+      .dp(0)
+      .toFixed();
+    return factAmount;
+  }
   getAssetHashPath(swapPath: string[]): any[] {
     const target = [];
     swapPath.forEach((name) => {

@@ -18,6 +18,7 @@ import {
   POLY_HOST,
   ETH_PUSDT,
   SWAP_CONTRACT_CHAIN_ID,
+  POLY_HOST_ADDRESS,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { CommonService } from '../util/common.service';
@@ -57,25 +58,6 @@ export class ApiService {
     });
   }
 
-  getBridgeRate(fromToken: Token, toToken: Token): Promise<string> {
-    const fromPUsdt = ETH_PUSDT[fromToken.chain];
-    const toPUsdt = ETH_PUSDT[toToken.chain];
-    return this.http
-      .get(
-        `${POLY_HOST}/spotPriceSansFee/0x16a3Ac9d6682dc4b1bfC02da254379E9F4b37Fed/${fromPUsdt}/${toPUsdt}`
-      )
-      .pipe(
-        map((res: any) => {
-          if (res.code === 200 && res.price) {
-            return new BigNumber(res.price)
-              .shiftedBy(-fromToken.decimals)
-              .toFixed();
-          }
-        })
-      )
-      .toPromise();
-  }
-
   getBridgeAmountOut(
     fromToken: Token,
     toToken: Token,
@@ -89,7 +71,7 @@ export class ApiService {
     );
     return this.http
       .get(
-        `${POLY_HOST}/calcOutGivenIn/0x16a3Ac9d6682dc4b1bfC02da254379E9F4b37Fed/${fromPUsdt}/${toPUsdt}/${amount}`
+        `${POLY_HOST}/calcOutGivenIn/${POLY_HOST_ADDRESS}/${fromPUsdt}/${toPUsdt}/${amount}`
       )
       .pipe(
         map((res: any) => {
@@ -103,13 +85,13 @@ export class ApiService {
       .toPromise();
   }
 
-  getFromEthPoolFee(): Promise<string> {
+  getFromEthPoolFeeRate(): Promise<string> {
     return this.http
-      .get(`${POLY_HOST}/swapFee/0x16a3Ac9d6682dc4b1bfC02da254379E9F4b37Fed`)
+      .get(`${POLY_HOST}/swapFee/${POLY_HOST_ADDRESS}`)
       .pipe(
         map((res: any) => {
           if (res.code === 200) {
-            return new BigNumber(res.fee).shiftedBy(-18).toFixed();
+            return new BigNumber(res.fee).shiftedBy(-9).toFixed();
           }
         })
       )
@@ -125,8 +107,8 @@ export class ApiService {
       })
       .pipe(
         map((res: any) => {
-          if (res.UsdtAmount) {
-            return res.UsdtAmount;
+          if (res.TokenAmount) {
+            return res.TokenAmount;
           }
         })
       )
@@ -331,7 +313,7 @@ export class ApiService {
     );
     return this.http
       .get(
-        `${POLY_HOST}/calcOutGivenIn/0x16a3Ac9d6682dc4b1bfC02da254379E9F4b37Fed/${fromPUsdt}/${toPUsdt}/${amount}`
+        `${POLY_HOST}/calcOutGivenIn/${POLY_HOST_ADDRESS}/${fromPUsdt}/${toPUsdt}/${amount}`
       )
       .pipe(
         map((res: any) => {
@@ -363,7 +345,7 @@ export class ApiService {
     const poolUsdtHash = ETH_PUSDT[fromToken.chain];
     amount = new BigNumber(amount).multipliedBy(new BigNumber(10).pow(fromToken.decimals)).toFixed();
     return this.http
-      .get(`${POLY_HOST}/calcPoolOutGivenSingleIn/0x16a3Ac9d6682dc4b1bfC02da254379E9F4b37Fed/${poolUsdtHash}/${amount}`)
+      .get(`${POLY_HOST}/calcPoolOutGivenSingleIn/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`)
       .pipe(
         map((res: any) => {
           if (res.code === 200) {
@@ -384,7 +366,7 @@ export class ApiService {
     const poolUsdtHash = ETH_PUSDT[fromToken.chain];
     amount = new BigNumber(amount).multipliedBy(new BigNumber(10).pow(fromToken.decimals)).toFixed();
     return this.http
-      .get(`${POLY_HOST}/calcPoolInGivenSingleOut/0x16a3Ac9d6682dc4b1bfC02da254379E9F4b37Fed/${poolUsdtHash}/${amount}`)
+      .get(`${POLY_HOST}/calcPoolInGivenSingleOut/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`)
       .pipe(
         map((res: any) => {
           if (res.code === 200) {
@@ -405,7 +387,7 @@ export class ApiService {
     const poolUsdtHash = ETH_PUSDT[fromToken.chain];
     amount = new BigNumber(amount).multipliedBy(new BigNumber(10).pow(fromToken.decimals)).toFixed();
     return this.http
-      .get(`${POLY_HOST}/calcSingleOutGivenPoolIn/0x16a3Ac9d6682dc4b1bfC02da254379E9F4b37Fed/${poolUsdtHash}/${amount}`)
+      .get(`${POLY_HOST}/calcSingleOutGivenPoolIn/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`)
       .pipe(
         map((res: any) => {
           if (res.code === 200) {

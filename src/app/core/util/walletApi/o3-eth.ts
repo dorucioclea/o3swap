@@ -349,7 +349,10 @@ export class O3EthWalletApiService {
     toToken: Token,
     inputAmount: string,
     fromAddress: string,
-    toAddress: string
+    toAddress: string,
+    receiveAmount: string,
+    slipValue: number,
+    polyFee: string
   ): Promise<string> {
     if (this.checkNetwork(fromToken) === false) {
       return;
@@ -357,8 +360,9 @@ export class O3EthWalletApiService {
     const json = await this.getSwapperJson();
     const swapContract = new this.web3.eth.Contract(
       json,
-      ETH_CROSS_SWAP_CONTRACT_HASH
+      ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain]
     );
+    const bigNumberPolyFee = new BigNumber(polyFee).shiftedBy(fromToken.decimals).dp(0).toFixed();
     try {
       const hash: string = await new Promise(async (resolve, reject) => {
         const data = swapContract.methods
@@ -366,15 +370,17 @@ export class O3EthWalletApiService {
             `0x${fromToken.assetID}`, // fromAssetHash
             1, // toPoolId
             SWAP_CONTRACT_CHAIN_ID[toToken.chain], // toChainId
+            `0x${toToken.assetID}`, // toAssetHash
             toAddress, // toAddress
             new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
-            0, // fee
+            this.swapService.getAmountOutMinWithAmountOut(receiveAmount, slipValue), // minAmountOut
+            bigNumberPolyFee, // fee
             1 // id
           ).encodeABI();
         const txHash = await o3dapi.ETH.request
           .request({
             method: 'eth_sendTransaction',
-            params: [this.getSendTransactionParams(fromAddress, ETH_CROSS_SWAP_CONTRACT_HASH, data, '0')]
+            params: [this.getSendTransactionParams(fromAddress, ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain], data, bigNumberPolyFee)]
           });
         resolve(txHash);
         const timer = setInterval(async () => {
@@ -416,7 +422,7 @@ export class O3EthWalletApiService {
     const json = await this.getSwapperJson();
     const swapContract = new this.web3.eth.Contract(
       json,
-      ETH_CROSS_SWAP_CONTRACT_HASH
+      ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain]
     );
     try {
       const data = swapContract.methods
@@ -432,7 +438,7 @@ export class O3EthWalletApiService {
       const hash = await o3dapi.ETH.request
         .request({
           method: 'eth_sendTransaction',
-          params: [this.getSendTransactionParams(fromAddress, ETH_CROSS_SWAP_CONTRACT_HASH, data, '0')]
+          params: [this.getSendTransactionParams(fromAddress, ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain], data, '0')]
         });
       this.handleTx(fromToken, null, inputAmount, hash);
       return hash;
@@ -457,7 +463,7 @@ export class O3EthWalletApiService {
     const json = await this.getSwapperJson();
     const swapContract = new this.web3.eth.Contract(
       json,
-      ETH_CROSS_SWAP_CONTRACT_HASH
+      ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain]
     );
     try {
       const data = swapContract.methods
@@ -473,7 +479,7 @@ export class O3EthWalletApiService {
       const hash = await o3dapi.ETH.request
         .request({
           method: 'eth_sendTransaction',
-          params: [this.getSendTransactionParams(fromAddress, ETH_CROSS_SWAP_CONTRACT_HASH, data, '0')]
+          params: [this.getSendTransactionParams(fromAddress, ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain], data, '0')]
         });
       this.handleTx(fromToken, null, inputAmount, hash);
       return hash;
@@ -491,7 +497,7 @@ export class O3EthWalletApiService {
       fromToken.assetID
     );
     const data = ethErc20Contract.methods
-      .allowance(fromAddress, ETH_CROSS_SWAP_CONTRACT_HASH)
+      .allowance(fromAddress, ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain])
       .encodeABI();
     const result = await o3dapi.ETH.request
       .request({
@@ -515,7 +521,7 @@ export class O3EthWalletApiService {
       const result = await new Promise(async (resolve, reject) => {
         const data = ethErc20Contract.methods
           .approve(
-            ETH_CROSS_SWAP_CONTRACT_HASH,
+            ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain],
             '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
           ).encodeABI();
         const hash = await o3dapi.ETH.request

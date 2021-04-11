@@ -35,9 +35,9 @@
         <div class="asset">≈ $ {{ receiveAmountFiat || '0.00' }}</div>
       </div>
     </div>
-    <p class="detail">Exchange Rate {{ fromToken?.symbol || '--' }}/{{ toToken?.symbol || '--' }} (including fees):
+    <p class="detail">Exchange Rate {{ toToken?.symbol || '--' }}/{{ fromToken?.symbol || '--' }} (including fees):
       <span>{{ bridgeRate }}</span></p>
-    <p class="detail">Max slippage: <span>1%</span></p>
+    <p class="detail">Max slippage: <span>{{ BRIDGE_SLIPVALUE }}%</span></p>
     <div class="btn-primary big-btn swap-btn" [ngClass]="{active: checkCanInquiry()}" (click)="swap()">Swap</div>
   </div>
   <div class="group-container row1 pool">

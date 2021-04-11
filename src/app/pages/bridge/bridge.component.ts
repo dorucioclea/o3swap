@@ -1,6 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService, MetaMaskWalletApiService } from '@core';
-import { EthWalletName, NeoWalletName, SwapStateType, Token, USD_TOKENS } from '@lib';
+import {
+  BRIDGE_SLIPVALUE,
+  EthWalletName,
+  NeoWalletName,
+  SwapStateType,
+  Token,
+  USD_TOKENS,
+} from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
@@ -17,6 +24,7 @@ interface State {
   styleUrls: ['./bridge.component.scss'],
 })
 export class BridgeComponent implements OnInit {
+  BRIDGE_SLIPVALUE = BRIDGE_SLIPVALUE;
   fromToken: Token = USD_TOKENS[0];
   toToken: Token;
 
@@ -92,7 +100,6 @@ export class BridgeComponent implements OnInit {
         } else {
           this.toToken = res;
         }
-        this.getBridgeRate();
         this.calcutionReceiveAmount();
       }
     });
@@ -106,7 +113,6 @@ export class BridgeComponent implements OnInit {
       this.checkInputAmountDecimal();
       this.calcutionInputAmountFiat();
       this.calcutionReceiveAmount();
-      this.getBridgeRate();
     }
   }
 
@@ -137,17 +143,24 @@ export class BridgeComponent implements OnInit {
     return true;
   }
 
-  swap(): void {
+  async swap(): Promise<void> {
     if (this.checkWalletConnect() === false) {
       return;
     }
+    const polyFee = await this.apiService.getFromEthPolyFee(
+      this.fromToken,
+      this.toToken
+    );
     this.metaMaskWalletApiService
       .swapCrossChain(
         this.fromToken,
         this.toToken,
         this.inputAmount,
         this.fromAddress,
-        this.toAddress
+        this.toAddress,
+        this.receiveAmount,
+        BRIDGE_SLIPVALUE,
+        polyFee
       )
       .then((res) => {
         if (res) {
@@ -297,6 +310,7 @@ export class BridgeComponent implements OnInit {
   }
 
   async calcutionReceiveAmount(): Promise<void> {
+    this.getBridgeRate();
     if (!this.fromToken || !this.toToken || !this.inputAmount) {
       this.receiveAmount = '';
       return;
@@ -311,22 +325,22 @@ export class BridgeComponent implements OnInit {
       this.inputAmount
     );
     this.calcutionReceiveAmountFiat();
+    this.getBridgeRate();
   }
-
-  async getBridgeRate(): Promise<void> {
-    if (this.fromToken && this.toToken) {
-      this.bridgeRate = await this.apiService.getBridgeRate(
-        this.fromToken,
-        this.toToken
-      );
-    } else {
-      this.bridgeRate = '';
-    }
-  }
-
   getRates(): void {
     this.apiService.getRates().subscribe((res) => {
       this.rates = res;
     });
   }
+  getBridgeRate(): void {
+    if (this.inputAmount && this.receiveAmount) {
+      this.bridgeRate = new BigNumber(this.receiveAmount)
+        .dividedBy(new BigNumber(this.inputAmount))
+        .dp(8)
+        .toFixed();
+    } else {
+      this.bridgeRate = '';
+    }
+  }
+  //#endregion
 }

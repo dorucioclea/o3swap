@@ -22,6 +22,7 @@ import {
   NeolineWalletApiService,
   O3NeoWalletApiService,
   MetaMaskWalletApiService,
+  O3EthWalletApiService,
 } from '@core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import BigNumber from 'bignumber.js';
@@ -87,7 +88,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   receiveSwapPathArray: AssetQueryResponse;
   price: string; // swap 比
   lnversePrice: string; // swap 反比
-  netWorkFee;
+  netWorkFee: string;
+  polyFee: string;
 
   fromAddress: string;
   toAddress: string;
@@ -104,6 +106,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     private neolineWalletApiService: NeolineWalletApiService,
     private o3NeoWalletApiService: O3NeoWalletApiService,
     private metaMaskWalletApiService: MetaMaskWalletApiService,
+    private o3EthWalletApiService: O3EthWalletApiService,
     private modal: NzModalService
   ) {
     this.swap$ = store.select('swap');
@@ -201,14 +204,13 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   approve(): void {
     this.inquiryInterval.unsubscribe();
     this.isApproveLoading = true;
-    this.metaMaskWalletApiService
-      .approve(this.fromToken, this.fromAddress)
-      .then((res) => {
-        this.isApproveLoading = false;
-        if (res !== undefined) {
-          this.hasApprove = true;
-        }
-      });
+    const swapApi = this.getEthDapiService();
+    swapApi.approve(this.fromToken, this.fromAddress).then((res) => {
+      this.isApproveLoading = false;
+      if (res !== undefined) {
+        this.hasApprove = true;
+      }
+    });
   }
 
   swap(): void {
@@ -327,13 +329,17 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   swapCrossChainEth(): void {
-    this.metaMaskWalletApiService
+    const swapApi = this.getEthDapiService();
+    swapApi
       .swapCrossChain(
         this.fromToken,
         this.toToken,
         this.inputAmount,
         this.fromAddress,
-        this.toAddress
+        this.toAddress,
+        this.chooseSwapPath.amount[this.chooseSwapPath.amount.length - 1],
+        this.slipValue,
+        this.polyFee
       )
       .then((res) => {
         if (res) {
@@ -344,6 +350,22 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   //#endregion
 
   //#region
+  getEthDapiService(): any {
+    switch (this.fromToken.chain) {
+      case 'ETH':
+        return this.ethWalletName === 'MetaMask'
+          ? this.metaMaskWalletApiService
+          : this.o3EthWalletApiService;
+      case 'BSC':
+        return this.bscWalletName === 'MetaMask'
+          ? this.metaMaskWalletApiService
+          : this.o3EthWalletApiService;
+      case 'HECO':
+        return this.hecoWalletName === 'MetaMask'
+          ? this.metaMaskWalletApiService
+          : this.o3EthWalletApiService;
+    }
+  }
   checkShowApprove(): void {
     if (!this.fromAddress || !this.toAddress) {
       this.showApprove = false;
@@ -354,19 +376,17 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.toToken.chain !== 'NEO' &&
       this.fromToken.chain !== this.toToken.chain
     ) {
-      this.metaMaskWalletApiService
-        .getAllowance(this.fromToken, this.fromAddress)
-        .then((balance) => {
-          if (
-            new BigNumber(balance).comparedTo(
-              new BigNumber(this.inputAmount)
-            ) >= 0
-          ) {
-            this.showApprove = false;
-          } else {
-            this.showApprove = true;
-          }
-        });
+      const swapApi = this.getEthDapiService();
+      swapApi.getAllowance(this.fromToken, this.fromAddress).then((balance) => {
+        if (
+          new BigNumber(balance).comparedTo(new BigNumber(this.inputAmount)) >=
+          0
+        ) {
+          this.showApprove = false;
+        } else {
+          this.showApprove = true;
+        }
+      });
     } else {
       this.showApprove = false;
     }
@@ -413,14 +433,14 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         .dp(this.fromToken.decimals)
         .toFixed();
     } else {
-      const polyFee = await this.apiService.getFromEthPolyFee(
+      this.polyFee = await this.apiService.getFromEthPolyFee(
         this.fromToken,
         this.toToken
       );
-      const poolFeeRate = await this.apiService.getFromEthPoolFee();
+      const poolFeeRate = await this.apiService.getFromEthPoolFeeRate();
       this.netWorkFee = new BigNumber(this.inputAmount)
         .times(new BigNumber(poolFeeRate))
-        .plus(new BigNumber(polyFee))
+        .plus(new BigNumber(this.polyFee))
         .dp(this.fromToken.decimals)
         .toFixed();
     }
