@@ -8,7 +8,10 @@ export interface Token {
   chain: CHAINS;
   rateName: string;
   atNeoAssetName?: string;
+  sourceTokenSymbol?: string;
 }
+
+export const ETH_SOURCE_CONTRACT_HASH = '0000000000000000000000000000000000000000';
 
 const MIX_NEO_TOKENS: Token[] = [
   {
@@ -160,7 +163,7 @@ export const ALL_NEO_TOKENS: Token[] = [...NEO_TOKENS, ...MIX_NEO_TOKENS];
 
 const ETH_TOKENS: Token[] = [
   {
-    assetID: '0000000000000000000000000000000000000000',
+    assetID: ETH_SOURCE_CONTRACT_HASH,
     symbol: 'ETH',
     decimals: 18,
     amount: '0',
@@ -168,6 +171,7 @@ const ETH_TOKENS: Token[] = [
     rateName: 'eth',
     logo: '/assets/images/tokens/eth.png',
     atNeoAssetName: 'pnWETH',
+    sourceTokenSymbol: 'ETH',
   },
   {
     assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
@@ -178,6 +182,7 @@ const ETH_TOKENS: Token[] = [
     chain: 'ETH',
     logo: '/assets/images/tokens/usdt.png',
     atNeoAssetName: 'pnUSDT',
+    sourceTokenSymbol: 'ETH',
   },
 ];
 
@@ -191,6 +196,7 @@ const BSC_TOKENS: Token[] = [
     chain: 'BSC',
     rateName: 'eth',
     logo: '/assets/images/tokens/eth.png',
+    sourceTokenSymbol: 'BNB',
   },
   {
     assetID:
@@ -201,6 +207,7 @@ const BSC_TOKENS: Token[] = [
     chain: 'BSC',
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
+    sourceTokenSymbol: 'BNB',
   },
 ];
 
@@ -214,12 +221,13 @@ const HECO_TOKENS: Token[] = [
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
+    sourceTokenSymbol: 'HT',
   },
 ];
 
 const ALL: Token[] = [
   {
-    assetID: '0000000000000000000000000000000000000000',
+    assetID: ETH_SOURCE_CONTRACT_HASH,
     symbol: 'ETH',
     decimals: 18,
     amount: '0',
@@ -227,6 +235,7 @@ const ALL: Token[] = [
     rateName: 'eth',
     logo: '/assets/images/tokens/eth.png',
     atNeoAssetName: 'pnWETH',
+    sourceTokenSymbol: 'ETH',
   },
   {
     assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
@@ -237,6 +246,7 @@ const ALL: Token[] = [
     chain: 'ETH',
     logo: '/assets/images/tokens/usdt.png',
     atNeoAssetName: 'pnUSDT',
+    sourceTokenSymbol: 'ETH',
   },
   {
     assetID:
@@ -259,6 +269,7 @@ const ALL: Token[] = [
     chain: 'BSC',
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
+    sourceTokenSymbol: 'BNB',
   },
   {
     assetID:
@@ -269,6 +280,7 @@ const ALL: Token[] = [
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
+    sourceTokenSymbol: 'HT',
   },
 ];
 
@@ -282,6 +294,7 @@ export const USD_TOKENS: Token[] = [
     chain: 'ETH',
     logo: '/assets/images/tokens/usdt.png',
     atNeoAssetName: 'pnUSDT',
+    sourceTokenSymbol: 'ETH',
   },
   {
     assetID:
@@ -292,6 +305,7 @@ export const USD_TOKENS: Token[] = [
     chain: 'BSC',
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
+    sourceTokenSymbol: 'BNB',
   },
   {
     assetID:
@@ -302,6 +316,7 @@ export const USD_TOKENS: Token[] = [
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
+    sourceTokenSymbol: 'HT',
   },
 ];
 
@@ -349,7 +364,7 @@ export const CHAIN_TOKENS = {
 export type CHAINS = 'ALL' | 'NEO' | 'ETH' | 'BSC' | 'HECO';
 
 export const CrossChainToToken: Token = {
-  assetID: '0000000000000000000000000000000000000000',
+  assetID: ETH_SOURCE_CONTRACT_HASH,
   symbol: 'ETH',
   decimals: 18,
   amount: '0',

@@ -59,7 +59,10 @@
     </div>
     <div class="fee-item">
       <p class="label">Estimated Fee</p>
-      <p class="value">{{ netWorkFee }} {{fromToken.symbol }}</p>
+      <div class="value">
+        <p>{{ netWorkFee }} {{ fromToken.symbol }} <span *ngIf="polyFee">+ {{ polyFee }}
+            {{ fromToken.sourceTokenSymbol }}</span></p>
+      </div>
     </div>
   </div>
   <div class="btn-group" *ngIf="showApprove">

@@ -28,6 +28,7 @@ import {
   NETWORK,
   SwapTransaction,
   UPDATE_METAMASK_NETWORK_ID,
+  ETH_SOURCE_CONTRACT_HASH,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { Unsubscribable, Observable, of } from 'rxjs';
@@ -150,7 +151,7 @@ export class O3EthWalletApiService {
   async getBalancByHash(token: Token): Promise<string> {
     const json = await this.getEthErc20Json();
     return new Promise(async (resolve, reject) => {
-      if (token.assetID !== '0000000000000000000000000000000000000000') {
+      if (token.assetID !== ETH_SOURCE_CONTRACT_HASH) {
         const ethErc20Contract = new this.web3.eth.Contract(
           json,
           token.assetID

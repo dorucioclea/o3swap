@@ -427,6 +427,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
   async getNetworkFee(): Promise<void> {
     this.netWorkFee = '';
+    this.polyFee = '';
     if (this.fromToken.chain === 'NEO') {
       this.netWorkFee = new BigNumber(this.inputAmount)
         .times(this.o3SwapFee)
@@ -440,8 +441,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       const poolFeeRate = await this.apiService.getFromEthPoolFeeRate();
       this.netWorkFee = new BigNumber(this.inputAmount)
         .times(new BigNumber(poolFeeRate))
-        .plus(new BigNumber(this.polyFee))
-        .dp(this.fromToken.decimals)
+        .dp(8)
         .toFixed();
     }
   }

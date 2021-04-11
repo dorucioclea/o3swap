@@ -19,6 +19,7 @@ import {
   ETH_PUSDT,
   SWAP_CONTRACT_CHAIN_ID,
   POLY_HOST_ADDRESS,
+  ETH_SOURCE_CONTRACT_HASH,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { CommonService } from '../util/common.service';
@@ -91,7 +92,7 @@ export class ApiService {
       .pipe(
         map((res: any) => {
           if (res.code === 200) {
-            return new BigNumber(res.fee).shiftedBy(-9).toFixed();
+            return new BigNumber(res.fee).shiftedBy(-10).toFixed();
           }
         })
       )
@@ -102,7 +103,7 @@ export class ApiService {
     return this.http
       .post(`${CROSS_CHAIN_SWAP_DETAIL_HOST}/getfee`, {
         SrcChainId: SWAP_CONTRACT_CHAIN_ID[fromToken.chain],
-        Hash: fromToken.assetID,
+        Hash: ETH_SOURCE_CONTRACT_HASH,
         DstChainId: SWAP_CONTRACT_CHAIN_ID[toToken.chain],
       })
       .pipe(
