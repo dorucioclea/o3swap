@@ -29,6 +29,7 @@ import {
   SwapTransaction,
   UPDATE_METAMASK_NETWORK_ID,
   ETH_SOURCE_CONTRACT_HASH,
+  METAMASK_CHAIN,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { Unsubscribable, Observable, of } from 'rxjs';
@@ -72,12 +73,10 @@ export class O3EthWalletApiService {
   connect(chain: string): void {
     o3dapi.ETH.request({ method: 'eth_requestAccounts' })
       .then(async (res) => {
-        this.metamaskNetworkId = new BigNumber(await o3dapi.ETH.request({ method: 'eth_chainId' }), 16).toNumber();
         this.commonService.log(res);
         this.accountAddress = res.result[0];
         let dispatchAccountType;
         let dispatchWalletNameType;
-        this.getBalance(chain);
         switch (chain) {
           case 'ETH':
             dispatchAccountType = UPDATE_ETH_ACCOUNT;
@@ -103,19 +102,13 @@ export class O3EthWalletApiService {
         this.addListener();
       })
       .catch((error) => {
-        if (error.type) {
-          this.handleDapiError(error);
-        } else {
-          this.nzMessage.error(error.message);
-        }
+        this.handleDapiError(error);
       });
   }
 
-  async getBalance(chain: string, token?: Token): Promise<boolean> {
-    // if (this.metamaskNetworkId !== METAMASK_CHAIN_ID[chain]) {
-    //   return;
-    // }
-    const json = await this.getEthErc20Json();
+  async getBalance(): Promise<boolean> {
+    const chainId = new BigNumber(this.ethereum.chainId, 16).toNumber();
+    const chain = METAMASK_CHAIN[chainId];
     let dispatchBalanceType;
     let tempTokenBalance: Token[];
     return new Promise(async (resolve, reject) => {
@@ -150,43 +143,32 @@ export class O3EthWalletApiService {
 
   async getBalancByHash(token: Token): Promise<string> {
     const json = await this.getEthErc20Json();
-    return new Promise(async (resolve, reject) => {
-      if (token.assetID !== ETH_SOURCE_CONTRACT_HASH) {
-        const ethErc20Contract = new this.web3.eth.Contract(
-          json,
-          token.assetID
-        );
-        try {
-          const balance = await ethErc20Contract.methods
-            .balanceOf(
-              this.accountAddress
-            ).call();
-          resolve(new BigNumber(balance)
-            .shiftedBy(-token.decimals)
-            .toFixed());
-        } catch (error) {
-          console.error(error);
-          this.handleDapiError(error);
-          // this.nzMessage.error(error.message);
-        }
-      } else {
-        try {
-          const balance = await o3dapi.ETH.request({
-            method: 'eth_getBalance',
-            params: [
-              this.accountAddress,
-              'latest',
-            ]
-          });
-          resolve(new BigNumber(token.amount, 16)
-            .shiftedBy(-token.decimals)
-            .toFixed());
-        } catch (error) {
-          console.error(error);
-          this.handleDapiError(error);
-        }
+    if (token.assetID !== ETH_SOURCE_CONTRACT_HASH) {
+      const ethErc20Contract = new this.web3.eth.Contract(json, token.assetID);
+      try {
+        const balance = await ethErc20Contract.methods
+          .balanceOf(this.accountAddress)
+          .call();
+        return new BigNumber(balance).shiftedBy(-token.decimals).toFixed();
+      } catch (error) {
+        console.error(error);
+        this.handleDapiError(error);
+        // this.handleDapiError(error);
       }
-    });
+    } else {
+      return o3dapi.ETH.request({
+        method: 'eth_getBalance',
+        params: [this.accountAddress, 'latest'],
+      })
+        .then((balance) => {
+          return new BigNumber(balance, 16)
+            .shiftedBy(-token.decimals)
+            .toFixed();
+        })
+        .catch((error) => {
+          this.handleDapiError(error);
+        });
+    }
   }
 
   async uniSwapExactTokensForETH(): Promise<any> {
@@ -198,47 +180,36 @@ export class O3EthWalletApiService {
       json,
       UNI_SWAP_CONTRACT_HASH
     );
-    try {
-      await new Promise(async (resolve, reject) => {
-        const data = uniswapContract.methods
-          .swapExactTokensForETHSupportingFeeOnTransferTokens(
-            new BigNumber(1).shiftedBy(18),
-            0,
-            [
-              '0xaD6D458402F60fD3Bd25163575031ACDce07538D', // dai
-              '0xc778417E063141139Fce010982780140Aa0cD5Ab', // weth
-            ],
-            '0xd34E3B073a484823058Ab76fc2304D5394beafE4',
-            Math.floor(Date.now() / 1000 + 600)
-          ).encodeABI();
-        const txHash = await o3dapi.ETH.request
-          .request({
-            method: 'eth_sendTransaction',
-            params: [this.getSendTransactionParams('0xd34E3B073a484823058Ab76fc2304D5394beafE4', UNI_SWAP_CONTRACT_HASH, data, '0')]
-          });
-        // resolve(txHash);
-        const timer = setInterval(async () => {
-          const receipt = await o3dapi.ETH.request
-            .request({
-              method: 'eth_getTransactionReceipt',
-              params: [txHash]
-            });
-          if (receipt) {
-            if (new BigNumber(receipt.status, 16).isZero()) {
-              this.nzMessage.error('Transaction failed');
-              this.store.dispatch({ type: UPDATE_PENDING_TX, data: null });
-            }
-            clearInterval(timer);
-          }
-        }, 5000);
+    const data = uniswapContract.methods
+      .swapExactTokensForETHSupportingFeeOnTransferTokens(
+        new BigNumber(1).shiftedBy(18),
+        0,
+        [
+          '0xaD6D458402F60fD3Bd25163575031ACDce07538D', // dai
+          '0xc778417E063141139Fce010982780140Aa0cD5Ab', // weth
+        ],
+        '0xd34E3B073a484823058Ab76fc2304D5394beafE4',
+        Math.floor(Date.now() / 1000 + 600)
+      )
+      .encodeABI();
+    return o3dapi.ETH.request({
+      method: 'eth_sendTransaction',
+      params: [
+        this.getSendTransactionParams(
+          '0xd34E3B073a484823058Ab76fc2304D5394beafE4',
+          UNI_SWAP_CONTRACT_HASH,
+          data,
+          '0'
+        ),
+      ],
+    })
+      .then((hash) => {
+        // this.handleTx(fromToken, toToken, inputAmount, hash);
+        return hash;
+      })
+      .catch((error) => {
+        this.handleDapiError(error);
       });
-      // this.handleTx(fromToken, toToken, inputAmount, hash);
-      // return hash;
-    } catch (error) {
-      console.error(error);
-      this.handleDapiError(error);
-      // this.nzMessage.error(error.message);
-    }
   }
 
   async uniSwapExactETHForTokens(): Promise<any> {
@@ -250,47 +221,35 @@ export class O3EthWalletApiService {
       json,
       UNI_SWAP_CONTRACT_HASH
     );
-    try {
-      await new Promise(async (resolve, reject) => {
-        const data = uniswapContract.methods
-          .swapExactETHForTokensSupportingFeeOnTransferTokens(
-            0,
-            [
-              '0xc778417E063141139Fce010982780140Aa0cD5Ab', // weth
-              '0xaD6D458402F60fD3Bd25163575031ACDce07538D', // dai
-            ],
-            '0xd34E3B073a484823058Ab76fc2304D5394beafE4',
-            Math.floor(Date.now() / 1000 + 600)
-          ).encodeABI();
-        const txHash = await o3dapi.ETH.request
-          .request({
-            method: 'eth_sendTransaction',
-            params: [this.getSendTransactionParams('0xd34E3B073a484823058Ab76fc2304D5394beafE4',
-              UNI_SWAP_CONTRACT_HASH, data, new BigNumber(0.001).shiftedBy(18).toFixed())]
-          });
-        // resolve(txHash);
-        const timer = setInterval(async () => {
-          const receipt = await o3dapi.ETH.request
-            .request({
-              method: 'eth_getTransactionReceipt',
-              params: [txHash]
-            });
-          if (receipt) {
-            if (new BigNumber(receipt.status, 16).isZero()) {
-              this.nzMessage.error('Transaction failed');
-              this.store.dispatch({ type: UPDATE_PENDING_TX, data: null });
-            }
-            clearInterval(timer);
-          }
-        }, 5000);
+    const data = uniswapContract.methods
+      .swapExactETHForTokensSupportingFeeOnTransferTokens(
+        0,
+        [
+          '0xc778417E063141139Fce010982780140Aa0cD5Ab', // weth
+          '0xaD6D458402F60fD3Bd25163575031ACDce07538D', // dai
+        ],
+        '0xd34E3B073a484823058Ab76fc2304D5394beafE4',
+        Math.floor(Date.now() / 1000 + 600)
+      )
+      .encodeABI();
+    return o3dapi.ETH.request({
+      method: 'eth_sendTransaction',
+      params: [
+        this.getSendTransactionParams(
+          '0xd34E3B073a484823058Ab76fc2304D5394beafE4',
+          UNI_SWAP_CONTRACT_HASH,
+          data,
+          new BigNumber(0.001).shiftedBy(18).toFixed()
+        ),
+      ],
+    })
+      .then((hash) => {
+        // this.handleTx(fromToken, toToken, inputAmount, hash);
+        return hash;
+      })
+      .catch((error) => {
+        this.handleDapiError(error);
       });
-      // this.handleTx(fromToken, toToken, inputAmount, hash);
-      // return hash;
-    } catch (error) {
-      console.error(error);
-      this.handleDapiError(error);
-      // this.nzMessage.error(error.message);
-    }
   }
 
   async uniSwapExactTokensForTokens(): Promise<any> {
@@ -302,47 +261,37 @@ export class O3EthWalletApiService {
       json,
       UNI_SWAP_CONTRACT_HASH
     );
-    try {
-      await new Promise(async (resolve, reject) => {
-        const data = uniswapContract.methods
-          .swapExactTokensForTokensSupportingFeeOnTransferTokens(
-            new BigNumber(0.0000001).shiftedBy(18),
-            0,
-            [
-              '0xc778417E063141139Fce010982780140Aa0cD5Ab', // weth
-              '0xaD6D458402F60fD3Bd25163575031ACDce07538D', // dai
-            ],
-            '0xd34E3B073a484823058Ab76fc2304D5394beafE4',
-            Math.floor(Date.now() / 1000 + 600)
-          ).encodeABI();
-        const txHash = await o3dapi.ETH.request
-          .request({
-            method: 'eth_sendTransaction',
-            params: [this.getSendTransactionParams('0xd34E3B073a484823058Ab76fc2304D5394beafE4', UNI_SWAP_CONTRACT_HASH, data, '0')]
-          });
-        // resolve(txHash);
-        const timer = setInterval(async () => {
-          const receipt = await o3dapi.ETH.request
-            .request({
-              method: 'eth_getTransactionReceipt',
-              params: [txHash]
-            });
-          if (receipt) {
-            if (new BigNumber(receipt.status, 16).isZero()) {
-              this.nzMessage.error('Transaction failed');
-              this.store.dispatch({ type: UPDATE_PENDING_TX, data: null });
-            }
-            clearInterval(timer);
-          }
-        }, 5000);
+
+    const data = uniswapContract.methods
+      .swapExactTokensForTokensSupportingFeeOnTransferTokens(
+        new BigNumber(0.0000001).shiftedBy(18),
+        0,
+        [
+          '0xc778417E063141139Fce010982780140Aa0cD5Ab', // weth
+          '0xaD6D458402F60fD3Bd25163575031ACDce07538D', // dai
+        ],
+        '0xd34E3B073a484823058Ab76fc2304D5394beafE4',
+        Math.floor(Date.now() / 1000 + 600)
+      )
+      .encodeABI();
+    return o3dapi.ETH.request({
+      method: 'eth_sendTransaction',
+      params: [
+        this.getSendTransactionParams(
+          '0xd34E3B073a484823058Ab76fc2304D5394beafE4',
+          UNI_SWAP_CONTRACT_HASH,
+          data,
+          '0'
+        ),
+      ],
+    })
+      .then((hash) => {
+        // this.handleTx(fromToken, toToken, inputAmount, hash);
+        return hash;
+      })
+      .catch((error) => {
+        this.handleDapiError(error);
       });
-      // this.handleTx(fromToken, toToken, inputAmount, hash);
-      // return hash;
-    } catch (error) {
-      console.error(error);
-      this.handleDapiError(error);
-      // this.nzMessage.error(error.message);
-    }
   }
 
   async swapCrossChain(
@@ -363,50 +312,41 @@ export class O3EthWalletApiService {
       json,
       ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain]
     );
-    const bigNumberPolyFee = new BigNumber(polyFee).shiftedBy(fromToken.decimals).dp(0).toFixed();
-    try {
-      const hash: string = await new Promise(async (resolve, reject) => {
-        const data = swapContract.methods
-          .swap(
-            `0x${fromToken.assetID}`, // fromAssetHash
-            1, // toPoolId
-            SWAP_CONTRACT_CHAIN_ID[toToken.chain], // toChainId
-            `0x${toToken.assetID}`, // toAssetHash
-            toAddress, // toAddress
-            new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
-            this.swapService.getAmountOutMinWithAmountOut(receiveAmount, slipValue), // minAmountOut
-            bigNumberPolyFee, // fee
-            1 // id
-          ).encodeABI();
-        const txHash = await o3dapi.ETH.request
-          .request({
-            method: 'eth_sendTransaction',
-            params: [this.getSendTransactionParams(fromAddress, ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain], data, bigNumberPolyFee)]
-          });
-        resolve(txHash);
-        const timer = setInterval(async () => {
-          const receipt = await o3dapi.ETH.request
-            .request({
-              method: 'eth_getTransactionReceipt',
-              params: [hash]
-            });
-          console.log(receipt);
-          if (receipt) {
-            if (new BigNumber(receipt.status, 16).isZero()) {
-              this.nzMessage.error('Transaction failed');
-              this.store.dispatch({ type: UPDATE_PENDING_TX, data: null });
-            }
-            clearInterval(timer);
-          }
-        }, 5000);
+    const bigNumberPolyFee = new BigNumber(polyFee)
+      .shiftedBy(18)
+      .dp(0)
+      .toFixed();
+    const data = swapContract.methods
+      .swap(
+        `0x${fromToken.assetID}`, // fromAssetHash
+        1, // toPoolId
+        SWAP_CONTRACT_CHAIN_ID[toToken.chain], // toChainId
+        `0x${toToken.assetID}`, // toAssetHash
+        toAddress, // toAddress
+        new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
+        this.swapService.getAmountOutMinWithAmountOut(receiveAmount, slipValue), // minAmountOut
+        bigNumberPolyFee, // fee
+        1 // id
+      )
+      .encodeABI();
+    return o3dapi.ETH.request({
+      method: 'eth_sendTransaction',
+      params: [
+        this.getSendTransactionParams(
+          fromAddress,
+          ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain],
+          data,
+          bigNumberPolyFee
+        ),
+      ],
+    })
+      .then((hash) => {
+        this.handleTx(fromToken, toToken, inputAmount, hash);
+        return hash;
+      })
+      .catch((error) => {
+        this.handleDapiError(error);
       });
-      this.handleTx(fromToken, toToken, inputAmount, hash);
-      return hash;
-    } catch (error) {
-      console.error(error);
-      this.handleDapiError(error);
-      // this.nzMessage.error(error.message);
-    }
   }
 
   async addLiquidity(
@@ -425,29 +365,37 @@ export class O3EthWalletApiService {
       json,
       ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain]
     );
-    try {
-      const data = swapContract.methods
-        .add_liquidity(
-          fromToken.assetID.startsWith('0x') ? fromToken.assetID : `0x${fromToken.assetID}`, // fromAssetHash
-          1, // toPoolId
-          toChainId, // toChainId
-          toAddress, // toAddress
-          new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
-          0, // fee
-          1 // id
-        ).encodeABI();
-      const hash = await o3dapi.ETH.request
-        .request({
-          method: 'eth_sendTransaction',
-          params: [this.getSendTransactionParams(fromAddress, ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain], data, '0')]
-        });
-      this.handleTx(fromToken, null, inputAmount, hash);
-      return hash;
-    } catch (error) {
-      console.error(error);
-      this.handleDapiError(error);
-      // this.nzMessage.error(error.message);
-    }
+    const data = swapContract.methods
+      .add_liquidity(
+        fromToken.assetID.startsWith('0x')
+          ? fromToken.assetID
+          : `0x${fromToken.assetID}`, // fromAssetHash
+        1, // toPoolId
+        toChainId, // toChainId
+        toAddress, // toAddress
+        new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
+        0, // fee
+        1 // id
+      )
+      .encodeABI();
+    return o3dapi.ETH.request({
+      method: 'eth_sendTransaction',
+      params: [
+        this.getSendTransactionParams(
+          fromAddress,
+          ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain],
+          data,
+          '0'
+        ),
+      ],
+    })
+      .then((hash) => {
+        this.handleTx(fromToken, null, inputAmount, hash);
+        return hash;
+      })
+      .catch((error) => {
+        this.handleDapiError(error);
+      });
   }
 
   async removeLiquidity(
@@ -466,29 +414,37 @@ export class O3EthWalletApiService {
       json,
       ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain]
     );
-    try {
-      const data = swapContract.methods
-        .remove_liquidity(
-          fromToken.assetID.startsWith('0x') ? fromToken.assetID : `0x${fromToken.assetID}`, // fromAssetHash
-          1, // toPoolId
-          toChainId, // toChainId
-          toAddress, // toAddress
-          new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
-          0, // fee
-          1 // id
-        ).encodeABI();
-      const hash = await o3dapi.ETH.request
-        .request({
-          method: 'eth_sendTransaction',
-          params: [this.getSendTransactionParams(fromAddress, ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain], data, '0')]
-        });
-      this.handleTx(fromToken, null, inputAmount, hash);
-      return hash;
-    } catch (error) {
-      console.error(error);
-      this.handleDapiError(error);
-      // this.nzMessage.error(error.message);
-    }
+    const data = swapContract.methods
+      .remove_liquidity(
+        fromToken.assetID.startsWith('0x')
+          ? fromToken.assetID
+          : `0x${fromToken.assetID}`, // fromAssetHash
+        1, // toPoolId
+        toChainId, // toChainId
+        toAddress, // toAddress
+        new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
+        0, // fee
+        1 // id
+      )
+      .encodeABI();
+    return o3dapi.ETH.request({
+      method: 'eth_sendTransaction',
+      params: [
+        this.getSendTransactionParams(
+          fromAddress,
+          ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain],
+          data,
+          '0'
+        ),
+      ],
+    })
+      .then((hash) => {
+        this.handleTx(fromToken, null, inputAmount, hash);
+        return hash;
+      })
+      .catch((error) => {
+        this.handleDapiError(error);
+      });
   }
 
   async getAllowance(fromToken: Token, fromAddress: string): Promise<string> {
@@ -500,13 +456,19 @@ export class O3EthWalletApiService {
     const data = ethErc20Contract.methods
       .allowance(fromAddress, ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain])
       .encodeABI();
-    const result = await o3dapi.ETH.request
-      .request({
-        method: 'eth_call',
-        params: [this.getSendTransactionParams(fromAddress, fromToken.assetID, data)]
+    return o3dapi.ETH.request({
+      method: 'eth_call',
+      params: [
+        this.getSendTransactionParams(fromAddress, fromToken.assetID, data),
+      ],
+    })
+      .then((result) => {
+        console.log('allowance: ' + result);
+        return new BigNumber(result).shiftedBy(-fromToken.decimals).toFixed();
+      })
+      .catch((error) => {
+        this.handleDapiError(error);
       });
-    console.log('allowance: ' + result);
-    return new BigNumber(result).shiftedBy(-fromToken.decimals).toFixed();
   }
 
   async approve(fromToken: Token, fromAddress: string): Promise<any> {
@@ -518,38 +480,25 @@ export class O3EthWalletApiService {
       json,
       fromToken.assetID
     );
-    try {
-      const result = await new Promise(async (resolve, reject) => {
-        const data = ethErc20Contract.methods
-          .approve(
-            ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain],
-            '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-          ).encodeABI();
-        const hash = await o3dapi.ETH.request
-          .request({
-            method: 'eth_sendTransaction',
-            params: [this.getSendTransactionParams(fromAddress, fromToken.assetID, data)]
-          });
-        resolve(hash);
-        // const timer = setInterval(async () => {
-        //   const receipt = await o3dapi.ETH.request
-        //     .request({
-        //       method: 'eth_getTransactionReceipt',
-        //       params: [hash]
-        //     });
-        //   console.log(receipt);
-        //   if (receipt) {
-        //     resolve(resolve);
-        //     clearInterval(timer);
-        //   }
-        // }, 1000);
+    const data = ethErc20Contract.methods
+      .approve(
+        ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain],
+        '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+      )
+      .encodeABI();
+    return o3dapi.ETH.request({
+      method: 'eth_sendTransaction',
+      params: [
+        this.getSendTransactionParams(fromAddress, fromToken.assetID, data),
+      ],
+    })
+      .then((hash) => {
+        // this.handleTx(fromToken, toToken, inputAmount, hash);
+        return this.listerTxReceipt(hash);
+      })
+      .catch((error) => {
+        this.handleDapiError(error);
       });
-      console.log('approve result: ' + result);
-      return result;
-    } catch (error) {
-      console.error(error);
-      this.handleDapiError(error);
-    }
   }
 
   //#region
@@ -573,9 +522,40 @@ export class O3EthWalletApiService {
       },
     };
     this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
+    this.listerTxReceipt(txHash);
   }
 
-  private getSendTransactionParams(from: string, to: string, data: string, value?: string, gas?: string, gasPrice?: string): object {
+  listerTxReceipt(txHash: string): void {
+    const timer = setInterval(async () => {
+      o3dapi.ETH.request({
+        method: 'eth_getTransactionReceipt',
+        params: [txHash],
+      })
+        .then((receipt) => {
+          console.log(receipt);
+          if (receipt) {
+            if (new BigNumber(receipt.status, 16).isZero()) {
+              this.nzMessage.error('Transaction failed');
+              this.store.dispatch({ type: UPDATE_PENDING_TX, data: null });
+            }
+            clearInterval(timer);
+          }
+        })
+        .catch((error) => {
+          clearInterval(timer);
+          this.handleDapiError(error);
+        });
+    }, 5000);
+  }
+
+  private getSendTransactionParams(
+    from: string,
+    to: string,
+    data: string,
+    value?: string,
+    gas?: string,
+    gasPrice?: string
+  ): object {
     if (value && !value.startsWith('0x')) {
       value = '0x' + new BigNumber(value).toString(16);
     }
@@ -588,7 +568,7 @@ export class O3EthWalletApiService {
       value,
       gas,
       gasPrice,
-      data
+      data,
     };
   }
 
@@ -610,15 +590,20 @@ export class O3EthWalletApiService {
     o3dapi.ETH.request({ method: 'net_version' })
       .then((chainId) => {
         this.commonService.log('chainId: ' + chainId);
-        this.store.dispatch({
-          type: UPDATE_METAMASK_NETWORK_ID,
-          data: Number(chainId),
-        });
+        const id = Number(chainId);
+        if (this.metamaskNetworkId !== id) {
+          this.metamaskNetworkId = id;
+          this.store.dispatch({
+            type: UPDATE_METAMASK_NETWORK_ID,
+            data: id,
+          });
+          this.getBalance();
+        }
       })
       .catch((error) => {
-        this.nzMessage.error(error.message);
+        this.handleDapiError(error);
       });
-    o3dapi.ETH.request.on('accountsChanged', (accounts) => {
+    this.ethereum.on('accountsChanged', (accounts) => {
       this.accountAddress = accounts.length > 0 ? accounts[0] : null;
       this.updateAccount(this.accountAddress);
       if (
@@ -627,13 +612,20 @@ export class O3EthWalletApiService {
       ) {
         this.updateWalletName(null);
       }
+      if (this.accountAddress) {
+        this.getBalance();
+      }
     });
-    o3dapi.ETH.request.on('chainChanged', (chainId) => {
-      this.commonService.log('chainId: ' + chainId);
-      this.store.dispatch({
-        type: UPDATE_METAMASK_NETWORK_ID,
-        data: Number(chainId),
-      });
+    this.ethereum.on('chainChanged', (chainId) => {
+      const id = Number(chainId);
+      if (this.metamaskNetworkId !== id) {
+        this.metamaskNetworkId = id;
+        this.store.dispatch({
+          type: UPDATE_METAMASK_NETWORK_ID,
+          data: id,
+        });
+        this.getBalance();
+      }
     });
   }
 

@@ -76,24 +76,42 @@ export class SwapService {
     return out;
   }
   handleNeoDapiError(error, walletName: NeoWalletName): void {
+    let message: string;
     switch (error.type) {
       case 'NO_PROVIDER':
         this.toDownloadWallet(walletName);
         break;
       case 'CONNECTION_DENIED':
-        this.nzMessage.error(
-          'The user rejected the request to connect with your dApp'
-        );
+        message = 'The user rejected the request to connect with your dApp';
+        break;
+      case 'RPC_ERROR':
+        message = 'RPC connection to a network node fails';
+        break;
+      case 'MALFORMED_INPUT':
+        message = 'The address is not a valid NEO address';
+        break;
+      case 'CANCELED':
+        message = 'User cancels, or refuses the dapps request';
+        break;
+      case 'FAIL':
+        message = 'The request failed';
+        break;
+      case 'INSUFFICIENT_FUNDS':
+        message = 'Insufficient balance';
         break;
       default:
         if (typeof error === 'string') {
-          this.nzMessage.error(error);
+          message = error;
         } else {
-          this.nzMessage.error(error.type || 'Unknown error');
+          message = error.type || 'Unknown error';
         }
         break;
     }
+    if (message) {
+      this.nzMessage.error(message);
+    }
   }
+
   toDownloadWallet(type: WalletName): void {
     switch (type) {
       case 'O3':

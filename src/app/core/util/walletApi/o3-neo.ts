@@ -96,7 +96,7 @@ export class O3NeoWalletApiService {
       })
       .catch((error) => {
         this.commonService.log(error);
-        this.swapService.handleNeoDapiError(error, 'NeoLine');
+        this.swapService.handleNeoDapiError(error, 'O3');
       });
   }
 
@@ -160,7 +160,7 @@ export class O3NeoWalletApiService {
       })
       .catch((error) => {
         this.commonService.log(error);
-        this.swapService.handleNeoDapiError(error, 'NeoLine');
+        this.swapService.handleNeoDapiError(error, 'O3');
       });
   }
 

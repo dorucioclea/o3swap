@@ -118,7 +118,7 @@ export class MetaMaskWalletApiService {
         this.addListener();
       })
       .catch((error) => {
-        this.nzMessage.error(error.message);
+        this.handleDapiError(error);
       });
   }
 
@@ -168,7 +168,7 @@ export class MetaMaskWalletApiService {
       } catch (error) {
         console.error(error);
         this.handleDapiError(error);
-        // this.nzMessage.error(error.message);
+        // this.handleDapiError(error);
       }
     } else {
       return this.ethereum
@@ -182,7 +182,7 @@ export class MetaMaskWalletApiService {
             .toFixed();
         })
         .catch((error) => {
-          this.nzMessage.error(error.message);
+          this.handleDapiError(error);
         });
     }
   }
@@ -225,7 +225,7 @@ export class MetaMaskWalletApiService {
         return hash;
       })
       .catch((error) => {
-        this.nzMessage.error(error.message);
+        this.handleDapiError(error);
       });
   }
 
@@ -266,7 +266,7 @@ export class MetaMaskWalletApiService {
         return hash;
       })
       .catch((error) => {
-        this.nzMessage.error(error.message);
+        this.handleDapiError(error);
       });
   }
 
@@ -309,7 +309,7 @@ export class MetaMaskWalletApiService {
         return hash;
       })
       .catch((error) => {
-        this.nzMessage.error(error.message);
+        this.handleDapiError(error);
       });
   }
 
@@ -365,7 +365,7 @@ export class MetaMaskWalletApiService {
         return hash;
       })
       .catch((error) => {
-        this.nzMessage.error(error.message);
+        this.handleDapiError(error);
       });
   }
 
@@ -415,7 +415,7 @@ export class MetaMaskWalletApiService {
         return hash;
       })
       .catch((error) => {
-        this.nzMessage.error(error.message);
+        this.handleDapiError(error);
       });
   }
 
@@ -465,7 +465,7 @@ export class MetaMaskWalletApiService {
         return hash;
       })
       .catch((error) => {
-        this.nzMessage.error(error.message);
+        this.handleDapiError(error);
       });
   }
 
@@ -490,7 +490,7 @@ export class MetaMaskWalletApiService {
         return new BigNumber(result).shiftedBy(-fromToken.decimals).toFixed();
       })
       .catch((error) => {
-        this.nzMessage.error(error.message);
+        this.handleDapiError(error);
       });
   }
 
@@ -521,7 +521,7 @@ export class MetaMaskWalletApiService {
         return this.listerTxReceipt(hash);
       })
       .catch((error) => {
-        this.nzMessage.error(error.message);
+        this.handleDapiError(error);
       });
   }
 
@@ -568,7 +568,7 @@ export class MetaMaskWalletApiService {
         })
         .catch((error) => {
           clearInterval(timer);
-          this.nzMessage.error(error.message);
+          this.handleDapiError(error);
         });
     }, 5000);
   }
@@ -627,7 +627,7 @@ export class MetaMaskWalletApiService {
         }
       })
       .catch((error) => {
-        this.nzMessage.error(error.message);
+        this.handleDapiError(error);
       });
     this.ethereum.on('accountsChanged', (accounts) => {
       this.accountAddress = accounts.length > 0 ? accounts[0] : null;
