@@ -228,9 +228,6 @@ export class LiquidityComponent implements OnInit, OnDestroy {
         this.nzMessage.error(error);
       });
   }
-  wordlimit(value: string | number): string {
-    return this.commonService.wordlimit(value);
-  }
 
   private getLPBalance(): void {
     this.metaMaskWalletApiService.getBalancByHash(this.LPToken).then(res => {

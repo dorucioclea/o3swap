@@ -38,12 +38,4 @@ export class CommonService {
     const isAddressPattern = new RegExp(/^A([0-9a-zA-Z]{33})$/);
     return isAddressPattern.test(address);
   }
-
-  wordlimit(value: number | string): string {
-    let data = value.toString();
-    if (value && data.length > 13) {
-      data = data.substring(0, 10) + '...';
-    }
-    return data;
-  }
 }
