@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ApiService, MetaMaskWalletApiService } from '@core';
 import {
   BRIDGE_SLIPVALUE,
@@ -58,7 +58,8 @@ export class BridgeComponent implements OnInit {
     private apiService: ApiService,
     private modal: NzModalService,
     private nzMessage: NzMessageService,
-    private metaMaskWalletApiService: MetaMaskWalletApiService
+    private metaMaskWalletApiService: MetaMaskWalletApiService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     this.swap$ = store.select('swap');
   }
@@ -75,6 +76,11 @@ export class BridgeComponent implements OnInit {
       this.bscWalletName = state.bscWalletName;
       this.hecoWalletName = state.hecoWalletName;
       this.getFromAndToAddress();
+      this.handleAccountBalance(
+        state.ethBalances,
+        state.bscBalances,
+        state.hecoBalances
+      );
     });
   }
 
@@ -169,6 +175,28 @@ export class BridgeComponent implements OnInit {
   }
 
   //#region
+  handleAccountBalance(ethBalances, bscBalances, hecoBalances): void {
+    this.fromToken.amount = '0';
+    if (!this.fromToken) {
+      return;
+    }
+    let balances;
+    switch (this.fromToken.chain) {
+      case 'ETH':
+        balances = ethBalances || {};
+        break;
+      case 'BSC':
+        balances = bscBalances || {};
+        break;
+      case 'HECO':
+        balances = hecoBalances || {};
+        break;
+    }
+    if (balances[this.fromToken.assetID]) {
+      this.fromToken.amount = balances[this.fromToken.assetID].amount;
+    }
+    this.changeDetectorRef.detectChanges();
+  }
   checkWalletConnect(): boolean {
     if (
       (this.fromToken.chain === 'NEO' || this.toToken.chain === 'NEO') &&

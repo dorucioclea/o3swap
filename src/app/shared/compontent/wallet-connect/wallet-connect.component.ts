@@ -44,7 +44,7 @@ export class WalletConnectComponent implements OnInit {
   BSC_WALLETS = BSC_WALLETS;
   HECO_WALLETS = HECO_WALLETS;
   @Input() show: boolean;
-  @Input() connectChainType: ConnectChainType = 'NEO';
+  @Input() connectChainType: ConnectChainType;
   @Output() closePage = new EventEmitter();
 
   swap$: Observable<any>;

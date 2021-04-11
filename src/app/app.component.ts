@@ -36,7 +36,7 @@ interface State {
 export class AppComponent implements OnInit {
   currentPage = this.router.url;
   isHome = true;
-  connectChainType: ConnectChainType = 'NEO';
+  connectChainType: ConnectChainType = 'ETH';
   showConnectModal = false; // connect wallet modal
   // account modal
   showNeoAccountModal = false;
