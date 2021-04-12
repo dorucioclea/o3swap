@@ -108,7 +108,7 @@ export class NeolineWalletApiService {
         },
       })
       .then(({ txid }) => {
-        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
+        const txHash = this.commonService.add0xHash(txid);
         this.handleTx(fromToken, toToken, inputAmount, txHash);
         return txHash;
       })
@@ -176,7 +176,7 @@ export class NeolineWalletApiService {
     return this.neolineDapi
       .invoke(params)
       .then(({ txid }) => {
-        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
+        const txHash = this.commonService.add0xHash(txid);
         this.handleTx(fromToken, toToken, inputAmount, txHash);
         return txHash;
       })
@@ -249,7 +249,7 @@ export class NeolineWalletApiService {
         args,
       })
       .then(({ txid }) => {
-        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
+        const txHash = this.commonService.add0xHash(txid);
         this.handleTx(fromToken, toToken, inputAmount, txHash);
         return txHash;
       })
@@ -342,7 +342,7 @@ export class NeolineWalletApiService {
         args,
       })
       .then(({ txid }) => {
-        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
+        const txHash = this.commonService.add0xHash(txid);
         this.handleTx(fromToken, toToken, inputAmount, txHash, false);
         return txHash;
       })

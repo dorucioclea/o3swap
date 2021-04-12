@@ -90,7 +90,7 @@ export class O3NeoWalletApiService {
       },
     })
       .then(({ txid }) => {
-        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
+        const txHash = this.commonService.add0xHash(txid);
         this.handleTx(fromToken, toToken, inputAmount, txHash);
         return txHash;
       })
@@ -154,7 +154,7 @@ export class O3NeoWalletApiService {
     }
     return o3dapi.NEO.invoke(params)
       .then(({ txid }) => {
-        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
+        const txHash = this.commonService.add0xHash(txid);
         this.handleTx(fromToken, toToken, inputAmount, txHash);
         return txHash;
       })
@@ -223,7 +223,7 @@ export class O3NeoWalletApiService {
       args,
     })
       .then(({ txid }) => {
-        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
+        const txHash = this.commonService.add0xHash(txid);
         this.handleTx(fromToken, toToken, inputAmount, txHash);
         return txHash;
       })
@@ -313,7 +313,7 @@ export class O3NeoWalletApiService {
       args,
     })
       .then(({ txid }) => {
-        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
+        const txHash = this.commonService.add0xHash(txid);
         this.handleTx(fromToken, toToken, inputAmount, txHash, false);
         return txHash;
       })

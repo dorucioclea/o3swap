@@ -11,5 +11,6 @@ export interface AssetQueryResponseItem {
   fiat?: string;
   receiveAmount?: number | string;
   swapPathLogo?: string[];
+  aggregator?: string;
 }
 export type AssetQueryResponse = AssetQueryResponseItem[];

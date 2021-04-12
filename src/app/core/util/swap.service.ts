@@ -63,9 +63,7 @@ export class SwapService {
     return (token && token.assetID) || '';
   }
   getHash160FromAddress(text: string): any {
-    if (text.startsWith('0x')) {
-      text = text.slice(2);
-    }
+    text = this.commonService.remove0xHash(text);
     return this.reverseHex(text);
   }
   private reverseHex(hex): string {

@@ -389,9 +389,7 @@ export class O3EthWalletApiService {
     const bigNumberPolyFee = new BigNumber(fee).shiftedBy(18).dp(0).toFixed();
     const data = swapContract.methods
       .add_liquidity(
-        fromToken.assetID.startsWith('0x')
-          ? fromToken.assetID
-          : `0x${fromToken.assetID}`, // fromAssetHash
+        this.commonService.add0xHash(fromToken.assetID), // fromAssetHash
         1, // toPoolId
         toChainId, // toChainId
         address, // toAddress
@@ -441,9 +439,7 @@ export class O3EthWalletApiService {
     const bigNumberPolyFee = new BigNumber(fee).shiftedBy(18).dp(0).toFixed();
     const data = swapContract.methods
       .remove_liquidity(
-        fromToken.assetID.startsWith('0x')
-          ? fromToken.assetID
-          : `0x${fromToken.assetID}`, // fromAssetHash
+        this.commonService.add0xHash(fromToken.assetID), // fromAssetHash
         1, // toPoolId
         toChainId, // toChainId
         `0x${usdtToken.assetID}`,
@@ -586,9 +582,7 @@ export class O3EthWalletApiService {
     if (value && !value.startsWith('0x')) {
       value = '0x' + new BigNumber(value).toString(16);
     }
-    if (!to.startsWith('0x')) {
-      to = '0x' + to;
-    }
+    to = this.commonService.add0xHash(to);
     return {
       from,
       to,

@@ -408,9 +408,7 @@ export class MetaMaskWalletApiService {
     const bigNumberPolyFee = new BigNumber(fee).shiftedBy(18).dp(0).toFixed();
     const data = swapContract.methods
       .add_liquidity(
-        fromToken.assetID.startsWith('0x')
-          ? fromToken.assetID
-          : `0x${fromToken.assetID}`, // fromAssetHash
+        this.commonService.add0xHash(fromToken.assetID), // fromAssetHash
         1, // toPoolId
         toChainId, // toChainId
         address, // toAddress
@@ -462,12 +460,10 @@ export class MetaMaskWalletApiService {
     const bigNumberPolyFee = new BigNumber(fee).shiftedBy(18).dp(0).toFixed();
     const data = swapContract.methods
       .remove_liquidity(
-        fromToken.assetID.startsWith('0x')
-          ? fromToken.assetID
-          : `0x${fromToken.assetID}`, // fromAssetHash
+        this.commonService.add0xHash(fromToken.assetID), // fromAssetHash
         1, // toPoolId
         toChainId, // toChainId
-        `0x${usdtToken.assetID}`,
+        this.commonService.add0xHash(usdtToken.assetID),
         address, // toAddress
         new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
         minAmountOut, // minAmountOut
@@ -612,9 +608,7 @@ export class MetaMaskWalletApiService {
     if (value && !value.startsWith('0x')) {
       value = '0x' + new BigNumber(value).toString(16);
     }
-    if (!to.startsWith('0x')) {
-      to = '0x' + to;
-    }
+    to = this.commonService.add0xHash(to);
     return {
       from,
       to,

@@ -20,6 +20,7 @@ import {
   SWAP_CONTRACT_CHAIN_ID,
   POLY_HOST_ADDRESS,
   ETH_SOURCE_CONTRACT_HASH,
+  ETH_INQUIRY_HOST,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { CommonService } from '../util/common.service';
@@ -35,7 +36,7 @@ export class ApiService {
     private http: HttpClient,
     private commonService: CommonService,
     private swapService: SwapService
-  ) { }
+  ) {}
 
   postEmail(email: string): Observable<any> {
     return this.http.post(`https://subscribe.o3swap.com/subscribe`, { email });
@@ -142,9 +143,7 @@ export class ApiService {
   }
 
   getCrossChainSwapDetail(hash: string): Observable<TxProgress> {
-    if (hash.startsWith('0x')) {
-      hash = hash.slice(2);
-    }
+    hash = this.commonService.remove0xHash(hash);
     return this.http
       .post(`${CROSS_CHAIN_SWAP_DETAIL_HOST}/transactionofhash`, { hash })
       .pipe(
@@ -191,11 +190,14 @@ export class ApiService {
     ) {
       return this.getNeoNNeoSwapPath(fromToken, toToken, inputAmount);
     }
-    if (fromToken.chain !== 'NEO' && toToken.chain !== 'NEO') {
-      return this.getFromEthCrossChainSwapPath(fromToken, toToken, inputAmount);
-    }
-    if (fromToken.chain === 'NEO') {
+    if (fromToken.chain === 'NEO' && toToken.chain === 'NEO') {
       return this.getFromNeoSwapPath(fromToken, toToken, inputAmount);
+    }
+    if (fromToken.chain === 'NEO' && toToken.chain !== 'NEO') {
+      return of([]);
+    }
+    if (fromToken.chain === toToken.chain) {
+      return this.getFromEthSwapPath(fromToken, toToken, inputAmount);
     }
   }
 
@@ -301,40 +303,70 @@ export class ApiService {
       );
   }
 
-  private getFromEthCrossChainSwapPath(
+  private getFromEthSwapPath(
     fromToken: Token,
     toToken: Token,
     inputAmount: string
   ): Observable<AssetQueryResponse> {
-    const fromPUsdt = ETH_PUSDT[fromToken.chain];
-    const toPUsdt = ETH_PUSDT[toToken.chain];
     const amount = this.commonService.decimalToInteger(
       inputAmount,
       fromToken.decimals
     );
     return this.http
-      .get(
-        `${POLY_HOST}/calcOutGivenIn/${POLY_HOST_ADDRESS}/${fromPUsdt}/${toPUsdt}/${amount}`
-      )
+      .post(`${ETH_INQUIRY_HOST}/v1/${fromToken.chain.toLowerCase()}/quote`, {
+        from: this.commonService.add0xHash(fromToken.assetID),
+        to: this.commonService.add0xHash(toToken.assetID),
+        amount,
+      })
       .pipe(
-        map((res: any) => {
-          if (res.code === 200) {
-            const result: AssetQueryResponse = [
-              {
-                amount: [
-                  new BigNumber(inputAmount)
-                    .shiftedBy(fromToken.decimals)
-                    .toFixed(),
-                  res.amount_out,
-                ],
-                swapPath: [fromToken.symbol, toToken.symbol],
-              },
-            ];
-            return this.handleReceiveSwapPathFiat(result, toToken);
+        map((res: CommonHttpResponse) => {
+          if (res.status === 'success') {
+            const target = [];
+            res.data.forEach((item) => {
+              const temp = { amount: item.amounts, swapPath: item.path };
+              target.push(temp);
+            });
+            console.log(target);
+            return this.handleReceiveSwapPathFiat(target, toToken);
           }
         })
       );
   }
+
+  // private getFromEthCrossChainSwapPath(
+  //   fromToken: Token,
+  //   toToken: Token,
+  //   inputAmount: string
+  // ): Observable<AssetQueryResponse> {
+  //   const fromPUsdt = ETH_PUSDT[fromToken.chain];
+  //   const toPUsdt = ETH_PUSDT[toToken.chain];
+  //   const amount = this.commonService.decimalToInteger(
+  //     inputAmount,
+  //     fromToken.decimals
+  //   );
+  //   return this.http
+  //     .get(
+  //       `${POLY_HOST}/calcOutGivenIn/${POLY_HOST_ADDRESS}/${fromPUsdt}/${toPUsdt}/${amount}`
+  //     )
+  //     .pipe(
+  //       map((res: any) => {
+  //         if (res.code === 200) {
+  //           const result: AssetQueryResponse = [
+  //             {
+  //               amount: [
+  //                 new BigNumber(inputAmount)
+  //                   .shiftedBy(fromToken.decimals)
+  //                   .toFixed(),
+  //                 res.amount_out,
+  //               ],
+  //               swapPath: [fromToken.symbol, toToken.symbol],
+  //             },
+  //           ];
+  //           return this.handleReceiveSwapPathFiat(result, toToken);
+  //         }
+  //       })
+  //     );
+  // }
 
   /**
    * @description: Input USDT get LP, pool add LP
@@ -346,7 +378,9 @@ export class ApiService {
     const poolUsdtHash = ETH_PUSDT[fromToken.chain];
     amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
     return this.http
-      .get(`${POLY_HOST}/calcPoolOutGivenSingleIn/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`)
+      .get(
+        `${POLY_HOST}/calcPoolOutGivenSingleIn/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`
+      )
       .pipe(
         map((res: any) => {
           if (res.code === 200) {
@@ -367,7 +401,9 @@ export class ApiService {
     const poolUsdtHash = ETH_PUSDT[fromToken.chain];
     amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
     return this.http
-      .get(`${POLY_HOST}/calcPoolInGivenSingleOut/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`)
+      .get(
+        `${POLY_HOST}/calcPoolInGivenSingleOut/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`
+      )
       .pipe(
         map((res: any) => {
           if (res.code === 200) {
@@ -388,17 +424,20 @@ export class ApiService {
     const poolUsdtHash = ETH_PUSDT[fromToken.chain];
     amount = new BigNumber(amount).shiftedBy(18).toFixed();
     return this.http
-      .get(`${POLY_HOST}/calcSingleOutGivenPoolIn/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`)
+      .get(
+        `${POLY_HOST}/calcSingleOutGivenPoolIn/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`
+      )
       .pipe(
         map((res: any) => {
           if (res.code === 200) {
-            return new BigNumber(res.token_amount_out).shiftedBy(-fromToken.decimals).toFixed();
+            return new BigNumber(res.token_amount_out)
+              .shiftedBy(-fromToken.decimals)
+              .toFixed();
           }
         })
       )
       .toPromise();
   }
-
 
   private getToStandardSwapPathReq(
     fromToken: Token,
