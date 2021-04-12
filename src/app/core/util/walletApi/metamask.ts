@@ -166,19 +166,29 @@ export class MetaMaskWalletApiService {
     if (!chain) {
       return;
     }
-    const json = await this.getEthErc20Json();
     if (token.assetID !== ETH_SOURCE_CONTRACT_HASH) {
+      const json = await this.getEthErc20Json();
       const ethErc20Contract = new this.web3.eth.Contract(json, token.assetID);
-      try {
-        const balance = await ethErc20Contract.methods
-          .balanceOf(this.accountAddress)
-          .call();
-        return new BigNumber(balance).shiftedBy(-token.decimals).toFixed();
-      } catch (error) {
-        console.error(error);
-        this.handleDapiError(error);
-        // this.handleDapiError(error);
-      }
+      const data = await ethErc20Contract.methods
+        .balanceOf(this.accountAddress)
+        .encodeABI();
+      return this.ethereum
+        .request({
+          method: 'eth_call',
+          params: [
+            this.getSendTransactionParams(
+              this.accountAddress,
+              token.assetID,
+              data
+            ),
+          ],
+        })
+        .then((balance) => {
+          return new BigNumber(balance).shiftedBy(-token.decimals).toFixed();
+        })
+        .catch((error) => {
+          this.handleDapiError(error);
+        });
     } else {
       return this.ethereum
         .request({

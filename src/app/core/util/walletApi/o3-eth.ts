@@ -36,6 +36,7 @@ import BigNumber from 'bignumber.js';
 import { Unsubscribable, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
+import Web3 from 'web3';
 
 interface State {
   swap: SwapStateType;
@@ -52,11 +53,10 @@ export class O3EthWalletApiService {
   ethWalletName: EthWalletName;
   bscWalletName: EthWalletName;
   hecoWalletName: EthWalletName;
-  metamaskNetworkId: number;
+  o3DesktopId: number;
 
-  ethereum;
   isConnected: boolean;
-  web3;
+  web3 = new Web3();
   swapperJson;
   ethErc20Json;
   uniswapJson;
@@ -74,7 +74,7 @@ export class O3EthWalletApiService {
   connect(chain: string): void {
     o3dapi.ETH.request({ method: 'eth_requestAccounts' })
       .then(async (res) => {
-        this.commonService.log(res);
+        console.log(res);
         this.accountAddress = res.result[0];
         let dispatchAccountType;
         let dispatchWalletNameType;
@@ -108,7 +108,7 @@ export class O3EthWalletApiService {
   }
 
   async getBalance(): Promise<boolean> {
-    const chainId = new BigNumber(this.ethereum.chainId, 16).toNumber();
+    const chainId = new BigNumber(this.o3DesktopId, 16).toNumber();
     const chain = METAMASK_CHAIN[chainId];
     if (!chain) {
       return;
@@ -146,24 +146,34 @@ export class O3EthWalletApiService {
   }
 
   async getBalancByHash(token: Token): Promise<string> {
-    const chainId = new BigNumber(this.ethereum.chainId, 16).toNumber();
+    const chainId = new BigNumber(this.o3DesktopId, 16).toNumber();
     const chain = METAMASK_CHAIN[chainId];
     if (!chain) {
       return;
     }
-    const json = await this.getEthErc20Json();
     if (token.assetID !== ETH_SOURCE_CONTRACT_HASH) {
+      const json = await this.getEthErc20Json();
       const ethErc20Contract = new this.web3.eth.Contract(json, token.assetID);
-      try {
-        const balance = await ethErc20Contract.methods
-          .balanceOf(this.accountAddress)
-          .call();
-        return new BigNumber(balance).shiftedBy(-token.decimals).toFixed();
-      } catch (error) {
-        console.error(error);
-        this.handleDapiError(error);
-        // this.handleDapiError(error);
-      }
+      const data = ethErc20Contract.methods
+        .balanceOf(this.accountAddress)
+        .encodeABI();
+      return o3dapi.ETH.request({
+        method: 'eth_call',
+        params: [
+          this.getSendTransactionParams(
+            this.accountAddress,
+            token.assetID,
+            data
+          ),
+        ],
+      })
+        .then((balance) => {
+          return new BigNumber(balance).shiftedBy(-token.decimals).toFixed();
+        })
+        .catch((error) => {
+          console.log(error);
+          this.handleDapiError(error);
+        });
     } else {
       return o3dapi.ETH.request({
         method: 'eth_getBalance',
@@ -604,51 +614,57 @@ export class O3EthWalletApiService {
 
   private addListener(): void {
     o3dapi.ETH.request({ method: 'net_version' })
-      .then((chainId) => {
-        this.commonService.log('chainId: ' + chainId);
-        const id = Number(chainId);
-        if (this.metamaskNetworkId !== id) {
-          this.metamaskNetworkId = id;
-          this.store.dispatch({
-            type: UPDATE_METAMASK_NETWORK_ID,
-            data: id,
-          });
+      .then((res) => {
+        const id = Number(res.result);
+        if (this.o3DesktopId !== id) {
+          this.o3DesktopId = id;
+          // this.store.dispatch({
+          //   type: UPDATE_O3DESKTOP_NETWORK_ID,
+          //   data: id,
+          // });
           this.getBalance();
         }
       })
       .catch((error) => {
         this.handleDapiError(error);
       });
-    this.ethereum.on('accountsChanged', (accounts) => {
-      this.accountAddress = accounts.length > 0 ? accounts[0] : null;
-      this.updateAccount(this.accountAddress);
-      if (
-        this.accountAddress === null &&
-        this.ethWalletName === this.myWalletName
-      ) {
-        this.updateWalletName(null);
+    // this.ethereum.on('accountsChanged', (accounts) => {
+    //   this.accountAddress = accounts.length > 0 ? accounts[0] : null;
+    //   this.updateAccount(this.accountAddress);
+    //   if (
+    //     this.accountAddress === null &&
+    //     this.ethWalletName === this.myWalletName
+    //   ) {
+    //     this.updateWalletName(null);
+    //   }
+    //   if (this.accountAddress) {
+    //     this.getBalance();
+    //   }
+    // });
+    // this.ethereum.on('chainChanged', (chainId) => {
+    //   const id = Number(chainId);
+    //   if (this.metamaskNetworkId !== id) {
+    //     this.metamaskNetworkId = id;
+    //     this.store.dispatch({
+    //       type: UPDATE_METAMASK_NETWORK_ID,
+    //       data: id,
+    //     });
+    //     this.getBalance();
+    //   }
+    // });
+    o3dapi.ETH.addEventListener(
+      o3dapi.ETH.Constants.EventName.NETWORK_CHANGED,
+      (res) => {
+        console.log(res);
+        console.log(`NETWORK_CHANGED: ${res.result}`);
       }
-      if (this.accountAddress) {
-        this.getBalance();
-      }
-    });
-    this.ethereum.on('chainChanged', (chainId) => {
-      const id = Number(chainId);
-      if (this.metamaskNetworkId !== id) {
-        this.metamaskNetworkId = id;
-        this.store.dispatch({
-          type: UPDATE_METAMASK_NETWORK_ID,
-          data: id,
-        });
-        this.getBalance();
-      }
-    });
+    );
   }
 
   private checkNetwork(fromToken: Token): boolean {
-    if (this.metamaskNetworkId !== METAMASK_CHAIN_ID[fromToken.chain]) {
+    if (this.o3DesktopId !== METAMASK_CHAIN_ID[fromToken.chain]) {
       this.nzMessage.error(
-        `Please switch network to ${fromToken.chain} ${NETWORK} on MetaMask wallet.`
+        `Please switch network to ${fromToken.chain} ${NETWORK} on O3 wallet.`
       );
       return false;
     }

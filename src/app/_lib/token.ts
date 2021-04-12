@@ -11,7 +11,8 @@ export interface Token {
   sourceTokenSymbol?: string;
 }
 
-export const ETH_SOURCE_CONTRACT_HASH = '0000000000000000000000000000000000000000';
+export const ETH_SOURCE_CONTRACT_HASH =
+  '0000000000000000000000000000000000000000';
 
 const MIX_NEO_TOKENS: Token[] = [
   {
@@ -183,6 +184,15 @@ const ETH_TOKENS: Token[] = [
     logo: '/assets/images/tokens/usdt.png',
     atNeoAssetName: 'pnUSDT',
     sourceTokenSymbol: 'ETH',
+  },
+  {
+    assetID: '0xc778417e063141139fce010982780140aa0cd5ab',
+    symbol: 'WETH',
+    decimals: 18,
+    chain: 'ETH',
+    logo: 'https://img.o3.network/logo/eth/eth.png',
+    amount: '0',
+    rateName: '',
   },
 ];
 
