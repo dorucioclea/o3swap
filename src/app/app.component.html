@@ -161,4 +161,4 @@
 <app-wallet-connect [show]="showConnectModal" [connectChainType]="connectChainType"
   (closePage)="showConnectModal=false"></app-wallet-connect>
 
-<app-tx-progress *ngIf="currentPage==='/bridge' || currentPage==='/swap'"></app-tx-progress>
+<app-tx-progress *ngIf="currentPage.startsWith('/bridge') || currentPage==='/swap'"></app-tx-progress>

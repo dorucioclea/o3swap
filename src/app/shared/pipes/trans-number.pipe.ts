@@ -5,6 +5,9 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class TransNumberPipe implements PipeTransform {
   transform(value: any): any {
+    if (!value) {
+      return;
+    }
     let data = value.toString();
     const dataGroup = data.split('.');
     if (dataGroup[0].length >= 13) {

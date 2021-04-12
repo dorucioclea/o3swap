@@ -45,6 +45,7 @@ export class TxProgressComponent implements OnInit, OnDestroy {
   };
   showTxModal = false;
   showTxDetail = false;
+  hasTransaction = false;
 
   swap$: Observable<any>;
   transaction: SwapTransaction;
@@ -63,38 +64,12 @@ export class TxProgressComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.swap$.subscribe((state) => {
-      if (
-        state.transaction &&
-        state.transaction.txid !== this.transaction?.txid &&
-        state.transaction.fromToken.chain !== state.transaction.toToken.chain &&
-        state.transaction.isPending
-      ) {
-        this.transaction = Object.assign({}, state.transaction);
-        this.setRequestCrossInterval();
+      this.hasTransaction = state.transaction ? true : false;
+      if (this.hasTransaction) {
+        this.handleTransacction(state.transaction);
       }
-      // if (交易失败) {
-      //   if (this.requestCrossInterval) {
-      //     this.requestCrossInterval.unsubscribe();
-      //   }
-      // }
-      this.transaction = Object.assign({}, state.transaction);
-      this.showTxModal = this.transaction.min === false ? true : false;
-      if (this.transaction.isPending === false) {
-        this.swapProgress = 100;
-      } else {
-        if (this.transaction.progress) {
-          if (this.transaction.progress.step3.status === 2) {
-            this.swapProgress = 100;
-          } else if (this.transaction.progress.step2.status === 2) {
-            this.swapProgress = 66;
-          } else if (this.transaction.progress.step1.status === 2) {
-            this.swapProgress = 33;
-          } else {
-            this.swapProgress = 20;
-          }
-        } else {
-          this.swapProgress = 20;
-        }
+      if (!this.hasTransaction && this.requestCrossInterval) {
+        this.requestCrossInterval.unsubscribe();
       }
     });
   }
@@ -109,6 +84,9 @@ export class TxProgressComponent implements OnInit, OnDestroy {
   }
 
   setRequestCrossInterval(): void {
+    if (this.requestCrossInterval) {
+      this.requestCrossInterval.unsubscribe();
+    }
     this.requestCrossInterval = interval(5000).subscribe(() => {
       this.apiService
         .getCrossChainSwapDetail(this.transaction.txid)
@@ -143,5 +121,39 @@ export class TxProgressComponent implements OnInit, OnDestroy {
 
   copy(hash: string): void {
     this.commonService.copy(hash);
+  }
+  handleTransacction(stateTx): void {
+    // 跨链交易定时查询交易状态
+    if (
+      stateTx &&
+      stateTx.txid !== this.transaction?.txid &&
+      stateTx.progress &&
+      stateTx.isPending
+    ) {
+      this.transaction = Object.assign({}, stateTx);
+      this.setRequestCrossInterval();
+    }
+    if (this.requestCrossInterval && !stateTx.progress) {
+      this.requestCrossInterval.unsubscribe();
+    }
+    this.transaction = Object.assign({}, stateTx);
+    this.showTxModal = this.transaction.min === false ? true : false;
+    if (this.transaction.isPending === false) {
+      this.swapProgress = 100;
+    } else {
+      if (this.transaction.progress) {
+        if (this.transaction.progress.step3.status === 2) {
+          this.swapProgress = 100;
+        } else if (this.transaction.progress.step2.status === 2) {
+          this.swapProgress = 66;
+        } else if (this.transaction.progress.step1.status === 2) {
+          this.swapProgress = 33;
+        } else {
+          this.swapProgress = 20;
+        }
+      } else {
+        this.swapProgress = 20;
+      }
+    }
   }
 }

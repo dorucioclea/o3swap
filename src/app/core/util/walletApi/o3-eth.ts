@@ -30,6 +30,7 @@ import {
   UPDATE_METAMASK_NETWORK_ID,
   ETH_SOURCE_CONTRACT_HASH,
   METAMASK_CHAIN,
+  USD_TOKENS,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { Unsubscribable, Observable, of } from 'rxjs';
@@ -109,6 +110,9 @@ export class O3EthWalletApiService {
   async getBalance(): Promise<boolean> {
     const chainId = new BigNumber(this.ethereum.chainId, 16).toNumber();
     const chain = METAMASK_CHAIN[chainId];
+    if (!chain) {
+      return;
+    }
     let dispatchBalanceType;
     let tempTokenBalance: Token[];
     return new Promise(async (resolve, reject) => {
@@ -142,6 +146,11 @@ export class O3EthWalletApiService {
   }
 
   async getBalancByHash(token: Token): Promise<string> {
+    const chainId = new BigNumber(this.ethereum.chainId, 16).toNumber();
+    const chain = METAMASK_CHAIN[chainId];
+    if (!chain) {
+      return;
+    }
     const json = await this.getEthErc20Json();
     if (token.assetID !== ETH_SOURCE_CONTRACT_HASH) {
       const ethErc20Contract = new this.web3.eth.Contract(json, token.assetID);
@@ -351,11 +360,12 @@ export class O3EthWalletApiService {
 
   async addLiquidity(
     fromToken: Token,
+    toToken: Token,
     inputAmount: string,
-    fromAddress: string,
-    toAddress: string,
+    address: string,
     toChainId: number,
-    fee?: string
+    minAmountOut: string,
+    fee: string
   ): Promise<string> {
     if (this.checkNetwork(fromToken) === false) {
       return;
@@ -365,6 +375,7 @@ export class O3EthWalletApiService {
       json,
       ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain]
     );
+    const bigNumberPolyFee = new BigNumber(fee).shiftedBy(18).dp(0).toFixed();
     const data = swapContract.methods
       .add_liquidity(
         fromToken.assetID.startsWith('0x')
@@ -372,9 +383,10 @@ export class O3EthWalletApiService {
           : `0x${fromToken.assetID}`, // fromAssetHash
         1, // toPoolId
         toChainId, // toChainId
-        toAddress, // toAddress
+        address, // toAddress
         new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
-        0, // fee
+        minAmountOut,
+        bigNumberPolyFee, // fee
         1 // id
       )
       .encodeABI();
@@ -382,15 +394,15 @@ export class O3EthWalletApiService {
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
-          fromAddress,
+          address,
           ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain],
           data,
-          '0'
+          bigNumberPolyFee
         ),
       ],
     })
       .then((hash) => {
-        this.handleTx(fromToken, null, inputAmount, hash);
+        this.handleTx(fromToken, toToken, inputAmount, hash);
         return hash;
       })
       .catch((error) => {
@@ -399,12 +411,12 @@ export class O3EthWalletApiService {
   }
 
   async removeLiquidity(
-    fromToken: Token,
+    fromToken: Token, // LP token
     inputAmount: string,
-    fromAddress: string,
-    toAddress: string,
+    address: string,
     toChainId: number,
-    fee?: string
+    minAmountOut: string,
+    fee: string
   ): Promise<string> {
     if (this.checkNetwork(fromToken) === false) {
       return;
@@ -414,6 +426,8 @@ export class O3EthWalletApiService {
       json,
       ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain]
     );
+    const usdtToken = USD_TOKENS.find((item) => item.chain === fromToken.chain);
+    const bigNumberPolyFee = new BigNumber(fee).shiftedBy(18).dp(0).toFixed();
     const data = swapContract.methods
       .remove_liquidity(
         fromToken.assetID.startsWith('0x')
@@ -421,9 +435,11 @@ export class O3EthWalletApiService {
           : `0x${fromToken.assetID}`, // fromAssetHash
         1, // toPoolId
         toChainId, // toChainId
-        toAddress, // toAddress
+        `0x${usdtToken.assetID}`,
+        address, // toAddress
         new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
-        0, // fee
+        minAmountOut, // minAmountOut
+        bigNumberPolyFee, // fee
         1 // id
       )
       .encodeABI();
@@ -431,15 +447,15 @@ export class O3EthWalletApiService {
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
-          fromAddress,
+          address,
           ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain],
           data,
-          '0'
+          bigNumberPolyFee
         ),
       ],
     })
       .then((hash) => {
-        this.handleTx(fromToken, null, inputAmount, hash);
+        this.handleTx(fromToken, usdtToken, inputAmount, hash);
         return hash;
       })
       .catch((error) => {

@@ -171,9 +171,12 @@
                   text-align: center;
                   background: #303030;
                   border-radius: 10px;
-                  color: #6162ef;
                   cursor: not-allowed;
+                  pointer-events: none;
+                  color: #4A4A4A;
                   &.active {
+                    color: #6162ef;
+                    pointer-events: auto;
                     cursor: pointer;
                     &:hover {
                       background-color: #6162EF;

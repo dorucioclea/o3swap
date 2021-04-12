@@ -320,7 +320,7 @@ export const USD_TOKENS: Token[] = [
   },
 ];
 
-const LP_TOKENS: Token[] = [
+export const LP_TOKENS: Token[] = [
   {
     assetID: '0xD5d63Dce45E0275Ca76a8b2e9BD8C11679A57D0D',
     symbol: 'pLP',

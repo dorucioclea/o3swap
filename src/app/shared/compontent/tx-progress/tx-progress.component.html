@@ -1,4 +1,4 @@
-<nz-modal [nzVisible]="transaction?.min===false" (nzOnCancel)="minTxHashModal()" [nzFooter]="null" [nzClosable]="false"
+<nz-modal *ngIf="hasTransaction" [nzVisible]="transaction?.min===false" (nzOnCancel)="minTxHashModal()" [nzFooter]="null" [nzClosable]="false"
   [nzTitle]="null" nzClassName="custom-modal tx-modal">
   <div class="modal-content tx-modal-content">
     <div class="close-group">
@@ -134,7 +134,7 @@
   </div>
 </nz-modal>
 
-<section class="min-tx" *ngIf="transaction?.min===true" (click)="maxTxHashModal()"
+<section class="min-tx" *ngIf="hasTransaction && transaction?.min===true" (click)="maxTxHashModal()"
   [ngClass]="{pending: transaction?.isPending}">
   <ng-lottie *ngIf="transaction?.isPending" class="pending-min-json" [options]="pendingMinOptions"></ng-lottie>
   <img *ngIf="!transaction?.isPending" src="/assets/images/swap-result/success-icon.png" alt="">

@@ -337,14 +337,14 @@ export class ApiService {
   }
 
   /**
-   * @description:
+   * @description: Input USDT get LP, pool add LP
    * @param fromToken fromToken
    * @param amount amount
    * @return Promise
    */
   getPoolOutGivenSingleIn(fromToken: Token, amount: string): Promise<string> {
     const poolUsdtHash = ETH_PUSDT[fromToken.chain];
-    amount = new BigNumber(amount).multipliedBy(new BigNumber(10).pow(fromToken.decimals)).toFixed();
+    amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
     return this.http
       .get(`${POLY_HOST}/calcPoolOutGivenSingleIn/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`)
       .pipe(
@@ -358,14 +358,14 @@ export class ApiService {
   }
 
   /**
-   * @description: Input USDT get LP
+   * @description: Input USDT get LP, pool remove LP
    * @param fromTokenn fromToken
    * @param amount USDT amount
    * @return Promise Out
    */
-  getPoolOutGivenSingleOut(fromToken: Token, amount: string): Promise<string> {
+  getPoolInGivenSingleOut(fromToken: Token, amount: string): Promise<string> {
     const poolUsdtHash = ETH_PUSDT[fromToken.chain];
-    amount = new BigNumber(amount).multipliedBy(new BigNumber(10).pow(fromToken.decimals)).toFixed();
+    amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
     return this.http
       .get(`${POLY_HOST}/calcPoolInGivenSingleOut/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`)
       .pipe(
@@ -379,14 +379,14 @@ export class ApiService {
   }
 
   /**
-   * @description: Input USDT get LP
+   * @description: Input LP get USDT
    * @param fromToken fromToken
    * @param amount LP amount
    * @return promise
    */
-  getSingleInGivenPoolIn(fromToken: Token, amount: string): Promise<string> {
+  getSingleOutGivenPoolIn(fromToken: Token, amount: string): Promise<string> {
     const poolUsdtHash = ETH_PUSDT[fromToken.chain];
-    amount = new BigNumber(amount).multipliedBy(new BigNumber(10).pow(fromToken.decimals)).toFixed();
+    amount = new BigNumber(amount).shiftedBy(18).toFixed();
     return this.http
       .get(`${POLY_HOST}/calcSingleOutGivenPoolIn/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`)
       .pipe(

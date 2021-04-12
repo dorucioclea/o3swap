@@ -6,7 +6,7 @@
       </div>
       <div class="content">
         <div class="value">
-          <span class="amount">{{LPToken ?  LPToken.amount : '--' }}</span>
+          <span class="amount">{{LPToken ? (LPToken.amount | number: '1.0-8') : '--' }}</span>
           <span class="rate">--</span>
         </div>
       </div>
@@ -148,12 +148,8 @@
         <span class="value">{{ liquidityType == 'add' ? receiveAmount : payAmount }}</span>
       </div>
       <div class="item-list">
-        <span class="name">Price impact</span>
-        <span class="value">0.0</span>
-      </div>
-      <div class="item-list">
         <span class="name">Max slippage</span>
-        <span class="value">0.0</span>
+        <span class="value">{{BRIDGE_SLIPVALUE}}%</span>
       </div>
     </div>
   </div>
