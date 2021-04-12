@@ -165,6 +165,7 @@ export class O3EthWalletApiService {
             token.assetID,
             data
           ),
+          'latest'
         ],
       })
         .then((balance) => {
