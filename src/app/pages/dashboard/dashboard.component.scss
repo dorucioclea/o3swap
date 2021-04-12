@@ -1,6 +1,9 @@
 .page-container {
   width: 1200px;
   margin: 0 auto;
+  @media screen and (max-width: 1680px) {
+    width: 1000px;
+  }
   .title {
     margin-bottom: 20px;
     padding-left: 10px;

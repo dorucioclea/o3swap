@@ -3,6 +3,7 @@
   height: 100%;
   background: #121212;
   color: #fff;
+  overflow: auto;
   &.home {
     height: auto;
     background-image: url("/assets/images/home/bg1.png");
