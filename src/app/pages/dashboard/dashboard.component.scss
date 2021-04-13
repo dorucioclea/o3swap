@@ -129,7 +129,19 @@
           .detail-container {
             margin: 15px 0;
             .detail-item {
+              position: relative;
               flex: 1;
+              &:nth-child(1)::before {
+                position: absolute;
+                right: 0;
+                top: 8px;
+                content: "";
+                display: block;
+                width: 1px;
+                height: 30px;
+                background-color: #FFFFFF;
+                opacity: 0.5;
+              }
             }
             .value {
               font-size: 18px;
@@ -147,8 +159,20 @@
             height: 50px;
             line-height: 50px;
             span {
+              position: relative;
               flex: 1;
               color: #46b069;
+              &:nth-child(1)::before {
+                position: absolute;
+                right: 0;
+                top: 10px;
+                content: "";
+                display: block;
+                width: 1px;
+                height: 30px;
+                background-color: #FFFFFF;
+                opacity: 0.5;
+              }
             }
           }
         }
