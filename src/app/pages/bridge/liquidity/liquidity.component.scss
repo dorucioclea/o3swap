@@ -82,6 +82,7 @@
           text-align: center;
           background: no-repeat;
           background: url("/assets/images/bridge-liquidity/defult.png") no-repeat;
+          cursor: pointer;
           &.tabs-add {
             left: 0;
             &:hover {
@@ -172,6 +173,7 @@
                   background: #303030;
                   border-radius: 10px;
                   color: #4A4A4A;
+                  cursor: pointer;
                   &.active {
                     color: #6162ef;
                   }
