@@ -14,6 +14,8 @@ import {
   AssetQueryResponseItem,
   SwapStateType,
   EthWalletName,
+  USD_TOKENS,
+  ApproveContract,
 } from '@lib';
 import {
   ApiService,
@@ -205,12 +207,27 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     this.inquiryInterval.unsubscribe();
     this.isApproveLoading = true;
     const swapApi = this.getEthDapiService();
-    swapApi.approve(this.fromToken, this.fromAddress).then((res) => {
-      this.isApproveLoading = false;
-      if (res !== undefined) {
-        this.hasApprove = true;
-      }
-    });
+    swapApi
+      .approve(this.fromToken, this.fromAddress, this.getApproveContractType())
+      .then((hash) => {
+        if (hash) {
+          const timerReq = interval(5000).subscribe(async () => {
+            const receipt = await this.metaMaskWalletApiService.getReceipt(
+              hash
+            );
+            console.log(receipt);
+            if (receipt !== null) {
+              timerReq.unsubscribe();
+              this.isApproveLoading = false;
+              if (receipt === true) {
+                this.hasApprove = true;
+              }
+            }
+          });
+        } else {
+          this.isApproveLoading = false;
+        }
+      });
   }
 
   swap(): void {
@@ -230,13 +247,41 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.swapNeo();
       return;
     }
-    if (this.fromToken.chain === 'NEO' && this.toToken.chain === 'ETH') {
-      this.swapNeoCrossChainEth();
+    if (this.fromToken.chain === 'NEO' && this.toToken.chain !== 'NEO') {
       return;
     }
-    if (this.fromToken.chain !== 'NEO' && this.toToken.chain !== 'NEO') {
+    const fromUsd = USD_TOKENS.find(
+      (item) => item.symbol === this.fromToken.symbol
+    );
+    const toUsd = USD_TOKENS.find(
+      (item) => item.symbol === this.toToken.symbol
+    );
+    if (fromUsd && toUsd) {
+      console.log('------');
       this.swapCrossChainEth();
       return;
+    }
+    if (this.fromToken.chain === 'ETH') {
+      if (this.toToken.chain === 'ETH') {
+        if (this.fromToken.symbol !== 'ETH' && this.toToken.symbol === 'ETH') {
+          this.swapExactTokensForETH();
+        }
+        if (this.fromToken.symbol === 'ETH' && this.toToken.symbol !== 'ETH') {
+          this.swapExactETHForTokens();
+        }
+        if (this.fromToken.symbol !== 'ETH' && this.toToken.symbol !== 'ETH') {
+          this.swapExactTokensForTokens();
+        }
+      } else {
+        if (toUsd) {
+          if (this.fromToken.symbol === 'ETH') {
+            this.swapExactETHForTokensCrossChain();
+          }
+          if (this.fromToken.symbol !== 'ETH') {
+            this.swapExactTokensForTokensCrossChain();
+          }
+        }
+      }
     }
   }
 
@@ -328,9 +373,105 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       });
   }
 
+  swapExactTokensForETH(): void {
+    const swapApi = this.getEthDapiService();
+    this.metaMaskWalletApiService
+      .uniSwapExactTokensForETH(
+        this.fromToken,
+        this.toToken,
+        this.chooseSwapPath,
+        this.inputAmount,
+        this.fromAddress,
+        this.toAddress,
+        this.deadline
+      )
+      .then((res) => {
+        if (res) {
+          this.closePage.emit();
+        }
+      });
+  }
+
+  swapExactETHForTokens(): void {
+    const swapApi = this.getEthDapiService();
+    this.metaMaskWalletApiService
+      .uniSwapExactETHForTokens(
+        this.fromToken,
+        this.toToken,
+        this.chooseSwapPath,
+        this.inputAmount,
+        this.fromAddress,
+        this.toAddress,
+        this.deadline
+      )
+      .then((res) => {
+        if (res) {
+          this.closePage.emit();
+        }
+      });
+  }
+
+  swapExactTokensForTokens(): void {
+    const swapApi = this.getEthDapiService();
+    this.metaMaskWalletApiService
+      .uniSwapExactTokensForTokens(
+        this.fromToken,
+        this.toToken,
+        this.chooseSwapPath,
+        this.inputAmount,
+        this.fromAddress,
+        this.toAddress,
+        this.deadline
+      )
+      .then((res) => {
+        if (res) {
+          this.closePage.emit();
+        }
+      });
+  }
+
+  swapExactETHForTokensCrossChain(): void {
+    this.metaMaskWalletApiService
+      .uniswapExactETHForTokensCrossChain(
+        this.fromToken,
+        this.toToken,
+        this.chooseSwapPath,
+        this.inputAmount,
+        this.fromAddress,
+        this.toAddress,
+        this.slipValue,
+        this.polyFee,
+        this.deadline
+      )
+      .then((res) => {
+        if (res) {
+          this.closePage.emit();
+        }
+      });
+  }
+  swapExactTokensForTokensCrossChain(): void {
+    this.metaMaskWalletApiService
+      .uniswapExactTokensForTokensCrossChain(
+        this.fromToken,
+        this.toToken,
+        this.chooseSwapPath,
+        this.inputAmount,
+        this.fromAddress,
+        this.toAddress,
+        this.slipValue,
+        this.polyFee,
+        this.deadline
+      )
+      .then((res) => {
+        if (res) {
+          this.closePage.emit();
+        }
+      });
+  }
+
   swapCrossChainEth(): void {
     const swapApi = this.getEthDapiService();
-    swapApi
+    this.metaMaskWalletApiService
       .swapCrossChain(
         this.fromToken,
         this.toToken,
@@ -350,6 +491,21 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   //#endregion
 
   //#region
+  getApproveContractType(): string {
+    const fromUsd = USD_TOKENS.find(
+      (item) => item.symbol === this.fromToken.symbol
+    );
+    const toUsd = USD_TOKENS.find(
+      (item) => item.symbol === this.toToken.symbol
+    );
+    let approveContract: ApproveContract;
+    if (fromUsd && toUsd) {
+      approveContract = 'poly';
+    } else {
+      approveContract = 'uniAggregator';
+    }
+    return approveContract;
+  }
   getEthDapiService(): any {
     switch (this.fromToken.chain) {
       case 'ETH':
@@ -371,22 +527,25 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.showApprove = false;
       return;
     }
-    if (
-      this.fromToken.chain !== 'NEO' &&
-      this.toToken.chain !== 'NEO' &&
-      this.fromToken.chain !== this.toToken.chain
-    ) {
+    if (this.fromToken.chain !== 'NEO' && this.toToken.chain !== 'NEO') {
       const swapApi = this.getEthDapiService();
-      swapApi.getAllowance(this.fromToken, this.fromAddress).then((balance) => {
-        if (
-          new BigNumber(balance).comparedTo(new BigNumber(this.inputAmount)) >=
-          0
-        ) {
-          this.showApprove = false;
-        } else {
-          this.showApprove = true;
-        }
-      });
+      swapApi
+        .getAllowance(
+          this.fromToken,
+          this.fromAddress,
+          this.getApproveContractType()
+        )
+        .then((balance) => {
+          if (
+            new BigNumber(balance).comparedTo(
+              new BigNumber(this.inputAmount)
+            ) >= 0
+          ) {
+            this.showApprove = false;
+          } else {
+            this.showApprove = true;
+          }
+        });
     } else {
       this.showApprove = false;
     }
@@ -395,7 +554,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     this.chooseSwapPath = null;
     this.apiService
       .getSwapPath(this.fromToken, this.toToken, this.inputAmount)
-      .subscribe((res) => {
+      .then((res) => {
         this.showInquiry = false;
         if (res.length === 0) {
           this.swapFail.emit();
@@ -471,25 +630,32 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         tempFromAddress = this.hecoAccountAddress;
         break;
     }
+    let tempToAddress;
     switch (this.toToken.chain) {
       case 'NEO':
-        this.toAddress = this.neoAccountAddress;
+        tempToAddress = this.neoAccountAddress;
         break;
       case 'ETH':
-        this.toAddress = this.ethAccountAddress;
+        tempToAddress = this.ethAccountAddress;
         break;
       case 'BSC':
-        this.toAddress = this.bscAccountAddress;
+        tempToAddress = this.bscAccountAddress;
         break;
       case 'HECO':
-        this.toAddress = this.hecoAccountAddress;
+        tempToAddress = this.hecoAccountAddress;
         break;
     }
-    if (tempFromAddress !== this.fromAddress) {
+    if (
+      tempFromAddress !== this.fromAddress ||
+      tempToAddress !== this.toAddress
+    ) {
       this.fromAddress = tempFromAddress;
+      this.toAddress = tempToAddress;
       this.checkShowApprove();
+    } else {
+      this.fromAddress = tempFromAddress;
+      this.toAddress = tempToAddress;
     }
-    this.fromAddress = tempFromAddress;
   }
   checkWalletConnect(): boolean {
     if (

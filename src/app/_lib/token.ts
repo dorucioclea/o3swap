@@ -192,7 +192,8 @@ const ETH_TOKENS: Token[] = [
     chain: 'ETH',
     logo: 'https://img.o3.network/logo/eth/eth.png',
     amount: '0',
-    rateName: '',
+    rateName: 'weth',
+    sourceTokenSymbol: 'ETH',
   },
 ];
 

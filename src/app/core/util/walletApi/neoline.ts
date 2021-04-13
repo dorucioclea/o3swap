@@ -408,7 +408,7 @@ export class NeolineWalletApiService {
     addLister = true
   ): void {
     const pendingTx: SwapTransaction = {
-      txid: txHash,
+      txid: this.commonService.remove0xHash(txHash),
       isPending: true,
       min: false,
       fromToken,

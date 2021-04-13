@@ -1,5 +1,5 @@
-<nz-modal *ngIf="hasTransaction" [nzVisible]="transaction?.min===false" (nzOnCancel)="minTxHashModal()" [nzFooter]="null" [nzClosable]="false"
-  [nzTitle]="null" nzClassName="custom-modal tx-modal">
+<nz-modal *ngIf="hasTransaction" [nzVisible]="transaction?.min===false" (nzOnCancel)="minTxHashModal()"
+  [nzFooter]="null" [nzClosable]="false" [nzTitle]="null" nzClassName="custom-modal tx-modal">
   <div class="modal-content tx-modal-content">
     <div class="close-group">
       <img *ngIf='transaction?.isPending' (click)="minTxHashModal()" class="close"
@@ -22,7 +22,7 @@
         <img [ngClass]="{show: showTxDetail}" (click)="showTxDetail=!showTxDetail"
           src="/assets/images/swap-result/more.png" alt="">
       </div>
-      <div class="tx-group" *ngIf="showTxDetail && transaction?.toToken.chain==='NEO'">
+      <div class="tx-group" *ngIf="showTxDetail && !transaction?.progress">
         <div class="tx-item">
           <div class="left">
             <ng-lottie *ngIf="!transaction?.isPending" class="tx-json" [options]="txCompleteOptions"></ng-lottie>
@@ -36,14 +36,14 @@
               <img class="copy" (click)="copy(transaction?.txid)" src="/assets/images/swap/copy.png" alt="">
             </div>
             <div class="link" *ngIf="!transaction?.isPending">
-              <a target="_blank" href="{{NEO_TX_PAGES_PREFIX}}/{{transaction?.txid}}">
+              <a target="_blank" href="{{TX_PAGES_PREFIX[transaction?.fromToken.chain]}}{{transaction?.txid}}">
                 <span></span>
               </a>
             </div>
           </div>
         </div>
       </div>
-      <div class="tx-group cross-chain" *ngIf="showTxDetail && transaction?.toToken.chain!=='NEO'">
+      <div class="tx-group cross-chain" *ngIf="showTxDetail && transaction?.progress">
         <div class="tx-item">
           <div class="left">
             <ng-lottie *ngIf="transaction?.progress.step1.status===1" class="tx-json" [options]="txPendingOptions">
@@ -64,7 +64,7 @@
             </div>
             <div class="link" *ngIf="transaction?.progress.step1.status===2">
               <a target="_blank"
-                href="{{ETH_TX_PAGES_PREFIX[transaction?.fromToken.chain]}}{{transaction?.progress.step1.hash}}">
+                href="{{TX_PAGES_PREFIX[transaction?.fromToken.chain]}}{{transaction?.progress.step1.hash}}">
                 <span></span>
               </a>
             </div>
@@ -123,7 +123,7 @@
             </div>
             <div class="link" *ngIf="transaction?.progress.step3.status===2">
               <a target="_blank"
-                href="{{ETH_TX_PAGES_PREFIX[transaction?.toToken.chain]}}{{transaction?.progress.step3.hash}}">
+                href="{{TX_PAGES_PREFIX[transaction?.toToken.chain]}}{{transaction?.progress.step3.hash}}">
                 <span></span>
               </a>
             </div>

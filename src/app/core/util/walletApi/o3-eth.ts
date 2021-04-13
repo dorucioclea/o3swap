@@ -165,7 +165,7 @@ export class O3EthWalletApiService {
             token.assetID,
             data
           ),
-          'latest'
+          'latest',
         ],
       })
         .then((balance) => {
@@ -338,10 +338,10 @@ export class O3EthWalletApiService {
       .toFixed();
     const data = swapContract.methods
       .swap(
-        `0x${fromToken.assetID}`, // fromAssetHash
+        this.commonService.add0xHash(fromToken.assetID), // fromAssetHash
         1, // toPoolId
         SWAP_CONTRACT_CHAIN_ID[toToken.chain], // toChainId
-        `0x${toToken.assetID}`, // toAssetHash
+        this.commonService.add0xHash(toToken.assetID), // toAssetHash
         toAddress, // toAddress
         new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
         this.swapService.getAmountOutMinWithAmountOut(receiveAmount, slipValue), // minAmountOut
@@ -442,7 +442,7 @@ export class O3EthWalletApiService {
         this.commonService.add0xHash(fromToken.assetID), // fromAssetHash
         1, // toPoolId
         toChainId, // toChainId
-        `0x${usdtToken.assetID}`,
+        this.commonService.add0xHash(usdtToken.assetID),
         address, // toAddress
         new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
         minAmountOut, // minAmountOut

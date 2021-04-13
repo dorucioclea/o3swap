@@ -373,7 +373,7 @@ export class O3NeoWalletApiService {
     addLister = true
   ): void {
     const pendingTx: SwapTransaction = {
-      txid: txHash,
+      txid: this.commonService.remove0xHash(txHash),
       isPending: true,
       min: false,
       fromToken,

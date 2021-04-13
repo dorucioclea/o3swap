@@ -4,9 +4,8 @@ import {
   SwapStateType,
   SwapTransaction,
   UPDATE_PENDING_TX,
-  ETH_TX_PAGES_PREFIX,
+  TX_PAGES_PREFIX,
   POLY_TX_PAGES_PREFIX,
-  NEO_TX_PAGES_PREFIX,
   TxProgress,
 } from '@lib';
 import { Store } from '@ngrx/store';
@@ -23,8 +22,7 @@ interface State {
   styleUrls: ['./tx-progress.component.scss'],
 })
 export class TxProgressComponent implements OnInit, OnDestroy {
-  ETH_TX_PAGES_PREFIX = ETH_TX_PAGES_PREFIX;
-  NEO_TX_PAGES_PREFIX = NEO_TX_PAGES_PREFIX;
+  TX_PAGES_PREFIX = TX_PAGES_PREFIX;
   POLY_TX_PAGES_PREFIX = POLY_TX_PAGES_PREFIX;
   successOptions: AnimationOptions = {
     path: '/assets/json/success.json',

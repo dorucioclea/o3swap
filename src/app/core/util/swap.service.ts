@@ -7,6 +7,8 @@ import {
   Token,
   WalletName,
   NeoWalletName,
+  CHAINS,
+  CHAIN_TOKENS,
 } from '@lib';
 import { CommonService } from './common.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -55,6 +57,18 @@ export class SwapService {
       if (assetHash) {
         target.push({ type: 'Hash160', value: assetHash });
       }
+    });
+    return target;
+  }
+  getAssetNamePath(swapPath: string[], chain: CHAINS): any[] {
+    const target = [];
+    swapPath.forEach((hash) => {
+      const token = CHAIN_TOKENS[chain].find(
+        (item) =>
+          this.commonService.remove0xHash(item.assetID).toLowerCase() ===
+          this.commonService.remove0xHash(hash).toLowerCase()
+      );
+      target.push(token.symbol);
     });
     return target;
   }

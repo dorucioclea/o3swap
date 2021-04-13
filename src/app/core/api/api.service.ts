@@ -21,6 +21,9 @@ import {
   POLY_HOST_ADDRESS,
   ETH_SOURCE_CONTRACT_HASH,
   ETH_INQUIRY_HOST,
+  USD_TOKENS,
+  O3_AGGREGATOR_FEE,
+  O3_AGGREGATOR_SLIPVALUE,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { CommonService } from '../util/common.service';
@@ -179,11 +182,11 @@ export class ApiService {
       );
   }
 
-  getSwapPath(
+  async getSwapPath(
     fromToken: Token,
     toToken: Token,
     inputAmount: string
-  ): Observable<AssetQueryResponse> {
+  ): Promise<AssetQueryResponse> {
     if (
       (fromToken.symbol === 'NEO' && toToken.symbol === 'nNEO') ||
       (fromToken.symbol === 'nNEO' && toToken.symbol === 'NEO')
@@ -194,10 +197,27 @@ export class ApiService {
       return this.getFromNeoSwapPath(fromToken, toToken, inputAmount);
     }
     if (fromToken.chain === 'NEO' && toToken.chain !== 'NEO') {
-      return of([]);
+      return of([]).toPromise();
     }
     if (fromToken.chain === toToken.chain) {
-      return this.getFromEthSwapPath(fromToken, toToken, inputAmount);
+      console.log('---------')
+      const res = await this.getFromEthSwapPath(fromToken, toToken, inputAmount);
+      return this.handleReceiveSwapPathFiat(res, toToken);
+    }
+    const fromUsd = USD_TOKENS.find((item) => item.chain === fromToken.chain);
+    const toUsd = USD_TOKENS.find((item) => item.chain === toToken.chain);
+    if (fromUsd.symbol === fromToken.symbol && toUsd.symbol === toToken.symbol) {
+      const res = await this.getFromEthCrossChainSwapPath(fromToken, toToken, inputAmount);
+      return this.handleReceiveSwapPathFiat(res, toToken);
+    }
+    if (fromUsd.symbol !== fromToken.symbol && toUsd.symbol === toToken.symbol) {
+      const res = await this.getFromEthCrossChainAggregatorSwapPath(
+        fromToken,
+        toToken,
+        inputAmount,
+        fromUsd
+      );
+      return this.handleReceiveSwapPathFiat(res, toToken);
     }
   }
 
@@ -221,12 +241,14 @@ export class ApiService {
   getRates(): Observable<any> {
     return this.http.get(`${this.RATE_HOST}/crypto/rates`).pipe(
       map((res: CommonHttpResponse) => {
-        const rates: any = { usdt: 1 };
+        const rates: any = {};
         if (res.status === 'success') {
           rates.neo = res.data.neo2.neo.price;
           rates.flm = res.data.neo2.flm.price;
           rates.swth = res.data.neo2.swth.price;
           rates.eth = res.data.eth.eth.price;
+          rates.usdt = res.data.eth.usdt.price;
+          rates.weth = res.data.eth.weth.price;
           rates.ont = res.data.ont.ont.price;
         }
         return rates;
@@ -239,7 +261,7 @@ export class ApiService {
     fromToken: Token,
     toToken: Token,
     inputAmount: string
-  ): Observable<AssetQueryResponse> {
+  ): Promise<AssetQueryResponse> {
     let result;
     // neo => nneo
     if (fromToken.symbol === 'NEO' && toToken.symbol === 'nNEO') {
@@ -271,7 +293,7 @@ export class ApiService {
     }
     this.commonService.log(result);
     if (result) {
-      return of(this.handleReceiveSwapPathFiat(result, toToken));
+      return of(this.handleReceiveSwapPathFiat(result, toToken)).toPromise();
     }
   }
 
@@ -279,7 +301,7 @@ export class ApiService {
     fromToken: Token,
     toToken: Token,
     inputAmount: string
-  ): Observable<AssetQueryResponse> {
+  ): Promise<AssetQueryResponse> {
     // swap from neo
     let toAssetName: string;
     toAssetName = toToken.symbol;
@@ -300,22 +322,31 @@ export class ApiService {
             return [];
           }
         })
-      );
+      )
+      .toPromise();
   }
 
   private getFromEthSwapPath(
     fromToken: Token,
     toToken: Token,
     inputAmount: string
-  ): Observable<AssetQueryResponse> {
+  ): Promise<AssetQueryResponse> {
     const amount = this.commonService.decimalToInteger(
       inputAmount,
       fromToken.decimals
     );
+    let fromAssetHash = fromToken.assetID;
+    let toAssetHash = toToken.assetID;
+    if (fromToken.symbol === 'ETH') {
+      fromAssetHash = '0xc778417e063141139fce010982780140aa0cd5ab';
+    }
+    if (toToken.symbol === 'ETH') {
+      toAssetHash = '0xc778417e063141139fce010982780140aa0cd5ab';
+    }
     return this.http
       .post(`${ETH_INQUIRY_HOST}/v1/${fromToken.chain.toLowerCase()}/quote`, {
-        from: this.commonService.add0xHash(fromToken.assetID),
-        to: this.commonService.add0xHash(toToken.assetID),
+        from: this.commonService.add0xHash(fromAssetHash),
+        to: this.commonService.add0xHash(toAssetHash),
         amount,
       })
       .pipe(
@@ -323,50 +354,81 @@ export class ApiService {
           if (res.status === 'success') {
             const target = [];
             res.data.forEach((item) => {
-              const temp = { amount: item.amounts, swapPath: item.path };
+              const swapPath = this.swapService.getAssetNamePath(
+                item.path,
+                fromToken.chain
+              );
+              const temp = {
+                amount: item.amounts,
+                swapPath,
+                assetHashPath: item.path,
+              };
               target.push(temp);
             });
             console.log(target);
-            return this.handleReceiveSwapPathFiat(target, toToken);
+            return target;
           }
         })
-      );
+      )
+      .toPromise();
   }
 
-  // private getFromEthCrossChainSwapPath(
-  //   fromToken: Token,
-  //   toToken: Token,
-  //   inputAmount: string
-  // ): Observable<AssetQueryResponse> {
-  //   const fromPUsdt = ETH_PUSDT[fromToken.chain];
-  //   const toPUsdt = ETH_PUSDT[toToken.chain];
-  //   const amount = this.commonService.decimalToInteger(
-  //     inputAmount,
-  //     fromToken.decimals
-  //   );
-  //   return this.http
-  //     .get(
-  //       `${POLY_HOST}/calcOutGivenIn/${POLY_HOST_ADDRESS}/${fromPUsdt}/${toPUsdt}/${amount}`
-  //     )
-  //     .pipe(
-  //       map((res: any) => {
-  //         if (res.code === 200) {
-  //           const result: AssetQueryResponse = [
-  //             {
-  //               amount: [
-  //                 new BigNumber(inputAmount)
-  //                   .shiftedBy(fromToken.decimals)
-  //                   .toFixed(),
-  //                 res.amount_out,
-  //               ],
-  //               swapPath: [fromToken.symbol, toToken.symbol],
-  //             },
-  //           ];
-  //           return this.handleReceiveSwapPathFiat(result, toToken);
-  //         }
-  //       })
-  //     );
-  // }
+  private async getFromEthCrossChainAggregatorSwapPath(
+    fromToken: Token,
+    toToken: Token,
+    inputAmount: string,
+    fromUsd: Token
+  ): Promise<AssetQueryResponse> {
+    const res1 = await this.getFromEthSwapPath(fromToken, fromUsd, inputAmount); // 排序
+    const amountOutA = res1[0].amount[res1[0].amount.length - 1];
+    console.log(`amountOutA: ${amountOutA}`);
+    const amountOutB = this.swapService.getAmountOutMinWithAmountOut(amountOutA, O3_AGGREGATOR_FEE);
+    console.log(`amountOutB: ${amountOutB}`);
+    let polyAmountIn = this.swapService.getAmountOutMinWithAmountOut(amountOutB, O3_AGGREGATOR_SLIPVALUE);
+    console.log(`polyAmountIn: ${polyAmountIn}`);
+    polyAmountIn = new BigNumber(polyAmountIn).shiftedBy(-fromUsd.decimals).toFixed();
+    const res2 = await this.getFromEthCrossChainSwapPath(fromUsd, toToken, polyAmountIn);
+    const polyAmountOut = res2[0].amount[1];
+    res1[0].amount.push(polyAmountOut);
+    res1[0].swapPath.push(toToken.symbol);
+    return res1;
+  }
+
+  private getFromEthCrossChainSwapPath(
+    fromToken: Token,
+    toToken: Token,
+    inputAmount: string
+  ): Promise<AssetQueryResponse> {
+    const fromPUsdt = ETH_PUSDT[fromToken.chain];
+    const toPUsdt = ETH_PUSDT[toToken.chain];
+    const amount = this.commonService.decimalToInteger(
+      inputAmount,
+      fromToken.decimals
+    );
+    return this.http
+      .get(
+        `${POLY_HOST}/calcOutGivenIn/${POLY_HOST_ADDRESS}/${fromPUsdt}/${toPUsdt}/${amount}`
+      )
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200) {
+            const result: AssetQueryResponse = [
+              {
+                amount: [
+                  new BigNumber(inputAmount)
+                    .shiftedBy(fromToken.decimals)
+                    .toFixed(),
+                  res.amount_out,
+                ],
+                swapPath: [fromToken.symbol, toToken.symbol],
+              },
+            ];
+            return result;
+          }
+        })
+      )
+      .toPromise();
+  }
 
   /**
    * @description: Input USDT get LP, pool add LP
