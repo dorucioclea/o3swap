@@ -179,7 +179,8 @@ export class BridgeComponent implements OnInit {
         this.toAddress,
         bigNumberReceive,
         BRIDGE_SLIPVALUE,
-        polyFee
+        polyFee,
+        'bridge'
       )
       .then((res) => {
         if (res) {

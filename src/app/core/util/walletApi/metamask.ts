@@ -27,6 +27,10 @@ import {
   AssetQueryResponseItem,
   O3_AGGREGATOR_SLIPVALUE,
   ApproveContract,
+  TxAtPage,
+  UPDATE_BRIDGE_PENDING_TX,
+  UPDATE_LIQUIDITY_PENDING_TX,
+  BRIDGE_SLIPVALUE,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import BigNumber from 'bignumber.js';
@@ -229,10 +233,12 @@ export class MetaMaskWalletApiService {
       json,
       ETH_SWAP_CONTRACT_HASH
     );
+    const receiveAmount =
+      chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
     const params = {
       amountIn: new BigNumber(inputAmount).shiftedBy(fromToken.decimals),
-      uniAmountOutMin: this.swapService.getAmountOutMin(
-        chooseSwapPath,
+      uniAmountOutMin: this.swapService.getMinAmountOut(
+        receiveAmount,
         O3_AGGREGATOR_SLIPVALUE
       ),
       path: chooseSwapPath.assetHashPath,
@@ -262,7 +268,15 @@ export class MetaMaskWalletApiService {
       })
       .then((hash) => {
         console.log(hash);
-        this.handleTx(fromToken, toToken, inputAmount, hash, false);
+        this.handleTx(
+          fromToken,
+          toToken,
+          inputAmount,
+          receiveAmount,
+          hash,
+          'swap',
+          false
+        );
         return hash;
       })
       .catch((error) => {
@@ -289,9 +303,11 @@ export class MetaMaskWalletApiService {
       json,
       ETH_SWAP_CONTRACT_HASH
     );
+    const receiveAmount =
+      chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
     const params = {
-      uniAmountOutMin: this.swapService.getAmountOutMin(
-        chooseSwapPath,
+      uniAmountOutMin: this.swapService.getMinAmountOut(
+        receiveAmount,
         O3_AGGREGATOR_SLIPVALUE
       ),
       path: chooseSwapPath.assetHashPath,
@@ -325,7 +341,15 @@ export class MetaMaskWalletApiService {
       })
       .then((hash) => {
         console.log(hash);
-        this.handleTx(fromToken, toToken, inputAmount, hash, false);
+        this.handleTx(
+          fromToken,
+          toToken,
+          inputAmount,
+          receiveAmount,
+          hash,
+          'swap',
+          false
+        );
         return hash;
       })
       .catch((error) => {
@@ -352,13 +376,15 @@ export class MetaMaskWalletApiService {
       json,
       ETH_SWAP_CONTRACT_HASH
     );
+    const receiveAmount =
+      chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
     const params = {
       amountIn: new BigNumber(inputAmount)
         .shiftedBy(fromToken.decimals)
         .dp(0)
         .toFixed(),
-      uniAmountOutMin: this.swapService.getAmountOutMin(
-        chooseSwapPath,
+      uniAmountOutMin: this.swapService.getMinAmountOut(
+        receiveAmount,
         O3_AGGREGATOR_SLIPVALUE
       ),
       path: chooseSwapPath.assetHashPath,
@@ -388,7 +414,15 @@ export class MetaMaskWalletApiService {
       })
       .then((hash) => {
         console.log(hash);
-        this.handleTx(fromToken, toToken, inputAmount, hash, false);
+        this.handleTx(
+          fromToken,
+          toToken,
+          inputAmount,
+          receiveAmount,
+          hash,
+          'swap',
+          false
+        );
         return hash;
       })
       .catch((error) => {
@@ -405,7 +439,8 @@ export class MetaMaskWalletApiService {
     toAddress: string,
     receiveAmount: string,
     slipValue: number,
-    polyFee: string
+    polyFee: string,
+    txAtPage: TxAtPage
   ): Promise<string> {
     console.log('poly swap');
     if (this.checkNetwork(fromToken) === false) {
@@ -427,10 +462,7 @@ export class MetaMaskWalletApiService {
       toAssetHash: this.commonService.add0xHash(toToken.assetID),
       toAddress,
       amount: new BigNumber(inputAmount).shiftedBy(fromToken.decimals),
-      minOutAmount: this.swapService.getAmountOutMinWithAmountOut(
-        receiveAmount,
-        slipValue
-      ),
+      minOutAmount: this.swapService.getMinAmountOut(receiveAmount, slipValue),
       fee: bigNumberPolyFee,
       id: 1,
     };
@@ -462,7 +494,14 @@ export class MetaMaskWalletApiService {
         ],
       })
       .then((hash) => {
-        this.handleTx(fromToken, toToken, inputAmount, hash);
+        this.handleTx(
+          fromToken,
+          toToken,
+          inputAmount,
+          receiveAmount,
+          hash,
+          txAtPage
+        );
         return hash;
       })
       .catch((error) => {
@@ -495,8 +534,10 @@ export class MetaMaskWalletApiService {
       .shiftedBy(18)
       .dp(0)
       .toFixed();
+    const receiveAmount =
+      chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
     const params = {
-      uniAmountOutMin: this.swapService.getAmountOutMinWithAmountOut(
+      uniAmountOutMin: this.swapService.getMinAmountOut(
         amountOutA,
         O3_AGGREGATOR_SLIPVALUE
       ),
@@ -506,8 +547,8 @@ export class MetaMaskWalletApiService {
       toPoolId: 1,
       toChainId: SWAP_CONTRACT_CHAIN_ID[toToken.chain],
       toAssetHash: this.commonService.add0xHash(toToken.assetID),
-      polyMinOutAmount: this.swapService.getAmountOutMin(
-        chooseSwapPath,
+      polyMinOutAmount: this.swapService.getMinAmountOut(
+        receiveAmount,
         slipValue
       ),
       fee: bigNumberPolyFee,
@@ -546,7 +587,14 @@ export class MetaMaskWalletApiService {
       })
       .then((hash) => {
         console.log(hash);
-        this.handleTx(fromToken, toToken, inputAmount, hash);
+        this.handleTx(
+          fromToken,
+          toToken,
+          inputAmount,
+          receiveAmount,
+          hash,
+          'swap'
+        );
         return hash;
       })
       .catch((error) => {
@@ -582,12 +630,14 @@ export class MetaMaskWalletApiService {
       .shiftedBy(18)
       .dp(0)
       .toFixed();
+    const receiveAmount =
+      chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
     const params = {
       amountIn: new BigNumber(inputAmount)
         .shiftedBy(fromToken.decimals)
         .dp(0)
         .toFixed(),
-      uniAmountOutMin: this.swapService.getAmountOutMinWithAmountOut(
+      uniAmountOutMin: this.swapService.getMinAmountOut(
         amountOutA,
         O3_AGGREGATOR_SLIPVALUE
       ),
@@ -597,8 +647,8 @@ export class MetaMaskWalletApiService {
       toPoolId: 1,
       toChainId: SWAP_CONTRACT_CHAIN_ID[toToken.chain],
       toAssetHash: this.commonService.add0xHash(toToken.assetID),
-      polyMinOutAmount: this.swapService.getAmountOutMin(
-        chooseSwapPath,
+      polyMinOutAmount: this.swapService.getMinAmountOut(
+        receiveAmount,
         slipValue
       ),
       fee: bigNumberPolyFee,
@@ -633,7 +683,14 @@ export class MetaMaskWalletApiService {
       })
       .then((hash) => {
         console.log(hash);
-        this.handleTx(fromToken, toToken, inputAmount, hash);
+        this.handleTx(
+          fromToken,
+          toToken,
+          inputAmount,
+          receiveAmount,
+          hash,
+          'swap'
+        );
         return hash;
       })
       .catch((error) => {
@@ -648,7 +705,7 @@ export class MetaMaskWalletApiService {
     inputAmount: string,
     address: string,
     toChainId: number,
-    minOutAmount: string,
+    receiveAmount: string,
     fee: string
   ): Promise<string> {
     if (this.checkNetwork(fromToken) === false) {
@@ -667,7 +724,10 @@ export class MetaMaskWalletApiService {
       toChainId,
       toAddress: address,
       amount: new BigNumber(inputAmount).shiftedBy(fromToken.decimals),
-      minOutAmount,
+      minOutAmount: this.swapService.getMinAmountOut(
+        receiveAmount,
+        BRIDGE_SLIPVALUE
+      ),
       fee: bigNumberPolyFee,
       id: 1,
     };
@@ -699,7 +759,14 @@ export class MetaMaskWalletApiService {
       })
       .then((hash) => {
         console.log(hash);
-        this.handleTx(fromToken, toToken, inputAmount, hash);
+        this.handleTx(
+          fromToken,
+          toToken,
+          inputAmount,
+          receiveAmount,
+          hash,
+          'liquidity'
+        );
         return hash;
       })
       .catch((error) => {
@@ -712,7 +779,7 @@ export class MetaMaskWalletApiService {
     inputAmount: string,
     address: string,
     toChainId: number,
-    minOutAmount: string,
+    receiveAmount: string,
     fee: string
   ): Promise<string> {
     if (this.checkNetwork(fromToken) === false) {
@@ -733,7 +800,10 @@ export class MetaMaskWalletApiService {
       toAssetHash: this.commonService.add0xHash(usdtToken.assetID),
       toAddress: address,
       amount: new BigNumber(inputAmount).shiftedBy(fromToken.decimals),
-      minOutAmount,
+      minOutAmount: this.swapService.getMinAmountOut(
+        receiveAmount,
+        BRIDGE_SLIPVALUE
+      ),
       fee: bigNumberPolyFee,
       id: 1,
     };
@@ -766,7 +836,14 @@ export class MetaMaskWalletApiService {
       })
       .then((hash) => {
         console.log(hash);
-        this.handleTx(fromToken, usdtToken, inputAmount, hash);
+        this.handleTx(
+          fromToken,
+          usdtToken,
+          inputAmount,
+          receiveAmount,
+          hash,
+          'liquidity'
+        );
         return hash;
       })
       .catch((error) => {
@@ -779,7 +856,7 @@ export class MetaMaskWalletApiService {
     fromAddress: string,
     approveContract?: ApproveContract
   ): Promise<string> {
-    console.log('\u001b[32m  ✓ start get allowance \u001b[0m')
+    console.log('\u001b[32m  ✓ start get allowance \u001b[0m');
     let tokenhash = fromToken.assetID;
     if (fromToken.symbol === 'ETH') {
       tokenhash = '0xc778417e063141139fce010982780140aa0cd5ab';
@@ -893,7 +970,9 @@ export class MetaMaskWalletApiService {
     fromToken: Token,
     toToken: Token,
     inputAmount: string,
+    receiveAmount: string,
     txHash: string,
+    txAtPage: TxAtPage,
     hasCrossChain = true
   ): void {
     const pendingTx: SwapTransaction = {
@@ -903,6 +982,9 @@ export class MetaMaskWalletApiService {
       fromToken,
       toToken,
       amount: inputAmount,
+      receiveAmount: new BigNumber(receiveAmount)
+        .shiftedBy(-toToken.decimals)
+        .toFixed(),
     };
     if (hasCrossChain) {
       pendingTx.progress = {
@@ -911,11 +993,27 @@ export class MetaMaskWalletApiService {
         step3: { hash: '', status: 0 },
       };
     }
-    this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
-    this.listerTxReceipt(txHash, hasCrossChain);
+    let dispatchType: string;
+    switch (txAtPage) {
+      case 'swap':
+        dispatchType = UPDATE_PENDING_TX;
+        break;
+      case 'bridge':
+        dispatchType = UPDATE_BRIDGE_PENDING_TX;
+        break;
+      case 'liquidity':
+        dispatchType = UPDATE_LIQUIDITY_PENDING_TX;
+        break;
+    }
+    this.store.dispatch({ type: dispatchType, data: pendingTx });
+    this.listerTxReceipt(txHash, dispatchType, hasCrossChain);
   }
 
-  listerTxReceipt(txHash: string, hasCrossChain = true): void {
+  listerTxReceipt(
+    txHash: string,
+    dispatchType: string,
+    hasCrossChain = true
+  ): void {
     if (this.requestTxStatusInterval) {
       this.requestTxStatusInterval.unsubscribe();
     }
@@ -931,12 +1029,12 @@ export class MetaMaskWalletApiService {
             this.requestTxStatusInterval.unsubscribe();
             if (new BigNumber(receipt.status, 16).isZero()) {
               this.nzMessage.error('Transaction failed');
-              this.store.dispatch({ type: UPDATE_PENDING_TX, data: null });
+              this.store.dispatch({ type: dispatchType, data: null });
             } else {
               if (hasCrossChain === false) {
                 this.transaction.isPending = false;
                 this.store.dispatch({
-                  type: UPDATE_PENDING_TX,
+                  type: dispatchType,
                   data: this.transaction,
                 });
               }

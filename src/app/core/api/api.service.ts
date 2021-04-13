@@ -382,9 +382,9 @@ export class ApiService {
     const res1 = await this.getFromEthSwapPath(fromToken, fromUsd, inputAmount); // 排序
     const amountOutA = res1[0].amount[res1[0].amount.length - 1];
     console.log(`amountOutA: ${amountOutA}`);
-    const amountOutB = this.swapService.getAmountOutMinWithAmountOut(amountOutA, O3_AGGREGATOR_FEE);
+    const amountOutB = this.swapService.getMinAmountOut(amountOutA, O3_AGGREGATOR_FEE);
     console.log(`amountOutB: ${amountOutB}`);
-    let polyAmountIn = this.swapService.getAmountOutMinWithAmountOut(amountOutB, O3_AGGREGATOR_SLIPVALUE);
+    let polyAmountIn = this.swapService.getMinAmountOut(amountOutB, O3_AGGREGATOR_SLIPVALUE);
     console.log(`polyAmountIn: ${polyAmountIn}`);
     polyAmountIn = new BigNumber(polyAmountIn).shiftedBy(-fromUsd.decimals).toFixed();
     const res2 = await this.getFromEthCrossChainSwapPath(fromUsd, toToken, polyAmountIn);

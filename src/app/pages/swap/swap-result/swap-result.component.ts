@@ -484,7 +484,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.toAddress,
         this.chooseSwapPath.amount[this.chooseSwapPath.amount.length - 1],
         this.slipValue,
-        this.polyFee
+        this.polyFee,
+        'swap'
       )
       .then((res) => {
         if (res) {

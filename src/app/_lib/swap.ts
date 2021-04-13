@@ -15,6 +15,7 @@ export interface SwapTransaction {
   fromToken: Token;
   toToken: Token;
   amount: string;
+  receiveAmount: string;
   progress?: TxProgress;
 }
 
@@ -34,8 +35,12 @@ export interface SwapStateType {
   neolineNetwork: Network;
   metamaskNetworkId: number;
   transaction: SwapTransaction;
+  bridgeeTransaction: SwapTransaction;
+  liquidityTransaction: SwapTransaction;
 }
 
 // export const NEO_SCRIPTHASH =
 //   '0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b';
 export type ApproveContract = 'poly' | 'uniAggregator';
+
+export type TxAtPage = 'swap' | 'bridge' | 'liquidity';

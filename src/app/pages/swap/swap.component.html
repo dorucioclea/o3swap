@@ -6,3 +6,5 @@
 <app-swap-result *ngIf="pageStatus==='result'" [rates]="rates" [fromToken]="fromToken" [toToken]="toToken"
   [inputAmount]="inputAmount" [initData]="initResultData" (closePage)="closeResultPage($event)" (swapFail)="swapFail()">
 </app-swap-result>
+
+<app-tx-progress [txAtPage]="'swap'"></app-tx-progress>

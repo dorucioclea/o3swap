@@ -9,7 +9,6 @@ import {
   UPDATE_METAMASK_NETWORK_ID,
   UPDATE_NEOLINE_NETWORK,
   UPDATE_PENDING_TX,
-  CrossChainToToken,
   UPDATE_BSC_ACCOUNT,
   UPDATE_BSC_WALLET_NAME,
   UPDATE_HECO_ACCOUNT,
@@ -20,7 +19,10 @@ import {
   RESET_HECO_BALANCES,
   UPDATE_BSC_BALANCES,
   UPDATE_HECO_BALANCES,
+  UPDATE_BRIDGE_PENDING_TX,
+  UPDATE_LIQUIDITY_PENDING_TX,
   NNEO_TOKEN,
+  CrossChainToToken,
 } from '@lib';
 
 const initialState: SwapStateType = {
@@ -39,6 +41,8 @@ const initialState: SwapStateType = {
   neolineNetwork: null,
   metamaskNetworkId: null,
   transaction: null,
+  bridgeeTransaction: null,
+  liquidityTransaction: null,
   // transaction: {
   //   txid: '0f4787014a5442fc02843dc376548fa7a4dd400a92850f783873b034d84dccd5',
   //   isPending: true,
@@ -46,6 +50,16 @@ const initialState: SwapStateType = {
   //   fromToken: NNEO_TOKEN[0],
   //   toToken: CrossChainToToken,
   //   amount: '100',
+  //   receiveAmount: '1000'
+  // },
+  // bridgeeTransaction: {
+  //   txid: '0f4787014a5442fc02843dc376548fa7a4dd400a92850f783873b034d84dccd5',
+  //   isPending: true,
+  //   min: false,
+  //   fromToken: NNEO_TOKEN[0],
+  //   toToken: CrossChainToToken,
+  //   amount: '1',
+  //   receiveAmount: '0.0001'
   // },
 };
 
@@ -75,17 +89,32 @@ export default function swap(state = initialState, action): any {
       return { ...state, balances: {} };
 
     case UPDATE_ETH_BALANCES:
-      return { ...state, ethBalances: action.data, bscBalances: {}, hecoBalances: {} };
+      return {
+        ...state,
+        ethBalances: action.data,
+        bscBalances: {},
+        hecoBalances: {},
+      };
     case RESET_ETH_BALANCES:
       return { ...state, ethBalances: {} };
 
     case UPDATE_BSC_BALANCES:
-      return { ...state, ethBalances: {}, bscBalances: action.data, hecoBalances: {} };
+      return {
+        ...state,
+        ethBalances: {},
+        bscBalances: action.data,
+        hecoBalances: {},
+      };
     case RESET_BSC_BALANCES:
       return { ...state, bscBalances: {} };
 
     case UPDATE_HECO_BALANCES:
-      return { ...state, ethBalances: {}, bscBalances: {}, hecoBalances: action.data };
+      return {
+        ...state,
+        ethBalances: {},
+        bscBalances: {},
+        hecoBalances: action.data,
+      };
     case RESET_HECO_BALANCES:
       return { ...state, hecoBalances: {} };
 
@@ -96,6 +125,10 @@ export default function swap(state = initialState, action): any {
 
     case UPDATE_PENDING_TX:
       return { ...state, transaction: action.data };
+    case UPDATE_BRIDGE_PENDING_TX:
+      return { ...state, bridgeeTransaction: action.data };
+    case UPDATE_LIQUIDITY_PENDING_TX:
+      return { ...state, liquidityTransaction: action.data };
     default:
       return state;
   }

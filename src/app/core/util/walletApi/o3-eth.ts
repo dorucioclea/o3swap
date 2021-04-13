@@ -344,7 +344,7 @@ export class O3EthWalletApiService {
         this.commonService.add0xHash(toToken.assetID), // toAssetHash
         toAddress, // toAddress
         new BigNumber(inputAmount).shiftedBy(fromToken.decimals), // amount
-        this.swapService.getAmountOutMinWithAmountOut(receiveAmount, slipValue), // minAmountOut
+        this.swapService.getMinAmountOut(receiveAmount, slipValue), // minAmountOut
         bigNumberPolyFee, // fee
         1 // id
       )
@@ -529,6 +529,7 @@ export class O3EthWalletApiService {
     fromToken: Token,
     toToken: Token,
     inputAmount: string,
+    // receiveAmount: string,
     txHash: string
   ): void {
     const pendingTx: SwapTransaction = {
@@ -538,6 +539,7 @@ export class O3EthWalletApiService {
       fromToken,
       toToken,
       amount: inputAmount,
+      receiveAmount: new BigNumber(inputAmount).shiftedBy(-toToken.decimals).toFixed(),
       progress: {
         step1: { hash: '', status: 1 },
         step2: { hash: '', status: 0 },

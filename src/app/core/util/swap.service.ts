@@ -26,21 +26,7 @@ export class SwapService {
       .toFixed();
     return this.commonService.decimalToInteger(factAmount, fromToken.decimals);
   }
-  getAmountOutMin(
-    chooseSwapPath: AssetQueryResponseItem,
-    slipValue: number
-  ): string {
-    const amount = chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
-    const factPercentage = new BigNumber(1).minus(
-      new BigNumber(slipValue).shiftedBy(-2)
-    );
-    const factAmount = new BigNumber(amount)
-      .times(factPercentage)
-      .dp(0)
-      .toFixed();
-    return factAmount;
-  }
-  getAmountOutMinWithAmountOut(amountOut: string, slipValue: number): string {
+  getMinAmountOut(amountOut: string, slipValue: number): string {
     const factPercentage = new BigNumber(1).minus(
       new BigNumber(slipValue).shiftedBy(-2)
     );

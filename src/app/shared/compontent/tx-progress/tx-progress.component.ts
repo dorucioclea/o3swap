@@ -1,12 +1,15 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ApiService, CommonService } from '@core';
 import {
   SwapStateType,
   SwapTransaction,
   UPDATE_PENDING_TX,
+  UPDATE_BRIDGE_PENDING_TX,
+  UPDATE_LIQUIDITY_PENDING_TX,
   TX_PAGES_PREFIX,
   POLY_TX_PAGES_PREFIX,
   TxProgress,
+  TxAtPage,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -22,6 +25,9 @@ interface State {
   styleUrls: ['./tx-progress.component.scss'],
 })
 export class TxProgressComponent implements OnInit, OnDestroy {
+  @Input() txAtPage: TxAtPage;
+  dispatchType: string;
+
   TX_PAGES_PREFIX = TX_PAGES_PREFIX;
   POLY_TX_PAGES_PREFIX = POLY_TX_PAGES_PREFIX;
   successOptions: AnimationOptions = {
@@ -61,10 +67,37 @@ export class TxProgressComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    switch (this.txAtPage) {
+      case 'swap':
+        this.dispatchType = UPDATE_PENDING_TX;
+        break;
+      case 'bridge':
+        this.dispatchType = UPDATE_BRIDGE_PENDING_TX;
+        break;
+      case 'liquidity':
+        this.dispatchType = UPDATE_LIQUIDITY_PENDING_TX;
+        break;
+    }
     this.swap$.subscribe((state) => {
-      this.hasTransaction = state.transaction ? true : false;
-      if (this.hasTransaction) {
-        this.handleTransacction(state.transaction);
+      switch (this.txAtPage) {
+        case 'swap':
+          this.hasTransaction = state.transaction ? true : false;
+          if (this.hasTransaction) {
+            this.handleTransacction(state.transaction);
+          }
+          break;
+        case 'bridge':
+          this.hasTransaction = state.bridgeeTransaction ? true : false;
+          if (this.hasTransaction) {
+            this.handleTransacction(state.bridgeeTransaction);
+          }
+          break;
+        case 'liquidity':
+          this.hasTransaction = state.liquidityTransaction ? true : false;
+          if (this.hasTransaction) {
+            this.handleTransacction(state.liquidityTransaction);
+          }
+          break;
       }
       if (!this.hasTransaction && this.requestCrossInterval) {
         this.requestCrossInterval.unsubscribe();
@@ -97,7 +130,7 @@ export class TxProgressComponent implements OnInit, OnDestroy {
             this.requestCrossInterval.unsubscribe();
           }
           this.store.dispatch({
-            type: UPDATE_PENDING_TX,
+            type: this.dispatchType,
             data: this.transaction,
           });
         });
@@ -106,12 +139,12 @@ export class TxProgressComponent implements OnInit, OnDestroy {
 
   minTxHashModal(): void {
     this.transaction.min = true;
-    this.store.dispatch({ type: UPDATE_PENDING_TX, data: this.transaction });
+    this.store.dispatch({ type: this.dispatchType, data: this.transaction });
   }
 
   maxTxHashModal(): void {
     this.transaction.min = false;
-    this.store.dispatch({ type: UPDATE_PENDING_TX, data: this.transaction });
+    this.store.dispatch({ type: this.dispatchType, data: this.transaction });
   }
 
   copy(hash: string): void {

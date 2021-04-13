@@ -4,7 +4,8 @@
       <div class="left-container">
         <div class="header">
           <div class="left">You pay</div>
-          <div class="right">Balance: {{ (fromToken?.amount | transNumber | number: '1.0-8') || '0' }} {{ fromToken?.symbol }}
+          <div class="right">Balance: {{ (fromToken?.amount | transNumber | number: '1.0-8') || '0' }}
+            {{ fromToken?.symbol }}
             <span (click)="allInputAmount()">Max</span></div>
         </div>
         <div class="content">
@@ -39,11 +40,12 @@
       <span>{{ bridgeRate }}</span></p>
     <p class="detail">Max slippage: <span>{{ BRIDGE_SLIPVALUE }}%</span></p>
     <div class="btn-group" *ngIf="showApprove">
-      <button class="btn-primary approve" nz-button [ngClass]="{disable: hasApprove===true}" [nzLoading]="isApproveLoading"
-        (click)="approve()">Approve</button>
+      <button class="btn-primary approve" nz-button [ngClass]="{disable: hasApprove===true}"
+        [nzLoading]="isApproveLoading" (click)="approve()">Approve</button>
       <button class="btn-primary" [ngClass]="{disable: hasApprove===false}" (click)="swap()">Confirm</button>
     </div>
-    <div *ngIf="!showApprove" class="btn-primary big-btn swap-btn" [ngClass]="{active: checkCanInquiry()}" (click)="swap()">Swap</div>
+    <div *ngIf="!showApprove" class="btn-primary big-btn swap-btn" [ngClass]="{active: checkCanInquiry()}"
+      (click)="swap()">Swap</div>
   </div>
   <div class="group-container row1 pool">
     <div class="header">Pool</div>
@@ -85,3 +87,5 @@
     </div>
   </div>
 </section>
+
+<app-tx-progress [txAtPage]="'bridge'"></app-tx-progress>

@@ -14,7 +14,12 @@
       </div>
       <p class="status">{{ transaction?.isPending ? 'Pending' : 'Success' }}</p>
       <div class="desc">
-        Swap {{ transaction?.amount }} {{ transaction?.fromToken?.symbol }} for {{ transaction?.toToken?.symbol }}
+        <span *ngIf="txAtPage!=='liquidity'">Swap</span>
+        <span
+          *ngIf="txAtPage==='liquidity'">{{ transaction?.fromToken.symbol==='pLP' ? 'Withdrawal' : 'Deposit' }}</span>
+        {{ transaction?.amount }} {{ transaction?.fromToken?.symbol }}
+        for {{ transaction?.receiveAmount }}
+        {{ transaction?.toToken?.symbol }}
       </div>
       <nz-progress [nzPercent]="swapProgress" [nzShowInfo]="false" nzStrokeWidth="6" nzStrokeColor="#46B069">
       </nz-progress>
