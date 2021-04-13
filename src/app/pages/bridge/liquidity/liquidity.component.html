@@ -46,13 +46,13 @@
         <div
           class="tabs tabs-add"
           [ngClass]="{addActive: liquidityType === 'add'}"
-          [routerLink]="['/bridge/liquidity', 'add']">
+          [routerLink]="['/hub/liquidity', 'add']">
             Add Liquidity
         </div>
         <div
           class="tabs tabs-remove"
           [ngClass]="{removeActive: liquidityType === 'remove'}"
-          [routerLink]="['/bridge/liquidity', 'remove']">
+          [routerLink]="['/hub/liquidity', 'remove']">
             Remove Liquidity
         </div>
       </div>
@@ -66,7 +66,7 @@
               </div>
               <div class="right">
                 <div class="input-container">
-                  <input type="number" [(ngModel)]="inputAmount[i]" placeholder="0.0">
+                  <input type="number" [disabled]="!(tokenItem['amount'] > 0)" [(ngModel)]="inputAmount[i]" placeholder="0.0">
                 </div>
                 <div
                   class="max-status"
