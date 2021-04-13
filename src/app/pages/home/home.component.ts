@@ -57,7 +57,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.roadmapInterval.unsubscribe();
     }
     this.roadmapInterval = interval(2000).subscribe(() => {
-      console.log('--');
       this.roadmapIndex = (this.roadmapIndex + 1) % this.roadmapLen;
     });
   }

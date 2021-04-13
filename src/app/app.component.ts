@@ -19,6 +19,8 @@ import {
 import {
   CommonService,
   ApiService,
+  NeolineWalletApiService,
+  MetaMaskWalletApiService,
 } from '@core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -63,7 +65,9 @@ export class AppComponent implements OnInit {
     private router: Router,
     private commonService: CommonService,
     public apiService: ApiService,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private metaMaskWalletApiService: MetaMaskWalletApiService,
+    private neolineWalletApiService: NeolineWalletApiService
   ) {
     this.swap$ = store.select('swap');
     this.router.events.subscribe((res: RouterEvent) => {
@@ -75,6 +79,10 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (location.pathname !== '/' && location.pathname !== '/home') {
+      this.neolineWalletApiService.init();
+      this.metaMaskWalletApiService.init();
+    }
     this.apiService.getTokens();
     this.swap$.subscribe((state) => {
       this.neoAccountAddress = state.neoAccountAddress;
@@ -97,7 +105,6 @@ export class AppComponent implements OnInit {
   }
 
   showConnect(): void {
-    console.log('-----')
     this.showConnectModal = true;
   }
 

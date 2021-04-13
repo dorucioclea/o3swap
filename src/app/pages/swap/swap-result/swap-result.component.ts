@@ -260,7 +260,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       (item) => item.symbol === this.toToken.symbol
     );
     if (fromUsd && toUsd) {
-      console.log('------');
       this.swapCrossChainEth();
       return;
     }
@@ -536,7 +535,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     }
     if (this.fromToken.chain !== 'NEO' && this.toToken.chain !== 'NEO') {
       const swapApi = this.getEthDapiService();
-      console.log('--------');
       this.metaMaskWalletApiService
         .getAllowance(
           this.fromToken,

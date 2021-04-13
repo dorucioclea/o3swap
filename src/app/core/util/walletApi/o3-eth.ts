@@ -135,7 +135,6 @@ export class O3EthWalletApiService {
         result[item.assetID] = JSON.parse(JSON.stringify(item));
         result[item.assetID].amount = await this.getBalancByHash(item);
       }
-      console.log('--------');
       console.log(result);
       this.store.dispatch({
         type: dispatchBalanceType,

@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { ApiService, CommonService } from '@core';
+import { ApiService, CommonService, MetaMaskWalletApiService } from '@core';
 import {
   SwapStateType,
   SwapTransaction,
@@ -61,7 +61,8 @@ export class TxProgressComponent implements OnInit, OnDestroy {
     public store: Store<State>,
     private apiService: ApiService,
     private nzMessage: NzMessageService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private metaMaskWalletApiService: MetaMaskWalletApiService
   ) {
     this.swap$ = store.select('swap');
   }
@@ -128,6 +129,7 @@ export class TxProgressComponent implements OnInit, OnDestroy {
           ) {
             this.transaction.isPending = false;
             this.requestCrossInterval.unsubscribe();
+            this.metaMaskWalletApiService.getBalance();
           }
           this.store.dispatch({
             type: this.dispatchType,

@@ -5,6 +5,7 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  ChangeDetectorRef,
 } from '@angular/core';
 import {
   ApiService,
@@ -65,7 +66,8 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     private metaMaskWalletApiService: MetaMaskWalletApiService,
     private nzMessage: NzMessageService,
     private router: Router,
-    private swapService: SwapService
+    private swapService: SwapService,
+    private changeDetectorRef: ChangeDetectorRef,
   ) {
     this.swap$ = store.select('swap');
     this.addLiquidityTokens.forEach((item, index) => {
@@ -102,6 +104,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
         this.metamaskNetworkId = state.metamaskNetworkId;
         this.getLPBalance();
       }
+      this.changeDetectorRef.detectChanges();
     });
   }
 

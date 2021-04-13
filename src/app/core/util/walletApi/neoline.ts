@@ -21,7 +21,7 @@ import {
   NETWORK,
   SWAP_CONTRACT_CHAIN_ID,
 } from '@lib';
-import { Observable } from 'rxjs';
+import { interval, Observable, Unsubscribable } from 'rxjs';
 import { wallet } from '@cityofzion/neon-js';
 import BigNumber from 'bignumber.js';
 
@@ -40,6 +40,7 @@ export class NeolineWalletApiService {
   neolineNetwork: Network;
 
   neolineDapi;
+  autoConnectInterval: Unsubscribable;
 
   constructor(
     private store: Store<State>,
@@ -59,10 +60,27 @@ export class NeolineWalletApiService {
     });
   }
 
+  init(): void {
+    const sessionNeoWalletName = sessionStorage.getItem(
+      'neoWalletName'
+    ) as NeoWalletName;
+    if (sessionNeoWalletName === 'NeoLine') {
+      this.autoConnectInterval = interval(2000).subscribe(() => {
+        if (this.neolineDapi) {
+          this.connect();
+          this.autoConnectInterval.unsubscribe();
+        }
+      });
+    }
+  }
+
   connect(): void {
     if (this.neolineDapi === undefined) {
       this.swapService.toDownloadWallet(this.myWalletName);
       return;
+    }
+    if (this.autoConnectInterval) {
+      this.autoConnectInterval.unsubscribe();
     }
     this.neolineDapi
       .getAccount()

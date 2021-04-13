@@ -66,12 +66,16 @@ const initialState: SwapStateType = {
 export default function swap(state = initialState, action): any {
   switch (action.type) {
     case UPDATE_NEO_WALLET_NAME:
+      sessionStorage.setItem('neoWalletName', action.data);
       return { ...state, neoWalletName: action.data };
     case UPDATE_ETH_WALLET_NAME:
+      setLocalStorage('ethWalletName', action.data);
       return { ...state, ethWalletName: action.data };
     case UPDATE_BSC_WALLET_NAME:
+      setLocalStorage('bscWalletName', action.data);
       return { ...state, bscWalletName: action.data };
     case UPDATE_HECO_WALLET_NAME:
+      setLocalStorage('hecoWalletName', action.data);
       return { ...state, hecoWalletName: action.data };
 
     case UPDATE_NEO_ACCOUNT:
@@ -89,32 +93,17 @@ export default function swap(state = initialState, action): any {
       return { ...state, balances: {} };
 
     case UPDATE_ETH_BALANCES:
-      return {
-        ...state,
-        ethBalances: action.data,
-        bscBalances: {},
-        hecoBalances: {},
-      };
+      return { ...state, ethBalances: action.data };
     case RESET_ETH_BALANCES:
       return { ...state, ethBalances: {} };
 
     case UPDATE_BSC_BALANCES:
-      return {
-        ...state,
-        ethBalances: {},
-        bscBalances: action.data,
-        hecoBalances: {},
-      };
+      return { ...state, bscBalances: action.data };
     case RESET_BSC_BALANCES:
       return { ...state, bscBalances: {} };
 
     case UPDATE_HECO_BALANCES:
-      return {
-        ...state,
-        ethBalances: {},
-        bscBalances: {},
-        hecoBalances: action.data,
-      };
+      return { ...state, hecoBalances: action.data };
     case RESET_HECO_BALANCES:
       return { ...state, hecoBalances: {} };
 
@@ -132,4 +121,8 @@ export default function swap(state = initialState, action): any {
     default:
       return state;
   }
+}
+
+function setLocalStorage(key: string, value: string): void {
+  localStorage.setItem(key, value);
 }

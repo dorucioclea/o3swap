@@ -127,12 +127,6 @@ export class BridgeTokenComponent implements OnInit, OnDestroy {
     this.displayTokens = this.allTokens;
   }
   receiveTokenBalance(state): void {
-    console.log('eth: \n');
-    console.log(state.ethBalances);
-    console.log('bsc: \n');
-    console.log(state.bscBalances);
-    console.log('heco: \n');
-    console.log(state.hecoBalances);
     if (
       JSON.stringify(state.ethBalances) !==
       JSON.stringify(this.tokenBalance.ETH)

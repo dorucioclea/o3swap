@@ -200,7 +200,6 @@ export class ApiService {
       return of([]).toPromise();
     }
     if (fromToken.chain === toToken.chain) {
-      console.log('---------')
       const res = await this.getFromEthSwapPath(fromToken, toToken, inputAmount);
       return this.handleReceiveSwapPathFiat(res, toToken);
     }
@@ -365,7 +364,6 @@ export class ApiService {
               };
               target.push(temp);
             });
-            console.log(target);
             return target;
           }
         })

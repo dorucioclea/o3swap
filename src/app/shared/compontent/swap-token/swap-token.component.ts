@@ -157,12 +157,6 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     }
   }
   receiveTokenBalance(state): void {
-    console.log('eth: \n');
-    console.log(state.ethBalances);
-    console.log('bsc: \n');
-    console.log(state.bscBalances);
-    console.log('heco: \n');
-    console.log(state.hecoBalances);
     if (
       JSON.stringify(state.balances) !== JSON.stringify(this.tokenBalance.NEO)
     ) {

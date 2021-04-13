@@ -21,7 +21,7 @@ import {
   NETWORK,
   SWAP_CONTRACT_CHAIN_ID,
 } from '@lib';
-import { Observable } from 'rxjs';
+import { interval, Observable } from 'rxjs';
 import { wallet } from '@cityofzion/neon-js';
 import BigNumber from 'bignumber.js';
 
