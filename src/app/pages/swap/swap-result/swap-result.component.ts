@@ -205,7 +205,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
 
   approve(): void {
     this.inquiryInterval.unsubscribe();
-    this.approveInterval.unsubscribe();
+    if (this.approveInterval) {
+      this.approveInterval.unsubscribe();
+    }
     this.isApproveLoading = true;
     const swapApi = this.getEthDapiService();
     swapApi
@@ -288,7 +290,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
 
   //#region 合约调用
   reGetSwapPath(): void {
-    this.inquiryInterval.unsubscribe();
+    // tslint:disable-next-line: no-unused-expression
+    this.inquiryInterval && this.inquiryInterval.unsubscribe();
     this.getSwapPathFun();
     this.getNetworkFee();
     this.setInquiryInterval();
@@ -492,7 +495,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   //#endregion
 
   //#region
-  getApproveContractType(): string {
+  getApproveContractType(): ApproveContract {
     const fromUsd = USD_TOKENS.find(
       (item) => item.symbol === this.fromToken.symbol
     );
@@ -524,13 +527,16 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     }
   }
   checkShowApprove(): void {
+    console.log('check show approve');
     if (!this.fromAddress || !this.toAddress) {
       this.showApprove = false;
+      console.log('check return');
       return;
     }
     if (this.fromToken.chain !== 'NEO' && this.toToken.chain !== 'NEO') {
       const swapApi = this.getEthDapiService();
-      swapApi
+      console.log('--------');
+      this.metaMaskWalletApiService
         .getAllowance(
           this.fromToken,
           this.fromAddress,

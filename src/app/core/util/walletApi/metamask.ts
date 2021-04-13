@@ -779,6 +779,7 @@ export class MetaMaskWalletApiService {
     fromAddress: string,
     approveContract?: ApproveContract
   ): Promise<string> {
+    console.log('\u001b[32m  ✓ start get allowance \u001b[0m')
     let tokenhash = fromToken.assetID;
     if (fromToken.symbol === 'ETH') {
       tokenhash = '0xc778417e063141139fce010982780140aa0cd5ab';
@@ -807,6 +808,9 @@ export class MetaMaskWalletApiService {
       })
       .then((result) => {
         console.log('allowance: ' + result);
+        console.log(fromToken);
+        console.log(fromAddress);
+        console.log(approveContract);
         if (new BigNumber(result, 16).isNaN()) {
           return 0;
         }

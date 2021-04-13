@@ -8,7 +8,6 @@ import {
   ApproveContract,
   BRIDGE_SLIPVALUE,
   EthWalletName,
-  NeoWalletName,
   SwapStateType,
   Token,
   USD_TOKENS,
@@ -18,7 +17,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { BridgeTokenComponent } from '@shared';
 import BigNumber from 'bignumber.js';
-import { Observable } from 'rxjs';
+import { interval, Observable, Unsubscribable } from 'rxjs';
 
 interface State {
   swap: SwapStateType;
@@ -30,7 +29,7 @@ interface State {
 })
 export class BridgeComponent implements OnInit {
   BRIDGE_SLIPVALUE = BRIDGE_SLIPVALUE;
-  fromToken: Token = USD_TOKENS[0];
+  fromToken: Token;
   toToken: Token;
 
   inputAmount: string;
@@ -42,11 +41,9 @@ export class BridgeComponent implements OnInit {
   rates = {};
 
   swap$: Observable<any>;
-  neoAccountAddress: string;
   ethAccountAddress: string;
   bscAccountAddress: string;
   hecoAccountAddress: string;
-  neoWalletName: NeoWalletName;
   ethWalletName: EthWalletName;
   bscWalletName: EthWalletName;
   hecoWalletName: EthWalletName;
@@ -56,6 +53,8 @@ export class BridgeComponent implements OnInit {
   showApprove = false;
   hasApprove = false;
   isApproveLoading = false;
+  approveInterval: Unsubscribable;
+  approveContractType: ApproveContract = 'poly';
   bridgeRate: string;
 
   constructor(
@@ -71,13 +70,12 @@ export class BridgeComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.fromToken = JSON.parse(JSON.stringify(USD_TOKENS[0]));
     this.getRates();
     this.swap$.subscribe((state) => {
-      this.neoAccountAddress = state.neoAccountAddress;
       this.ethAccountAddress = state.ethAccountAddress;
       this.bscAccountAddress = state.bscAccountAddress;
       this.hecoAccountAddress = state.hecoAccountAddress;
-      this.neoWalletName = state.neoWalletName;
       this.ethWalletName = state.ethWalletName;
       this.bscWalletName = state.bscWalletName;
       this.hecoWalletName = state.hecoWalletName;
@@ -109,6 +107,7 @@ export class BridgeComponent implements OnInit {
           this.fromToken = res;
           this.checkInputAmountDecimal();
           this.calcutionInputAmountFiat();
+          this.checkShowApprove();
         } else {
           this.toToken = res;
         }
@@ -125,6 +124,7 @@ export class BridgeComponent implements OnInit {
       this.checkInputAmountDecimal();
       this.calcutionInputAmountFiat();
       this.calcutionReceiveAmount();
+      this.checkShowApprove();
     }
   }
 
@@ -166,7 +166,10 @@ export class BridgeComponent implements OnInit {
       this.fromToken,
       this.toToken
     );
-    const bigNumberReceive = new BigNumber(this.receiveAmount).shiftedBy(this.toToken.decimals).dp(0).toFixed();
+    const bigNumberReceive = new BigNumber(this.receiveAmount)
+      .shiftedBy(this.toToken.decimals)
+      .dp(0)
+      .toFixed();
     this.metaMaskWalletApiService
       .swapCrossChain(
         this.fromToken,
@@ -180,11 +183,54 @@ export class BridgeComponent implements OnInit {
       )
       .then((res) => {
         if (res) {
+          this.resetSwapData();
+        }
+      });
+  }
+
+  approve(): void {
+    if (this.approveInterval) {
+      this.approveInterval.unsubscribe();
+    }
+    this.isApproveLoading = true;
+    const swapApi = this.getEthDapiService();
+    swapApi
+      .approve(this.fromToken, this.fromAddress, this.approveContractType)
+      .then((hash) => {
+        if (hash) {
+          this.approveInterval = interval(5000).subscribe(async () => {
+            const receipt = await this.metaMaskWalletApiService.getReceipt(
+              hash
+            );
+            console.log(receipt);
+            if (receipt !== null) {
+              this.approveInterval.unsubscribe();
+              this.isApproveLoading = false;
+              if (receipt === true) {
+                this.hasApprove = true;
+              }
+            }
+          });
+        } else {
+          this.isApproveLoading = false;
         }
       });
   }
 
   //#region
+  resetSwapData(): void {
+    this.fromToken = JSON.parse(JSON.stringify(USD_TOKENS[0]));
+    this.toToken = null;
+    this.inputAmount = null;
+    this.inputAmountFiat = null;
+    this.receiveAmount = null;
+    this.receiveAmountFiat = null;
+    this.fromAddress = null;
+    this.toAddress = null;
+    this.showApprove = false;
+    this.hasApprove = false;
+    this.bridgeRate = null;
+  }
   handleAccountBalance(ethBalances, bscBalances, hecoBalances): void {
     if (!this.fromToken) {
       return;
@@ -208,13 +254,6 @@ export class BridgeComponent implements OnInit {
     this.changeDetectorRef.detectChanges();
   }
   checkWalletConnect(): boolean {
-    if (
-      (this.fromToken.chain === 'NEO' || this.toToken.chain === 'NEO') &&
-      !this.neoAccountAddress
-    ) {
-      this.nzMessage.error('Please connect the NEO wallet first');
-      return false;
-    }
     if (
       (this.fromToken.chain === 'ETH' || this.toToken.chain === 'ETH') &&
       !this.ethAccountAddress
@@ -241,9 +280,6 @@ export class BridgeComponent implements OnInit {
   getFromAndToAddress(): void {
     let tempFromAddress;
     switch (this.fromToken?.chain) {
-      case 'NEO':
-        tempFromAddress = this.neoAccountAddress;
-        break;
       case 'ETH':
         tempFromAddress = this.ethAccountAddress;
         break;
@@ -256,9 +292,6 @@ export class BridgeComponent implements OnInit {
     }
     let tempToAddress;
     switch (this.toToken?.chain) {
-      case 'NEO':
-        tempToAddress = this.neoAccountAddress;
-        break;
       case 'ETH':
         tempToAddress = this.ethAccountAddress;
         break;
@@ -281,21 +314,6 @@ export class BridgeComponent implements OnInit {
       this.toAddress = tempToAddress;
     }
   }
-  getApproveContractType(): string {
-    const fromUsd = USD_TOKENS.find(
-      (item) => item.symbol === this.fromToken.symbol
-    );
-    const toUsd = USD_TOKENS.find(
-      (item) => item.symbol === this.toToken.symbol
-    );
-    let approveContract: ApproveContract;
-    if (fromUsd && toUsd) {
-      approveContract = 'poly';
-    } else {
-      approveContract = 'uniAggregator';
-    }
-    return approveContract;
-  }
   getEthDapiService(): any {
     switch (this.fromToken.chain) {
       case 'ETH':
@@ -317,28 +335,19 @@ export class BridgeComponent implements OnInit {
       this.showApprove = false;
       return;
     }
-    if (this.fromToken.chain !== 'NEO' && this.toToken.chain !== 'NEO') {
-      const swapApi = this.getEthDapiService();
-      swapApi
-        .getAllowance(
-          this.fromToken,
-          this.fromAddress,
-          this.getApproveContractType()
-        )
-        .then((balance) => {
-          if (
-            new BigNumber(balance).comparedTo(
-              new BigNumber(this.inputAmount)
-            ) >= 0
-          ) {
-            this.showApprove = false;
-          } else {
-            this.showApprove = true;
-          }
-        });
-    } else {
-      this.showApprove = false;
-    }
+    const swapApi = this.getEthDapiService();
+    swapApi
+      .getAllowance(this.fromToken, this.fromAddress, this.approveContractType)
+      .then((balance) => {
+        if (
+          new BigNumber(balance).comparedTo(new BigNumber(this.inputAmount)) >=
+          0
+        ) {
+          this.showApprove = false;
+        } else {
+          this.showApprove = true;
+        }
+      });
   }
   checkInputAmountDecimal(): boolean {
     const decimalPart = this.inputAmount && this.inputAmount.split('.')[1];
