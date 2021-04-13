@@ -4,7 +4,7 @@
       <div class="left-container">
         <div class="header">
           <div class="left">You pay</div>
-          <div class="right">Balance: {{ fromToken?.amount || '0' }} {{ fromToken?.symbol }}
+          <div class="right">Balance: {{ (fromToken?.amount | transNumber | number: '1.0-8') || '0' }} {{ fromToken?.symbol }}
             <span (click)="allInputAmount()">Max</span></div>
         </div>
         <div class="content">

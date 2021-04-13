@@ -105,7 +105,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.swapUnScribe !== null && this.swapUnScribe !== undefined) {
+    if (this.swapUnScribe) {
       this.swapUnScribe.unsubscribe();
     }
   }

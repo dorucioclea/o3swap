@@ -7,7 +7,7 @@ import {
   Output,
 } from '@angular/core';
 import {
-  O3SWAP_FEE_PERCENTAGE,
+  O3_AGGREGATOR_FEE,
   Token,
   NeoWalletName,
   AssetQueryResponse,
@@ -28,13 +28,7 @@ import {
 } from '@core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import BigNumber from 'bignumber.js';
-import {
-  interval,
-  Observable,
-  Subscription,
-  timer,
-  Unsubscribable,
-} from 'rxjs';
+import { interval, Observable, timer, Unsubscribable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { SwapExchangeComponent } from '@shared';
@@ -79,7 +73,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   hecoWalletName: EthWalletName;
 
   TOKENS: Token[] = []; // 所有的 tokens
-  o3SwapFee = O3SWAP_FEE_PERCENTAGE;
+  O3_AGGREGATOR_FEE = O3_AGGREGATOR_FEE;
   showInquiry: boolean;
   inquiryInterval: Unsubscribable; // 询价定时器
   seconds = 30;
@@ -90,7 +84,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   receiveSwapPathArray: AssetQueryResponse;
   price: string; // swap 比
   lnversePrice: string; // swap 反比
-  netWorkFee: string;
   polyFee: string;
 
   fromAddress: string;
@@ -98,6 +91,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   showApprove = false;
   hasApprove = false;
   isApproveLoading = false;
+  approveInterval: Unsubscribable;
 
   constructor(
     public store: Store<State>,
@@ -116,6 +110,20 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    if (this.initData) {
+      this.chooseSwapPath = this.initData.chooseSwapPath;
+      this.chooseSwapPathIndex = this.initData.chooseSwapPathIndex;
+      this.receiveSwapPathArray = this.initData.receiveSwapPathArray;
+      this.price = this.initData.price;
+      this.lnversePrice = this.initData.lnversePrice;
+      this.polyFee = this.initData.polyFee;
+      this.showInquiry = false;
+    } else {
+      this.showInquiry = true;
+    }
+    this.getSwapPathFun();
+    this.getNetworkFee();
+    this.setInquiryInterval();
     this.swap$.subscribe((state) => {
       this.neoAccountAddress = state.neoAccountAddress;
       this.ethAccountAddress = state.ethAccountAddress;
@@ -131,30 +139,22 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.slipValue = state.slipValue;
       this.deadline = state.deadline;
     });
-    if (this.initData) {
-      this.chooseSwapPath = this.initData.chooseSwapPath;
-      this.chooseSwapPathIndex = this.initData.chooseSwapPathIndex;
-      this.receiveSwapPathArray = this.initData.receiveSwapPathArray;
-      this.price = this.initData.price;
-      this.lnversePrice = this.initData.lnversePrice;
-      this.netWorkFee = this.initData.netWorkFee;
-      this.showInquiry = false;
-    } else {
-      this.showInquiry = true;
-    }
-    this.getSwapPathFun();
-    this.getNetworkFee();
-    this.setInquiryInterval();
   }
 
   ngOnDestroy(): void {
-    if (this.inquiryInterval !== null && this.inquiryInterval !== undefined) {
+    if (this.inquiryInterval) {
       this.inquiryInterval.unsubscribe();
+    }
+    if (this.approveInterval) {
+      this.approveInterval.unsubscribe();
     }
   }
 
   setInquiryInterval(): void {
     this.inquiryTime = this.seconds;
+    if (this.inquiryInterval) {
+      this.inquiryInterval.unsubscribe();
+    }
     this.inquiryInterval = interval(1000)
       .pipe(take(this.seconds))
       .subscribe((time) => {
@@ -177,7 +177,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       receiveSwapPathArray: this.receiveSwapPathArray,
       price: this.price,
       lnversePrice: this.lnversePrice,
-      netWorkFee: this.netWorkFee,
+      polyFee: this.polyFee,
     };
     this.closePage.emit(initData);
   }
@@ -205,19 +205,20 @@ export class SwapResultComponent implements OnInit, OnDestroy {
 
   approve(): void {
     this.inquiryInterval.unsubscribe();
+    this.approveInterval.unsubscribe();
     this.isApproveLoading = true;
     const swapApi = this.getEthDapiService();
     swapApi
       .approve(this.fromToken, this.fromAddress, this.getApproveContractType())
       .then((hash) => {
         if (hash) {
-          const timerReq = interval(5000).subscribe(async () => {
+          this.approveInterval = interval(5000).subscribe(async () => {
             const receipt = await this.metaMaskWalletApiService.getReceipt(
               hash
             );
             console.log(receipt);
             if (receipt !== null) {
-              timerReq.unsubscribe();
+              this.approveInterval.unsubscribe();
               this.isApproveLoading = false;
               if (receipt === true) {
                 this.hasApprove = true;
@@ -556,10 +557,10 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       .getSwapPath(this.fromToken, this.toToken, this.inputAmount)
       .then((res) => {
         this.showInquiry = false;
-        if (res.length === 0) {
+        if (!res || res.length === 0) {
           this.swapFail.emit();
         }
-        if (res.length > 0) {
+        if (res && res.length > 0) {
           this.commonService.log(res);
           this.receiveSwapPathArray = res;
           this.handleReceiveSwapPathFiat();
@@ -585,23 +586,12 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     this.calculationPrice();
   }
   async getNetworkFee(): Promise<void> {
-    this.netWorkFee = '';
     this.polyFee = '';
-    if (this.fromToken.chain === 'NEO') {
-      this.netWorkFee = new BigNumber(this.inputAmount)
-        .times(this.o3SwapFee)
-        .dp(this.fromToken.decimals)
-        .toFixed();
-    } else {
+    if (this.fromToken.chain !== this.toToken.chain) {
       this.polyFee = await this.apiService.getFromEthPolyFee(
         this.fromToken,
         this.toToken
       );
-      const poolFeeRate = await this.apiService.getFromEthPoolFeeRate();
-      this.netWorkFee = new BigNumber(this.inputAmount)
-        .times(new BigNumber(poolFeeRate))
-        .dp(8)
-        .toFixed();
     }
   }
   calculationPrice(): void {

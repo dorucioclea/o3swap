@@ -36,9 +36,6 @@ export interface SwapStateType {
   transaction: SwapTransaction;
 }
 
-export const O3SWAP_FEE_PERCENTAGE = 0.003; // 系统收费 0.3%
-export const ALL_PERCENTAGE = 1.003;
-
 // export const NEO_SCRIPTHASH =
 //   '0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b';
 export type ApproveContract = 'poly' | 'uniAggregator';

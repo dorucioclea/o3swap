@@ -1,6 +1,11 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { ApiService, MetaMaskWalletApiService } from '@core';
 import {
+  ApiService,
+  MetaMaskWalletApiService,
+  O3EthWalletApiService,
+} from '@core';
+import {
+  ApproveContract,
   BRIDGE_SLIPVALUE,
   EthWalletName,
   NeoWalletName,
@@ -59,7 +64,8 @@ export class BridgeComponent implements OnInit {
     private modal: NzModalService,
     private nzMessage: NzMessageService,
     private metaMaskWalletApiService: MetaMaskWalletApiService,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private o3EthWalletApiService: O3EthWalletApiService
   ) {
     this.swap$ = store.select('swap');
   }
@@ -153,10 +159,14 @@ export class BridgeComponent implements OnInit {
     if (this.checkWalletConnect() === false) {
       return;
     }
+    if (!this.fromAddress || !this.toAddress) {
+      return;
+    }
     const polyFee = await this.apiService.getFromEthPolyFee(
       this.fromToken,
       this.toToken
     );
+    const bigNumberReceive = new BigNumber(this.receiveAmount).shiftedBy(this.toToken.decimals).dp(0).toFixed();
     this.metaMaskWalletApiService
       .swapCrossChain(
         this.fromToken,
@@ -164,7 +174,7 @@ export class BridgeComponent implements OnInit {
         this.inputAmount,
         this.fromAddress,
         this.toAddress,
-        this.receiveAmount,
+        bigNumberReceive,
         BRIDGE_SLIPVALUE,
         polyFee
       )
@@ -176,20 +186,20 @@ export class BridgeComponent implements OnInit {
 
   //#region
   handleAccountBalance(ethBalances, bscBalances, hecoBalances): void {
-    this.fromToken.amount = '0';
     if (!this.fromToken) {
       return;
     }
+    this.fromToken.amount = '0';
     let balances;
     switch (this.fromToken.chain) {
       case 'ETH':
-        balances = ethBalances || {};
+        balances = JSON.parse(JSON.stringify(ethBalances)) || {};
         break;
       case 'BSC':
-        balances = bscBalances || {};
+        balances = JSON.parse(JSON.stringify(bscBalances)) || {};
         break;
       case 'HECO':
-        balances = hecoBalances || {};
+        balances = JSON.parse(JSON.stringify(hecoBalances)) || {};
         break;
     }
     if (balances[this.fromToken.assetID]) {
@@ -244,38 +254,77 @@ export class BridgeComponent implements OnInit {
         tempFromAddress = this.hecoAccountAddress;
         break;
     }
+    let tempToAddress;
     switch (this.toToken?.chain) {
       case 'NEO':
-        this.toAddress = this.neoAccountAddress;
+        tempToAddress = this.neoAccountAddress;
         break;
       case 'ETH':
-        this.toAddress = this.ethAccountAddress;
+        tempToAddress = this.ethAccountAddress;
         break;
       case 'BSC':
-        this.toAddress = this.bscAccountAddress;
+        tempToAddress = this.bscAccountAddress;
         break;
       case 'HECO':
-        this.toAddress = this.hecoAccountAddress;
+        tempToAddress = this.hecoAccountAddress;
         break;
     }
-    if (tempFromAddress !== this.fromAddress) {
+    if (
+      tempFromAddress !== this.fromAddress ||
+      tempToAddress !== this.toAddress
+    ) {
       this.fromAddress = tempFromAddress;
+      this.toAddress = tempToAddress;
       this.checkShowApprove();
+    } else {
+      this.fromAddress = tempFromAddress;
+      this.toAddress = tempToAddress;
     }
-    this.fromAddress = tempFromAddress;
+  }
+  getApproveContractType(): string {
+    const fromUsd = USD_TOKENS.find(
+      (item) => item.symbol === this.fromToken.symbol
+    );
+    const toUsd = USD_TOKENS.find(
+      (item) => item.symbol === this.toToken.symbol
+    );
+    let approveContract: ApproveContract;
+    if (fromUsd && toUsd) {
+      approveContract = 'poly';
+    } else {
+      approveContract = 'uniAggregator';
+    }
+    return approveContract;
+  }
+  getEthDapiService(): any {
+    switch (this.fromToken.chain) {
+      case 'ETH':
+        return this.ethWalletName === 'MetaMask'
+          ? this.metaMaskWalletApiService
+          : this.o3EthWalletApiService;
+      case 'BSC':
+        return this.bscWalletName === 'MetaMask'
+          ? this.metaMaskWalletApiService
+          : this.o3EthWalletApiService;
+      case 'HECO':
+        return this.hecoWalletName === 'MetaMask'
+          ? this.metaMaskWalletApiService
+          : this.o3EthWalletApiService;
+    }
   }
   checkShowApprove(): void {
     if (!this.fromAddress || !this.toAddress) {
       this.showApprove = false;
       return;
     }
-    if (
-      this.fromToken.chain !== 'NEO' &&
-      this.toToken.chain !== 'NEO' &&
-      this.fromToken.chain !== this.toToken.chain
-    ) {
-      this.metaMaskWalletApiService
-        .getAllowance(this.fromToken, this.fromAddress)
+    if (this.fromToken.chain !== 'NEO' && this.toToken.chain !== 'NEO') {
+      const swapApi = this.getEthDapiService();
+      swapApi
+        .getAllowance(
+          this.fromToken,
+          this.fromAddress,
+          this.getApproveContractType()
+        )
         .then((balance) => {
           if (
             new BigNumber(balance).comparedTo(

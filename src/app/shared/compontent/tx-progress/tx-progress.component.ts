@@ -73,10 +73,7 @@ export class TxProgressComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (
-      this.requestCrossInterval !== null &&
-      this.requestCrossInterval !== undefined
-    ) {
+    if (this.requestCrossInterval) {
       this.requestCrossInterval.unsubscribe();
     }
   }
