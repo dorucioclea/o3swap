@@ -3,7 +3,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_weth",
+        "name": "_wbnb",
         "type": "address"
       },
       {
@@ -24,6 +24,25 @@
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amountOut",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "fee",
+        "type": "uint256"
+      }
+    ],
+    "name": "LOG_AGG_SWAP",
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -55,12 +74,11 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
-    "name": "WETH",
+    "name": "WBNB",
     "outputs": [
       {
         "internalType": "address",
@@ -69,8 +87,7 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -83,8 +100,7 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -97,8 +113,20 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "pancakeFactory",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -111,8 +139,7 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -132,8 +159,7 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -149,23 +175,8 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "uniswapFactory",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
     "stateMutability": "payable",
-    "type": "receive",
-    "payable": true
+    "type": "receive"
   },
   {
     "inputs": [
@@ -176,7 +187,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "uniAmountOutMin",
+        "name": "swapAmountOutMin",
         "type": "uint256"
       },
       {
@@ -209,7 +220,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "uniAmountOutMin",
+        "name": "swapAmountOutMin",
         "type": "uint256"
       },
       {
@@ -261,14 +272,14 @@
         "type": "bool"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "payable",
     "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "uniAmountOutMin",
+        "name": "swapAmountOutMin",
         "type": "uint256"
       },
       {
@@ -290,14 +301,13 @@
     "name": "swapExactETHForTokensSupportingFeeOnTransferTokens",
     "outputs": [],
     "stateMutability": "payable",
-    "type": "function",
-    "payable": true
+    "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "uniAmountOutMin",
+        "name": "swapAmountOutMin",
         "type": "uint256"
       },
       {
@@ -350,8 +360,7 @@
       }
     ],
     "stateMutability": "payable",
-    "type": "function",
-    "payable": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -362,7 +371,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "uniAmountOutMin",
+        "name": "swapAmountOutMin",
         "type": "uint256"
       },
       {
@@ -397,8 +406,7 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -443,11 +451,11 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_uniswapFactory",
+        "name": "_pancakeFactory",
         "type": "address"
       }
     ],
-    "name": "setUniswapFactory",
+    "name": "setPancakeFactory",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -461,6 +469,19 @@
       }
     ],
     "name": "setPolySwapper",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_wbnb",
+        "type": "address"
+      }
+    ],
+    "name": "setWBNB",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

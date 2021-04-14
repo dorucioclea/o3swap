@@ -104,6 +104,7 @@ export class ApiService {
     if (fromToken.chain === 'NEO' && toToken.chain !== 'NEO') {
       return of([]).toPromise();
     }
+    console.log(1);
     if (fromToken.chain === toToken.chain) {
       const res = await this.getFromEthSwapPath(
         fromToken,
@@ -112,6 +113,7 @@ export class ApiService {
       );
       return this.handleReceiveSwapPathFiat(res, toToken);
     }
+    console.log(2);
     const fromUsd = USD_TOKENS.find((item) => item.chain === fromToken.chain);
     const toUsd = USD_TOKENS.find((item) => item.chain === toToken.chain);
     if (
@@ -125,10 +127,13 @@ export class ApiService {
       );
       return this.handleReceiveSwapPathFiat(res, toToken);
     }
+    console.log(toUsd.symbol)
+    console.log(toToken.symbol)
     if (
       fromUsd.symbol !== fromToken.symbol &&
       toUsd.symbol === toToken.symbol
     ) {
+      console.log(3);
       const res = await this.getFromEthCrossChainAggregatorSwapPath(
         fromToken,
         toToken,
@@ -137,6 +142,8 @@ export class ApiService {
       );
       return this.handleReceiveSwapPathFiat(res, toToken);
     }
+    console.log(4);
+    return of([]).toPromise();
   }
 
   getToStandardSwapPath(
@@ -436,6 +443,7 @@ export class ApiService {
                 amount: item.amounts,
                 swapPath,
                 assetHashPath: item.path,
+                aggregator: item.aggregator,
               };
               target.push(temp);
             });
@@ -457,11 +465,15 @@ export class ApiService {
     );
     let fromAssetHash = fromToken.assetID;
     let toAssetHash = toToken.assetID;
-    if (fromToken.symbol === 'ETH') {
-      fromAssetHash = WETH_ASSET_HASH;
+    if (
+      fromToken.symbol === WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
+    ) {
+      fromAssetHash = WETH_ASSET_HASH[fromToken.chain].assetID;
     }
-    if (toToken.symbol === 'ETH') {
-      toAssetHash = WETH_ASSET_HASH;
+    if (
+      toToken.symbol === WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
+    ) {
+      toAssetHash = WETH_ASSET_HASH[fromToken.chain].assetID;
     }
     return this.http
       .post(`${INQUIRY_HOST}/v1/${fromToken.chain.toLowerCase()}/quote`, {
@@ -478,19 +490,23 @@ export class ApiService {
                 item.path,
                 this.CHAIN_TOKENS[fromToken.chain]
               );
-              if (toToken.symbol === 'ETH') {
-                toAssetHash = WETH_ASSET_HASH;
-              }
               const temp = {
                 amount: item.amounts,
                 swapPath,
                 assetHashPath: item.path,
+                aggregator: item.aggregator,
               };
-              if (fromToken.symbol === 'ETH') {
-                temp.swapPath.unshift('ETH');
+              if (
+                fromToken.symbol ===
+                WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
+              ) {
+                temp.swapPath.unshift(fromToken.symbol);
               }
-              if (toToken.symbol === 'ETH') {
-                temp.swapPath.push('ETH');
+              if (
+                toToken.symbol ===
+                WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
+              ) {
+                temp.swapPath.push(toToken.symbol);
               }
               target.push(temp);
             });

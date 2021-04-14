@@ -30,8 +30,17 @@ export const SWAP_CONTRACT_CHAIN_ID = {
   ETH: NETWORK === 'MainNet' ? '' : 2,
 };
 
-export const POLY_HOST_ADDRESS = '0x0687e6392de735B83ed2808797c92051B5dF5618';
+export const POLY_HOST_ADDRESS = 'MainNet'
+  ? ''
+  : '0x0687e6392de735B83ed2808797c92051B5dF5618';
 
-// ETH to BSC/HECO uni
-export const ETH_UNI_SWAP_CONTRACT_HASH =
-  NETWORK === 'MainNet' ? '' : '0xAB55811908273B2629abE0F2B59cFD69cE938392';
+export const AGGREGATOR_CONTRACT = {
+  BSC: {
+    Pancakeswap:
+      NETWORK === 'MainNet' ? '' : '0xA78a195E6DCDa3eC2074CF8d0b8392602783107B',
+  },
+  ETH: {
+    Uniswap:
+      NETWORK === 'MainNet' ? '' : '0x1296300290e32a24E0c8d3428DAcB8aC0f3B67d3',
+  },
+};

@@ -6,7 +6,6 @@ import {
   CommonService,
 } from '@core';
 import {
-  ApproveContract,
   BRIDGE_SLIPVALUE,
   EthWalletName,
   SwapStateType,
@@ -55,7 +54,6 @@ export class BridgeComponent implements OnInit {
   hasApprove = false;
   isApproveLoading = false;
   approveInterval: Unsubscribable;
-  approveContractType: ApproveContract = 'poly';
   bridgeRate: string;
 
   constructor(
@@ -195,27 +193,23 @@ export class BridgeComponent implements OnInit {
     }
     this.isApproveLoading = true;
     const swapApi = this.getEthDapiService();
-    swapApi
-      .approve(this.fromToken, this.fromAddress, this.approveContractType)
-      .then((hash) => {
-        if (hash) {
-          this.approveInterval = interval(5000).subscribe(async () => {
-            const receipt = await this.metaMaskWalletApiService.getReceipt(
-              hash
-            );
-            console.log(receipt);
-            if (receipt !== null) {
-              this.approveInterval.unsubscribe();
-              this.isApproveLoading = false;
-              if (receipt === true) {
-                this.hasApprove = true;
-              }
+    swapApi.approve(this.fromToken, this.fromAddress).then((hash) => {
+      if (hash) {
+        this.approveInterval = interval(5000).subscribe(async () => {
+          const receipt = await this.metaMaskWalletApiService.getReceipt(hash);
+          console.log(receipt);
+          if (receipt !== null) {
+            this.approveInterval.unsubscribe();
+            this.isApproveLoading = false;
+            if (receipt === true) {
+              this.hasApprove = true;
             }
-          });
-        } else {
-          this.isApproveLoading = false;
-        }
-      });
+          }
+        });
+      } else {
+        this.isApproveLoading = false;
+      }
+    });
   }
 
   //#region
@@ -337,18 +331,15 @@ export class BridgeComponent implements OnInit {
       return;
     }
     const swapApi = this.getEthDapiService();
-    swapApi
-      .getAllowance(this.fromToken, this.fromAddress, this.approveContractType)
-      .then((balance) => {
-        if (
-          new BigNumber(balance).comparedTo(new BigNumber(this.inputAmount)) >=
-          0
-        ) {
-          this.showApprove = false;
-        } else {
-          this.showApprove = true;
-        }
-      });
+    swapApi.getAllowance(this.fromToken, this.fromAddress).then((balance) => {
+      if (
+        new BigNumber(balance).comparedTo(new BigNumber(this.inputAmount)) >= 0
+      ) {
+        this.showApprove = false;
+      } else {
+        this.showApprove = true;
+      }
+    });
   }
   checkInputAmountDecimal(): boolean {
     const decimalPart = this.inputAmount && this.inputAmount.split('.')[1];

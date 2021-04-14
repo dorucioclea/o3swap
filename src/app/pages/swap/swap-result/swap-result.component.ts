@@ -15,7 +15,6 @@ import {
   SwapStateType,
   EthWalletName,
   USD_TOKENS,
-  ApproveContract,
   SOURCE_TOKEN_SYMBOL,
 } from '@lib';
 import {
@@ -137,7 +136,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.ethWalletName = state.ethWalletName;
       this.bscWalletName = state.bscWalletName;
       this.hecoWalletName = state.hecoWalletName;
-      this.getFromAndToAddress();
+      // this.getFromAndToAddress();
     });
     this.setting$.subscribe((state) => {
       this.slipValue = state.slipValue;
@@ -221,7 +220,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     this.isApproveLoading = true;
     const swapApi = this.getEthDapiService();
     swapApi
-      .approve(this.fromToken, this.fromAddress, this.getApproveContractType())
+      .approve(this.fromToken, this.fromAddress, this.chooseSwapPath.aggregator)
       .then((hash) => {
         if (hash) {
           this.approveInterval = interval(5000).subscribe(async () => {
@@ -278,20 +277,52 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       if (this.toToken.chain === 'ETH') {
         if (this.fromToken.symbol !== 'ETH' && this.toToken.symbol === 'ETH') {
           this.swapExactTokensForETH();
+          return;
         }
         if (this.fromToken.symbol === 'ETH' && this.toToken.symbol !== 'ETH') {
           this.swapExactETHForTokens();
+          return;
         }
         if (this.fromToken.symbol !== 'ETH' && this.toToken.symbol !== 'ETH') {
           this.swapExactTokensForTokens();
+          return;
         }
       } else {
         if (toUsd) {
           if (this.fromToken.symbol === 'ETH') {
             this.swapExactETHForTokensCrossChain();
+            return;
           }
           if (this.fromToken.symbol !== 'ETH') {
             this.swapExactTokensForTokensCrossChain();
+            return;
+          }
+        }
+      }
+    }
+    if (this.fromToken.chain === 'BSC') {
+      if (this.toToken.chain === 'BSC') {
+        if (this.fromToken.symbol !== 'BNB' && this.toToken.symbol === 'BNB') {
+          this.swapExactTokensForETH();
+          return;
+        }
+        if (this.fromToken.symbol === 'BNB' && this.toToken.symbol !== 'BNB') {
+          this.swapExactETHForTokens();
+          return;
+        }
+        if (this.fromToken.symbol !== 'BNB' && this.toToken.symbol !== 'BNB') {
+          this.swapExactTokensForTokens();
+          return;
+        }
+      } else {
+        if (toUsd) {
+          if (this.fromToken.symbol === 'BNB') {
+            this.swapExactETHForTokensCrossChain();
+            return;
+          }
+          if (this.fromToken.symbol !== 'BNB') {
+            this.swapExactTokensForTokensCrossChain();
+            return;
           }
         }
       }
@@ -390,7 +421,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   swapExactTokensForETH(): void {
     const swapApi = this.getEthDapiService();
     this.metaMaskWalletApiService
-      .uniSwapExactTokensForETH(
+      .swapExactTokensForETH(
         this.fromToken,
         this.toToken,
         this.chooseSwapPath,
@@ -409,7 +440,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   swapExactETHForTokens(): void {
     const swapApi = this.getEthDapiService();
     this.metaMaskWalletApiService
-      .uniSwapExactETHForTokens(
+      .swapExactETHForTokens(
         this.fromToken,
         this.toToken,
         this.chooseSwapPath,
@@ -428,7 +459,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   swapExactTokensForTokens(): void {
     const swapApi = this.getEthDapiService();
     this.metaMaskWalletApiService
-      .uniSwapExactTokensForTokens(
+      .swapExactTokensForTokens(
         this.fromToken,
         this.toToken,
         this.chooseSwapPath,
@@ -446,7 +477,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
 
   swapExactETHForTokensCrossChain(): void {
     this.metaMaskWalletApiService
-      .uniswapExactETHForTokensCrossChain(
+      .swapExactETHForTokensCrossChain(
         this.fromToken,
         this.toToken,
         this.chooseSwapPath,
@@ -465,7 +496,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
   swapExactTokensForTokensCrossChain(): void {
     this.metaMaskWalletApiService
-      .uniswapExactTokensForTokensCrossChain(
+      .swapExactTokensForTokensCrossChain(
         this.fromToken,
         this.toToken,
         this.chooseSwapPath,
@@ -506,21 +537,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   //#endregion
 
   //#region
-  getApproveContractType(): ApproveContract {
-    const fromUsd = USD_TOKENS.find(
-      (item) => item.symbol === this.fromToken.symbol
-    );
-    const toUsd = USD_TOKENS.find(
-      (item) => item.symbol === this.toToken.symbol
-    );
-    let approveContract: ApproveContract;
-    if (fromUsd && toUsd) {
-      approveContract = 'poly';
-    } else {
-      approveContract = 'uniAggregator';
-    }
-    return approveContract;
-  }
   getEthDapiService(): any {
     switch (this.fromToken.chain) {
       case 'ETH':
@@ -550,7 +566,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         .getAllowance(
           this.fromToken,
           this.fromAddress,
-          this.getApproveContractType()
+          this.chooseSwapPath.aggregator
         )
         .then((balance) => {
           if (

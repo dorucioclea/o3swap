@@ -39,8 +39,4 @@ export interface SwapStateType {
   liquidityTransaction: SwapTransaction;
 }
 
-// export const NEO_SCRIPTHASH =
-//   '0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b';
-export type ApproveContract = 'poly' | 'uniAggregator';
-
 export type TxAtPage = 'swap' | 'bridge' | 'liquidity';

@@ -22,10 +22,8 @@ import {
   ETH_SOURCE_ASSET_HASH,
   METAMASK_CHAIN,
   USD_TOKENS,
-  ETH_UNI_SWAP_CONTRACT_HASH,
   AssetQueryResponseItem,
   O3_AGGREGATOR_SLIPVALUE,
-  ApproveContract,
   TxAtPage,
   UPDATE_BRIDGE_PENDING_TX,
   UPDATE_LIQUIDITY_PENDING_TX,
@@ -34,6 +32,8 @@ import {
   RESET_BSC_BALANCES,
   RESET_HECO_BALANCES,
   WETH_ASSET_HASH,
+  AGGREGATOR_CONTRACT,
+  CHAINS,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import BigNumber from 'bignumber.js';
@@ -65,11 +65,17 @@ export class MetaMaskWalletApiService {
   transaction: SwapTransaction;
 
   ethereum;
-  isConnected: boolean;
   web3;
   swapperJson;
   ethErc20Json;
-  o3UniSwapJson;
+  aggregatorSwapJson = {
+    BSC: {
+      Pancakeswap: null,
+    },
+    ETH: {
+      Uniswap: null,
+    },
+  };
 
   constructor(
     private http: HttpClient,
@@ -190,8 +196,11 @@ export class MetaMaskWalletApiService {
       }
       const result = {};
       for (const item of tempTokenBalance) {
-        result[item.assetID] = JSON.parse(JSON.stringify(item));
-        result[item.assetID].amount = await this.getBalancByHash(item);
+        const tempAmount = await this.getBalancByHash(item);
+        if (tempAmount) {
+          result[item.assetID] = JSON.parse(JSON.stringify(item));
+          result[item.assetID].amount = tempAmount;
+        }
       }
       this.store.dispatch({
         type: dispatchBalanceType,
@@ -240,10 +249,12 @@ export class MetaMaskWalletApiService {
           ],
         })
         .then((balance) => {
-          return new BigNumber(balance).shiftedBy(-token.decimals).toFixed();
+          if (!balance.isNaN()) {
+            return new BigNumber(balance).shiftedBy(-token.decimals).toFixed();
+          }
         })
         .catch((error) => {
-          this.handleDapiError(error);
+          console.log(error);
         });
     } else {
       return this.ethereum
@@ -252,12 +263,14 @@ export class MetaMaskWalletApiService {
           params: [this.accountAddress, 'latest'],
         })
         .then((balance) => {
-          return new BigNumber(balance, 16)
-            .shiftedBy(-token.decimals)
-            .toFixed();
+          if (!balance.isNaN()) {
+            return new BigNumber(balance, 16)
+              .shiftedBy(-token.decimals)
+              .toFixed();
+          }
         })
         .catch((error) => {
-          this.handleDapiError(error);
+          console.log(error);
         });
     }
   }
@@ -338,13 +351,13 @@ export class MetaMaskWalletApiService {
         return hash;
       })
       .catch((error) => {
-        this.handleDapiError(error);
+        console.log(error);
       });
   }
   //#endregion
 
-  //#region uni
-  async uniSwapExactTokensForETH(
+  //#region eth uni
+  async swapExactTokensForETH(
     fromToken: Token,
     toToken: Token,
     chooseSwapPath: AssetQueryResponseItem,
@@ -353,20 +366,24 @@ export class MetaMaskWalletApiService {
     toAddress: string,
     deadline: number
   ): Promise<any> {
-    console.log('swapExactTokensForETHSupportingFeeOnTransferTokens');
+    console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    console.log('swapExactTokensForETH');
     if (this.checkNetwork(fromToken) === false) {
       return;
     }
-    const json = await this.getO3UniSwapJson();
+    const json = await this.getAggregatorSwapJson(
+      fromToken.chain,
+      chooseSwapPath.aggregator
+    );
     const swapContract = new this.web3.eth.Contract(
       json,
-      ETH_UNI_SWAP_CONTRACT_HASH
+      AGGREGATOR_CONTRACT[fromToken.chain][chooseSwapPath.aggregator]
     );
     const receiveAmount =
       chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
     const params = {
       amountIn: new BigNumber(inputAmount).shiftedBy(fromToken.decimals),
-      uniAmountOutMin: this.swapService.getMinAmountOut(
+      swapAmountOutMin: this.swapService.getMinAmountOut(
         receiveAmount,
         O3_AGGREGATOR_SLIPVALUE
       ),
@@ -378,7 +395,7 @@ export class MetaMaskWalletApiService {
     const data = swapContract.methods
       .swapExactTokensForETHSupportingFeeOnTransferTokens(
         params.amountIn,
-        params.uniAmountOutMin,
+        params.swapAmountOutMin,
         params.path,
         params.to,
         params.deadline
@@ -390,7 +407,7 @@ export class MetaMaskWalletApiService {
         params: [
           this.getSendTransactionParams(
             fromAddress,
-            ETH_UNI_SWAP_CONTRACT_HASH,
+            AGGREGATOR_CONTRACT[fromToken.chain][chooseSwapPath.aggregator],
             data
           ),
         ],
@@ -414,7 +431,7 @@ export class MetaMaskWalletApiService {
       });
   }
 
-  async uniSwapExactETHForTokens(
+  async swapExactETHForTokens(
     fromToken: Token,
     toToken: Token,
     chooseSwapPath: AssetQueryResponseItem,
@@ -423,19 +440,23 @@ export class MetaMaskWalletApiService {
     toAddress: string,
     deadline: number
   ): Promise<any> {
-    console.log('swapExactETHForTokensSupportingFeeOnTransferTokens');
+    console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    console.log('swapExactETHForTokens');
     if (this.checkNetwork(fromToken) === false) {
       return;
     }
-    const json = await this.getO3UniSwapJson();
+    const json = await this.getAggregatorSwapJson(
+      fromToken.chain,
+      chooseSwapPath.aggregator
+    );
     const swapContract = new this.web3.eth.Contract(
       json,
-      ETH_UNI_SWAP_CONTRACT_HASH
+      AGGREGATOR_CONTRACT[fromToken.chain][chooseSwapPath.aggregator]
     );
     const receiveAmount =
       chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
     const params = {
-      uniAmountOutMin: this.swapService.getMinAmountOut(
+      swapAmountOutMin: this.swapService.getMinAmountOut(
         receiveAmount,
         O3_AGGREGATOR_SLIPVALUE
       ),
@@ -450,7 +471,7 @@ export class MetaMaskWalletApiService {
     console.log(`value: ${value}`);
     const data = swapContract.methods
       .swapExactETHForTokensSupportingFeeOnTransferTokens(
-        params.uniAmountOutMin,
+        params.swapAmountOutMin,
         params.path,
         params.to,
         params.deadline
@@ -462,7 +483,7 @@ export class MetaMaskWalletApiService {
         params: [
           this.getSendTransactionParams(
             fromAddress,
-            ETH_UNI_SWAP_CONTRACT_HASH,
+            AGGREGATOR_CONTRACT[fromToken.chain][chooseSwapPath.aggregator],
             data,
             value
           ),
@@ -487,7 +508,7 @@ export class MetaMaskWalletApiService {
       });
   }
 
-  async uniSwapExactTokensForTokens(
+  async swapExactTokensForTokens(
     fromToken: Token,
     toToken: Token,
     chooseSwapPath: AssetQueryResponseItem,
@@ -496,14 +517,18 @@ export class MetaMaskWalletApiService {
     toAddress: string,
     deadline: number
   ): Promise<any> {
-    console.log('swapExactTokensForTokensSupportingFeeOnTransferTokens');
+    console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    console.log('swapExactTokensForTokens');
     if (this.checkNetwork(fromToken) === false) {
       return;
     }
-    const json = await this.getO3UniSwapJson();
+    const json = await this.getAggregatorSwapJson(
+      fromToken.chain,
+      chooseSwapPath.aggregator
+    );
     const swapContract = new this.web3.eth.Contract(
       json,
-      ETH_UNI_SWAP_CONTRACT_HASH
+      AGGREGATOR_CONTRACT[fromToken.chain][chooseSwapPath.aggregator]
     );
     const receiveAmount =
       chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
@@ -512,7 +537,7 @@ export class MetaMaskWalletApiService {
         .shiftedBy(fromToken.decimals)
         .dp(0)
         .toFixed(),
-      uniAmountOutMin: this.swapService.getMinAmountOut(
+      swapAmountOutMin: this.swapService.getMinAmountOut(
         receiveAmount,
         O3_AGGREGATOR_SLIPVALUE
       ),
@@ -524,7 +549,7 @@ export class MetaMaskWalletApiService {
     const data = swapContract.methods
       .swapExactTokensForTokensSupportingFeeOnTransferTokens(
         params.amountIn,
-        params.uniAmountOutMin,
+        params.swapAmountOutMin,
         params.path,
         params.to,
         params.deadline
@@ -536,7 +561,7 @@ export class MetaMaskWalletApiService {
         params: [
           this.getSendTransactionParams(
             fromAddress,
-            ETH_UNI_SWAP_CONTRACT_HASH,
+            AGGREGATOR_CONTRACT[fromToken.chain][chooseSwapPath.aggregator],
             data
           ),
         ],
@@ -560,7 +585,7 @@ export class MetaMaskWalletApiService {
       });
   }
 
-  async uniswapExactETHForTokensCrossChain(
+  async swapExactETHForTokensCrossChain(
     fromToken: Token,
     toToken: Token,
     chooseSwapPath: AssetQueryResponseItem,
@@ -571,14 +596,18 @@ export class MetaMaskWalletApiService {
     polyFee: string,
     deadline: number
   ): Promise<string> {
-    console.log('swapExactETHForTokensSupportingFeeOnTransferTokensCrossChain');
+    console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    console.log('swapExactETHForTokensCrossChain');
     if (this.checkNetwork(fromToken) === false) {
       return;
     }
-    const json = await this.getO3UniSwapJson();
+    const json = await this.getAggregatorSwapJson(
+      fromToken.chain,
+      chooseSwapPath.aggregator
+    );
     const swapContract = new this.web3.eth.Contract(
       json,
-      ETH_UNI_SWAP_CONTRACT_HASH
+      AGGREGATOR_CONTRACT[fromToken.chain][chooseSwapPath.aggregator]
     );
     const amountOutA = chooseSwapPath.amount[chooseSwapPath.amount.length - 2];
     const bigNumberPolyFee = new BigNumber(polyFee)
@@ -588,7 +617,7 @@ export class MetaMaskWalletApiService {
     const receiveAmount =
       chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
     const params = {
-      uniAmountOutMin: this.swapService.getMinAmountOut(
+      swapAmountOutMin: this.swapService.getMinAmountOut(
         amountOutA,
         O3_AGGREGATOR_SLIPVALUE
       ),
@@ -613,7 +642,7 @@ export class MetaMaskWalletApiService {
     console.log(`value: ${value}`);
     const data = swapContract.methods
       .swapExactETHForTokensSupportingFeeOnTransferTokensCrossChain(
-        params.uniAmountOutMin,
+        params.swapAmountOutMin,
         params.path,
         params.to,
         params.deadline,
@@ -630,7 +659,7 @@ export class MetaMaskWalletApiService {
         params: [
           this.getSendTransactionParams(
             fromAddress,
-            ETH_UNI_SWAP_CONTRACT_HASH,
+            AGGREGATOR_CONTRACT[fromToken.chain][chooseSwapPath.aggregator],
             data,
             value
           ),
@@ -654,7 +683,7 @@ export class MetaMaskWalletApiService {
       });
   }
 
-  async uniswapExactTokensForTokensCrossChain(
+  async swapExactTokensForTokensCrossChain(
     fromToken: Token,
     toToken: Token,
     chooseSwapPath: AssetQueryResponseItem,
@@ -665,16 +694,18 @@ export class MetaMaskWalletApiService {
     polyFee: string,
     deadline: number
   ): Promise<string> {
-    console.log(
-      'swapExactTokensForTokensSupportingFeeOnTransferTokensCrossChain'
-    );
+    console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    console.log('swapExactTokensForTokensCrossChain');
     if (this.checkNetwork(fromToken) === false) {
       return;
     }
-    const json = await this.getO3UniSwapJson();
+    const json = await this.getAggregatorSwapJson(
+      fromToken.chain,
+      chooseSwapPath.aggregator
+    );
     const swapContract = new this.web3.eth.Contract(
       json,
-      ETH_UNI_SWAP_CONTRACT_HASH
+      AGGREGATOR_CONTRACT[fromToken.chain][chooseSwapPath.aggregator]
     );
     const amountOutA = chooseSwapPath.amount[chooseSwapPath.amount.length - 2];
     const bigNumberPolyFee = new BigNumber(polyFee)
@@ -688,7 +719,7 @@ export class MetaMaskWalletApiService {
         .shiftedBy(fromToken.decimals)
         .dp(0)
         .toFixed(),
-      uniAmountOutMin: this.swapService.getMinAmountOut(
+      swapAmountOutMin: this.swapService.getMinAmountOut(
         amountOutA,
         O3_AGGREGATOR_SLIPVALUE
       ),
@@ -709,7 +740,7 @@ export class MetaMaskWalletApiService {
     const data = swapContract.methods
       .swapExactTokensForTokensSupportingFeeOnTransferTokensCrossChain(
         params.amountIn,
-        params.uniAmountOutMin,
+        params.swapAmountOutMin,
         params.path,
         params.to,
         params.deadline,
@@ -726,7 +757,7 @@ export class MetaMaskWalletApiService {
         params: [
           this.getSendTransactionParams(
             fromAddress,
-            ETH_UNI_SWAP_CONTRACT_HASH,
+            AGGREGATOR_CONTRACT[fromToken.chain][chooseSwapPath.aggregator],
             data,
             bigNumberPolyFee
           ),
@@ -909,26 +940,20 @@ export class MetaMaskWalletApiService {
   async getAllowance(
     fromToken: Token,
     fromAddress: string,
-    approveContract?: ApproveContract
+    aggregator?: string
   ): Promise<string> {
     console.log('\u001b[32m  ✓ start get allowance \u001b[0m');
     let tokenhash = fromToken.assetID;
-    if (fromToken.symbol === 'ETH') {
-      tokenhash = WETH_ASSET_HASH;
+    if (
+      fromToken.symbol === WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
+    ) {
+      tokenhash = WETH_ASSET_HASH[fromToken.chain].assetID;
     }
     const json = await this.getEthErc20Json();
     const ethErc20Contract = new this.web3.eth.Contract(json, tokenhash);
-    let contract;
-    switch (approveContract) {
-      case 'poly':
-        contract = ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain];
-        break;
-      case 'uniAggregator':
-        contract = ETH_UNI_SWAP_CONTRACT_HASH;
-        break;
-      default:
-        contract = ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain];
-        break;
+    let contract = ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain];
+    if (aggregator) {
+      contract = AGGREGATOR_CONTRACT[fromToken.chain][aggregator];
     }
     const data = ethErc20Contract.methods
       .allowance(fromAddress, contract)
@@ -940,9 +965,7 @@ export class MetaMaskWalletApiService {
       })
       .then((result) => {
         console.log('allowance: ' + result);
-        console.log(fromToken);
-        console.log(fromAddress);
-        console.log(approveContract);
+        console.log('aggregator: ' + aggregator);
         if (new BigNumber(result, 16).isNaN()) {
           return 0;
         }
@@ -958,26 +981,20 @@ export class MetaMaskWalletApiService {
   async approve(
     fromToken: Token,
     fromAddress: string,
-    approveContract?: ApproveContract
+    aggregator?: string
   ): Promise<any> {
     let tokenhash = fromToken.assetID;
-    if (fromToken.symbol === 'ETH') {
-      tokenhash = WETH_ASSET_HASH;
+    if (
+      fromToken.symbol === WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
+    ) {
+      tokenhash = WETH_ASSET_HASH[fromToken.chain].assetID;
     }
     if (this.checkNetwork(fromToken) === false) {
       return;
     }
-    let contract: string;
-    switch (approveContract) {
-      case 'poly':
-        contract = ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain];
-        break;
-      case 'uniAggregator':
-        contract = ETH_UNI_SWAP_CONTRACT_HASH;
-        break;
-      default:
-        contract = ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain];
-        break;
+    let contract = ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain];
+    if (aggregator) {
+      contract = AGGREGATOR_CONTRACT[fromToken.chain][aggregator];
     }
     const json = await this.getEthErc20Json();
     const ethErc20Contract = new this.web3.eth.Contract(json, tokenhash);
@@ -1196,15 +1213,18 @@ export class MetaMaskWalletApiService {
     return true;
   }
 
-  private getO3UniSwapJson(): Promise<any> {
-    if (this.o3UniSwapJson) {
-      return of(this.o3UniSwapJson).toPromise();
+  private getAggregatorSwapJson(
+    chain: CHAINS,
+    aggregator: string
+  ): Promise<any> {
+    if (this.aggregatorSwapJson[chain][aggregator]) {
+      return of(this.aggregatorSwapJson[chain][aggregator]).toPromise();
     }
     return this.http
-      .get('assets/contracts-json/O3SwapUniBridge.json')
+      .get(`assets/contracts-json/O3Swap${chain}${aggregator}Bridge.json`)
       .pipe(
         map((res) => {
-          this.o3UniSwapJson = res;
+          this.aggregatorSwapJson[chain][aggregator] = res;
           return res;
         })
       )
