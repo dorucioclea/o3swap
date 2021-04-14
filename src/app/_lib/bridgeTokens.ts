@@ -7,11 +7,8 @@ const ETH_TOKEN: Token[] = [
     symbol: 'USDT',
     decimals: 6,
     amount: '0',
-    rateName: 'usdt',
     chain: 'ETH',
     logo: '/assets/images/tokens/usdt.png',
-    atNeoAssetName: 'pnUSDT',
-    sourceTokenSymbol: 'ETH',
   },
 ];
 
@@ -23,9 +20,7 @@ const BSC_TOKEN: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'BSC',
-    rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
-    sourceTokenSymbol: 'BNB',
   },
 ];
 
@@ -36,10 +31,8 @@ const HECO_TOKEN: Token[] = [
     symbol: 'HUSD',
     decimals: 18,
     amount: '0',
-    rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
-    sourceTokenSymbol: 'HT',
   },
 ];
 
@@ -49,11 +42,8 @@ const ALL_TOKENS: Token[] = [
     symbol: 'USDT',
     decimals: 6,
     amount: '0',
-    rateName: 'usdt',
     chain: 'ETH',
     logo: '/assets/images/tokens/usdt.png',
-    atNeoAssetName: 'pnUSDT',
-    sourceTokenSymbol: 'ETH',
   },
   {
     assetID:
@@ -62,9 +52,7 @@ const ALL_TOKENS: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'BSC',
-    rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
-    sourceTokenSymbol: 'BNB',
   },
   {
     assetID:
@@ -72,10 +60,8 @@ const ALL_TOKENS: Token[] = [
     symbol: 'HUSD',
     decimals: 18,
     amount: '0',
-    rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
-    sourceTokenSymbol: 'HT',
   },
 ];
 

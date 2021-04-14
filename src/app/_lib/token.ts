@@ -6,61 +6,48 @@ export interface Token {
   amount: string;
   decimals: number;
   chain: CHAINS;
-  rateName: string;
-  atNeoAssetName?: string;
-  sourceTokenSymbol?: string;
 }
+export type CHAINS = 'ALL' | 'NEO' | 'ETH' | 'BSC' | 'HECO';
 
-export const ETH_SOURCE_CONTRACT_HASH =
+//#region some token
+export const SOURCE_TOKEN_SYMBOL = {
+  ETH: 'ETH',
+  HECO: 'HT',
+  BSC: 'BNB',
+};
+export const ETH_SOURCE_ASSET_HASH =
   '0000000000000000000000000000000000000000';
+export const WETH_ASSET_HASH = '0xc778417e063141139fce010982780140aa0cd5ab';
+export const ETH_PUSDT_ASSET_HASH = {
+  ETH: '0x63799851696CDE43c2305dccd7208a03272BA591',
+  BSC: '0x78Ec09343122737925f9839d7794de49FeB6B083',
+  HECO: '0xbdd265FC4D5b7E7a937608B91EDAFc38F27E4479',
+};
+export const FUSDT_ASSET_HASH =
+  NETWORK === 'MainNet'
+    ? '1aa893170b1babfefba973e9a9183990d792c2a7'
+    : 'b55026d49bb5b585e1d2f9820efdc969f4b8cde6';
+export const NNEO_TOKEN: Token = {
+  assetID:
+    NETWORK === 'MainNet'
+      ? 'f46719e2d16bf50cddcef9d4bbfece901f73cbb6'
+      : '17da3881ab2d050fea414c80b3fa8324d756f60e',
+  symbol: 'nNEO',
+  decimals: 8,
+  amount: '0',
+  chain: 'NEO',
+  logo: '/assets/images/tokens/neo.png',
+};
+//#endregion
 
-const MIX_NEO_TOKENS: Token[] = [
-  {
-    assetID:
-      NETWORK === 'MainNet'
-        ? '0df563008be710f3e0130208f8adc95ed7e5518d'
-        : '23535b6fd46b8f867ed010bab4c2bd8ef0d0c64f',
-    symbol: 'pnWETH',
-    decimals: 18,
-    amount: '0',
-    rateName: 'eth',
-    chain: 'NEO',
-    logo: '/assets/images/tokens/eth.png',
-  },
-  {
-    assetID:
-      NETWORK === 'MainNet'
-        ? '282e3340d5a1cd6a461d5f558d91bc1dbc02a07b'
-        : 'b8f78d43ea9fe006c85a26b9aff67bcf69dd4fe1',
-    symbol: 'pnUSDT',
-    decimals: 6,
-    amount: '0',
-    rateName: 'usdt',
-    chain: 'NEO',
-    logo: '/assets/images/tokens/usdt.png',
-  },
-  {
-    assetID:
-      NETWORK === 'MainNet'
-        ? '534dcac35b0dfadc7b2d716a7a73a7067c148b37'
-        : '69c57a716567a0f6910a0b3c1d4508fa163eb927',
-    symbol: 'pnWBTC',
-    decimals: 8,
-    amount: '0',
-    rateName: 'btc',
-    chain: 'NEO',
-    logo: '/assets/images/tokens/btc.png',
-  },
-];
-
-export const NEO_TOKENS: Token[] = [
+//#region chain tokens
+const NEO_TOKENS: Token[] = [
   {
     assetID:
       '0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b',
     symbol: 'NEO',
     decimals: 0,
     amount: '0',
-    rateName: 'neo',
     chain: 'NEO',
     logo: '/assets/images/tokens/neo.png',
   },
@@ -72,7 +59,6 @@ export const NEO_TOKENS: Token[] = [
     symbol: 'nNEO',
     decimals: 8,
     amount: '0',
-    rateName: 'neo',
     chain: 'NEO',
     logo: '/assets/images/tokens/neo.png',
   },
@@ -84,7 +70,6 @@ export const NEO_TOKENS: Token[] = [
     symbol: 'fWETH',
     decimals: 18,
     amount: '0',
-    rateName: 'eth',
     chain: 'NEO',
     logo: '/assets/images/tokens/eth.png',
   },
@@ -96,20 +81,9 @@ export const NEO_TOKENS: Token[] = [
     symbol: 'fUSDT',
     decimals: 6,
     amount: '0',
-    rateName: 'usdt',
     chain: 'NEO',
     logo: '/assets/images/tokens/usdt.png',
   },
-  // {
-  //   assetID:
-  //     '0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7',
-  //   symbol: 'GAS',
-  //   decimals: 8,
-  //   amount: '0',
-  //   rateName: 'gas',
-  //   chain: 'NEO',
-  //   logo: '/assets/images/tokens/gas.png',
-  // },
   {
     assetID:
       NETWORK === 'MainNet'
@@ -118,7 +92,6 @@ export const NEO_TOKENS: Token[] = [
     symbol: 'SWTH',
     decimals: 8,
     amount: '0',
-    rateName: 'swth',
     chain: 'NEO',
     logo: '/assets/images/tokens/swth.png',
   },
@@ -130,7 +103,6 @@ export const NEO_TOKENS: Token[] = [
     symbol: 'FLM',
     decimals: 8,
     amount: '0',
-    rateName: 'flm',
     chain: 'NEO',
     logo: '/assets/images/tokens/flm.png',
   },
@@ -142,7 +114,6 @@ export const NEO_TOKENS: Token[] = [
     symbol: 'pONT',
     decimals: 9,
     amount: '0',
-    rateName: 'ont',
     chain: 'NEO',
     logo: '/assets/images/tokens/ont.png',
   },
@@ -154,36 +125,26 @@ export const NEO_TOKENS: Token[] = [
     symbol: 'fWBTC',
     decimals: 8,
     amount: '0',
-    rateName: 'btc',
     chain: 'NEO',
     logo: '/assets/images/tokens/btc.png',
   },
 ];
-
-export const ALL_NEO_TOKENS: Token[] = [...NEO_TOKENS, ...MIX_NEO_TOKENS];
-
 const ETH_TOKENS: Token[] = [
   {
-    assetID: ETH_SOURCE_CONTRACT_HASH,
+    assetID: ETH_SOURCE_ASSET_HASH,
     symbol: 'ETH',
     decimals: 18,
     amount: '0',
     chain: 'ETH',
-    rateName: 'eth',
     logo: '/assets/images/tokens/eth.png',
-    atNeoAssetName: 'pnWETH',
-    sourceTokenSymbol: 'ETH',
   },
   {
     assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
     symbol: 'USDT',
     decimals: 6,
     amount: '0',
-    rateName: 'usdt',
     chain: 'ETH',
     logo: '/assets/images/tokens/usdt.png',
-    atNeoAssetName: 'pnUSDT',
-    sourceTokenSymbol: 'ETH',
   },
   {
     assetID: '0xc778417e063141139fce010982780140aa0cd5ab',
@@ -192,11 +153,8 @@ const ETH_TOKENS: Token[] = [
     chain: 'ETH',
     logo: 'https://img.o3.network/logo/eth/eth.png',
     amount: '0',
-    rateName: 'weth',
-    sourceTokenSymbol: 'ETH',
   },
 ];
-
 const BSC_TOKENS: Token[] = [
   {
     assetID:
@@ -205,9 +163,7 @@ const BSC_TOKENS: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'BSC',
-    rateName: 'eth',
     logo: '/assets/images/tokens/eth.png',
-    sourceTokenSymbol: 'BNB',
   },
   {
     assetID:
@@ -216,12 +172,9 @@ const BSC_TOKENS: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'BSC',
-    rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
-    sourceTokenSymbol: 'BNB',
   },
 ];
-
 const HECO_TOKENS: Token[] = [
   {
     assetID:
@@ -229,35 +182,26 @@ const HECO_TOKENS: Token[] = [
     symbol: 'HUSD',
     decimals: 18,
     amount: '0',
-    rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
-    sourceTokenSymbol: 'HT',
   },
 ];
-
 const ALL: Token[] = [
   {
-    assetID: ETH_SOURCE_CONTRACT_HASH,
+    assetID: ETH_SOURCE_ASSET_HASH,
     symbol: 'ETH',
     decimals: 18,
     amount: '0',
     chain: 'ETH',
-    rateName: 'eth',
     logo: '/assets/images/tokens/eth.png',
-    atNeoAssetName: 'pnWETH',
-    sourceTokenSymbol: 'ETH',
   },
   {
     assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
     symbol: 'USDT',
     decimals: 6,
     amount: '0',
-    rateName: 'usdt',
     chain: 'ETH',
     logo: '/assets/images/tokens/usdt.png',
-    atNeoAssetName: 'pnUSDT',
-    sourceTokenSymbol: 'ETH',
   },
   {
     assetID:
@@ -267,7 +211,6 @@ const ALL: Token[] = [
     symbol: 'nNEO',
     decimals: 8,
     amount: '0',
-    rateName: 'neo',
     chain: 'NEO',
     logo: '/assets/images/tokens/neo.png',
   },
@@ -278,9 +221,7 @@ const ALL: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'BSC',
-    rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
-    sourceTokenSymbol: 'BNB',
   },
   {
     assetID:
@@ -288,24 +229,28 @@ const ALL: Token[] = [
     symbol: 'HUSD',
     decimals: 18,
     amount: '0',
-    rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
-    sourceTokenSymbol: 'HT',
   },
 ];
+export const CHAIN_TOKENS = {
+  ALL,
+  NEO: NEO_TOKENS,
+  ETH: ETH_TOKENS,
+  BSC: BSC_TOKENS,
+  HECO: HECO_TOKENS,
+};
+//#endregion
 
+//#region liquidity page
 export const USD_TOKENS: Token[] = [
   {
     assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
     symbol: 'USDT',
     decimals: 6,
     amount: '0',
-    rateName: 'usdt',
     chain: 'ETH',
     logo: '/assets/images/tokens/usdt.png',
-    atNeoAssetName: 'pnUSDT',
-    sourceTokenSymbol: 'ETH',
   },
   {
     assetID:
@@ -314,9 +259,7 @@ export const USD_TOKENS: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'BSC',
-    rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
-    sourceTokenSymbol: 'BNB',
   },
   {
     assetID:
@@ -324,20 +267,16 @@ export const USD_TOKENS: Token[] = [
     symbol: 'HUSD',
     decimals: 18,
     amount: '0',
-    rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
-    sourceTokenSymbol: 'HT',
   },
 ];
-
 export const LP_TOKENS: Token[] = [
   {
     assetID: '0xD5d63Dce45E0275Ca76a8b2e9BD8C11679A57D0D',
     symbol: 'pLP',
     decimals: 18,
     amount: '0',
-    rateName: 'pLP',
     chain: 'ETH',
     logo: '/assets/images/tokens/lp.png',
   },
@@ -346,7 +285,6 @@ export const LP_TOKENS: Token[] = [
     symbol: 'pLP',
     decimals: 18,
     amount: '0',
-    rateName: 'pLP',
     chain: 'BSC',
     logo: '/assets/images/tokens/lp.png',
   },
@@ -355,63 +293,8 @@ export const LP_TOKENS: Token[] = [
     symbol: 'pLP',
     decimals: 18,
     amount: '0',
-    rateName: 'pLP',
     chain: 'HECO',
     logo: '/assets/images/tokens/lp.png',
   },
 ];
-
-export const CHAIN_TOKENS = {
-  ALL,
-  NEO: NEO_TOKENS,
-  ETH: ETH_TOKENS,
-  BSC: BSC_TOKENS,
-  HECO: HECO_TOKENS,
-  USD: USD_TOKENS,
-  LP: LP_TOKENS,
-  MIX_NEO_TOKENS,
-};
-
-export type CHAINS = 'ALL' | 'NEO' | 'ETH' | 'BSC' | 'HECO';
-
-export const CrossChainToToken: Token = {
-  assetID: ETH_SOURCE_CONTRACT_HASH,
-  symbol: 'ETH',
-  decimals: 18,
-  amount: '0',
-  chain: 'ETH',
-  rateName: 'eth',
-  logo: '/assets/images/tokens/eth.png',
-  atNeoAssetName: 'pnWETH',
-};
-
-export const NNEO_TOKEN: Token[] = [
-  {
-    assetID:
-      NETWORK === 'MainNet'
-        ? 'f46719e2d16bf50cddcef9d4bbfece901f73cbb6'
-        : '17da3881ab2d050fea414c80b3fa8324d756f60e',
-    symbol: 'nNEO',
-    decimals: 8,
-    amount: '0',
-    rateName: 'neo',
-    chain: 'NEO',
-    logo: '/assets/images/tokens/neo.png',
-  },
-];
-
-export const ETH_PUSDT = {
-  ETH: '0x63799851696CDE43c2305dccd7208a03272BA591',
-  BSC: '0x78Ec09343122737925f9839d7794de49FeB6B083',
-  HECO: '0xbdd265FC4D5b7E7a937608B91EDAFc38F27E4479',
-};
-
-export const NNEO_ASSET_HASH =
-  NETWORK === 'MainNet'
-    ? 'f46719e2d16bf50cddcef9d4bbfece901f73cbb6'
-    : '17da3881ab2d050fea414c80b3fa8324d756f60e';
-
-export const FUSDT_ASSET_HASH =
-  NETWORK === 'MainNet'
-    ? '1aa893170b1babfefba973e9a9183990d792c2a7'
-    : 'b55026d49bb5b585e1d2f9820efdc969f4b8cde6';
+//#endregion

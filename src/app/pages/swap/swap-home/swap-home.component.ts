@@ -13,6 +13,7 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { Store } from '@ngrx/store';
 import { Observable, Unsubscribable } from 'rxjs';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { CommonService } from '@core';
 
 interface State {
   setting: any;
@@ -59,7 +60,8 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
   constructor(
     private modal: NzModalService,
     public store: Store<State>,
-    private nzMessage: NzMessageService
+    private nzMessage: NzMessageService,
+    private commonService: CommonService
   ) {
     this.setting$ = store.select('setting');
     this.swap$ = store.select('swap');
@@ -91,7 +93,8 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
       }
       if (
         this.fromToken &&
-        JSON.stringify(state.ethBalances) !== JSON.stringify(this.ethTokenBalance)
+        JSON.stringify(state.ethBalances) !==
+          JSON.stringify(this.ethTokenBalance)
       ) {
         this.ethTokenBalance = JSON.parse(JSON.stringify(state.ethBalances));
         if (this.ethTokenBalance[this.fromToken.assetID]) {
@@ -273,7 +276,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
       this.inputAmountFiat = '';
       return;
     }
-    const price = this.rates[this.fromToken.rateName];
+    const price = this.commonService.getAssetRate(this.rates, this.fromToken);
     if (this.inputAmount && price) {
       this.inputAmountFiat = new BigNumber(this.inputAmount)
         .multipliedBy(new BigNumber(price))

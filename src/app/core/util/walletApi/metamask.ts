@@ -20,7 +20,7 @@ import {
   CHAIN_TOKENS,
   UPDATE_BSC_BALANCES,
   UPDATE_HECO_BALANCES,
-  ETH_SOURCE_CONTRACT_HASH,
+  ETH_SOURCE_ASSET_HASH,
   METAMASK_CHAIN,
   USD_TOKENS,
   ETH_SWAP_CONTRACT_HASH,
@@ -34,6 +34,7 @@ import {
   RESET_ETH_BALANCES,
   RESET_BSC_BALANCES,
   RESET_HECO_BALANCES,
+  WETH_ASSET_HASH,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import BigNumber from 'bignumber.js';
@@ -211,7 +212,7 @@ export class MetaMaskWalletApiService {
     if (!chain) {
       return;
     }
-    if (token.assetID !== ETH_SOURCE_CONTRACT_HASH) {
+    if (token.assetID !== ETH_SOURCE_ASSET_HASH) {
       const json = await this.getEthErc20Json();
       const ethErc20Contract = new this.web3.eth.Contract(json, token.assetID);
       const data = await ethErc20Contract.methods
@@ -895,7 +896,7 @@ export class MetaMaskWalletApiService {
     console.log('\u001b[32m  ✓ start get allowance \u001b[0m');
     let tokenhash = fromToken.assetID;
     if (fromToken.symbol === 'ETH') {
-      tokenhash = '0xc778417e063141139fce010982780140aa0cd5ab';
+      tokenhash = WETH_ASSET_HASH;
     }
     const json = await this.getEthErc20Json();
     const ethErc20Contract = new this.web3.eth.Contract(json, tokenhash);
@@ -943,7 +944,7 @@ export class MetaMaskWalletApiService {
   ): Promise<any> {
     let tokenhash = fromToken.assetID;
     if (fromToken.symbol === 'ETH') {
-      tokenhash = '0xc778417e063141139fce010982780140aa0cd5ab';
+      tokenhash = WETH_ASSET_HASH;
     }
     if (this.checkNetwork(fromToken) === false) {
       return;

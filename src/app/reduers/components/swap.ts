@@ -22,7 +22,6 @@ import {
   UPDATE_BRIDGE_PENDING_TX,
   UPDATE_LIQUIDITY_PENDING_TX,
   NNEO_TOKEN,
-  CrossChainToToken,
 } from '@lib';
 
 const initialState: SwapStateType = {
@@ -47,8 +46,8 @@ const initialState: SwapStateType = {
   //   txid: '0f4787014a5442fc02843dc376548fa7a4dd400a92850f783873b034d84dccd5',
   //   isPending: true,
   //   min: false,
-  //   fromToken: NNEO_TOKEN[0],
-  //   toToken: CrossChainToToken,
+  //   fromToken: NNEO_TOKEN,
+  //   toToken: NNEO_TOKEN,
   //   amount: '100',
   //   receiveAmount: '1000'
   // },
@@ -56,8 +55,8 @@ const initialState: SwapStateType = {
   //   txid: '0f4787014a5442fc02843dc376548fa7a4dd400a92850f783873b034d84dccd5',
   //   isPending: true,
   //   min: false,
-  //   fromToken: NNEO_TOKEN[0],
-  //   toToken: CrossChainToToken,
+  //   fromToken: NNEO_TOKEN,
+  //   toToken: NNEO_TOKEN,
   //   amount: '1',
   //   receiveAmount: '0.0001'
   // },

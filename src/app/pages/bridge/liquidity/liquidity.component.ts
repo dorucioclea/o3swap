@@ -23,6 +23,8 @@ import {
   BRIDGE_SLIPVALUE,
   CHAIN_TOKENS,
   Token,
+  USD_TOKENS,
+  LP_TOKENS,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -40,7 +42,7 @@ interface State {
 export class LiquidityComponent implements OnInit, OnDestroy {
   BRIDGE_SLIPVALUE = BRIDGE_SLIPVALUE;
   swapProgress = 20;
-  addLiquidityTokens: Token[] = JSON.parse(JSON.stringify(CHAIN_TOKENS.USD));
+  addLiquidityTokens: Token[] = JSON.parse(JSON.stringify(USD_TOKENS));
   liquidityType: LiquidityType = 'add';
   rates = {};
 
@@ -67,7 +69,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     private nzMessage: NzMessageService,
     private router: Router,
     private swapService: SwapService,
-    private changeDetectorRef: ChangeDetectorRef,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     this.swap$ = store.select('swap');
     this.addLiquidityTokens.forEach((item, index) => {
@@ -83,7 +85,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getRates();
-    this.LPTokens = JSON.parse(JSON.stringify(CHAIN_TOKENS.LP));
+    this.LPTokens = JSON.parse(JSON.stringify(LP_TOKENS));
     this.addLiquidityTokens.forEach((item) => {
       if (this.metaMaskWalletApiService !== METAMASK_CHAIN_ID[item.chain]) {
         item.amount = '--';
@@ -285,7 +287,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     });
   }
   private handleAccountBalance(ethBalances, bscBalances, hecoBalances): void {
-    this.addLiquidityTokens = JSON.parse(JSON.stringify(CHAIN_TOKENS.USD));
+    this.addLiquidityTokens = JSON.parse(JSON.stringify(USD_TOKENS));
     if (ethBalances) {
       this.addLiquidityTokens
         .filter((item) => item.chain === 'ETH')
