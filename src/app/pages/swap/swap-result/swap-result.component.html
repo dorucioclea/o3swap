@@ -59,7 +59,7 @@
     </div>
     <div class="fee-item" *ngIf="polyFee">
       <p class="label">Poly Fee</p>
-      <div class="value">{{ polyFee }} {{ fromToken.sourceTokenSymbol }}</div>
+      <div class="value">{{ polyFee | transNumber | number: '1.0-8' }} {{ fromToken.sourceTokenSymbol }}</div>
     </div>
     <div class="fee-item">
       <p class="label">Quote includes a {{ O3_AGGREGATOR_FEE }}% O3Swap fee</p>
