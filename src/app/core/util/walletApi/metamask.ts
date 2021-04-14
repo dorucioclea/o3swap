@@ -90,7 +90,7 @@ export class MetaMaskWalletApiService {
   }
 
   init(): void {
-    if ((window as any).ethereum) {
+    if ((window as any).ethereum && (window as any).ethereum.isConnected()) {
       const localEthWalletName = localStorage.getItem(
         'ethWalletName'
       ) as EthWalletName;

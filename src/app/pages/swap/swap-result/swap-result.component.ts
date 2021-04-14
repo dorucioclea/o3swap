@@ -244,6 +244,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   swap(): void {
+    this.getFromAndToAddress();
     if (this.checkWalletConnect() === false) {
       return;
     }
