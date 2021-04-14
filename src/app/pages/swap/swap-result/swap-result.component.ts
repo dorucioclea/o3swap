@@ -16,6 +16,7 @@ import {
   EthWalletName,
   USD_TOKENS,
   ApproveContract,
+  SOURCE_TOKEN_SYMBOL,
 } from '@lib';
 import {
   ApiService,
@@ -45,6 +46,7 @@ interface State {
   styleUrls: ['../common.scss', './swap-result.component.scss'],
 })
 export class SwapResultComponent implements OnInit, OnDestroy {
+  SOURCE_TOKEN_SYMBOL = SOURCE_TOKEN_SYMBOL;
   @Input() rates;
   @Input() fromToken: Token;
   @Input() toToken: Token;
@@ -578,7 +580,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         .shiftedBy(-this.toToken.decimals)
         .toFixed();
       // 计算法币价格
-      const price = this.rates[this.toToken.rateName];
+      const price = this.commonService.getAssetRate(this.rates, this.toToken);
       if (price) {
         item.fiat = new BigNumber(item.receiveAmount)
           .multipliedBy(new BigNumber(price))

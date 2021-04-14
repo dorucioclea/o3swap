@@ -13,7 +13,7 @@ export class SwapComponent implements OnInit {
   pageStatus: PageStatus = 'home';
   rates = {};
 
-  fromToken: Token = NNEO_TOKEN[0];
+  fromToken: Token = NNEO_TOKEN;
   toToken: Token;
   inputAmount: string; // 支付的 token 数量
 

@@ -28,7 +28,7 @@ import {
   NETWORK,
   SwapTransaction,
   UPDATE_METAMASK_NETWORK_ID,
-  ETH_SOURCE_CONTRACT_HASH,
+  ETH_SOURCE_ASSET_HASH,
   METAMASK_CHAIN,
   USD_TOKENS,
 } from '@lib';
@@ -150,7 +150,7 @@ export class O3EthWalletApiService {
     if (!chain) {
       return;
     }
-    if (token.assetID !== ETH_SOURCE_CONTRACT_HASH) {
+    if (token.assetID !== ETH_SOURCE_ASSET_HASH) {
       const json = await this.getEthErc20Json();
       const ethErc20Contract = new this.web3.eth.Contract(json, token.assetID);
       const data = ethErc20Contract.methods

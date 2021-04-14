@@ -3,6 +3,7 @@ import {
   ApiService,
   MetaMaskWalletApiService,
   O3EthWalletApiService,
+  CommonService,
 } from '@core';
 import {
   ApproveContract,
@@ -64,7 +65,8 @@ export class BridgeComponent implements OnInit {
     private nzMessage: NzMessageService,
     private metaMaskWalletApiService: MetaMaskWalletApiService,
     private changeDetectorRef: ChangeDetectorRef,
-    private o3EthWalletApiService: O3EthWalletApiService
+    private o3EthWalletApiService: O3EthWalletApiService,
+    private commonService: CommonService
   ) {
     this.swap$ = store.select('swap');
   }
@@ -369,7 +371,7 @@ export class BridgeComponent implements OnInit {
       this.inputAmountFiat = '';
       return;
     }
-    const price = this.rates[this.fromToken.rateName];
+    const price = this.commonService.getAssetRate(this.rates, this.fromToken);
     if (this.inputAmount && price) {
       this.inputAmountFiat = new BigNumber(this.inputAmount)
         .multipliedBy(new BigNumber(price))
@@ -385,7 +387,7 @@ export class BridgeComponent implements OnInit {
       this.receiveAmountFiat = '';
       return;
     }
-    const price = this.rates[this.toToken.rateName];
+    const price = this.commonService.getAssetRate(this.rates, this.fromToken);
     if (this.receiveAmount && price) {
       this.receiveAmountFiat = new BigNumber(this.receiveAmount)
         .multipliedBy(new BigNumber(price))

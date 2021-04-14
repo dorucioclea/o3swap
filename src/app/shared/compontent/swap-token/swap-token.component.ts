@@ -73,7 +73,7 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     this.myCHAIN_TOKENS.ETH = JSON.parse(JSON.stringify(CHAIN_TOKENS.ETH));
     this.myCHAIN_TOKENS.BSC = JSON.parse(JSON.stringify(CHAIN_TOKENS.BSC));
     this.myCHAIN_TOKENS.HECO = JSON.parse(JSON.stringify(CHAIN_TOKENS.HECO));
-    this.myNNEO_TOKEN = JSON.parse(JSON.stringify(NNEO_TOKEN));
+    this.myNNEO_TOKEN = [JSON.parse(JSON.stringify(NNEO_TOKEN))];
   }
 
   close(): void {

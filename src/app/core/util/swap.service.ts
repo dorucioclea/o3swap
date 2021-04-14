@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import BigNumber from 'bignumber.js';
 import {
   ALL_PERCENTAGE,
-  AssetQueryResponseItem,
-  ALL_NEO_TOKENS,
   Token,
   WalletName,
   NeoWalletName,
@@ -36,16 +34,6 @@ export class SwapService {
       .toFixed();
     return factAmount;
   }
-  getAssetHashPath(swapPath: string[]): any[] {
-    const target = [];
-    swapPath.forEach((name) => {
-      const assetHash = this.getNeoAssetHashByName(name);
-      if (assetHash) {
-        target.push({ type: 'Hash160', value: assetHash });
-      }
-    });
-    return target;
-  }
   getAssetNamePath(swapPath: string[], chain: CHAINS): any[] {
     const target = [];
     swapPath.forEach((hash) => {
@@ -57,10 +45,6 @@ export class SwapService {
       target.push(token.symbol);
     });
     return target;
-  }
-  getNeoAssetHashByName(name: string): string {
-    const token = ALL_NEO_TOKENS.find((item) => item.symbol === name);
-    return (token && token.assetID) || '';
   }
   getHash160FromAddress(text: string): any {
     text = this.commonService.remove0xHash(text);
