@@ -42,9 +42,11 @@ export class ApiService {
     private swapService: SwapService
   ) {}
 
+  //#region home
   postEmail(email: string): Observable<any> {
     return this.http.post(`https://subscribe.o3swap.com/subscribe`, { email });
   }
+  //#endregion
 
   getTokens(): void {
     this.http.get('https://o3swap.com/pairs.json').subscribe((res) => {
@@ -64,63 +66,25 @@ export class ApiService {
     });
   }
 
-  getBridgeAmountOut(
-    fromToken: Token,
-    toToken: Token,
-    inputAmount: string
-  ): Promise<string> {
-    const fromPUsdt = ETH_PUSDT[fromToken.chain];
-    const toPUsdt = ETH_PUSDT[toToken.chain];
-    const amount = this.commonService.decimalToInteger(
-      inputAmount,
-      fromToken.decimals
-    );
-    return this.http
-      .get(
-        `${POLY_HOST}/calcOutGivenIn/${POLY_HOST_ADDRESS}/${fromPUsdt}/${toPUsdt}/${amount}`
-      )
-      .pipe(
-        map((res: any) => {
-          if (res.code === 200 && res.amount_out) {
-            return new BigNumber(res.amount_out)
-              .shiftedBy(-toToken.decimals)
-              .toFixed();
-          }
-        })
-      )
-      .toPromise();
-  }
-
-  getFromEthPoolFeeRate(): Promise<string> {
-    return this.http
-      .get(`${POLY_HOST}/swapFee/${POLY_HOST_ADDRESS}`)
-      .pipe(
-        map((res: any) => {
-          if (res.code === 200) {
-            return new BigNumber(res.fee).shiftedBy(-10).toFixed();
-          }
-        })
-      )
-      .toPromise();
-  }
-
-  getFromEthPolyFee(fromToken: Token, toToken: Token): Promise<string> {
-    return this.http
-      .post(`${CROSS_CHAIN_SWAP_DETAIL_HOST}/getfee`, {
-        SrcChainId: SWAP_CONTRACT_CHAIN_ID[fromToken.chain],
-        Hash: ETH_SOURCE_CONTRACT_HASH,
-        DstChainId: SWAP_CONTRACT_CHAIN_ID[toToken.chain],
+  getRates(): Observable<any> {
+    return this.http.get(`${this.RATE_HOST}/crypto/rates`).pipe(
+      map((res: CommonHttpResponse) => {
+        const rates: any = {};
+        if (res.status === 'success') {
+          rates.neo = res.data.neo2.neo.price;
+          rates.flm = res.data.neo2.flm.price;
+          rates.swth = res.data.neo2.swth.price;
+          rates.eth = res.data.eth.eth.price;
+          rates.usdt = res.data.eth.usdt.price;
+          rates.weth = res.data.eth.weth.price;
+          rates.ont = res.data.ont.ont.price;
+        }
+        return rates;
       })
-      .pipe(
-        map((res: any) => {
-          if (res.TokenAmount) {
-            return res.TokenAmount;
-          }
-        })
-      )
-      .toPromise();
+    );
   }
 
+  // neo nneo swap
   getUtxo(address: string, amount: string): Promise<any> {
     return this.http
       .post(`${UTXO_HOST}/utxo`, {
@@ -144,43 +108,6 @@ export class ApiService {
         })
       )
       .toPromise();
-  }
-
-  getCrossChainSwapDetail(hash: string): Observable<TxProgress> {
-    hash = this.commonService.remove0xHash(hash);
-    return this.http
-      .post(`${CROSS_CHAIN_SWAP_DETAIL_HOST}/transactionofhash`, { hash })
-      .pipe(
-        map((res: any) => {
-          const target: TxProgress = {
-            step1: { hash: '', status: 1 },
-            step2: { hash: '', status: 0 },
-            step3: { hash: '', status: 0 },
-          };
-          if (res.TransactionState) {
-            const data = res.TransactionState;
-            if (data[0].Hash) {
-              target.step1.hash = data[0].Hash;
-              target.step1.status = 2;
-            }
-            if (data[1].Hash) {
-              target.step2.hash = data[1].Hash;
-              target.step2.status = 2;
-            }
-            if (data[2].Hash) {
-              target.step3.hash = data[2].Hash;
-              target.step3.status = 2;
-            }
-            if (target.step1.status === 2 && target.step2.status === 0) {
-              target.step2.status = 1;
-            }
-            if (target.step2.status === 2 && target.step3.status === 0) {
-              target.step3.status = 1;
-            }
-          }
-          return target;
-        })
-      );
   }
 
   async getSwapPath(
@@ -260,25 +187,191 @@ export class ApiService {
     }
   }
 
-  getRates(): Observable<any> {
-    return this.http.get(`${this.RATE_HOST}/crypto/rates`).pipe(
-      map((res: CommonHttpResponse) => {
-        const rates: any = {};
-        if (res.status === 'success') {
-          rates.neo = res.data.neo2.neo.price;
-          rates.flm = res.data.neo2.flm.price;
-          rates.swth = res.data.neo2.swth.price;
-          rates.eth = res.data.eth.eth.price;
-          rates.usdt = res.data.eth.usdt.price;
-          rates.weth = res.data.eth.weth.price;
-          rates.ont = res.data.ont.ont.price;
-        }
-        return rates;
-      })
+  //#region poly
+  getBridgeAmountOut(
+    fromToken: Token,
+    toToken: Token,
+    inputAmount: string
+  ): Promise<string> {
+    const fromPUsdt = ETH_PUSDT[fromToken.chain];
+    const toPUsdt = ETH_PUSDT[toToken.chain];
+    const amount = this.commonService.decimalToInteger(
+      inputAmount,
+      fromToken.decimals
     );
+    return this.http
+      .get(
+        `${POLY_HOST}/calcOutGivenIn/${POLY_HOST_ADDRESS}/${fromPUsdt}/${toPUsdt}/${amount}`
+      )
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200 && res.amount_out) {
+            return new BigNumber(res.amount_out)
+              .shiftedBy(-toToken.decimals)
+              .toFixed();
+          }
+        })
+      )
+      .toPromise();
   }
 
-  //#region
+  // getFromEthPoolFeeRate(): Promise<string> {
+  //   return this.http
+  //     .get(`${POLY_HOST}/swapFee/${POLY_HOST_ADDRESS}`)
+  //     .pipe(
+  //       map((res: any) => {
+  //         if (res.code === 200) {
+  //           return new BigNumber(res.fee).shiftedBy(-10).toFixed();
+  //         }
+  //       })
+  //     )
+  //     .toPromise();
+  // }
+
+  getCrossChainSwapDetail(hash: string): Observable<TxProgress> {
+    hash = this.commonService.remove0xHash(hash);
+    return this.http
+      .post(`${CROSS_CHAIN_SWAP_DETAIL_HOST}/transactionofhash`, { hash })
+      .pipe(
+        map((res: any) => {
+          const target: TxProgress = {
+            step1: { hash: '', status: 1 },
+            step2: { hash: '', status: 0 },
+            step3: { hash: '', status: 0 },
+          };
+          if (res.TransactionState) {
+            const data = res.TransactionState;
+            if (data[0].Hash) {
+              target.step1.hash = data[0].Hash;
+              target.step1.status = 2;
+            }
+            if (data[1].Hash) {
+              target.step2.hash = data[1].Hash;
+              target.step2.status = 2;
+            }
+            if (data[2].Hash) {
+              target.step3.hash = data[2].Hash;
+              target.step3.status = 2;
+            }
+            if (target.step1.status === 2 && target.step2.status === 0) {
+              target.step2.status = 1;
+            }
+            if (target.step2.status === 2 && target.step3.status === 0) {
+              target.step3.status = 1;
+            }
+          }
+          return target;
+        })
+      );
+  }
+
+  getFromEthPolyFee(fromToken: Token, toToken: Token): Promise<string> {
+    return this.http
+      .post(`${CROSS_CHAIN_SWAP_DETAIL_HOST}/getfee`, {
+        SrcChainId: SWAP_CONTRACT_CHAIN_ID[fromToken.chain],
+        Hash: ETH_SOURCE_CONTRACT_HASH,
+        DstChainId: SWAP_CONTRACT_CHAIN_ID[toToken.chain],
+      })
+      .pipe(
+        map((res: any) => {
+          if (res.TokenAmount) {
+            return res.TokenAmount;
+          }
+        })
+      )
+      .toPromise();
+  }
+  //#endregion
+
+  //#region bridge page
+  /**
+   * @description: Input USDT get LP, pool add LP
+   * @param fromToken fromToken
+   * @param amount amount
+   * @return Promise
+   */
+  getPoolOutGivenSingleIn(fromToken: Token, amount: string): Promise<string> {
+    const poolUsdtHash = ETH_PUSDT[fromToken.chain];
+    amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
+    return this.http
+      .get(
+        `${POLY_HOST}/calcPoolOutGivenSingleIn/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`
+      )
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200) {
+            return new BigNumber(res.pool_amount_out).shiftedBy(-18).toFixed();
+          }
+        })
+      )
+      .toPromise();
+  }
+
+  /**
+   * @description: Input USDT get LP, pool remove LP
+   * @param fromTokenn fromToken
+   * @param amount USDT amount
+   * @return Promise Out
+   */
+  getPoolInGivenSingleOut(fromToken: Token, amount: string): Promise<string> {
+    const poolUsdtHash = ETH_PUSDT[fromToken.chain];
+    amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
+    return this.http
+      .get(
+        `${POLY_HOST}/calcPoolInGivenSingleOut/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`
+      )
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200) {
+            return new BigNumber(res.pool_amount_out).shiftedBy(-18).toFixed();
+          }
+        })
+      )
+      .toPromise();
+  }
+
+  /**
+   * @description: Input LP get USDT
+   * @param fromToken fromToken
+   * @param amount LP amount
+   * @return promise
+   */
+  getSingleOutGivenPoolIn(fromToken: Token, amount: string): Promise<string> {
+    const poolUsdtHash = ETH_PUSDT[fromToken.chain];
+    amount = new BigNumber(amount).shiftedBy(18).toFixed();
+    return this.http
+      .get(
+        `${POLY_HOST}/calcSingleOutGivenPoolIn/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`
+      )
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200) {
+            return new BigNumber(res.token_amount_out)
+              .shiftedBy(-fromToken.decimals)
+              .toFixed();
+          }
+        })
+      )
+      .toPromise();
+  }
+
+  getPUsdtBalance(fromToken: Token): Promise<string> {
+    return this.http
+      .get(`${POLY_HOST}/balance/${POLY_HOST_ADDRESS}/${fromToken.assetID}`)
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200) {
+            return new BigNumber(res.balance)
+              .shiftedBy(-fromToken.decimals)
+              .toFixed();
+          }
+        })
+      )
+      .toPromise();
+  }
+  //#endregion
+
+  //#region private functions
   private getNeoNNeoSwapPath(
     fromToken: Token,
     toToken: Token,
@@ -469,77 +562,6 @@ export class ApiService {
               },
             ];
             return result;
-          }
-        })
-      )
-      .toPromise();
-  }
-
-  /**
-   * @description: Input USDT get LP, pool add LP
-   * @param fromToken fromToken
-   * @param amount amount
-   * @return Promise
-   */
-  getPoolOutGivenSingleIn(fromToken: Token, amount: string): Promise<string> {
-    const poolUsdtHash = ETH_PUSDT[fromToken.chain];
-    amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
-    return this.http
-      .get(
-        `${POLY_HOST}/calcPoolOutGivenSingleIn/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`
-      )
-      .pipe(
-        map((res: any) => {
-          if (res.code === 200) {
-            return new BigNumber(res.pool_amount_out).shiftedBy(-18).toFixed();
-          }
-        })
-      )
-      .toPromise();
-  }
-
-  /**
-   * @description: Input USDT get LP, pool remove LP
-   * @param fromTokenn fromToken
-   * @param amount USDT amount
-   * @return Promise Out
-   */
-  getPoolInGivenSingleOut(fromToken: Token, amount: string): Promise<string> {
-    const poolUsdtHash = ETH_PUSDT[fromToken.chain];
-    amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
-    return this.http
-      .get(
-        `${POLY_HOST}/calcPoolInGivenSingleOut/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`
-      )
-      .pipe(
-        map((res: any) => {
-          if (res.code === 200) {
-            return new BigNumber(res.pool_amount_out).shiftedBy(-18).toFixed();
-          }
-        })
-      )
-      .toPromise();
-  }
-
-  /**
-   * @description: Input LP get USDT
-   * @param fromToken fromToken
-   * @param amount LP amount
-   * @return promise
-   */
-  getSingleOutGivenPoolIn(fromToken: Token, amount: string): Promise<string> {
-    const poolUsdtHash = ETH_PUSDT[fromToken.chain];
-    amount = new BigNumber(amount).shiftedBy(18).toFixed();
-    return this.http
-      .get(
-        `${POLY_HOST}/calcSingleOutGivenPoolIn/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`
-      )
-      .pipe(
-        map((res: any) => {
-          if (res.code === 200) {
-            return new BigNumber(res.token_amount_out)
-              .shiftedBy(-fromToken.decimals)
-              .toFixed();
           }
         })
       )
