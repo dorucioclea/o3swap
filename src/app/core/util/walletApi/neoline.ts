@@ -21,7 +21,7 @@ import {
   NETWORK,
   SWAP_CONTRACT_CHAIN_ID,
 } from '@lib';
-import { Observable } from 'rxjs';
+import { interval, Observable, Unsubscribable } from 'rxjs';
 import { wallet } from '@cityofzion/neon-js';
 import BigNumber from 'bignumber.js';
 
@@ -40,6 +40,7 @@ export class NeolineWalletApiService {
   neolineNetwork: Network;
 
   neolineDapi;
+  autoConnectInterval: Unsubscribable;
 
   constructor(
     private store: Store<State>,
@@ -59,10 +60,27 @@ export class NeolineWalletApiService {
     });
   }
 
+  init(): void {
+    const sessionNeoWalletName = sessionStorage.getItem(
+      'neoWalletName'
+    ) as NeoWalletName;
+    if (sessionNeoWalletName === 'NeoLine') {
+      this.autoConnectInterval = interval(2000).subscribe(() => {
+        if (this.neolineDapi) {
+          this.connect();
+          this.autoConnectInterval.unsubscribe();
+        }
+      });
+    }
+  }
+
   connect(): void {
     if (this.neolineDapi === undefined) {
       this.swapService.toDownloadWallet(this.myWalletName);
       return;
+    }
+    if (this.autoConnectInterval) {
+      this.autoConnectInterval.unsubscribe();
     }
     this.neolineDapi
       .getAccount()
@@ -108,8 +126,8 @@ export class NeolineWalletApiService {
         },
       })
       .then(({ txid }) => {
-        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
-        this.handleTx(fromToken, toToken, inputAmount, txHash);
+        const txHash = this.commonService.add0xHash(txid);
+        this.handleTx(fromToken, toToken, inputAmount, inputAmount, txHash);
         return txHash;
       })
       .catch((error) => {
@@ -176,8 +194,8 @@ export class NeolineWalletApiService {
     return this.neolineDapi
       .invoke(params)
       .then(({ txid }) => {
-        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
-        this.handleTx(fromToken, toToken, inputAmount, txHash);
+        const txHash = this.commonService.add0xHash(txid);
+        this.handleTx(fromToken, toToken, inputAmount, inputAmount, txHash);
         return txHash;
       })
       .catch((error) => {
@@ -206,6 +224,8 @@ export class NeolineWalletApiService {
       fromToken,
       inputAmount
     );
+    const receiveAmount =
+      chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
     const args = [
       {
         type: 'Address',
@@ -217,7 +237,7 @@ export class NeolineWalletApiService {
       },
       {
         type: 'Integer',
-        value: this.swapService.getAmountOutMin(chooseSwapPath, slipValue),
+        value: this.swapService.getMinAmountOut(receiveAmount, slipValue),
       },
       {
         type: 'Array',
@@ -249,8 +269,8 @@ export class NeolineWalletApiService {
         args,
       })
       .then(({ txid }) => {
-        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
-        this.handleTx(fromToken, toToken, inputAmount, txHash);
+        const txHash = this.commonService.add0xHash(txid);
+        this.handleTx(fromToken, toToken, inputAmount, receiveAmount, txHash);
         return txHash;
       })
       .catch((error) => {
@@ -282,6 +302,8 @@ export class NeolineWalletApiService {
       fromToken,
       inputAmount
     );
+    const receiveAmount =
+      chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
     const args = [
       {
         type: 'Address',
@@ -293,7 +315,7 @@ export class NeolineWalletApiService {
       },
       {
         type: 'Integer',
-        value: this.swapService.getAmountOutMin(chooseSwapPath, slipValue),
+        value: this.swapService.getMinAmountOut(receiveAmount, slipValue),
       },
       {
         type: 'Array',
@@ -342,8 +364,15 @@ export class NeolineWalletApiService {
         args,
       })
       .then(({ txid }) => {
-        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
-        this.handleTx(fromToken, toToken, inputAmount, txHash, false);
+        const txHash = this.commonService.add0xHash(txid);
+        this.handleTx(
+          fromToken,
+          toToken,
+          inputAmount,
+          receiveAmount,
+          txHash,
+          false
+        );
         return txHash;
       })
       .catch((error) => {
@@ -404,16 +433,20 @@ export class NeolineWalletApiService {
     fromToken: Token,
     toToken: Token,
     inputAmount: string,
+    receiveAmount: string,
     txHash: string,
     addLister = true
   ): void {
     const pendingTx: SwapTransaction = {
-      txid: txHash,
+      txid: this.commonService.remove0xHash(txHash),
       isPending: true,
       min: false,
       fromToken,
       toToken,
       amount: inputAmount,
+      receiveAmount: new BigNumber(receiveAmount)
+        .shiftedBy(-toToken.decimals)
+        .toFixed(),
     };
     if (addLister === false) {
       pendingTx.progress = {

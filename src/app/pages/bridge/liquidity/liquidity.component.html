@@ -6,7 +6,7 @@
       </div>
       <div class="content">
         <div class="value">
-          <span class="amount">{{LPToken ?  LPToken.amount : '--' }}</span>
+          <span class="amount">{{LPToken ? (LPToken.amount | number: '1.0-8') : '--' }}</span>
           <span class="rate">--</span>
         </div>
       </div>
@@ -43,51 +43,66 @@
   <div class="group-container tab-container row2">
     <div class="tab-wrap">
       <div class="tab-nav-scroll">
-        <div
-          class="tabs tabs-add"
-          [ngClass]="{addActive: liquidityType === 'add'}"
-          [routerLink]="['/hub/liquidity', 'add']">
-            Add Liquidity
+        <div class="tabs tabs-add" [ngClass]="{addActive: liquidityType === 'add'}"
+          [routerLink]="['/bridge/liquidity', 'add']">
+          Add Liquidity
         </div>
-        <div
-          class="tabs tabs-remove"
-          [ngClass]="{removeActive: liquidityType === 'remove'}"
-          [routerLink]="['/hub/liquidity', 'remove']">
-            Remove Liquidity
+        <div class="tabs tabs-remove" [ngClass]="{removeActive: liquidityType === 'remove'}"
+          [routerLink]="['/bridge/liquidity', 'remove']">
+          Remove Liquidity
         </div>
       </div>
       <div class="tab-content">
         <ul class="list-wrap">
-          <li *ngFor="let tokenItem  of addLiquidityTokens; let i = index ">
-            <div class="detail">
-              <div class="left">
-                <img src="" alt="" class="token-logo">
-                <div class="token-name">{{ tokenItem.symbol }}</div>
-              </div>
-              <div class="right">
-                <div class="input-container">
-                  <input type="number" [disabled]="!(tokenItem['amount'] > 0)" [(ngModel)]="inputAmount[i]" placeholder="0.0">
+          <ng-container *ngIf="liquidityType === 'add'">
+            <li *ngFor="let tokenItem  of addLiquidityTokens; let i = index ">
+              <div class="detail">
+                <div class="left">
+                  <img src="" alt="" class="token-logo">
+                  <div class="token-name">{{ tokenItem.symbol }}</div>
                 </div>
-                <div
-                  class="max-status"
-                  [ngClass]="{active: tokenItem.amount === inputAmount[i]}"
-                  (click)="inputAmount[i] = tokenItem.amount">MAX</div>
-                <div class="balance">
-                  <span>Balance</span>
-                  <span
-                    nz-tooltip
-                    nzTooltipPlacement="bottom"
-                    [nzTooltipTitle]="tokenItem.amount"
-                    *ngIf="tokenItem.amount.length > 13">{{ wordlimit(tokenItem.amount) }}</span>
-                  <span *ngIf="tokenItem.amount.length <= 13">{{ tokenItem.amount }}</span>
+                <div class="right">
+                  <div class="input-container">
+                    <input type="number" (input)="changeInAmount(tokenItem, i)" [(ngModel)]="addLiquidityInputAmount[i]"
+                      placeholder="0.0">
+                  </div>
+                  <div class="max-status" (click)="maxAddLiquidityInput(i)"
+                    [ngClass]="{active: tokenItem.amount != '--'}">MAX</div>
+                  <div class="balance" nz-tooltip [nzTooltipTitle]="tokenItem.amount">
+                    <span>Balance</span><span>{{tokenItem.amount | transNumber}}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="btn-primary btn-liquidity"
-              (click)="liquidityType === 'add' ? depost(tokenItem, i) : withdrawal(tokenItem, i)">
-              {{ liquidityType == 'add' ? 'Deposit' : 'Withdrawal' }}
-            </div>
-          </li>
+              <div class="btn-primary btn-liquidity" (click)="depost(tokenItem, i)">
+                Deposit
+              </div>
+            </li>
+          </ng-container>
+          <ng-container *ngIf="liquidityType !== 'add'">
+            <li *ngFor="let tokenItem  of addLiquidityTokens; let i = index ">
+              <div class="detail">
+                <div class="left">
+                  <img src="" alt="" class="token-logo">
+                  <div class="token-name">{{ tokenItem.symbol }}</div>
+                </div>
+                <div class="right">
+                  <div class="input-container">
+                    <input type="number" (input)="changeOutAmount(tokenItem, i)"
+                      [(ngModel)]="removeLiquidityInputAmount[i]" placeholder="0.0">
+                  </div>
+                  <div class="max-status" (click)="maxRemoveLiquidityInput(i)"
+                    [ngClass]="{active: tokenItem.amount != '--'}">MAX</div>
+                  <div class="balance" nz-tooltip [nzTooltipTitle]="tokenItem.amount">
+                    <span>Balance</span><span>{{tokenItem.amount | transNumber}}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="btn-primary btn-liquidity" (click)=" withdrawal(tokenItem, i)">
+                Withdrawal
+              </div>
+            </li>
+          </ng-container>
+
         </ul>
         <!-- <div class="btn-primary big-btn" [ngClass]="{active: liquidityType === 'add'}">Add Liquidity</div>
         <div class="btn-primary remove-btn big-btn" [ngClass]="{active: liquidityType === 'remove'}">Remove Liquidity
@@ -128,16 +143,14 @@
     <div class="right">
       <div class="item-list">
         <span class="name">{{ liquidityType == 'add' ? 'Receive' : 'PayAmount' }}</span>
-        <span class="value">0.0</span>
-      </div>
-      <div class="item-list">
-        <span class="name">Price impact</span>
-        <span class="value">0.0</span>
+        <span class="value">{{ liquidityType == 'add' ? receiveAmount : payAmount }}</span>
       </div>
       <div class="item-list">
         <span class="name">Max slippage</span>
-        <span class="value">0.0</span>
+        <span class="value">{{BRIDGE_SLIPVALUE}}%</span>
       </div>
     </div>
   </div>
 </section>
+
+<app-tx-progress txAtPage="liquidity"></app-tx-progress>

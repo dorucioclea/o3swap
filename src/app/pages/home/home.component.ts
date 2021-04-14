@@ -1,21 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { LiquiditySource } from './liquidity-source';
 import { ApiService } from '@core';
 import { CommonHttpResponse } from '@lib';
+import { interval, Unsubscribable } from 'rxjs';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   liquiditySource = LiquiditySource;
   lang = 'en';
   copyRightYear = new Date().getFullYear();
   roadmapIndex = 0;
   roadmapLen = 4;
-  roadmapInterval;
+  roadmapInterval: Unsubscribable;
   enterActiviteFirst = false;
   enterActiviteLast = false;
 
@@ -45,14 +46,23 @@ export class HomeComponent implements OnInit {
     this.roadmapIntervalFun();
   }
 
+  ngOnDestroy(): void {
+    if (this.roadmapInterval) {
+      this.roadmapInterval.unsubscribe();
+    }
+  }
+
   roadmapIntervalFun(): void {
-    this.roadmapInterval = setInterval(() => {
+    if (this.roadmapInterval) {
+      this.roadmapInterval.unsubscribe();
+    }
+    this.roadmapInterval = interval(2000).subscribe(() => {
       this.roadmapIndex = (this.roadmapIndex + 1) % this.roadmapLen;
-    }, 2000);
+    });
   }
 
   enterRoadmap(index: number): void {
-    clearInterval(this.roadmapInterval);
+    this.roadmapInterval.unsubscribe();
     this.roadmapIndex = index;
   }
 

@@ -8,7 +8,11 @@ export interface Token {
   chain: CHAINS;
   rateName: string;
   atNeoAssetName?: string;
+  sourceTokenSymbol?: string;
 }
+
+export const ETH_SOURCE_CONTRACT_HASH =
+  '0000000000000000000000000000000000000000';
 
 const MIX_NEO_TOKENS: Token[] = [
   {
@@ -160,7 +164,7 @@ export const ALL_NEO_TOKENS: Token[] = [...NEO_TOKENS, ...MIX_NEO_TOKENS];
 
 const ETH_TOKENS: Token[] = [
   {
-    assetID: '0000000000000000000000000000000000000000',
+    assetID: ETH_SOURCE_CONTRACT_HASH,
     symbol: 'ETH',
     decimals: 18,
     amount: '0',
@@ -168,6 +172,7 @@ const ETH_TOKENS: Token[] = [
     rateName: 'eth',
     logo: '/assets/images/tokens/eth.png',
     atNeoAssetName: 'pnWETH',
+    sourceTokenSymbol: 'ETH',
   },
   {
     assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
@@ -178,6 +183,17 @@ const ETH_TOKENS: Token[] = [
     chain: 'ETH',
     logo: '/assets/images/tokens/usdt.png',
     atNeoAssetName: 'pnUSDT',
+    sourceTokenSymbol: 'ETH',
+  },
+  {
+    assetID: '0xc778417e063141139fce010982780140aa0cd5ab',
+    symbol: 'WETH',
+    decimals: 18,
+    chain: 'ETH',
+    logo: 'https://img.o3.network/logo/eth/eth.png',
+    amount: '0',
+    rateName: 'weth',
+    sourceTokenSymbol: 'ETH',
   },
 ];
 
@@ -191,6 +207,7 @@ const BSC_TOKENS: Token[] = [
     chain: 'BSC',
     rateName: 'eth',
     logo: '/assets/images/tokens/eth.png',
+    sourceTokenSymbol: 'BNB',
   },
   {
     assetID:
@@ -201,6 +218,7 @@ const BSC_TOKENS: Token[] = [
     chain: 'BSC',
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
+    sourceTokenSymbol: 'BNB',
   },
 ];
 
@@ -214,12 +232,13 @@ const HECO_TOKENS: Token[] = [
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
+    sourceTokenSymbol: 'HT',
   },
 ];
 
 const ALL: Token[] = [
   {
-    assetID: '0000000000000000000000000000000000000000',
+    assetID: ETH_SOURCE_CONTRACT_HASH,
     symbol: 'ETH',
     decimals: 18,
     amount: '0',
@@ -227,6 +246,7 @@ const ALL: Token[] = [
     rateName: 'eth',
     logo: '/assets/images/tokens/eth.png',
     atNeoAssetName: 'pnWETH',
+    sourceTokenSymbol: 'ETH',
   },
   {
     assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
@@ -237,6 +257,7 @@ const ALL: Token[] = [
     chain: 'ETH',
     logo: '/assets/images/tokens/usdt.png',
     atNeoAssetName: 'pnUSDT',
+    sourceTokenSymbol: 'ETH',
   },
   {
     assetID:
@@ -259,6 +280,7 @@ const ALL: Token[] = [
     chain: 'BSC',
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
+    sourceTokenSymbol: 'BNB',
   },
   {
     assetID:
@@ -269,10 +291,11 @@ const ALL: Token[] = [
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
+    sourceTokenSymbol: 'HT',
   },
 ];
 
-const USD_TOKENS: Token[] = [
+export const USD_TOKENS: Token[] = [
   {
     assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
     symbol: 'USDT',
@@ -282,6 +305,7 @@ const USD_TOKENS: Token[] = [
     chain: 'ETH',
     logo: '/assets/images/tokens/usdt.png',
     atNeoAssetName: 'pnUSDT',
+    sourceTokenSymbol: 'ETH',
   },
   {
     assetID:
@@ -292,6 +316,7 @@ const USD_TOKENS: Token[] = [
     chain: 'BSC',
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
+    sourceTokenSymbol: 'BNB',
   },
   {
     assetID:
@@ -302,10 +327,11 @@ const USD_TOKENS: Token[] = [
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
-  }
+    sourceTokenSymbol: 'HT',
+  },
 ];
 
-const LP_TOKENS: Token[] = [
+export const LP_TOKENS: Token[] = [
   {
     assetID: '0xD5d63Dce45E0275Ca76a8b2e9BD8C11679A57D0D',
     symbol: 'pLP',
@@ -342,13 +368,14 @@ export const CHAIN_TOKENS = {
   BSC: BSC_TOKENS,
   HECO: HECO_TOKENS,
   USD: USD_TOKENS,
-  LP: LP_TOKENS
+  LP: LP_TOKENS,
+  MIX_NEO_TOKENS,
 };
 
 export type CHAINS = 'ALL' | 'NEO' | 'ETH' | 'BSC' | 'HECO';
 
 export const CrossChainToToken: Token = {
-  assetID: '0000000000000000000000000000000000000000',
+  assetID: ETH_SOURCE_CONTRACT_HASH,
   symbol: 'ETH',
   decimals: 18,
   amount: '0',
@@ -374,7 +401,7 @@ export const NNEO_TOKEN: Token[] = [
 ];
 
 export const ETH_PUSDT = {
-  ETH: '0x76D56873426CEe920F9e8c439Ee0a2CeCf50d979',
-  BSC: '0x2e6c7cD9C98373C9bB74817b2a78E94C73E38BC9',
-  HECO: '0x6F2383Cb1495E85Af95C0f9701215D9BFFA77FD7',
+  ETH: '0x63799851696CDE43c2305dccd7208a03272BA591',
+  BSC: '0x78Ec09343122737925f9839d7794de49FeB6B083',
+  HECO: '0xbdd265FC4D5b7E7a937608B91EDAFc38F27E4479',
 };

@@ -1,7 +1,7 @@
 import { Token } from '@lib';
 import { NETWORK } from './network';
 
-export const USDT_TOKEN: Token[] = [
+const ETH_TOKEN: Token[] = [
   {
     assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
     symbol: 'USDT',
@@ -11,10 +11,11 @@ export const USDT_TOKEN: Token[] = [
     chain: 'ETH',
     logo: '/assets/images/tokens/usdt.png',
     atNeoAssetName: 'pnUSDT',
-  }
+    sourceTokenSymbol: 'ETH',
+  },
 ];
 
-const BUSD_TOKEN: Token[] = [
+const BSC_TOKEN: Token[] = [
   {
     assetID:
       NETWORK === 'MainNet' ? '' : '74A7f2A3aFa8B0CB577985663B5811901A860619',
@@ -24,10 +25,11 @@ const BUSD_TOKEN: Token[] = [
     chain: 'BSC',
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
-  }
+    sourceTokenSymbol: 'BNB',
+  },
 ];
 
-const HUSD_TOKEN: Token[] = [
+const HECO_TOKEN: Token[] = [
   {
     assetID:
       NETWORK === 'MainNet' ? '' : '77e8eBD5B2D7cD984e6Ae05a809409c795Bf9b04',
@@ -37,10 +39,11 @@ const HUSD_TOKEN: Token[] = [
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
-  }
+    sourceTokenSymbol: 'HT',
+  },
 ];
 
-const USD_TOKENS: Token[] = [
+const ALL_TOKENS: Token[] = [
   {
     assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
     symbol: 'USDT',
@@ -50,6 +53,7 @@ const USD_TOKENS: Token[] = [
     chain: 'ETH',
     logo: '/assets/images/tokens/usdt.png',
     atNeoAssetName: 'pnUSDT',
+    sourceTokenSymbol: 'ETH',
   },
   {
     assetID:
@@ -60,6 +64,7 @@ const USD_TOKENS: Token[] = [
     chain: 'BSC',
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
+    sourceTokenSymbol: 'BNB',
   },
   {
     assetID:
@@ -70,13 +75,13 @@ const USD_TOKENS: Token[] = [
     rateName: 'usdt',
     logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
-  }
+    sourceTokenSymbol: 'HT',
+  },
 ];
 
-
-export const CHAIN_USD_TOKENS = {
-  ETH: USDT_TOKEN,
-  BSC: BUSD_TOKEN,
-  HECO: HUSD_TOKEN,
-  USD: USD_TOKENS,
+export const CHAIN_BRIDGE_TOKENS = {
+  ETH: ETH_TOKEN,
+  BSC: BSC_TOKEN,
+  HECO: HECO_TOKEN,
+  ALL: ALL_TOKENS,
 };

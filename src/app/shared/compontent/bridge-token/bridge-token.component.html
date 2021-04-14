@@ -15,10 +15,10 @@
   </div>
   <ul class="tokens scroll">
     <li class="token" *ngFor="let tokenItem of displayTokens"
-      [ngClass]="{active: activeToken?.assetID===tokenItem?.assetID}" (click)="selectThisToken(tokenItem)">
+      [ngClass]="{active: activeToken?.symbol===tokenItem?.symbol}" (click)="selectThisToken(tokenItem)">
       <img [src]="tokenItem?.logo" alt="">
       <span class="name flex-1">{{ tokenItem?.symbol }}</span>
-      <span class="amount">{{ tokenItem?.amount | number: '1.0-8' }}</span>
+      <span class="amount">{{ tokenItem?.amount | transNumber | number: '1.0-8' }}</span>
     </li>
   </ul>
 </section>

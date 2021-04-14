@@ -5,23 +5,20 @@ import {
   ChangeDetectorRef,
   OnDestroy,
 } from '@angular/core';
-import { CHAIN_USD_TOKENS, SwapStateType, CHAINS, USDT_TOKEN } from '@lib';
+import { CHAIN_BRIDGE_TOKENS, SwapStateType, CHAINS } from '@lib';
 import { Token } from '@lib';
 import { Observable, Unsubscribable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { CommonService } from '@core';
-
 interface State {
   swap: SwapStateType;
 }
-
 @Component({
   templateUrl: './bridge-token.component.html',
   styleUrls: ['./bridge-token.component.scss'],
 })
 export class BridgeTokenComponent implements OnInit, OnDestroy {
-  myUSDT_TOKEN;
   myCHAIN_TOKENS;
   @Input() isFrom: boolean;
   @Input() fromToken: Token;
@@ -29,14 +26,12 @@ export class BridgeTokenComponent implements OnInit, OnDestroy {
 
   activeToken: Token;
   hideToken: Token;
-  hideUsdtToken = false;
-  showOnlyUsdt = false;
 
   swap$: Observable<any>;
-  tokenBalance; // 账户的 tokens
+  tokenBalance = { ETH: {}, BSC: {}, HECO: {} }; // 账户的 tokens
   swapUnScribe: Unsubscribable;
 
-  chain: CHAINS;
+  chain: CHAINS = 'ALL';
   allTokens: Token[] = []; // 所有的 tokens, 排除了 fromToken 或 toToken
   displayTokens: any[] = []; // 最终展示的 tokens, search 结果
   isfocusSearchInput = false;
@@ -50,43 +45,36 @@ export class BridgeTokenComponent implements OnInit, OnDestroy {
     this.swap$ = store.select('swap');
   }
   ngOnDestroy(): void {
-    if (this.swapUnScribe !== null && this.swapUnScribe !== undefined) {
+    if (this.swapUnScribe) {
       this.swapUnScribe.unsubscribe();
     }
   }
 
   ngOnInit(): void {
-    this.cloneChainTokens();
-    this.myUSDT_TOKEN = JSON.parse(JSON.stringify(USDT_TOKEN));
+    this.cloneTokens();
     this.activeToken = this.isFrom ? this.fromToken : this.toToken;
     this.hideToken = this.isFrom ? this.toToken : this.fromToken;
-    this.chain = this.isFrom === true ? 'ETH' : 'ETH';
-    const tokens = this.showOnlyUsdt
-      ? this.myUSDT_TOKEN
-      : this.myCHAIN_TOKENS[this.chain];
-    this.allTokens = this.hideToken
-      ? tokens.filter((item) => item.symbol !== this.hideToken.symbol)
-      : tokens;
-    this.allTokens = this.hideUsdtToken
-      ? this.allTokens.filter((item) => item.symbol !== 'USDT')
-      : this.allTokens;
-    this.displayTokens = this.allTokens;
+    this.getTokens();
     this.swapUnScribe = this.swap$.subscribe((state) => {
-      if (
-        JSON.stringify(state.balances) !== JSON.stringify(this.tokenBalance)
-      ) {
-        this.tokenBalance = JSON.parse(JSON.stringify(state.balances));
-        this.handleTokenAmount();
-      }
+      this.receiveTokenBalance(state);
+      this.changeDetectorRef.detectChanges();
     });
   }
 
-  cloneChainTokens(): void {
+  cloneTokens(): void {
     this.myCHAIN_TOKENS = {};
-    this.myCHAIN_TOKENS.ALL = JSON.parse(JSON.stringify(CHAIN_USD_TOKENS.USD));
-    this.myCHAIN_TOKENS.ETH = JSON.parse(JSON.stringify(CHAIN_USD_TOKENS.ETH));
-    this.myCHAIN_TOKENS.BSC = JSON.parse(JSON.stringify(CHAIN_USD_TOKENS.BSC));
-    this.myCHAIN_TOKENS.HECO = JSON.parse(JSON.stringify(CHAIN_USD_TOKENS.HECO));
+    this.myCHAIN_TOKENS.ALL = JSON.parse(
+      JSON.stringify(CHAIN_BRIDGE_TOKENS.ALL)
+    );
+    this.myCHAIN_TOKENS.ETH = JSON.parse(
+      JSON.stringify(CHAIN_BRIDGE_TOKENS.ETH)
+    );
+    this.myCHAIN_TOKENS.BSC = JSON.parse(
+      JSON.stringify(CHAIN_BRIDGE_TOKENS.BSC)
+    );
+    this.myCHAIN_TOKENS.HECO = JSON.parse(
+      JSON.stringify(CHAIN_BRIDGE_TOKENS.HECO)
+    );
   }
 
   close(): void {
@@ -98,9 +86,7 @@ export class BridgeTokenComponent implements OnInit, OnDestroy {
       return;
     }
     this.chain = chain;
-    const tokens = this.showOnlyUsdt
-      ? this.myUSDT_TOKEN
-      : this.myCHAIN_TOKENS[this.chain];
+    const tokens = this.myCHAIN_TOKENS[this.chain];
     this.allTokens = this.hideToken
       ? tokens.filter((item) => item.symbol !== this.hideToken.symbol)
       : tokens;
@@ -133,35 +119,82 @@ export class BridgeTokenComponent implements OnInit, OnDestroy {
   }
 
   //#region
-  handleTokenAmount(): void {
-    if (this.tokenBalance[this.myUSDT_TOKEN[0].assetID]) {
-      this.myUSDT_TOKEN[0].amount = this.tokenBalance[
-        this.myUSDT_TOKEN[0].assetID
-      ].amount;
+  getTokens(): void {
+    const tokens = this.myCHAIN_TOKENS[this.chain];
+    this.allTokens = this.hideToken
+      ? tokens.filter((item) => item.symbol !== this.hideToken.symbol)
+      : tokens;
+    this.displayTokens = this.allTokens;
+  }
+  receiveTokenBalance(state): void {
+    if (
+      JSON.stringify(state.ethBalances) !==
+      JSON.stringify(this.tokenBalance.ETH)
+    ) {
+      this.tokenBalance.ETH = JSON.parse(JSON.stringify(state.ethBalances));
+      this.handleTokenAmount('ETH');
     }
+    if (
+      JSON.stringify(state.bscBalances) !==
+      JSON.stringify(this.tokenBalance.BSC)
+    ) {
+      this.tokenBalance.BSC = JSON.parse(JSON.stringify(state.bscBalances));
+      this.handleTokenAmount('BSC');
+    }
+    if (
+      JSON.stringify(state.hecoBalances) !==
+      JSON.stringify(this.tokenBalance.HECO)
+    ) {
+      this.tokenBalance.HECO = JSON.parse(JSON.stringify(state.hecoBalances));
+      this.handleTokenAmount('HECO');
+    }
+  }
+  handleTokenAmount(chainType: CHAINS): void {
+    const chainBalance = this.tokenBalance[chainType];
+    // my chain tokens [all]
     this.myCHAIN_TOKENS.ALL.forEach((tokenItem, index) => {
-      if (this.tokenBalance[tokenItem.assetID]) {
-        this.myCHAIN_TOKENS.ALL[index].amount = this.tokenBalance[
-          tokenItem.assetID
-        ].amount;
-      }
-    });
-    this.allTokens.forEach((tokenItem, index) => {
-      if (this.tokenBalance[tokenItem.assetID]) {
-        this.allTokens[index].amount = this.tokenBalance[
-          tokenItem.assetID
-        ].amount;
-      }
-    });
-    this.displayTokens.forEach((tokenItem, index) => {
-      if (this.tokenBalance[tokenItem.assetID]) {
-        this.displayTokens[index].amount = this.tokenBalance[
-          tokenItem.assetID
-        ].amount;
+      if (
+        chainBalance[tokenItem.assetID] &&
+        chainBalance[tokenItem.assetID].symbol === // 资产id相同且symbol相同
+          tokenItem.symbol
+      ) {
+        this.myCHAIN_TOKENS.ALL[index].amount =
+          chainBalance[tokenItem.assetID].amount;
       }
     });
     this.myCHAIN_TOKENS.ALL = this.sortTokens(this.myCHAIN_TOKENS.ALL);
+    // chainType tokens
+    this.myCHAIN_TOKENS[chainType].forEach((tokenItem, index) => {
+      if (chainBalance[tokenItem.assetID]) {
+        this.myCHAIN_TOKENS[chainType][index].amount =
+          chainBalance[tokenItem.assetID].amount;
+      }
+    });
+    this.myCHAIN_TOKENS[chainType] = this.sortTokens(
+      this.myCHAIN_TOKENS[chainType]
+    );
+    // alltokens
+    this.allTokens.forEach((tokenItem, index) => {
+      if (
+        chainBalance[tokenItem.assetID] &&
+        chainBalance[tokenItem.assetID].symbol === // 资产id相同且symbol相同
+          tokenItem.symbol
+      ) {
+        this.allTokens[index].amount = chainBalance[tokenItem.assetID].amount;
+      }
+    });
     this.allTokens = this.sortTokens(this.allTokens);
+    // display tokens
+    this.displayTokens.forEach((tokenItem, index) => {
+      if (
+        chainBalance[tokenItem.assetID] &&
+        chainBalance[tokenItem.assetID].symbol === // 资产id相同且symbol相同
+          tokenItem.symbol
+      ) {
+        this.displayTokens[index].amount =
+          chainBalance[tokenItem.assetID].amount;
+      }
+    });
     this.displayTokens = this.sortTokens(this.displayTokens);
   }
   sortTokens(tokens: Token[]): Token[] {

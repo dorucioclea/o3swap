@@ -4,7 +4,9 @@
       <div class="left-container">
         <div class="header">
           <div class="left">You pay</div>
-          <div class="right">Balance: 1000 USDT <span>Max</span></div>
+          <div class="right">Balance: {{ (fromToken?.amount | transNumber | number: '1.0-8') || '0' }}
+            {{ fromToken?.symbol }}
+            <span (click)="allInputAmount()">Max</span></div>
         </div>
         <div class="content">
           <div class="token-name" [ngClass]="{active: fromToken?.symbol}" (click)="showTokens('from')">
@@ -18,7 +20,7 @@
         </div>
         <div class="asset">≈ $ {{ inputAmountFiat || '0.00' }}</div>
       </div>
-      <img class="transform" src="/assets/images/swap/exchange-home.png" alt="">
+      <img class="transform" (click)="exchangeToken()" src="/assets/images/swap/exchange-home.png" alt="">
       <div class="right-container">
         <div class="header">
           <div class="left">You will receive</div>
@@ -29,15 +31,21 @@
             {{ toToken?.symbol || 'SELECT' }}
             <img _ngcontent-may-c99="" src="/assets/images/swap/arrow-down.png" alt="" class="arrow">
           </div>
-          <div class="token-amount">{{inputAmount || 0}}</div>
+          <div class="token-amount">{{ receiveAmount || 0 }}</div>
         </div>
-        <div class="asset">≈ $ {{ inputAmountFiat || '0.00' }}</div>
+        <div class="asset">≈ $ {{ receiveAmountFiat || '0.00' }}</div>
       </div>
     </div>
-    <p class="detail">Exchange Rate BUSD/USDT (including fees): <span>1: 0.9984</span></p>
-    <p class="detail">Trading routed through: <span>Venus</span></p>
-    <p class="detail">Max slippage: <span>1%</span></p>
-    <div class="btn-primary big-btn">Swap</div>
+    <p class="detail">Exchange Rate {{ toToken?.symbol || '--' }}/{{ fromToken?.symbol || '--' }} (including fees):
+      <span>{{ bridgeRate }}</span></p>
+    <p class="detail">Max slippage: <span>{{ BRIDGE_SLIPVALUE }}%</span></p>
+    <div class="btn-group" *ngIf="showApprove">
+      <button class="btn-primary approve" nz-button [ngClass]="{disable: hasApprove===true}"
+        [nzLoading]="isApproveLoading" (click)="approve()">Approve</button>
+      <button class="btn-primary" [ngClass]="{disable: hasApprove===false}" (click)="swap()">Confirm</button>
+    </div>
+    <div *ngIf="!showApprove" class="btn-primary big-btn swap-btn" [ngClass]="{active: checkCanInquiry()}"
+      (click)="swap()">Swap</div>
   </div>
   <div class="group-container row1 pool">
     <div class="header">Pool</div>
@@ -79,3 +87,5 @@
     </div>
   </div>
 </section>
+
+<app-tx-progress [txAtPage]="'bridge'"></app-tx-progress>

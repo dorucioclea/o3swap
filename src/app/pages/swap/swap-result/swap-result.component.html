@@ -57,9 +57,12 @@
         1 {{ toToken?.symbol }} = {{ lnversePrice }} {{ fromToken?.symbol }}
       </p>
     </div>
+    <div class="fee-item" *ngIf="polyFee">
+      <p class="label">Poly Fee</p>
+      <div class="value">{{ polyFee }} {{ fromToken.sourceTokenSymbol }}</div>
+    </div>
     <div class="fee-item">
-      <p class="label">Estimated Fee</p>
-      <p class="value">{{ netWorkFee }} {{fromToken.symbol }}</p>
+      <p class="label">Quote includes a {{ O3_AGGREGATOR_FEE }}% O3Swap fee</p>
     </div>
   </div>
   <div class="btn-group" *ngIf="showApprove">

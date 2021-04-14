@@ -105,7 +105,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.swapUnScribe !== null && this.swapUnScribe !== undefined) {
+    if (this.swapUnScribe) {
       this.swapUnScribe.unsubscribe();
     }
   }
@@ -152,7 +152,6 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
     this.inputAmount = $event.target.value;
     this.resetSwapData();
     this.checkInputAmountDecimal();
-    this.resetSwapData();
     this.calcutionInputAmountFiat();
   }
 
@@ -160,14 +159,10 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
     this.inputAmountError = '';
     this.inputAmount = (this.fromToken && this.fromToken.amount) || '0';
     this.resetSwapData();
-    this.resetSwapData();
     this.calcutionInputAmountFiat();
   }
 
   inquiry(): void {
-    if (this.checkCanInquiry() === false) {
-      return;
-    }
     // if (this.checkWalletConnect() === false) {
     //   return;
     // }
@@ -275,6 +270,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
   }
   calcutionInputAmountFiat(): void {
     if (!this.fromToken) {
+      this.inputAmountFiat = '';
       return;
     }
     const price = this.rates[this.fromToken.rateName];

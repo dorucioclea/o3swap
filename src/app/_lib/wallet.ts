@@ -10,6 +10,15 @@ export const METAMASK_CHAIN_ID = {
   ETH: NETWORK === 'MainNet' ? 1 : 3,
 };
 
+export const METAMASK_CHAIN = {
+  56: 'BSC',
+  97: 'BSC',
+  128: 'HECO',
+  256: 'HECO',
+  1: 'ETH',
+  3: 'ETH',
+};
+
 export interface Wallet {
   name: WalletName;
   logo: string;
@@ -45,12 +54,20 @@ export const ETH_WALLETS: EthWallet[] = [
 
 export const BSC_WALLETS: EthWallet[] = [
   {
+    name: 'O3',
+    logo: '/assets/images/logo-O3.png',
+  },
+  {
     name: 'MetaMask',
     logo: '/assets/images/logo-MetaMask.png',
   },
 ];
 
 export const HECO_WALLETS: EthWallet[] = [
+  {
+    name: 'O3',
+    logo: '/assets/images/logo-O3.png',
+  },
   {
     name: 'MetaMask',
     logo: '/assets/images/logo-MetaMask.png',

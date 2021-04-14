@@ -7,7 +7,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 export class CommonService {
   isProduction = environment.production;
 
-  constructor(private nzMessage: NzMessageService) { }
+  constructor(private nzMessage: NzMessageService) {}
 
   log(value: any): void {
     if (this.isProduction === false) {
@@ -39,11 +39,18 @@ export class CommonService {
     return isAddressPattern.test(address);
   }
 
-  wordlimit(value: number | string): string {
-    let data = value.toString();
-    if (value && data.length > 13) {
-      data = data.substring(0, 10) + '...';
+  add0xHash(hash: string): string {
+    if (hash.startsWith('0x')) {
+      return hash;
+    } else {
+      return `0x${hash}`;
     }
-    return data;
+  }
+  remove0xHash(hash: string): string {
+    if (hash.startsWith('0x')) {
+      return hash.slice(2);
+    } else {
+      return hash;
+    }
   }
 }

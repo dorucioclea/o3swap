@@ -21,7 +21,7 @@ import {
   NETWORK,
   SWAP_CONTRACT_CHAIN_ID,
 } from '@lib';
-import { Observable } from 'rxjs';
+import { interval, Observable } from 'rxjs';
 import { wallet } from '@cityofzion/neon-js';
 import BigNumber from 'bignumber.js';
 
@@ -90,13 +90,13 @@ export class O3NeoWalletApiService {
       },
     })
       .then(({ txid }) => {
-        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
-        this.handleTx(fromToken, toToken, inputAmount, txHash);
+        const txHash = this.commonService.add0xHash(txid);
+        this.handleTx(fromToken, toToken, inputAmount, inputAmount, txHash);
         return txHash;
       })
       .catch((error) => {
         this.commonService.log(error);
-        this.swapService.handleNeoDapiError(error, 'NeoLine');
+        this.swapService.handleNeoDapiError(error, 'O3');
       });
   }
 
@@ -154,13 +154,13 @@ export class O3NeoWalletApiService {
     }
     return o3dapi.NEO.invoke(params)
       .then(({ txid }) => {
-        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
-        this.handleTx(fromToken, toToken, inputAmount, txHash);
+        const txHash = this.commonService.add0xHash(txid);
+        this.handleTx(fromToken, toToken, inputAmount, inputAmount, txHash);
         return txHash;
       })
       .catch((error) => {
         this.commonService.log(error);
-        this.swapService.handleNeoDapiError(error, 'NeoLine');
+        this.swapService.handleNeoDapiError(error, 'O3');
       });
   }
 
@@ -181,6 +181,8 @@ export class O3NeoWalletApiService {
       fromToken,
       inputAmount
     );
+    const receiveAmount =
+      chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
     const args = [
       {
         type: 'Address',
@@ -192,7 +194,7 @@ export class O3NeoWalletApiService {
       },
       {
         type: 'Integer',
-        value: this.swapService.getAmountOutMin(chooseSwapPath, slipValue),
+        value: this.swapService.getMinAmountOut(receiveAmount, slipValue),
       },
       {
         type: 'Array',
@@ -223,8 +225,8 @@ export class O3NeoWalletApiService {
       args,
     })
       .then(({ txid }) => {
-        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
-        this.handleTx(fromToken, toToken, inputAmount, txHash);
+        const txHash = this.commonService.add0xHash(txid);
+        this.handleTx(fromToken, toToken, inputAmount, receiveAmount, txHash);
         return txHash;
       })
       .catch((error) => {
@@ -252,6 +254,8 @@ export class O3NeoWalletApiService {
       fromToken,
       inputAmount
     );
+    const receiveAmount =
+      chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
     const args = [
       {
         type: 'Address', // sender (用户小端序Hash)
@@ -263,7 +267,7 @@ export class O3NeoWalletApiService {
       },
       {
         type: 'Integer', // amountOutMin (用户允许获得的代币数量最小值)
-        value: this.swapService.getAmountOutMin(chooseSwapPath, slipValue),
+        value: this.swapService.getMinAmountOut(receiveAmount, slipValue),
       },
       {
         type: 'Array', // paths (输入资产 到 输出资产 的路径)
@@ -313,8 +317,15 @@ export class O3NeoWalletApiService {
       args,
     })
       .then(({ txid }) => {
-        const txHash = (txid as string).startsWith('0x') ? txid : '0x' + txid;
-        this.handleTx(fromToken, toToken, inputAmount, txHash, false);
+        const txHash = this.commonService.add0xHash(txid);
+        this.handleTx(
+          fromToken,
+          toToken,
+          inputAmount,
+          receiveAmount,
+          txHash,
+          false
+        );
         return txHash;
       })
       .catch((error) => {
@@ -369,16 +380,20 @@ export class O3NeoWalletApiService {
     fromToken: Token,
     toToken: Token,
     inputAmount: string,
+    receiveAmount: string,
     txHash: string,
     addLister = true
   ): void {
     const pendingTx: SwapTransaction = {
-      txid: txHash,
+      txid: this.commonService.remove0xHash(txHash),
       isPending: true,
       min: false,
       fromToken,
       toToken,
       amount: inputAmount,
+      receiveAmount: new BigNumber(receiveAmount)
+        .shiftedBy(-toToken.decimals)
+        .toFixed(),
     };
     if (addLister === false) {
       pendingTx.progress = {

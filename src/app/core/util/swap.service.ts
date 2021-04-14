@@ -7,6 +7,8 @@ import {
   Token,
   WalletName,
   NeoWalletName,
+  CHAINS,
+  CHAIN_TOKENS,
 } from '@lib';
 import { CommonService } from './common.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -24,15 +26,11 @@ export class SwapService {
       .toFixed();
     return this.commonService.decimalToInteger(factAmount, fromToken.decimals);
   }
-  getAmountOutMin(
-    chooseSwapPath: AssetQueryResponseItem,
-    slipValue: number
-  ): string {
-    const amount = chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
+  getMinAmountOut(amountOut: string, slipValue: number): string {
     const factPercentage = new BigNumber(1).minus(
       new BigNumber(slipValue).shiftedBy(-2)
     );
-    const factAmount = new BigNumber(amount)
+    const factAmount = new BigNumber(amountOut)
       .times(factPercentage)
       .dp(0)
       .toFixed();
@@ -48,14 +46,24 @@ export class SwapService {
     });
     return target;
   }
+  getAssetNamePath(swapPath: string[], chain: CHAINS): any[] {
+    const target = [];
+    swapPath.forEach((hash) => {
+      const token = CHAIN_TOKENS[chain].find(
+        (item) =>
+          this.commonService.remove0xHash(item.assetID).toLowerCase() ===
+          this.commonService.remove0xHash(hash).toLowerCase()
+      );
+      target.push(token.symbol);
+    });
+    return target;
+  }
   getNeoAssetHashByName(name: string): string {
     const token = ALL_NEO_TOKENS.find((item) => item.symbol === name);
     return (token && token.assetID) || '';
   }
   getHash160FromAddress(text: string): any {
-    if (text.startsWith('0x')) {
-      text = text.slice(2);
-    }
+    text = this.commonService.remove0xHash(text);
     return this.reverseHex(text);
   }
   private reverseHex(hex): string {
@@ -66,24 +74,42 @@ export class SwapService {
     return out;
   }
   handleNeoDapiError(error, walletName: NeoWalletName): void {
+    let message: string;
     switch (error.type) {
       case 'NO_PROVIDER':
         this.toDownloadWallet(walletName);
         break;
       case 'CONNECTION_DENIED':
-        this.nzMessage.error(
-          'The user rejected the request to connect with your dApp'
-        );
+        message = 'The user rejected the request to connect with your dApp';
+        break;
+      case 'RPC_ERROR':
+        message = 'RPC connection to a network node fails';
+        break;
+      case 'MALFORMED_INPUT':
+        message = 'The address is not a valid NEO address';
+        break;
+      case 'CANCELED':
+        message = 'User cancels, or refuses the dapps request';
+        break;
+      case 'FAIL':
+        message = 'The request failed';
+        break;
+      case 'INSUFFICIENT_FUNDS':
+        message = 'Insufficient balance';
         break;
       default:
         if (typeof error === 'string') {
-          this.nzMessage.error(error);
+          message = error;
         } else {
-          this.nzMessage.error(error.type || 'Unknown error');
+          message = error.type || 'Unknown error';
         }
         break;
     }
+    if (message) {
+      this.nzMessage.error(message);
+    }
   }
+
   toDownloadWallet(type: WalletName): void {
     switch (type) {
       case 'O3':
