@@ -13,7 +13,7 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { Store } from '@ngrx/store';
 import { Observable, Unsubscribable } from 'rxjs';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { CommonService } from '@core';
+import { CommonService, ApiService } from '@core';
 
 interface State {
   setting: any;
@@ -26,7 +26,6 @@ interface State {
   styleUrls: ['../common.scss', './swap-home.component.scss'],
 })
 export class SwapHomeComponent implements OnInit, OnDestroy {
-  @Input() rates = {};
   @Input() fromToken: Token;
   @Input() toToken: Token;
   @Input() chooseSwapPath;
@@ -38,6 +37,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
   }>();
   @Output() toResultPage = new EventEmitter();
 
+  rates = {};
   swap$: Observable<any>;
   neoAccountAddress: string;
   ethAccountAddress: string;
@@ -61,13 +61,15 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
     private modal: NzModalService,
     public store: Store<State>,
     private nzMessage: NzMessageService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private apiService: ApiService
   ) {
     this.setting$ = store.select('setting');
     this.swap$ = store.select('swap');
   }
 
   ngOnInit(): void {
+    this.getRates();
     this.setting$.subscribe((state) => {
       this.slipValue = state.slipValue;
       this.isCustomSlip = state.isCustomSlip;
@@ -111,6 +113,12 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
     if (this.swapUnScribe) {
       this.swapUnScribe.unsubscribe();
     }
+  }
+
+  getRates(): void {
+    this.apiService.getRates().subscribe((res) => {
+      this.rates = res;
+    });
   }
 
   showTokens(type: 'from' | 'to'): void {
@@ -276,6 +284,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
       this.inputAmountFiat = '';
       return;
     }
+    console.log(this.rates);
     const price = this.commonService.getAssetRate(this.rates, this.fromToken);
     if (this.inputAmount && price) {
       this.inputAmountFiat = new BigNumber(this.inputAmount)

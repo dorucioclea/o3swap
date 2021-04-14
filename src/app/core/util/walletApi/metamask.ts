@@ -17,7 +17,6 @@ import {
   UPDATE_HECO_WALLET_NAME,
   UPDATE_METAMASK_NETWORK_ID,
   UPDATE_PENDING_TX,
-  CHAIN_TOKENS,
   UPDATE_BSC_BALANCES,
   UPDATE_HECO_BALANCES,
   ETH_SOURCE_ASSET_HASH,
@@ -45,6 +44,7 @@ import { SwapService } from '../swap.service';
 import Web3 from 'web3';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
+import { ApiService } from '../../api/api.service';
 interface State {
   swap: SwapStateType;
 }
@@ -76,7 +76,8 @@ export class MetaMaskWalletApiService {
     private store: Store<State>,
     private nzMessage: NzMessageService,
     private swapService: SwapService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private apiService: ApiService
   ) {
     this.swap$ = store.select('swap');
     this.swap$.subscribe((state) => {
@@ -89,7 +90,7 @@ export class MetaMaskWalletApiService {
   }
 
   init(): void {
-    if ((window as any).ethereum) {
+    if ((window as any).ethereum && (window as any).ethereum.isConnected()) {
       const localEthWalletName = localStorage.getItem(
         'ethWalletName'
       ) as EthWalletName;
@@ -167,15 +168,21 @@ export class MetaMaskWalletApiService {
       switch (chain) {
         case 'ETH':
           dispatchBalanceType = UPDATE_ETH_BALANCES;
-          tempTokenBalance = JSON.parse(JSON.stringify(CHAIN_TOKENS.ETH));
+          tempTokenBalance = JSON.parse(
+            JSON.stringify(this.apiService.CHAIN_TOKENS.ETH)
+          );
           break;
         case 'BSC':
           dispatchBalanceType = UPDATE_BSC_BALANCES;
-          tempTokenBalance = JSON.parse(JSON.stringify(CHAIN_TOKENS.BSC));
+          tempTokenBalance = JSON.parse(
+            JSON.stringify(this.apiService.CHAIN_TOKENS.BSC)
+          );
           break;
         case 'HECO':
           dispatchBalanceType = UPDATE_HECO_BALANCES;
-          tempTokenBalance = JSON.parse(JSON.stringify(CHAIN_TOKENS.HECO));
+          tempTokenBalance = JSON.parse(
+            JSON.stringify(this.apiService.CHAIN_TOKENS.HECO)
+          );
           break;
       }
       const result = {};

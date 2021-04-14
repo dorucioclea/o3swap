@@ -47,13 +47,14 @@ interface State {
 })
 export class SwapResultComponent implements OnInit, OnDestroy {
   SOURCE_TOKEN_SYMBOL = SOURCE_TOKEN_SYMBOL;
-  @Input() rates;
   @Input() fromToken: Token;
   @Input() toToken: Token;
   @Input() inputAmount: string; // 支付的 token 数量
   @Input() initData: any;
   @Output() closePage = new EventEmitter<any>();
   @Output() swapFail = new EventEmitter();
+
+  rates = {};
 
   inquiryOptions = {
     path: '/assets/json/Inquerying.json',
@@ -112,6 +113,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.getRates();
     if (this.initData) {
       this.chooseSwapPath = this.initData.chooseSwapPath;
       this.chooseSwapPathIndex = this.initData.chooseSwapPathIndex;
@@ -150,6 +152,12 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     if (this.approveInterval) {
       this.approveInterval.unsubscribe();
     }
+  }
+
+  getRates(): void {
+    this.apiService.getRates().subscribe((res) => {
+      this.rates = res;
+    });
   }
 
   setInquiryInterval(): void {
@@ -236,6 +244,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   swap(): void {
+    this.getFromAndToAddress();
     if (this.checkWalletConnect() === false) {
       return;
     }

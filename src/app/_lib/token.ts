@@ -15,8 +15,7 @@ export const SOURCE_TOKEN_SYMBOL = {
   HECO: 'HT',
   BSC: 'BNB',
 };
-export const ETH_SOURCE_ASSET_HASH =
-  '0000000000000000000000000000000000000000';
+export const ETH_SOURCE_ASSET_HASH = '0000000000000000000000000000000000000000';
 export const WETH_ASSET_HASH = '0xc778417e063141139fce010982780140aa0cd5ab';
 export const ETH_PUSDT_ASSET_HASH = {
   ETH: '0x63799851696CDE43c2305dccd7208a03272BA591',
@@ -139,7 +138,7 @@ const ETH_TOKENS: Token[] = [
     logo: '/assets/images/tokens/eth.png',
   },
   {
-    assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
+    assetID: '0x74a7f2a3afa8b0cb577985663b5811901a860619',
     symbol: 'USDT',
     decimals: 6,
     amount: '0',
@@ -151,14 +150,14 @@ const ETH_TOKENS: Token[] = [
     symbol: 'WETH',
     decimals: 18,
     chain: 'ETH',
-    logo: 'https://img.o3.network/logo/eth/eth.png',
+    logo: '/assets/images/tokens/eth.png',
     amount: '0',
   },
 ];
 const BSC_TOKENS: Token[] = [
   {
     assetID:
-      NETWORK === 'MainNet' ? '' : '163f9d7a590e1921c1461bf6ed455b67e7877e95',
+      NETWORK === 'MainNet' ? '' : '0x163f9d7a590e1921c1461bf6ed455b67e7877e95',
     symbol: 'BETH',
     decimals: 18,
     amount: '0',
@@ -167,7 +166,7 @@ const BSC_TOKENS: Token[] = [
   },
   {
     assetID:
-      NETWORK === 'MainNet' ? '' : '74A7f2A3aFa8B0CB577985663B5811901A860619',
+      NETWORK === 'MainNet' ? '' : '0x74a7f2a3afa8b0cb577985663b5811901a860619',
     symbol: 'BUSD',
     decimals: 18,
     amount: '0',
@@ -178,7 +177,7 @@ const BSC_TOKENS: Token[] = [
 const HECO_TOKENS: Token[] = [
   {
     assetID:
-      NETWORK === 'MainNet' ? '' : '77e8eBD5B2D7cD984e6Ae05a809409c795Bf9b04',
+      NETWORK === 'MainNet' ? '' : '0x77e8ebd5b2d7cd984e6ae05a809409c795bf9b04',
     symbol: 'HUSD',
     decimals: 18,
     amount: '0',
@@ -196,7 +195,7 @@ const ALL: Token[] = [
     logo: '/assets/images/tokens/eth.png',
   },
   {
-    assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
+    assetID: '0x74a7f2a3afa8b0cb577985663b5811901a860619',
     symbol: 'USDT',
     decimals: 6,
     amount: '0',
@@ -216,7 +215,7 @@ const ALL: Token[] = [
   },
   {
     assetID:
-      NETWORK === 'MainNet' ? '' : '74A7f2A3aFa8B0CB577985663B5811901A860619',
+      NETWORK === 'MainNet' ? '' : '0x74a7f2a3afa8b0cb577985663b5811901a860619',
     symbol: 'BUSD',
     decimals: 18,
     amount: '0',
@@ -225,7 +224,7 @@ const ALL: Token[] = [
   },
   {
     assetID:
-      NETWORK === 'MainNet' ? '' : '77e8eBD5B2D7cD984e6Ae05a809409c795Bf9b04',
+      NETWORK === 'MainNet' ? '' : '0x77e8ebd5b2d7cd984e6ae05a809409c795bf9b04',
     symbol: 'HUSD',
     decimals: 18,
     amount: '0',
@@ -233,6 +232,7 @@ const ALL: Token[] = [
     chain: 'HECO',
   },
 ];
+// 只在接口出问题时使用
 export const CHAIN_TOKENS = {
   ALL,
   NEO: NEO_TOKENS,
@@ -245,7 +245,7 @@ export const CHAIN_TOKENS = {
 //#region liquidity page
 export const USD_TOKENS: Token[] = [
   {
-    assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
+    assetID: '0x74a7f2a3afa8b0cb577985663b5811901a860619',
     symbol: 'USDT',
     decimals: 6,
     amount: '0',
@@ -254,7 +254,7 @@ export const USD_TOKENS: Token[] = [
   },
   {
     assetID:
-      NETWORK === 'MainNet' ? '' : '74A7f2A3aFa8B0CB577985663B5811901A860619',
+      NETWORK === 'MainNet' ? '' : '0x74a7f2a3afa8b0cb577985663b5811901a860619',
     symbol: 'BUSD',
     decimals: 18,
     amount: '0',
@@ -263,7 +263,7 @@ export const USD_TOKENS: Token[] = [
   },
   {
     assetID:
-      NETWORK === 'MainNet' ? '' : '77e8eBD5B2D7cD984e6Ae05a809409c795Bf9b04',
+      NETWORK === 'MainNet' ? '' : '0x77e8ebd5b2d7cd984e6ae05a809409c795bf9b04',
     symbol: 'HUSD',
     decimals: 18,
     amount: '0',
@@ -273,7 +273,7 @@ export const USD_TOKENS: Token[] = [
 ];
 export const LP_TOKENS: Token[] = [
   {
-    assetID: '0xD5d63Dce45E0275Ca76a8b2e9BD8C11679A57D0D',
+    assetID: '0xd5d63dce45e0275ca76a8b2e9bd8c11679a57d0d',
     symbol: 'pLP',
     decimals: 18,
     amount: '0',
@@ -281,7 +281,7 @@ export const LP_TOKENS: Token[] = [
     logo: '/assets/images/tokens/lp.png',
   },
   {
-    assetID: '0xD5d63Dce45E0275Ca76a8b2e9BD8C11679A57D0D',
+    assetID: '0xd5d63dce45e0275ca76a8b2e9bd8c11679a57d0d',
     symbol: 'pLP',
     decimals: 18,
     amount: '0',
@@ -289,7 +289,7 @@ export const LP_TOKENS: Token[] = [
     logo: '/assets/images/tokens/lp.png',
   },
   {
-    assetID: '0x74A7f2A3aFa8B0CB577985663B5811901A860619',
+    assetID: '0x74a7f2a3afa8b0cb577985663b5811901a860619',
     symbol: 'pLP',
     decimals: 18,
     amount: '0',

@@ -3,7 +3,7 @@ import { NETWORK } from './network';
 
 const ETH_TOKEN: Token[] = [
   {
-    assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
+    assetID: '74a7f2a3afa8b0cb577985663b5811901a860619',
     symbol: 'USDT',
     decimals: 6,
     amount: '0',
@@ -15,7 +15,7 @@ const ETH_TOKEN: Token[] = [
 const BSC_TOKEN: Token[] = [
   {
     assetID:
-      NETWORK === 'MainNet' ? '' : '74A7f2A3aFa8B0CB577985663B5811901A860619',
+      NETWORK === 'MainNet' ? '' : '74a7f2a3afa8b0cb577985663b5811901a860619',
     symbol: 'BUSD',
     decimals: 18,
     amount: '0',
@@ -27,7 +27,7 @@ const BSC_TOKEN: Token[] = [
 const HECO_TOKEN: Token[] = [
   {
     assetID:
-      NETWORK === 'MainNet' ? '' : '77e8eBD5B2D7cD984e6Ae05a809409c795Bf9b04',
+      NETWORK === 'MainNet' ? '' : '77e8ebd5b2d7cd984e6ae05a809409c795bf9b04',
     symbol: 'HUSD',
     decimals: 18,
     amount: '0',
@@ -38,7 +38,7 @@ const HECO_TOKEN: Token[] = [
 
 const ALL_TOKENS: Token[] = [
   {
-    assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
+    assetID: '74a7f2a3afa8b0cb577985663b5811901a860619',
     symbol: 'USDT',
     decimals: 6,
     amount: '0',
@@ -47,7 +47,7 @@ const ALL_TOKENS: Token[] = [
   },
   {
     assetID:
-      NETWORK === 'MainNet' ? '' : '74A7f2A3aFa8B0CB577985663B5811901A860619',
+      NETWORK === 'MainNet' ? '' : '74a7f2a3afa8b0cb577985663b5811901a860619',
     symbol: 'BUSD',
     decimals: 18,
     amount: '0',
@@ -56,7 +56,7 @@ const ALL_TOKENS: Token[] = [
   },
   {
     assetID:
-      NETWORK === 'MainNet' ? '' : '77e8eBD5B2D7cD984e6Ae05a809409c795Bf9b04',
+      NETWORK === 'MainNet' ? '' : '77e8ebd5b2d7cd984e6ae05a809409c795bf9b04',
     symbol: 'HUSD',
     decimals: 18,
     amount: '0',

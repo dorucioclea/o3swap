@@ -72,17 +72,9 @@ export class ApiService {
   getRates(): Observable<any> {
     return this.http.get(`${this.RATE_HOST}/crypto/rates`).pipe(
       map((res: CommonHttpResponse) => {
-        const rates: any = {};
         if (res.status === 'success') {
-          rates.neo = res.data.neo2.neo.price;
-          rates.flm = res.data.neo2.flm.price;
-          rates.swth = res.data.neo2.swth.price;
-          rates.eth = res.data.eth.eth.price;
-          rates.usdt = res.data.eth.usdt.price;
-          rates.weth = res.data.eth.weth.price;
-          rates.ont = res.data.ont.ont.price;
+          return res.data;
         }
-        return rates;
       })
     );
   }
@@ -430,7 +422,7 @@ export class ApiService {
             res.data.forEach((item) => {
               const swapPath = this.swapService.getAssetNamePath(
                 item.path,
-                fromToken.chain
+                this.CHAIN_TOKENS[fromToken.chain]
               );
               const temp = {
                 amount: item.amounts,
@@ -476,7 +468,7 @@ export class ApiService {
             res.data.forEach((item) => {
               const swapPath = this.swapService.getAssetNamePath(
                 item.path,
-                fromToken.chain
+                this.CHAIN_TOKENS[fromToken.chain]
               );
               if (toToken.symbol === 'ETH') {
                 toAssetHash = WETH_ASSET_HASH;
@@ -596,9 +588,9 @@ export class ApiService {
 
   private getAssetLogoByName(name: string): string {
     let token;
-    for (const key in CHAIN_TOKENS) {
-      if (CHAIN_TOKENS.hasOwnProperty(key)) {
-        const tokenList = CHAIN_TOKENS[key];
+    for (const key in this.CHAIN_TOKENS) {
+      if (this.CHAIN_TOKENS.hasOwnProperty(key)) {
+        const tokenList = this.CHAIN_TOKENS[key];
         token = tokenList.find((item) => item.symbol === name);
         if (token) {
           break;
@@ -610,7 +602,7 @@ export class ApiService {
 
   private handleReceiveSwapPathFiat(
     swapPathArr: AssetQueryResponse,
-    toToken: Token | string
+    toToken: Token
   ): AssetQueryResponse {
     swapPathArr.forEach((item) => {
       item.receiveAmount = item.amount[item.amount.length - 1];

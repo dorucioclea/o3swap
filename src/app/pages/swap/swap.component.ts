@@ -11,7 +11,6 @@ type PageStatus = 'home' | 'result';
 })
 export class SwapComponent implements OnInit {
   pageStatus: PageStatus = 'home';
-  rates = {};
 
   fromToken: Token = NNEO_TOKEN;
   toToken: Token;
@@ -24,15 +23,7 @@ export class SwapComponent implements OnInit {
     private nzMessage: NzMessageService
   ) {}
 
-  ngOnInit(): void {
-    this.getRates();
-  }
-
-  getRates(): void {
-    this.apiService.getRates().subscribe((res) => {
-      this.rates = res;
-    });
-  }
+  ngOnInit(): void {}
 
   //#region home
   toInquiryPage({ inputAmount, fromToken, toToken }): void {

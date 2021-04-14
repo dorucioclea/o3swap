@@ -44,11 +44,11 @@
     <div class="tab-wrap">
       <div class="tab-nav-scroll">
         <div class="tabs tabs-add" [ngClass]="{addActive: liquidityType === 'add'}"
-          [routerLink]="['/bridge/liquidity', 'add']">
+          [routerLink]="['/hub/liquidity', 'add']">
           Add Liquidity
         </div>
         <div class="tabs tabs-remove" [ngClass]="{removeActive: liquidityType === 'remove'}"
-          [routerLink]="['/bridge/liquidity', 'remove']">
+          [routerLink]="['/hub/liquidity', 'remove']">
           Remove Liquidity
         </div>
       </div>
@@ -68,7 +68,7 @@
                   </div>
                   <div class="max-status" (click)="maxAddLiquidityInput(i)"
                     [ngClass]="{active: tokenItem.amount != '--'}">MAX</div>
-                  <div class="balance" nz-tooltip [nzTooltipTitle]="tokenItem.amount">
+                  <div class="balance">
                     <span>Balance</span><span>{{tokenItem.amount | transNumber}}</span>
                   </div>
                 </div>
@@ -92,7 +92,7 @@
                   </div>
                   <div class="max-status" (click)="maxRemoveLiquidityInput(i)"
                     [ngClass]="{active: tokenItem.amount != '--'}">MAX</div>
-                  <div class="balance" nz-tooltip [nzTooltipTitle]="tokenItem.amount">
+                  <div class="balance">
                     <span>Balance</span><span>{{tokenItem.amount | transNumber}}</span>
                   </div>
                 </div>
@@ -143,7 +143,8 @@
     <div class="right">
       <div class="item-list">
         <span class="name">{{ liquidityType == 'add' ? 'Receive' : 'PayAmount' }}</span>
-        <span class="value">{{ liquidityType == 'add' ? receiveAmount : payAmount }}</span>
+        <span
+          class="value">{{ (liquidityType == 'add' ? receiveAmount : payAmount) | transNumber | number: '1.0-8' }}</span>
       </div>
       <div class="item-list">
         <span class="name">Max slippage</span>

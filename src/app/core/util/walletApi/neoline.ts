@@ -393,12 +393,10 @@ export class NeolineWalletApiService {
       })
       .then((addressTokens: any[]) => {
         const tokens = addressTokens[this.accountAddress];
-        this.commonService.log(tokens);
         const tempTokenBalance = {};
         tokens.forEach((tokenItem: any) => {
           tempTokenBalance[tokenItem.asset_id || tokenItem.assetID] = tokenItem;
         });
-        this.commonService.log('temp: ' + tempTokenBalance);
         this.store.dispatch({
           type: UPDATE_NEO_BALANCES,
           data: tempTokenBalance,

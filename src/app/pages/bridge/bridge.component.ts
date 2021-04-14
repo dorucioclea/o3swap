@@ -158,10 +158,8 @@ export class BridgeComponent implements OnInit {
   }
 
   async swap(): Promise<void> {
+    this.getFromAndToAddress();
     if (this.checkWalletConnect() === false) {
-      return;
-    }
-    if (!this.fromAddress || !this.toAddress) {
       return;
     }
     const polyFee = await this.apiService.getFromEthPolyFee(
