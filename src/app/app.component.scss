@@ -60,10 +60,12 @@ header {
       &.active a,
       &:hover a {
         color: #46b069;
+        background-image: -webkit-linear-gradient(-30deg, #46b069 0%, #00af92 99.6337890625%);
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
       &.active,
       &:hover {
-        color: #46b069;
         font-family: "fontBold";
         &::before {
           display: block;
