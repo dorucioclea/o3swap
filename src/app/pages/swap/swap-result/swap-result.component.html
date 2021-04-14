@@ -18,7 +18,7 @@
   </div>
   <div class="receive content-border content-border-active">
     <p class="sub-title">Receive</p>
-    <p class="amount">{{ chooseSwapPath?.receiveAmount }} {{ toToken?.symbol }}</p>
+    <p class="amount">{{ chooseSwapPath?.receiveAmount | transNumber | number: '1.0-8' }} {{ toToken?.symbol }}</p>
     <p class="fiat">≈＄{{ chooseSwapPath?.fiat }}</p>
     <div class="optimal">Optimal</div>
   </div>

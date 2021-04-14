@@ -7,7 +7,6 @@ import {
   AssetQueryResponse,
   CommonHttpResponse,
   CROSS_CHAIN_SWAP_DETAIL_HOST,
-  INQUIRY_HOST,
   UTXO_HOST,
   Token,
   TxProgress,
@@ -20,10 +19,12 @@ import {
   SWAP_CONTRACT_CHAIN_ID,
   POLY_HOST_ADDRESS,
   ETH_SOURCE_CONTRACT_HASH,
-  ETH_INQUIRY_HOST,
+  INQUIRY_HOST,
   USD_TOKENS,
   O3_AGGREGATOR_FEE,
   O3_AGGREGATOR_SLIPVALUE,
+  FUSDT_ASSET_HASH,
+  NNEO_ASSET_HASH,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { CommonService } from '../util/common.service';
@@ -200,16 +201,30 @@ export class ApiService {
       return of([]).toPromise();
     }
     if (fromToken.chain === toToken.chain) {
-      const res = await this.getFromEthSwapPath(fromToken, toToken, inputAmount);
+      const res = await this.getFromEthSwapPath(
+        fromToken,
+        toToken,
+        inputAmount
+      );
       return this.handleReceiveSwapPathFiat(res, toToken);
     }
     const fromUsd = USD_TOKENS.find((item) => item.chain === fromToken.chain);
     const toUsd = USD_TOKENS.find((item) => item.chain === toToken.chain);
-    if (fromUsd.symbol === fromToken.symbol && toUsd.symbol === toToken.symbol) {
-      const res = await this.getFromEthCrossChainSwapPath(fromToken, toToken, inputAmount);
+    if (
+      fromUsd.symbol === fromToken.symbol &&
+      toUsd.symbol === toToken.symbol
+    ) {
+      const res = await this.getFromEthCrossChainSwapPath(
+        fromToken,
+        toToken,
+        inputAmount
+      );
       return this.handleReceiveSwapPathFiat(res, toToken);
     }
-    if (fromUsd.symbol !== fromToken.symbol && toUsd.symbol === toToken.symbol) {
+    if (
+      fromUsd.symbol !== fromToken.symbol &&
+      toUsd.symbol === toToken.symbol
+    ) {
       const res = await this.getFromEthCrossChainAggregatorSwapPath(
         fromToken,
         toToken,
@@ -226,14 +241,22 @@ export class ApiService {
   ): Promise<string[]> {
     if (NETWORK === 'MainNet') {
       if (fromToken.symbol === 'fUSDT') {
-        return of(['fUSDT']).toPromise();
+        return of([FUSDT_ASSET_HASH]).toPromise();
       }
-      return this.getToStandardSwapPathReq(fromToken, 'fUSDT', inputAmount);
+      return this.getToStandardSwapPathReq(
+        fromToken,
+        FUSDT_ASSET_HASH,
+        inputAmount
+      );
     } else {
       if (fromToken.symbol === 'nNEO') {
-        return of(['nNEO']).toPromise();
+        return of([NNEO_ASSET_HASH]).toPromise();
       }
-      return this.getToStandardSwapPathReq(fromToken, 'nNEO', inputAmount);
+      return this.getToStandardSwapPathReq(
+        fromToken,
+        NNEO_ASSET_HASH,
+        inputAmount
+      );
     }
   }
 
@@ -309,16 +332,28 @@ export class ApiService {
     }
     const amount = this.swapService.getAmountIn(fromToken, inputAmount);
     return this.http
-      .post(
-        `${INQUIRY_HOST}?StartAsset=${fromToken.symbol}&EndAsset=${toAssetName}&amount=${amount}`,
-        null
-      )
+      .post(`${INQUIRY_HOST}/v1/neo/quote`, {
+        from: this.commonService.remove0xHash(fromToken.assetID),
+        to: this.commonService.remove0xHash(toToken.assetID),
+        amount,
+      })
       .pipe(
-        map((res: AssetQueryResponse) => {
-          if (res.length > 0) {
-            return this.handleReceiveSwapPathFiat(res, toToken);
-          } else {
-            return [];
+        map((res: CommonHttpResponse) => {
+          if (res.status === 'success') {
+            const target = [];
+            res.data.forEach((item) => {
+              const swapPath = this.swapService.getAssetNamePath(
+                item.path,
+                fromToken.chain
+              );
+              const temp = {
+                amount: item.amounts,
+                swapPath,
+                assetHashPath: item.path,
+              };
+              target.push(temp);
+            });
+            return this.handleReceiveSwapPathFiat(target, toToken);
           }
         })
       )
@@ -343,7 +378,7 @@ export class ApiService {
       toAssetHash = '0xc778417e063141139fce010982780140aa0cd5ab';
     }
     return this.http
-      .post(`${ETH_INQUIRY_HOST}/v1/${fromToken.chain.toLowerCase()}/quote`, {
+      .post(`${INQUIRY_HOST}/v1/${fromToken.chain.toLowerCase()}/quote`, {
         from: this.commonService.add0xHash(fromAssetHash),
         to: this.commonService.add0xHash(toAssetHash),
         amount,
@@ -380,12 +415,24 @@ export class ApiService {
     const res1 = await this.getFromEthSwapPath(fromToken, fromUsd, inputAmount); // 排序
     const amountOutA = res1[0].amount[res1[0].amount.length - 1];
     console.log(`amountOutA: ${amountOutA}`);
-    const amountOutB = this.swapService.getMinAmountOut(amountOutA, O3_AGGREGATOR_FEE);
+    const amountOutB = this.swapService.getMinAmountOut(
+      amountOutA,
+      O3_AGGREGATOR_FEE
+    );
     console.log(`amountOutB: ${amountOutB}`);
-    let polyAmountIn = this.swapService.getMinAmountOut(amountOutB, O3_AGGREGATOR_SLIPVALUE);
+    let polyAmountIn = this.swapService.getMinAmountOut(
+      amountOutB,
+      O3_AGGREGATOR_SLIPVALUE
+    );
     console.log(`polyAmountIn: ${polyAmountIn}`);
-    polyAmountIn = new BigNumber(polyAmountIn).shiftedBy(-fromUsd.decimals).toFixed();
-    const res2 = await this.getFromEthCrossChainSwapPath(fromUsd, toToken, polyAmountIn);
+    polyAmountIn = new BigNumber(polyAmountIn)
+      .shiftedBy(-fromUsd.decimals)
+      .toFixed();
+    const res2 = await this.getFromEthCrossChainSwapPath(
+      fromUsd,
+      toToken,
+      polyAmountIn
+    );
     const polyAmountOut = res2[0].amount[1];
     res1[0].amount.push(polyAmountOut);
     res1[0].swapPath.push(toToken.symbol);
@@ -501,19 +548,20 @@ export class ApiService {
 
   private getToStandardSwapPathReq(
     fromToken: Token,
-    toAssetName: string,
+    standardTokenAssetHash: string,
     inputAmount: string
   ): Promise<string[]> {
     const amount = this.swapService.getAmountIn(fromToken, inputAmount);
     return this.http
-      .post(
-        `${INQUIRY_HOST}?StartAsset=${fromToken.symbol}&EndAsset=${toAssetName}&amount=${amount}`,
-        null
-      )
+      .post(`${INQUIRY_HOST}/v1/neo/quote`, {
+        from: this.commonService.remove0xHash(fromToken.assetID),
+        to: this.commonService.remove0xHash(standardTokenAssetHash),
+        amount,
+      })
       .pipe(
-        map((res: AssetQueryResponse) => {
-          if (res.length > 0) {
-            return res[0].swapPath;
+        map((res: CommonHttpResponse) => {
+          if (res.status === 'success') {
+            return res.data[0].path;
           } else {
             return [];
           }

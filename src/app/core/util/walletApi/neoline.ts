@@ -241,16 +241,16 @@ export class NeolineWalletApiService {
       },
       {
         type: 'Array',
-        value: chooseSwapPath.swapPath.map((assetName) => ({
+        value: chooseSwapPath.assetHashPath.map((assetHash) => ({
           type: 'Hash160',
-          value: this.swapService.getNeoAssetHashByName(assetName),
+          value: assetHash,
         })),
       },
       {
         type: 'Array',
-        value: toNeoswapPath.map((assetName) => ({
+        value: toNeoswapPath.map((assetHash) => ({
           type: 'Hash160',
-          value: this.swapService.getNeoAssetHashByName(assetName),
+          value: assetHash,
         })),
       },
       {
@@ -319,13 +319,13 @@ export class NeolineWalletApiService {
       },
       {
         type: 'Array',
-        value: this.swapService.getAssetHashPath(chooseSwapPath.swapPath),
+        value: chooseSwapPath.assetHashPath,
       },
       {
         type: 'Array',
-        value: toNeoswapPath.map((assetName) => ({
+        value: toNeoswapPath.map((assetHash) => ({
           type: 'Hash160',
-          value: this.swapService.getNeoAssetHashByName(assetName),
+          value: assetHash,
         })),
       },
       {

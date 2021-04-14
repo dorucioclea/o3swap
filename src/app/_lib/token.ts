@@ -405,3 +405,13 @@ export const ETH_PUSDT = {
   BSC: '0x78Ec09343122737925f9839d7794de49FeB6B083',
   HECO: '0xbdd265FC4D5b7E7a937608B91EDAFc38F27E4479',
 };
+
+export const NNEO_ASSET_HASH =
+  NETWORK === 'MainNet'
+    ? 'f46719e2d16bf50cddcef9d4bbfece901f73cbb6'
+    : '17da3881ab2d050fea414c80b3fa8324d756f60e';
+
+export const FUSDT_ASSET_HASH =
+  NETWORK === 'MainNet'
+    ? '1aa893170b1babfefba973e9a9183990d792c2a7'
+    : 'b55026d49bb5b585e1d2f9820efdc969f4b8cde6';

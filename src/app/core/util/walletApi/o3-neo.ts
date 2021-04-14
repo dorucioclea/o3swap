@@ -198,16 +198,16 @@ export class O3NeoWalletApiService {
       },
       {
         type: 'Array',
-        value: chooseSwapPath.swapPath.map((assetName) => ({
+        value: chooseSwapPath.assetHashPath.map((assetHash) => ({
           type: 'Hash160',
-          value: this.swapService.getNeoAssetHashByName(assetName),
+          value: assetHash,
         })),
       },
       {
         type: 'Array',
-        value: toNeoswapPath.map((assetName) => ({
+        value: toNeoswapPath.map((assetHash) => ({
           type: 'Hash160',
-          value: this.swapService.getNeoAssetHashByName(assetName),
+          value: assetHash,
         })),
       },
       {
@@ -271,13 +271,13 @@ export class O3NeoWalletApiService {
       },
       {
         type: 'Array', // paths (输入资产 到 输出资产 的路径)
-        value: this.swapService.getAssetHashPath(chooseSwapPath.swapPath),
+        value: chooseSwapPath.assetHashPath,
       },
       {
         type: 'Array', // toStandardTokenPaths (输入资产 到 nNeo(fUSDT) 的路径， 如输入资产为nNeo, 则仅为 nNeo)
-        value: toNeoswapPath.map((assetName) => ({
+        value: toNeoswapPath.map((assetHash) => ({
           type: 'Hash160',
-          value: this.swapService.getNeoAssetHashByName(assetName),
+          value: assetHash,
         })),
       },
       {
