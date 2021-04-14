@@ -47,6 +47,7 @@ export class ApiService {
   }
   //#endregion
 
+  //#region o3 api
   getTokens(): void {
     this.http
       .get(`${INQUIRY_HOST}/v1/tokens/all`)
@@ -69,6 +70,7 @@ export class ApiService {
             });
           });
           res.data.ALL = res.data.recommend;
+          delete res.data.recommend;
           console.log(res.data);
           this.CHAIN_TOKENS = res.data;
         }
@@ -83,32 +85,6 @@ export class ApiService {
         }
       })
     );
-  }
-
-  // neo nneo swap
-  getUtxo(address: string, amount: string): Promise<any> {
-    return this.http
-      .post(`${UTXO_HOST}/utxo`, {
-        address,
-        neoVal: amount,
-      })
-      .pipe(
-        map((res: any) => {
-          if (res.status === 'ok' && res.result) {
-            let sum = 0;
-            const utxoList = res.result.map((item) => {
-              sum += item.amount;
-              return {
-                txid: item.txid,
-                index: item.n,
-              };
-            });
-            return { utxoList, sum };
-          }
-          return false;
-        })
-      )
-      .toPromise();
   }
 
   async getSwapPath(
@@ -187,8 +163,36 @@ export class ApiService {
       );
     }
   }
+  //#endregion
 
-  //#region poly
+  //#region neo nneo swap
+  getUtxo(address: string, amount: string): Promise<any> {
+    return this.http
+      .post(`${UTXO_HOST}/utxo`, {
+        address,
+        neoVal: amount,
+      })
+      .pipe(
+        map((res: any) => {
+          if (res.status === 'ok' && res.result) {
+            let sum = 0;
+            const utxoList = res.result.map((item) => {
+              sum += item.amount;
+              return {
+                txid: item.txid,
+                index: item.n,
+              };
+            });
+            return { utxoList, sum };
+          }
+          return false;
+        })
+      )
+      .toPromise();
+  }
+  //#endregion
+
+  //#region poly api
   getBridgeAmountOut(
     fromToken: Token,
     toToken: Token,
@@ -270,7 +274,7 @@ export class ApiService {
     return this.http
       .post(`${CROSS_CHAIN_SWAP_DETAIL_HOST}/getfee`, {
         SrcChainId: SWAP_CONTRACT_CHAIN_ID[fromToken.chain],
-        Hash: ETH_SOURCE_ASSET_HASH,
+        Hash: this.commonService.remove0xHash(ETH_SOURCE_ASSET_HASH),
         DstChainId: SWAP_CONTRACT_CHAIN_ID[toToken.chain],
       })
       .pipe(
@@ -362,9 +366,7 @@ export class ApiService {
       .pipe(
         map((res: any) => {
           if (res.code === 200) {
-            return new BigNumber(res.balance)
-              .shiftedBy(-decimals)
-              .toFixed();
+            return new BigNumber(res.balance).shiftedBy(-decimals).toFixed();
           }
         })
       )

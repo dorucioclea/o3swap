@@ -21,7 +21,7 @@ import {
   NETWORK,
   SWAP_CONTRACT_CHAIN_ID,
 } from '@lib';
-import { interval, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { wallet } from '@cityofzion/neon-js';
 import BigNumber from 'bignumber.js';
 
@@ -71,6 +71,7 @@ export class O3NeoWalletApiService {
       });
   }
 
+  //#region NEO nNEO swap
   async mintNNeo(
     fromToken: Token, // neo
     toToken: Token, // nneo
@@ -163,6 +164,7 @@ export class O3NeoWalletApiService {
         this.swapService.handleNeoDapiError(error, 'O3');
       });
   }
+  //#endregion
 
   async swap(
     fromToken: Token,
@@ -334,7 +336,7 @@ export class O3NeoWalletApiService {
       });
   }
 
-  //#region
+  //#region private function
   private getBalances(
     fromTokenAssetId?: string,
     inputAmount?: string

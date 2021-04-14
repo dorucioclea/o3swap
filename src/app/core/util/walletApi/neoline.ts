@@ -60,6 +60,7 @@ export class NeolineWalletApiService {
     });
   }
 
+  //#region connect
   init(): void {
     const sessionNeoWalletName = sessionStorage.getItem(
       'neoWalletName'
@@ -102,7 +103,9 @@ export class NeolineWalletApiService {
         this.swapService.handleNeoDapiError(error, 'NeoLine');
       });
   }
+  //#endregion
 
+  //#region NEO nNEO swap
   async mintNNeo(
     fromToken: Token, // neo
     toToken: Token, // nneo
@@ -203,6 +206,7 @@ export class NeolineWalletApiService {
         this.swapService.handleNeoDapiError(error, 'NeoLine');
       });
   }
+  //#endregion
 
   async swap(
     fromToken: Token,
@@ -381,7 +385,7 @@ export class NeolineWalletApiService {
       });
   }
 
-  //#region
+  //#region private function
   private getBalances(
     fromTokenAssetId?: string,
     inputAmount?: string

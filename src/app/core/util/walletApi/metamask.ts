@@ -22,7 +22,7 @@ import {
   ETH_SOURCE_ASSET_HASH,
   METAMASK_CHAIN,
   USD_TOKENS,
-  ETH_SWAP_CONTRACT_HASH,
+  ETH_UNI_SWAP_CONTRACT_HASH,
   AssetQueryResponseItem,
   O3_AGGREGATOR_SLIPVALUE,
   ApproveContract,
@@ -89,6 +89,7 @@ export class MetaMaskWalletApiService {
     });
   }
 
+  //#region connect
   init(): void {
     if ((window as any).ethereum && (window as any).ethereum.isConnected()) {
       const localEthWalletName = localStorage.getItem(
@@ -154,7 +155,9 @@ export class MetaMaskWalletApiService {
         this.handleDapiError(error);
       });
   }
+  //#endregion
 
+  //#region balance
   async getBalance(): Promise<boolean> {
     console.log('getBalance-----------');
     const chainId = new BigNumber(this.ethereum.chainId, 16).toNumber();
@@ -258,223 +261,9 @@ export class MetaMaskWalletApiService {
         });
     }
   }
+  //#endregion
 
-  async uniSwapExactTokensForETH(
-    fromToken: Token,
-    toToken: Token,
-    chooseSwapPath: AssetQueryResponseItem,
-    inputAmount: string,
-    fromAddress: string,
-    toAddress: string,
-    deadline: number
-  ): Promise<any> {
-    console.log('swapExactTokensForETHSupportingFeeOnTransferTokens');
-    if (this.checkNetwork(fromToken) === false) {
-      return;
-    }
-    const json = await this.getO3UniSwapJson();
-    const swapContract = new this.web3.eth.Contract(
-      json,
-      ETH_SWAP_CONTRACT_HASH
-    );
-    const receiveAmount =
-      chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
-    const params = {
-      amountIn: new BigNumber(inputAmount).shiftedBy(fromToken.decimals),
-      uniAmountOutMin: this.swapService.getMinAmountOut(
-        receiveAmount,
-        O3_AGGREGATOR_SLIPVALUE
-      ),
-      path: chooseSwapPath.assetHashPath,
-      to: toAddress,
-      deadline: Math.floor(Date.now() / 1000 + deadline * 60),
-    };
-    console.log(params);
-    const data = swapContract.methods
-      .swapExactTokensForETHSupportingFeeOnTransferTokens(
-        params.amountIn,
-        params.uniAmountOutMin,
-        params.path,
-        params.to,
-        params.deadline
-      )
-      .encodeABI();
-    return this.ethereum
-      .request({
-        method: 'eth_sendTransaction',
-        params: [
-          this.getSendTransactionParams(
-            fromAddress,
-            ETH_SWAP_CONTRACT_HASH,
-            data
-          ),
-        ],
-      })
-      .then((hash) => {
-        console.log(hash);
-        this.handleTx(
-          fromToken,
-          toToken,
-          inputAmount,
-          receiveAmount,
-          hash,
-          'swap',
-          false
-        );
-        return hash;
-      })
-      .catch((error) => {
-        console.log(error);
-        this.handleDapiError(error);
-      });
-  }
-
-  async uniSwapExactETHForTokens(
-    fromToken: Token,
-    toToken: Token,
-    chooseSwapPath: AssetQueryResponseItem,
-    inputAmount: string,
-    fromAddress: string,
-    toAddress: string,
-    deadline: number
-  ): Promise<any> {
-    console.log('swapExactETHForTokensSupportingFeeOnTransferTokens');
-    if (this.checkNetwork(fromToken) === false) {
-      return;
-    }
-    const json = await this.getO3UniSwapJson();
-    const swapContract = new this.web3.eth.Contract(
-      json,
-      ETH_SWAP_CONTRACT_HASH
-    );
-    const receiveAmount =
-      chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
-    const params = {
-      uniAmountOutMin: this.swapService.getMinAmountOut(
-        receiveAmount,
-        O3_AGGREGATOR_SLIPVALUE
-      ),
-      path: chooseSwapPath.assetHashPath,
-      to: toAddress,
-      deadline: Math.floor(Date.now() / 1000 + deadline * 60),
-    };
-    console.log(params);
-    const value = new BigNumber(inputAmount)
-      .shiftedBy(fromToken.decimals)
-      .toFixed();
-    console.log(`value: ${value}`);
-    const data = swapContract.methods
-      .swapExactETHForTokensSupportingFeeOnTransferTokens(
-        params.uniAmountOutMin,
-        params.path,
-        params.to,
-        params.deadline
-      )
-      .encodeABI();
-    return this.ethereum
-      .request({
-        method: 'eth_sendTransaction',
-        params: [
-          this.getSendTransactionParams(
-            fromAddress,
-            ETH_SWAP_CONTRACT_HASH,
-            data,
-            value
-          ),
-        ],
-      })
-      .then((hash) => {
-        console.log(hash);
-        this.handleTx(
-          fromToken,
-          toToken,
-          inputAmount,
-          receiveAmount,
-          hash,
-          'swap',
-          false
-        );
-        return hash;
-      })
-      .catch((error) => {
-        console.log(error);
-        this.handleDapiError(error);
-      });
-  }
-
-  async uniSwapExactTokensForTokens(
-    fromToken: Token,
-    toToken: Token,
-    chooseSwapPath: AssetQueryResponseItem,
-    inputAmount: string,
-    fromAddress: string,
-    toAddress: string,
-    deadline: number
-  ): Promise<any> {
-    console.log('swapExactTokensForTokensSupportingFeeOnTransferTokens');
-    if (this.checkNetwork(fromToken) === false) {
-      return;
-    }
-    const json = await this.getO3UniSwapJson();
-    const swapContract = new this.web3.eth.Contract(
-      json,
-      ETH_SWAP_CONTRACT_HASH
-    );
-    const receiveAmount =
-      chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
-    const params = {
-      amountIn: new BigNumber(inputAmount)
-        .shiftedBy(fromToken.decimals)
-        .dp(0)
-        .toFixed(),
-      uniAmountOutMin: this.swapService.getMinAmountOut(
-        receiveAmount,
-        O3_AGGREGATOR_SLIPVALUE
-      ),
-      path: chooseSwapPath.assetHashPath,
-      to: toAddress,
-      deadline: Math.floor(Date.now() / 1000 + deadline * 60),
-    };
-    console.log(params);
-    const data = swapContract.methods
-      .swapExactTokensForTokensSupportingFeeOnTransferTokens(
-        params.amountIn,
-        params.uniAmountOutMin,
-        params.path,
-        params.to,
-        params.deadline
-      )
-      .encodeABI();
-    return this.ethereum
-      .request({
-        method: 'eth_sendTransaction',
-        params: [
-          this.getSendTransactionParams(
-            fromAddress,
-            ETH_SWAP_CONTRACT_HASH,
-            data
-          ),
-        ],
-      })
-      .then((hash) => {
-        console.log(hash);
-        this.handleTx(
-          fromToken,
-          toToken,
-          inputAmount,
-          receiveAmount,
-          hash,
-          'swap',
-          false
-        );
-        return hash;
-      })
-      .catch((error) => {
-        console.log(error);
-        this.handleDapiError(error);
-      });
-  }
-
+  //#region USDT BUSD PUSD swap
   async swapCrossChain(
     fromToken: Token,
     toToken: Token,
@@ -552,6 +341,224 @@ export class MetaMaskWalletApiService {
         this.handleDapiError(error);
       });
   }
+  //#endregion
+
+  //#region uni
+  async uniSwapExactTokensForETH(
+    fromToken: Token,
+    toToken: Token,
+    chooseSwapPath: AssetQueryResponseItem,
+    inputAmount: string,
+    fromAddress: string,
+    toAddress: string,
+    deadline: number
+  ): Promise<any> {
+    console.log('swapExactTokensForETHSupportingFeeOnTransferTokens');
+    if (this.checkNetwork(fromToken) === false) {
+      return;
+    }
+    const json = await this.getO3UniSwapJson();
+    const swapContract = new this.web3.eth.Contract(
+      json,
+      ETH_UNI_SWAP_CONTRACT_HASH
+    );
+    const receiveAmount =
+      chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
+    const params = {
+      amountIn: new BigNumber(inputAmount).shiftedBy(fromToken.decimals),
+      uniAmountOutMin: this.swapService.getMinAmountOut(
+        receiveAmount,
+        O3_AGGREGATOR_SLIPVALUE
+      ),
+      path: chooseSwapPath.assetHashPath,
+      to: toAddress,
+      deadline: Math.floor(Date.now() / 1000 + deadline * 60),
+    };
+    console.log(params);
+    const data = swapContract.methods
+      .swapExactTokensForETHSupportingFeeOnTransferTokens(
+        params.amountIn,
+        params.uniAmountOutMin,
+        params.path,
+        params.to,
+        params.deadline
+      )
+      .encodeABI();
+    return this.ethereum
+      .request({
+        method: 'eth_sendTransaction',
+        params: [
+          this.getSendTransactionParams(
+            fromAddress,
+            ETH_UNI_SWAP_CONTRACT_HASH,
+            data
+          ),
+        ],
+      })
+      .then((hash) => {
+        console.log(hash);
+        this.handleTx(
+          fromToken,
+          toToken,
+          inputAmount,
+          receiveAmount,
+          hash,
+          'swap',
+          false
+        );
+        return hash;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.handleDapiError(error);
+      });
+  }
+
+  async uniSwapExactETHForTokens(
+    fromToken: Token,
+    toToken: Token,
+    chooseSwapPath: AssetQueryResponseItem,
+    inputAmount: string,
+    fromAddress: string,
+    toAddress: string,
+    deadline: number
+  ): Promise<any> {
+    console.log('swapExactETHForTokensSupportingFeeOnTransferTokens');
+    if (this.checkNetwork(fromToken) === false) {
+      return;
+    }
+    const json = await this.getO3UniSwapJson();
+    const swapContract = new this.web3.eth.Contract(
+      json,
+      ETH_UNI_SWAP_CONTRACT_HASH
+    );
+    const receiveAmount =
+      chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
+    const params = {
+      uniAmountOutMin: this.swapService.getMinAmountOut(
+        receiveAmount,
+        O3_AGGREGATOR_SLIPVALUE
+      ),
+      path: chooseSwapPath.assetHashPath,
+      to: toAddress,
+      deadline: Math.floor(Date.now() / 1000 + deadline * 60),
+    };
+    console.log(params);
+    const value = new BigNumber(inputAmount)
+      .shiftedBy(fromToken.decimals)
+      .toFixed();
+    console.log(`value: ${value}`);
+    const data = swapContract.methods
+      .swapExactETHForTokensSupportingFeeOnTransferTokens(
+        params.uniAmountOutMin,
+        params.path,
+        params.to,
+        params.deadline
+      )
+      .encodeABI();
+    return this.ethereum
+      .request({
+        method: 'eth_sendTransaction',
+        params: [
+          this.getSendTransactionParams(
+            fromAddress,
+            ETH_UNI_SWAP_CONTRACT_HASH,
+            data,
+            value
+          ),
+        ],
+      })
+      .then((hash) => {
+        console.log(hash);
+        this.handleTx(
+          fromToken,
+          toToken,
+          inputAmount,
+          receiveAmount,
+          hash,
+          'swap',
+          false
+        );
+        return hash;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.handleDapiError(error);
+      });
+  }
+
+  async uniSwapExactTokensForTokens(
+    fromToken: Token,
+    toToken: Token,
+    chooseSwapPath: AssetQueryResponseItem,
+    inputAmount: string,
+    fromAddress: string,
+    toAddress: string,
+    deadline: number
+  ): Promise<any> {
+    console.log('swapExactTokensForTokensSupportingFeeOnTransferTokens');
+    if (this.checkNetwork(fromToken) === false) {
+      return;
+    }
+    const json = await this.getO3UniSwapJson();
+    const swapContract = new this.web3.eth.Contract(
+      json,
+      ETH_UNI_SWAP_CONTRACT_HASH
+    );
+    const receiveAmount =
+      chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
+    const params = {
+      amountIn: new BigNumber(inputAmount)
+        .shiftedBy(fromToken.decimals)
+        .dp(0)
+        .toFixed(),
+      uniAmountOutMin: this.swapService.getMinAmountOut(
+        receiveAmount,
+        O3_AGGREGATOR_SLIPVALUE
+      ),
+      path: chooseSwapPath.assetHashPath,
+      to: toAddress,
+      deadline: Math.floor(Date.now() / 1000 + deadline * 60),
+    };
+    console.log(params);
+    const data = swapContract.methods
+      .swapExactTokensForTokensSupportingFeeOnTransferTokens(
+        params.amountIn,
+        params.uniAmountOutMin,
+        params.path,
+        params.to,
+        params.deadline
+      )
+      .encodeABI();
+    return this.ethereum
+      .request({
+        method: 'eth_sendTransaction',
+        params: [
+          this.getSendTransactionParams(
+            fromAddress,
+            ETH_UNI_SWAP_CONTRACT_HASH,
+            data
+          ),
+        ],
+      })
+      .then((hash) => {
+        console.log(hash);
+        this.handleTx(
+          fromToken,
+          toToken,
+          inputAmount,
+          receiveAmount,
+          hash,
+          'swap',
+          false
+        );
+        return hash;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.handleDapiError(error);
+      });
+  }
 
   async uniswapExactETHForTokensCrossChain(
     fromToken: Token,
@@ -571,7 +578,7 @@ export class MetaMaskWalletApiService {
     const json = await this.getO3UniSwapJson();
     const swapContract = new this.web3.eth.Contract(
       json,
-      ETH_SWAP_CONTRACT_HASH
+      ETH_UNI_SWAP_CONTRACT_HASH
     );
     const amountOutA = chooseSwapPath.amount[chooseSwapPath.amount.length - 2];
     const bigNumberPolyFee = new BigNumber(polyFee)
@@ -623,7 +630,7 @@ export class MetaMaskWalletApiService {
         params: [
           this.getSendTransactionParams(
             fromAddress,
-            ETH_SWAP_CONTRACT_HASH,
+            ETH_UNI_SWAP_CONTRACT_HASH,
             data,
             value
           ),
@@ -667,7 +674,7 @@ export class MetaMaskWalletApiService {
     const json = await this.getO3UniSwapJson();
     const swapContract = new this.web3.eth.Contract(
       json,
-      ETH_SWAP_CONTRACT_HASH
+      ETH_UNI_SWAP_CONTRACT_HASH
     );
     const amountOutA = chooseSwapPath.amount[chooseSwapPath.amount.length - 2];
     const bigNumberPolyFee = new BigNumber(polyFee)
@@ -719,7 +726,7 @@ export class MetaMaskWalletApiService {
         params: [
           this.getSendTransactionParams(
             fromAddress,
-            ETH_SWAP_CONTRACT_HASH,
+            ETH_UNI_SWAP_CONTRACT_HASH,
             data,
             bigNumberPolyFee
           ),
@@ -742,7 +749,9 @@ export class MetaMaskWalletApiService {
         this.handleDapiError(error);
       });
   }
+  //#endregion
 
+  //#region liquidity
   async addLiquidity(
     fromToken: Token,
     toToken: Token,
@@ -894,7 +903,9 @@ export class MetaMaskWalletApiService {
         this.handleDapiError(error);
       });
   }
+  //#endregion
 
+  //#region approve
   async getAllowance(
     fromToken: Token,
     fromAddress: string,
@@ -913,7 +924,7 @@ export class MetaMaskWalletApiService {
         contract = ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain];
         break;
       case 'uniAggregator':
-        contract = ETH_SWAP_CONTRACT_HASH;
+        contract = ETH_UNI_SWAP_CONTRACT_HASH;
         break;
       default:
         contract = ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain];
@@ -962,7 +973,7 @@ export class MetaMaskWalletApiService {
         contract = ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain];
         break;
       case 'uniAggregator':
-        contract = ETH_SWAP_CONTRACT_HASH;
+        contract = ETH_UNI_SWAP_CONTRACT_HASH;
         break;
       default:
         contract = ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain];
@@ -1008,8 +1019,9 @@ export class MetaMaskWalletApiService {
         this.handleDapiError(error);
       });
   }
+  //#endregion
 
-  //#region
+  //#region private function
   private handleTx(
     fromToken: Token,
     toToken: Token,
@@ -1053,7 +1065,7 @@ export class MetaMaskWalletApiService {
     this.listerTxReceipt(txHash, dispatchType, hasCrossChain);
   }
 
-  listerTxReceipt(
+  private listerTxReceipt(
     txHash: string,
     dispatchType: string,
     hasCrossChain = true

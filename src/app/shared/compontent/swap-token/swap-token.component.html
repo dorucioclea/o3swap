@@ -8,11 +8,11 @@
       [ngClass]="{focus: isfocusSearchInput}" (input)="search($event)" placeholder="Search token name">
   </div>
   <div class="chains">
-    <span (click)="changeChain('ALL')" [ngClass]="{active: chain==='ALL'}" class="all"></span>
+    <!-- <span (click)="changeChain('ALL')" [ngClass]="{active: chain==='ALL'}" class="all"></span> -->
     <span (click)="changeChain('ETH')" [ngClass]="{active: chain==='ETH', disable: showOnlyNNeo}" class="eth"></span>
-    <span (click)="changeChain('NEO')" [ngClass]="{active: chain==='NEO'}" class="neo"></span>
     <span (click)="changeChain('BSC')" [ngClass]="{active: chain==='BSC', disable: showOnlyNNeo}" class="bsc"></span>
     <span (click)="changeChain('HECO')" [ngClass]="{active: chain==='HECO', disable: showOnlyNNeo}" class="heco"></span>
+    <span (click)="changeChain('NEO')" [ngClass]="{active: chain==='NEO'}" class="neo"></span>
   </div>
   <ul class="tokens scroll">
     <li class="token" *ngFor="let tokenItem of displayTokens"
