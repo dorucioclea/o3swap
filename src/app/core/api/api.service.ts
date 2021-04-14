@@ -31,7 +31,7 @@ import { SwapService } from '../util/swap.service';
 
 @Injectable()
 export class ApiService {
-  CHAIN_TOKENS: any = CHAIN_TOKENS;
+  CHAIN_TOKENS = CHAIN_TOKENS;
   apiDo = environment.apiDomain;
   RATE_HOST = 'https://hub.o3.network/v1';
 
@@ -51,21 +51,27 @@ export class ApiService {
     this.http
       .get(`${INQUIRY_HOST}/v1/tokens/all`)
       .subscribe((res: CommonHttpResponse) => {
-        // if (res.status === 'success') {
-        //   Object.keys(res.data).forEach((key) => {
-        //     res.data[key] = res.data[key].map((item) => {
-        //       return {
-        //         symbol: item.symbol,
-        //         logo: item.url,
-        //         assetID: item.address,
-        //         amount: '0',
-        //         decimals: item.decimals,
-        //         chain: item.chain,
-        //       };
-        //     });
-        //   });
-        //   this.CHAIN_TOKENS = res.data;
-        // }
+        if (res.status === 'success') {
+          Object.keys(res.data).forEach((key) => {
+            res.data[key] = res.data[key].map((item) => {
+              let chainLowerCase = (item.chain as string).toLowerCase();
+              if (item.chain === 'NEO') {
+                chainLowerCase = 'neo2';
+              }
+              return {
+                symbol: item.symbol,
+                logo: `https://img.o3.network/logo/${chainLowerCase}/${item.address}.png`,
+                assetID: item.address,
+                amount: '0',
+                decimals: item.decimals,
+                chain: item.chain,
+              };
+            });
+          });
+          res.data.ALL = res.data.recommend;
+          console.log(res.data);
+          this.CHAIN_TOKENS = res.data;
+        }
       });
   }
 

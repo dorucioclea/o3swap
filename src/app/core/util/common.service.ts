@@ -52,8 +52,8 @@ export class CommonService {
     if (tokenRate) {
       if (
         tokenRate.asset_id &&
-        this.remove0xHash(tokenRate.asset_id) ===
-          this.remove0xHash(token.assetID)
+        this.remove0xHash(tokenRate.asset_id).toLowerCase() ===
+          this.remove0xHash(token.assetID).toLowerCase()
       ) {
         return tokenRate.price;
       }
