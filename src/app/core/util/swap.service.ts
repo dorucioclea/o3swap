@@ -1,13 +1,6 @@
 import { Injectable } from '@angular/core';
 import BigNumber from 'bignumber.js';
-import {
-  ALL_PERCENTAGE,
-  Token,
-  WalletName,
-  NeoWalletName,
-  CHAINS,
-  CHAIN_TOKENS,
-} from '@lib';
+import { ALL_PERCENTAGE, Token, WalletName, NeoWalletName, CHAINS } from '@lib';
 import { CommonService } from './common.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
@@ -34,10 +27,10 @@ export class SwapService {
       .toFixed();
     return factAmount;
   }
-  getAssetNamePath(swapPath: string[], chain: CHAINS): any[] {
+  getAssetNamePath(swapPath: string[], tokens: Token[]): any[] {
     const target = [];
     swapPath.forEach((hash) => {
-      const token = CHAIN_TOKENS[chain].find(
+      const token = tokens.find(
         (item) =>
           this.commonService.remove0xHash(item.assetID).toLowerCase() ===
           this.commonService.remove0xHash(hash).toLowerCase()

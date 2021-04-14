@@ -45,6 +45,9 @@ export class CommonService {
     if (chain === 'neo') {
       chain = 'neo2';
     }
+    if (!rates[chain]) {
+      return;
+    }
     const tokenRate = rates[chain][token.symbol.toLowerCase()];
     if (tokenRate) {
       if (

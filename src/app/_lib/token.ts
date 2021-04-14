@@ -139,7 +139,7 @@ const ETH_TOKENS: Token[] = [
     logo: '/assets/images/tokens/eth.png',
   },
   {
-    assetID: '74A7f2A3aFa8B0CB577985663B5811901A860619',
+    assetID: '0x74a7f2a3afa8b0cb577985663b5811901a860619',
     symbol: 'USDT',
     decimals: 6,
     amount: '0',
@@ -151,7 +151,7 @@ const ETH_TOKENS: Token[] = [
     symbol: 'WETH',
     decimals: 18,
     chain: 'ETH',
-    logo: 'https://img.o3.network/logo/eth/eth.png',
+    logo: '/assets/images/tokens/eth.png',
     amount: '0',
   },
 ];
@@ -233,6 +233,7 @@ const ALL: Token[] = [
     chain: 'HECO',
   },
 ];
+// 只在接口出问题时使用
 export const CHAIN_TOKENS = {
   ALL,
   NEO: NEO_TOKENS,

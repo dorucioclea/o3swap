@@ -5,12 +5,12 @@ import {
   ChangeDetectorRef,
   OnDestroy,
 } from '@angular/core';
-import { CHAIN_TOKENS, SwapStateType, CHAINS, NNEO_TOKEN } from '@lib';
+import { SwapStateType, CHAINS, NNEO_TOKEN } from '@lib';
 import { Token } from '@lib';
 import { Observable, Unsubscribable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NzModalRef } from 'ng-zorro-antd/modal';
-import { CommonService } from '@core';
+import { ApiService } from '@core';
 interface State {
   swap: SwapStateType;
 }
@@ -43,7 +43,7 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     private store: Store<State>,
     private changeDetectorRef: ChangeDetectorRef,
     private modal: NzModalRef,
-    private commonService: CommonService
+    private apiService: ApiService
   ) {
     this.swap$ = store.select('swap');
   }
@@ -68,11 +68,21 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
 
   cloneTokens(): void {
     this.myCHAIN_TOKENS = {};
-    this.myCHAIN_TOKENS.ALL = JSON.parse(JSON.stringify(CHAIN_TOKENS.ALL));
-    this.myCHAIN_TOKENS.NEO = JSON.parse(JSON.stringify(CHAIN_TOKENS.NEO));
-    this.myCHAIN_TOKENS.ETH = JSON.parse(JSON.stringify(CHAIN_TOKENS.ETH));
-    this.myCHAIN_TOKENS.BSC = JSON.parse(JSON.stringify(CHAIN_TOKENS.BSC));
-    this.myCHAIN_TOKENS.HECO = JSON.parse(JSON.stringify(CHAIN_TOKENS.HECO));
+    this.myCHAIN_TOKENS.ALL = JSON.parse(
+      JSON.stringify(this.apiService.CHAIN_TOKENS.ALL)
+    );
+    this.myCHAIN_TOKENS.NEO = JSON.parse(
+      JSON.stringify(this.apiService.CHAIN_TOKENS.NEO)
+    );
+    this.myCHAIN_TOKENS.ETH = JSON.parse(
+      JSON.stringify(this.apiService.CHAIN_TOKENS.ETH)
+    );
+    this.myCHAIN_TOKENS.BSC = JSON.parse(
+      JSON.stringify(this.apiService.CHAIN_TOKENS.BSC)
+    );
+    this.myCHAIN_TOKENS.HECO = JSON.parse(
+      JSON.stringify(this.apiService.CHAIN_TOKENS.HECO)
+    );
     this.myNNEO_TOKEN = [JSON.parse(JSON.stringify(NNEO_TOKEN))];
   }
 
