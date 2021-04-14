@@ -14,7 +14,7 @@ import {
   CHAIN_TOKENS,
   NETWORK,
   POLY_HOST,
-  ETH_PUSDT_ASSET_HASH,
+  ETH_PUSDT_ASSET,
   SWAP_CONTRACT_CHAIN_ID,
   POLY_HOST_ADDRESS,
   ETH_SOURCE_ASSET_HASH,
@@ -194,8 +194,8 @@ export class ApiService {
     toToken: Token,
     inputAmount: string
   ): Promise<string> {
-    const fromPUsdt = ETH_PUSDT_ASSET_HASH[fromToken.chain];
-    const toPUsdt = ETH_PUSDT_ASSET_HASH[toToken.chain];
+    const fromPUsdt = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    const toPUsdt = ETH_PUSDT_ASSET[toToken.chain].assetID;
     const amount = this.commonService.decimalToInteger(
       inputAmount,
       fromToken.decimals
@@ -292,7 +292,7 @@ export class ApiService {
    * @return Promise
    */
   getPoolOutGivenSingleIn(fromToken: Token, amount: string): Promise<string> {
-    const poolUsdtHash = ETH_PUSDT_ASSET_HASH[fromToken.chain];
+    const poolUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
     amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
     return this.http
       .get(
@@ -315,7 +315,7 @@ export class ApiService {
    * @return Promise Out
    */
   getPoolInGivenSingleOut(fromToken: Token, amount: string): Promise<string> {
-    const poolUsdtHash = ETH_PUSDT_ASSET_HASH[fromToken.chain];
+    const poolUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
     amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
     return this.http
       .get(
@@ -338,7 +338,7 @@ export class ApiService {
    * @return promise
    */
   getSingleOutGivenPoolIn(fromToken: Token, amount: string): Promise<string> {
-    const poolUsdtHash = ETH_PUSDT_ASSET_HASH[fromToken.chain];
+    const poolUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
     amount = new BigNumber(amount).shiftedBy(18).toFixed();
     return this.http
       .get(
@@ -356,14 +356,14 @@ export class ApiService {
       .toPromise();
   }
 
-  getPUsdtBalance(fromToken: Token): Promise<string> {
+  getPUsdtBalance(assetID: string, decimals: number): Promise<string> {
     return this.http
-      .get(`${POLY_HOST}/balance/${POLY_HOST_ADDRESS}/${fromToken.assetID}`)
+      .get(`${POLY_HOST}/balance/${POLY_HOST_ADDRESS}/${assetID}`)
       .pipe(
         map((res: any) => {
           if (res.code === 200) {
             return new BigNumber(res.balance)
-              .shiftedBy(-fromToken.decimals)
+              .shiftedBy(-decimals)
               .toFixed();
           }
         })
@@ -537,8 +537,8 @@ export class ApiService {
     toToken: Token,
     inputAmount: string
   ): Promise<AssetQueryResponse> {
-    const fromPUsdt = ETH_PUSDT_ASSET_HASH[fromToken.chain];
-    const toPUsdt = ETH_PUSDT_ASSET_HASH[toToken.chain];
+    const fromPUsdt = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    const toPUsdt = ETH_PUSDT_ASSET[toToken.chain].assetID;
     const amount = this.commonService.decimalToInteger(
       inputAmount,
       fromToken.decimals

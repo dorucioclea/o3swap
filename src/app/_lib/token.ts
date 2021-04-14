@@ -15,12 +15,22 @@ export const SOURCE_TOKEN_SYMBOL = {
   HECO: 'HT',
   BSC: 'BNB',
 };
-export const ETH_SOURCE_ASSET_HASH = '0x0000000000000000000000000000000000000000';
+export const ETH_SOURCE_ASSET_HASH =
+  '0x0000000000000000000000000000000000000000';
 export const WETH_ASSET_HASH = '0xc778417e063141139fce010982780140aa0cd5ab';
-export const ETH_PUSDT_ASSET_HASH = {
-  ETH: '0x63799851696CDE43c2305dccd7208a03272BA591',
-  BSC: '0x78Ec09343122737925f9839d7794de49FeB6B083',
-  HECO: '0xbdd265FC4D5b7E7a937608B91EDAFc38F27E4479',
+export const ETH_PUSDT_ASSET = {
+  ETH: {
+    assetID: '0x63799851696CDE43c2305dccd7208a03272BA591',
+    decimals: 6,
+  },
+  BSC: {
+    assetID: '0x78Ec09343122737925f9839d7794de49FeB6B083',
+    decimals: 18,
+  },
+  HECO: {
+    assetID: '0xbdd265FC4D5b7E7a937608B91EDAFc38F27E4479',
+    decimals: 18,
+  },
 };
 export const FUSDT_ASSET_HASH =
   NETWORK === 'MainNet'
@@ -250,7 +260,7 @@ export const USD_TOKENS: Token[] = [
     decimals: 6,
     amount: '0',
     chain: 'ETH',
-    logo: '/assets/images/tokens/usdt.png',
+    logo: `https://img.o3.network/logo/eth/0x74a7f2a3afa8b0cb577985663b5811901a860619.png`,
   },
   {
     assetID:
@@ -259,7 +269,7 @@ export const USD_TOKENS: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'BSC',
-    logo: '/assets/images/tokens/usdt.png',
+    logo: `https://img.o3.network/logo/bsc/0x74a7f2a3afa8b0cb577985663b5811901a860619.png`,
   },
   {
     assetID:
@@ -267,8 +277,8 @@ export const USD_TOKENS: Token[] = [
     symbol: 'HUSD',
     decimals: 18,
     amount: '0',
-    logo: '/assets/images/tokens/usdt.png',
     chain: 'HECO',
+    logo: `https://img.o3.network/logo/heco/0x77e8ebd5b2d7cd984e6ae05a809409c795bf9b04.png`,
   },
 ];
 export const LP_TOKENS: Token[] = [

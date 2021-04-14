@@ -24,6 +24,7 @@ import {
   Token,
   USD_TOKENS,
   LP_TOKENS,
+  ETH_PUSDT_ASSET,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -60,6 +61,13 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   hecoAccountAddress: string;
   metamaskNetworkId: number;
 
+  pusdtBalance = {
+    ALL: '',
+    ETH: { value: '', percentage: '0' },
+    BSC: { value: '', percentage: '0' },
+    HECO: { value: '', percentage: '0' },
+  };
+
   constructor(
     private apiService: ApiService,
     private commonService: CommonService,
@@ -84,6 +92,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getRates();
+    this.getPusdtBalance();
     this.LPTokens = JSON.parse(JSON.stringify(LP_TOKENS));
     this.addLiquidityTokens.forEach((item) => {
       if (this.metaMaskWalletApiService !== METAMASK_CHAIN_ID[item.chain]) {
@@ -110,6 +119,46 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {}
+
+  async getPusdtBalance(): Promise<void> {
+    this.pusdtBalance.ETH.value = await this.apiService.getPUsdtBalance(
+      ETH_PUSDT_ASSET.ETH.assetID,
+      ETH_PUSDT_ASSET.ETH.decimals
+    );
+    this.pusdtBalance.BSC.value = await this.apiService.getPUsdtBalance(
+      ETH_PUSDT_ASSET.BSC.assetID,
+      ETH_PUSDT_ASSET.BSC.decimals
+    );
+    this.pusdtBalance.HECO.value = await this.apiService.getPUsdtBalance(
+      ETH_PUSDT_ASSET.HECO.assetID,
+      ETH_PUSDT_ASSET.HECO.decimals
+    );
+    this.pusdtBalance.ALL = new BigNumber(this.pusdtBalance.ETH.value)
+      .plus(new BigNumber(this.pusdtBalance.BSC.value))
+      .plus(new BigNumber(this.pusdtBalance.HECO.value))
+      .toFixed();
+    this.pusdtBalance.ETH.percentage = new BigNumber(
+      this.pusdtBalance.ETH.value
+    )
+      .dividedBy(new BigNumber(this.pusdtBalance.ALL))
+      .times(100)
+      .dp(3)
+      .toFixed();
+    this.pusdtBalance.BSC.percentage = new BigNumber(
+      this.pusdtBalance.BSC.value
+    )
+      .dividedBy(new BigNumber(this.pusdtBalance.ALL))
+      .times(100)
+      .dp(3)
+      .toFixed();
+    this.pusdtBalance.HECO.percentage = new BigNumber(
+      this.pusdtBalance.HECO.value
+    )
+      .dividedBy(new BigNumber(this.pusdtBalance.ALL))
+      .times(100)
+      .dp(3)
+      .toFixed();
+  }
 
   getRates(): void {
     this.apiService.getRates().subscribe((res) => {

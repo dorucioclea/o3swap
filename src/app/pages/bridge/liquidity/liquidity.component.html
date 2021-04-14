@@ -58,7 +58,7 @@
             <li *ngFor="let tokenItem  of addLiquidityTokens; let i = index ">
               <div class="detail">
                 <div class="left">
-                  <img src="" alt="" class="token-logo">
+                  <img [src]="tokenItem.logo" alt="" class="token-logo">
                   <div class="token-name">{{ tokenItem.symbol }}</div>
                 </div>
                 <div class="right">
@@ -82,7 +82,7 @@
             <li *ngFor="let tokenItem  of addLiquidityTokens; let i = index ">
               <div class="detail">
                 <div class="left">
-                  <img src="" alt="" class="token-logo">
+                  <img [src]="tokenItem.logo" alt="" class="token-logo">
                   <div class="token-name">{{ tokenItem.symbol }}</div>
                 </div>
                 <div class="right">
@@ -113,29 +113,32 @@
   <div class="group-container blp-detail row2">
     <div class="left">
       <div class="item-list">
-        DAI+USDC+USDT:<span class="value">986,389,258.14</span>
+        pUSDT+pbUSDT+phUSDT: <span class="value">&nbsp;&nbsp;{{ pusdtBalance.ALL | number: '1.0-8' }}</span>
       </div>
       <div class="item-list">
-        <div>DAI: <span class="value">986,389,258.14</span> (30.1%)</div>
+        <div>pUSDT: <span class="value">{{ pusdtBalance.ETH.value | number: '1.0-8' }}</span>
+          ({{ pusdtBalance.ETH.percentage }}%)</div>
       </div>
       <div class="progress-container">
-        <nz-progress class="progress" [nzPercent]="swapProgress" [nzShowInfo]="false" nzStrokeWidth="6"
+        <nz-progress class="progress" [nzPercent]="pusdtBalance.ETH.percentage" [nzShowInfo]="false" nzStrokeWidth="6"
           nzStrokeColor="#46B069">
         </nz-progress>
       </div>
       <div class="item-list">
-        <div>USDC: <span class="value">986,389,258.14</span> (30.1%)</div>
+        <div>pbUSDT: <span class="value">{{ pusdtBalance.BSC.value | number: '1.0-8' }}</span>
+          ({{ pusdtBalance.BSC.percentage }}%)</div>
       </div>
       <div class="progress-container">
-        <nz-progress class="progress" [nzPercent]="swapProgress" [nzShowInfo]="false" nzStrokeWidth="6"
+        <nz-progress class="progress" [nzPercent]="pusdtBalance.BSC.percentage" [nzShowInfo]="false" nzStrokeWidth="6"
           nzStrokeColor="#46B069">
         </nz-progress>
       </div>
       <div class="item-list">
-        <div>USDT: <span class="value">986,389,258.14</span> (30.1%)</div>
+        <div>phUSDT: <span class="value">{{ pusdtBalance.HECO.value | number: '1.0-8' }}</span>
+          ({{ pusdtBalance.HECO.percentage }}%)</div>
       </div>
       <div class="progress-container">
-        <nz-progress class="progress" [nzPercent]="swapProgress" [nzShowInfo]="false" nzStrokeWidth="6"
+        <nz-progress class="progress" [nzPercent]="pusdtBalance.HECO.percentage" [nzShowInfo]="false" nzStrokeWidth="6"
           nzStrokeColor="#46B069">
         </nz-progress>
       </div>
