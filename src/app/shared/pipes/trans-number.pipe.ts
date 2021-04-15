@@ -1,21 +1,14 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import BigNumber from 'bignumber.js';
 
 @Pipe({
   name: 'transNumber',
 })
 export class TransNumberPipe implements PipeTransform {
-  transform(value: any, len = 13): any {
-    if (!value) {
-      return;
+  transform(value: any): any {
+    if (!value || new BigNumber(value).isNaN()) {
+      return '';
     }
-    let data = value.toString();
-    const dataGroup = data.split('.');
-    if (dataGroup[0].length >= len) {
-      return dataGroup[0];
-    }
-    if (value && data.length > len) {
-      data = data.substring(0, len);
-    }
-    return data;
+    return new BigNumber(value).dp(8).toFormat();
   }
 }

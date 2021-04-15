@@ -238,7 +238,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       await this.metaMaskWalletApiService.approve(token, this.currentAddress);
     }
     const amountOut = new BigNumber(this.receiveAmount)
-      .shiftedBy(18)
+      .shiftedBy(this.LPToken.decimals)
       .dp(0)
       .toFixed();
     const fee = await this.apiService.getFromEthPolyFee(token, token);

@@ -6,7 +6,7 @@
       </div>
       <div class="content">
         <div class="value">
-          <span class="amount">{{LPToken ? (LPToken.amount | number: '1.0-8') : '--' }}</span>
+          <span class="amount">{{LPToken ? (LPToken.amount | transNumber) : '--' }}</span>
           <span class="rate">--</span>
         </div>
       </div>
@@ -113,10 +113,10 @@
   <div class="group-container blp-detail row2">
     <div class="left">
       <div class="item-list">
-        pUSDT+pbUSDT+phUSDT: <span class="value">&nbsp;&nbsp;{{ pusdtBalance.ALL | number: '1.0-8' }}</span>
+        pUSDT+pbUSDT+phUSDT: <span class="value">&nbsp;&nbsp;{{ pusdtBalance.ALL | transNumber }}</span>
       </div>
       <div class="item-list">
-        <div>pUSDT: <span class="value">{{ pusdtBalance.ETH.value | number: '1.0-8' }}</span>
+        <div>pUSDT: <span class="value">{{ pusdtBalance.ETH.value | transNumber }}</span>
           ({{ pusdtBalance.ETH.percentage }}%)</div>
       </div>
       <div class="progress-container">
@@ -125,7 +125,7 @@
         </nz-progress>
       </div>
       <div class="item-list">
-        <div>pbUSDT: <span class="value">{{ pusdtBalance.BSC.value | number: '1.0-8' }}</span>
+        <div>pbUSDT: <span class="value">{{ pusdtBalance.BSC.value | transNumber }}</span>
           ({{ pusdtBalance.BSC.percentage }}%)</div>
       </div>
       <div class="progress-container">
@@ -134,7 +134,7 @@
         </nz-progress>
       </div>
       <div class="item-list">
-        <div>phUSDT: <span class="value">{{ pusdtBalance.HECO.value | number: '1.0-8' }}</span>
+        <div>phUSDT: <span class="value">{{ pusdtBalance.HECO.value | transNumber }}</span>
           ({{ pusdtBalance.HECO.percentage }}%)</div>
       </div>
       <div class="progress-container">
@@ -146,8 +146,7 @@
     <div class="right">
       <div class="item-list">
         <span class="name">{{ liquidityType == 'add' ? 'Receive' : 'PayAmount' }}</span>
-        <span
-          class="value">{{ (liquidityType == 'add' ? receiveAmount : payAmount) | transNumber | number: '1.0-8' }}</span>
+        <span class="value">{{ (liquidityType == 'add' ? receiveAmount : payAmount) | transNumber }}</span>
       </div>
       <div class="item-list">
         <span class="name">Max slippage</span>

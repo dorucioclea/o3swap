@@ -18,7 +18,7 @@
   </div>
   <div class="receive content-border content-border-active">
     <p class="sub-title">Receive</p>
-    <p class="amount">{{ chooseSwapPath?.receiveAmount | transNumber | number: '1.0-8' }} {{ toToken?.symbol }}</p>
+    <p class="amount">{{ chooseSwapPath?.receiveAmount | transNumber }} {{ toToken?.symbol }}</p>
     <p class="fiat">≈＄{{ chooseSwapPath?.fiat }}</p>
     <div class="optimal">Optimal</div>
   </div>
@@ -59,7 +59,7 @@
     </div>
     <div class="fee-item" *ngIf="polyFee">
       <p class="label">Poly Fee</p>
-      <div class="value">{{ polyFee | transNumber | number: '1.0-8' }} {{ SOURCE_TOKEN_SYMBOL[fromToken.chain] }}</div>
+      <div class="value">{{ polyFee | transNumber }} {{ SOURCE_TOKEN_SYMBOL[fromToken.chain] }}</div>
     </div>
     <div class="fee-item">
       <p class="label">Quote includes a {{ O3_AGGREGATOR_FEE }}% O3Swap fee</p>

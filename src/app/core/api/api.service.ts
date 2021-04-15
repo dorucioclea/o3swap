@@ -24,6 +24,7 @@ import {
   O3_AGGREGATOR_SLIPVALUE,
   FUSDT_ASSET_HASH,
   WETH_ASSET_HASH,
+  LP_TOKENS,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { CommonService } from '../util/common.service';
@@ -312,16 +313,19 @@ export class ApiService {
    * @return Promise
    */
   getPoolOutGivenSingleIn(fromToken: Token, amount: string): Promise<string> {
-    const poolUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    const poolPUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    const lpToken = LP_TOKENS.find((item) => item.chain === fromToken.chain);
     amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
     return this.http
       .get(
-        `${POLY_HOST}/calcPoolOutGivenSingleIn/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`
+        `${POLY_HOST}/calcPoolOutGivenSingleIn/${POLY_HOST_ADDRESS}/${poolPUsdtHash}/${amount}`
       )
       .pipe(
         map((res: any) => {
           if (res.code === 200) {
-            return new BigNumber(res.pool_amount_out).shiftedBy(-18).toFixed();
+            return new BigNumber(res.pool_amount_out)
+              .shiftedBy(-lpToken.decimals)
+              .toFixed();
           }
         })
       )
@@ -335,16 +339,19 @@ export class ApiService {
    * @return Promise Out
    */
   getPoolInGivenSingleOut(fromToken: Token, amount: string): Promise<string> {
-    const poolUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    const poolPUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    const lpToken = LP_TOKENS.find((item) => item.chain === fromToken.chain);
     amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
     return this.http
       .get(
-        `${POLY_HOST}/calcPoolInGivenSingleOut/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`
+        `${POLY_HOST}/calcPoolInGivenSingleOut/${POLY_HOST_ADDRESS}/${poolPUsdtHash}/${amount}`
       )
       .pipe(
         map((res: any) => {
           if (res.code === 200) {
-            return new BigNumber(res.pool_amount_out).shiftedBy(-18).toFixed();
+            return new BigNumber(res.pool_amount_out)
+              .shiftedBy(-lpToken.decimals)
+              .toFixed();
           }
         })
       )
@@ -358,17 +365,18 @@ export class ApiService {
    * @return promise
    */
   getSingleOutGivenPoolIn(fromToken: Token, amount: string): Promise<string> {
-    const poolUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
-    amount = new BigNumber(amount).shiftedBy(18).toFixed();
+    const poolPUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    const usdtToken = USD_TOKENS.find((item) => item.chain === fromToken.chain);
+    amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
     return this.http
       .get(
-        `${POLY_HOST}/calcSingleOutGivenPoolIn/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`
+        `${POLY_HOST}/calcSingleOutGivenPoolIn/${POLY_HOST_ADDRESS}/${poolPUsdtHash}/${amount}`
       )
       .pipe(
         map((res: any) => {
           if (res.code === 200) {
             return new BigNumber(res.token_amount_out)
-              .shiftedBy(-fromToken.decimals)
+              .shiftedBy(-usdtToken.decimals)
               .toFixed();
           }
         })

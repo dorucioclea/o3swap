@@ -79,7 +79,7 @@ export class BridgeComponent implements OnInit {
       this.ethWalletName = state.ethWalletName;
       this.bscWalletName = state.bscWalletName;
       this.hecoWalletName = state.hecoWalletName;
-      this.getFromAndToAddress();
+      // this.getFromAndToAddress();
       this.handleAccountBalance(
         state.ethBalances,
         state.bscBalances,

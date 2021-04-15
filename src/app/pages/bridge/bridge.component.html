@@ -4,7 +4,7 @@
       <div class="left-container">
         <div class="header">
           <div class="left">You pay</div>
-          <div class="right">Balance: {{ (fromToken?.amount | transNumber | number: '1.0-8') || '0' }}
+          <div class="right">Balance: {{ (fromToken?.amount | transNumber) || '0' }}
             {{ fromToken?.symbol }}
             <span (click)="allInputAmount()">Max</span></div>
         </div>
@@ -31,7 +31,7 @@
             {{ toToken?.symbol || 'SELECT' }}
             <img _ngcontent-may-c99="" src="/assets/images/swap/arrow-down.png" alt="" class="arrow">
           </div>
-          <div class="token-amount">{{ (receiveAmount | transNumber | number: '1.0-8') || 0 }}</div>
+          <div class="token-amount">{{ (receiveAmount | transNumber) || 0 }}</div>
         </div>
         <div class="asset">≈ $ {{ receiveAmountFiat || '0.00' }}</div>
       </div>

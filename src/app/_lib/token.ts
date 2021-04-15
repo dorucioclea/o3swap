@@ -100,8 +100,8 @@ export const USD_TOKENS: Token[] = [
     chain: 'BSC',
     logo:
       NETWORK === 'MainNet'
-        ? `https://img.o3.network/logo/eth/0xe9e7cea3dedca5984780bafc599bd69add087d56.png`
-        : 'https://img.o3.network/logo/eth/0x74a7f2a3afa8b0cb577985663b5811901a860619.png',
+        ? `https://img.o3.network/logo/bsc/0xe9e7cea3dedca5984780bafc599bd69add087d56.png`
+        : 'https://img.o3.network/logo/bsc/0x74a7f2a3afa8b0cb577985663b5811901a860619.png',
   },
   {
     assetID:
@@ -114,8 +114,8 @@ export const USD_TOKENS: Token[] = [
     chain: 'HECO',
     logo:
       NETWORK === 'MainNet'
-        ? `https://img.o3.network/logo/eth/0x0298c2b32eae4da002a15f36fdf7615bea3da047.png`
-        : 'https://img.o3.network/logo/eth/0x77e8ebd5b2d7cd984e6ae05a809409c795bf9b04.png',
+        ? `https://img.o3.network/logo/heco/0x0298c2b32eae4da002a15f36fdf7615bea3da047.png`
+        : 'https://img.o3.network/logo/heco/0x77e8ebd5b2d7cd984e6ae05a809409c795bf9b04.png',
   },
 ];
 export const LP_TOKENS: Token[] = [
