@@ -18,7 +18,7 @@
   </div>
   <div class="receive content-border content-border-active">
     <p class="sub-title">Receive</p>
-    <p class="amount">{{ chooseSwapPath?.receiveAmount }} {{ toToken?.symbol }}</p>
+    <p class="amount">{{ chooseSwapPath?.receiveAmount | transNumber }} {{ toToken?.symbol }}</p>
     <p class="fiat">≈＄{{ chooseSwapPath?.fiat }}</p>
     <div class="optimal">Optimal</div>
   </div>
@@ -57,11 +57,20 @@
         1 {{ toToken?.symbol }} = {{ lnversePrice }} {{ fromToken?.symbol }}
       </p>
     </div>
-    <!-- <div class="fee-item">
-      <p class="label">Quote includes a {{ o3SwapFee }}% O3Swap fee</p>
-    </div> -->
+    <div class="fee-item" *ngIf="polyFee">
+      <p class="label">Poly Fee</p>
+      <div class="value">{{ polyFee | transNumber }} {{ SOURCE_TOKEN_SYMBOL[fromToken.chain] }}</div>
+    </div>
+    <div class="fee-item">
+      <p class="label">Quote includes a {{ O3_AGGREGATOR_FEE }}% O3Swap fee</p>
+    </div>
   </div>
-  <button class="confirm" (click)="swap()">Confirm</button>
+  <div class="btn-group" *ngIf="showApprove">
+    <button class="approve" nz-button [ngClass]="{disable: hasApprove===true}" [nzLoading]="isApproveLoading"
+      (click)="approve()">Approve</button>
+    <button [ngClass]="{disable: hasApprove===false}" (click)="swap()">Confirm</button>
+  </div>
+  <button *ngIf="!showApprove" class="confirm" (click)="swap()">Confirm</button>
   <div class="setting-group">
     <div class="refresh">
       After<span>{{ inquiryTime }}</span>s

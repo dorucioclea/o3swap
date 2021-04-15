@@ -3,7 +3,8 @@
     <p class="title">Cross-chain</p>
     <p class="desc1">Aggregation Protocol</p>
     <p class="desc2">Access multi-chain liquidity sources on one platform</p>
-    <ng-lottie class="price-json" [options]="priceOptions"></ng-lottie>
+    <!-- <ng-lottie class="price-json" [options]="priceOptions"></ng-lottie> -->
+    <img class="price-json" src="/assets/images/home/price.png" alt="">
   </div>
 </section>
 <section class="content exchanges">
@@ -48,7 +49,8 @@
 </section>
 <section class="content exchange-click">
   <div class="wrapper">
-    <ng-lottie class="exchange-json" [options]="exchangeOptions"></ng-lottie>
+    <!-- <ng-lottie class="exchange-json" [options]="exchangeOptions"></ng-lottie> -->
+    <img class="exchange-json" src="/assets/images/home/exchange.png" alt="">
     <div class="desc">
       <p class="desc-title">{{ "feature2Title" | translate: lang }}</p>
       <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature2Detail1" | translate: lang }}</p>
@@ -113,35 +115,35 @@
         <div class="activity" [ngClass]="{page: enterActiviteFirst===false}" (mouseenter)="enterActiviteFirst=true"
           (mouseleave)="enterActiviteFirst=false">
           <p class="title">Added multi currency support</p>
-          <p class="desc">Release ETH Swap.Publish O3 SWAP white paper and economic model.Release OST (O3 SWAP
+          <p class="desc">Release ETH Swap.Publish O3 SWAP white paper and economic model.Release O3 (O3 SWAP
             token), Release DAO</p>
         </div>
         <div class="activity" [ngClass]="{page: enterActiviteFirst===true}">
           <p class="title">Added multi currency support</p>
-          <p class="desc">Release ETH Swap.Publish O3 SWAP white paper and economic model.Release OST (O3 SWAP
+          <p class="desc">Release ETH Swap.Publish O3 SWAP white paper and economic model.Release O3 (O3 SWAP
             token), Release DAO</p>
         </div>
         <div class="activity">
           <p class="title">Added multi currency support</p>
-          <p class="desc">Release ETH Swap.Publish O3 SWAP white paper and economic model.Release OST (O3 SWAP
+          <p class="desc">Release ETH Swap.Publish O3 SWAP white paper and economic model.Release O3 (O3 SWAP
             token), Release DAO</p>
         </div>
       </div>
       <div class="row">
         <div class="activity">
           <p class="title">Added multi currency support</p>
-          <p class="desc">Release ETH Swap.Publish O3 SWAP white paper and economic model.Release OST (O3 SWAP
+          <p class="desc">Release ETH Swap.Publish O3 SWAP white paper and economic model.Release O3 (O3 SWAP
             token), Release DAO</p>
         </div>
         <div class="activity" [ngClass]="{page: enterActiviteLast===true}">
           <p class="title">Added multi currency support</p>
-          <p class="desc">Release ETH Swap.Publish O3 SWAP white paper and economic model.Release OST (O3 SWAP
+          <p class="desc">Release ETH Swap.Publish O3 SWAP white paper and economic model.Release O3 (O3 SWAP
             token), Release DAO</p>
         </div>
         <div class="activity" [ngClass]="{page: enterActiviteLast===false}" (mouseenter)="enterActiviteLast=true"
           (mouseleave)="enterActiviteLast=false">
           <p class="title">Added multi currency support</p>
-          <p class="desc">Release ETH Swap.Publish O3 SWAP white paper and economic model.Release OST (O3 SWAP
+          <p class="desc">Release ETH Swap.Publish O3 SWAP white paper and economic model.Release O3 (O3 SWAP
             token), Release DAO</p>
         </div>
       </div>
@@ -200,6 +202,9 @@
     <a target="_blank" href="mailto:contact@o3swap.com">
       <img src="/assets/images/home/contact-email.png" alt="">
     </a>
+    <a target="_blank" href="https://github.com/O3Labs">
+      <img src="/assets/images/home/contact-github.png" alt="">
+    </a>
   </div>
   <div class="bottom">
     <img src="/assets/images/home/footer-logo.png" alt="">
@@ -209,9 +214,8 @@
         <span class="line">|</span>
         <span [ngClass]="{active: lang==='zh'}" (click)="changeLang('zh')">CN</span>
       </p> -->
-    <p class="doc" nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="top">Doc</p>
-    <!-- <a href="https://docs.o3swap.com/" target="_blank">
-        <p class="doc">Doc</p>
-      </a> -->
+    <a href="https://docs.o3swap.com/" target="_blank">
+      <p class="doc">Doc</p>
+    </a>
   </div>
 </footer>

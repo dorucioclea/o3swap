@@ -1,0 +1,91 @@
+<section class="page-container">
+  <div class="group-container row1">
+    <div class="token-select-container">
+      <div class="left-container">
+        <div class="header">
+          <div class="left">You pay</div>
+          <div class="right">Balance: {{ (fromToken?.amount | transNumber) || '0' }}
+            {{ fromToken?.symbol }}
+            <span (click)="allInputAmount()">Max</span></div>
+        </div>
+        <div class="content">
+          <div class="token-name" [ngClass]="{active: fromToken?.symbol}" (click)="showTokens('from')">
+            <img *ngIf="fromToken?.logo" [src]="fromToken?.logo" alt="" class="token-logo">
+            {{ fromToken?.symbol || 'SELECT' }}
+            <img _ngcontent-may-c99="" src="/assets/images/swap/arrow-down.png" alt="" class="arrow">
+          </div>
+          <div class="input-container">
+            <input type="number" (input)="changeInputAmount($event)" [ngModel]="inputAmount" placeholder="0">
+          </div>
+        </div>
+        <div class="asset">≈ $ {{ inputAmountFiat || '0.00' }}</div>
+      </div>
+      <img class="transform" (click)="exchangeToken()" src="/assets/images/swap/exchange-home.png" alt="">
+      <div class="right-container">
+        <div class="header">
+          <div class="left">You will receive</div>
+        </div>
+        <div class="content">
+          <div class="token-name" [ngClass]="{active: toToken?.symbol}" (click)="showTokens('to')">
+            <img *ngIf="toToken?.logo" [src]="toToken?.logo" alt="" class="token-logo">
+            {{ toToken?.symbol || 'SELECT' }}
+            <img _ngcontent-may-c99="" src="/assets/images/swap/arrow-down.png" alt="" class="arrow">
+          </div>
+          <div class="token-amount">{{ (receiveAmount | transNumber) || 0 }}</div>
+        </div>
+        <div class="asset">≈ $ {{ receiveAmountFiat || '0.00' }}</div>
+      </div>
+    </div>
+    <p class="detail">Exchange Rate {{ toToken?.symbol || '--' }}/{{ fromToken?.symbol || '--' }} (including fees):
+      <span>{{ bridgeRate }}</span></p>
+    <p class="detail">Max slippage: <span>{{ BRIDGE_SLIPVALUE }}%</span></p>
+    <div class="btn-group" *ngIf="showApprove">
+      <button class="btn-primary approve" nz-button [ngClass]="{disable: hasApprove===true}"
+        [nzLoading]="isApproveLoading" (click)="approve()">Approve</button>
+      <button class="btn-primary" [ngClass]="{disable: hasApprove===false}" (click)="swap()">Confirm</button>
+    </div>
+    <div *ngIf="!showApprove" class="btn-primary big-btn swap-btn" [ngClass]="{active: checkCanInquiry()}"
+      (click)="swap()">Swap</div>
+  </div>
+  <div class="group-container row1 pool">
+    <div class="header">Pool</div>
+    <div class="group-item">
+      <div class="pool-detail">
+        <div class="list">
+          <div class="item">
+            <div class="value">$1,071,909,102</div>
+            <div class="name">TVL</div>
+          </div>
+          <div class="item">
+            <div class="value">$7,225,526</div>
+            <div class="name">VOL</div>
+          </div>
+          <div class="item">
+            <div class="value">66.81%</div>
+            <div class="name">APR</div>
+          </div>
+          <div class="item">
+            <div class="value">0.18%</div>
+            <div class="name">DAILY</div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="btn-primary deposit-btn" [routerLink]="['/hub/liquidity', 'add']">
+            Deposit
+          </div>
+          <div class="btn-primary withdrawal-btn" [routerLink]="['/hub/liquidity', 'remove']">
+            Withdrawal
+          </div>
+        </div>
+      </div>
+      <div class="token-detail">
+        <img src="" alt="" class="token-logo">
+        <div class="token-name">
+          pUSDT <span>(pUSDT+pbUSDT+phUSDT)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<app-tx-progress [txAtPage]="'bridge'"></app-tx-progress>

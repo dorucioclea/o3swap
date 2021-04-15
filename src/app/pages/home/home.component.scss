@@ -25,6 +25,13 @@ section.home {
     font-size: 70px;
     color: #47af6a;
     line-height: 80px;
+    background-image: -webkit-linear-gradient(
+      -30deg,
+      #46b069 0%,
+      #00af92 99.6337890625%
+    );
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
   .desc1 {
     font-size: 60px;
@@ -384,9 +391,15 @@ section.o3wallet {
     cursor: pointer;
     margin-left: 75px;
     font-family: "fontDemiBold";
+    background: -webkit-linear-gradient(
+      -30deg,
+      #46b069 0%,
+      #00af92 99.6337890625%
+    );
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
     &:hover {
-      background: #46b069;
-      color: #fff;
+      font-size: 18px;
     }
   }
   img.screenshot {
@@ -464,7 +477,7 @@ footer {
         height: 50px;
         width: 130px;
         border: 1px solid #46b069;
-        background: #46b069;
+        background: linear-gradient(-30deg, #46b069, #00af92);
         border-radius: 10px;
         color: #fff;
         font-size: 16px;
@@ -537,6 +550,13 @@ footer {
       &:hover,
       &.active {
         color: #46b069;
+        background: -webkit-linear-gradient(
+          -30deg,
+          #46b069 0%,
+          #00af92 99.6337890625%
+        );
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
     }
   }

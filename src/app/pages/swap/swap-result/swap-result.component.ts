@@ -7,13 +7,15 @@ import {
   Output,
 } from '@angular/core';
 import {
-  O3SWAP_FEE_PERCENTAGE,
+  O3_AGGREGATOR_FEE,
   Token,
   NeoWalletName,
   AssetQueryResponse,
   AssetQueryResponseItem,
   SwapStateType,
   EthWalletName,
+  USD_TOKENS,
+  SOURCE_TOKEN_SYMBOL,
 } from '@lib';
 import {
   ApiService,
@@ -22,16 +24,11 @@ import {
   NeolineWalletApiService,
   O3NeoWalletApiService,
   MetaMaskWalletApiService,
+  O3EthWalletApiService,
 } from '@core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import BigNumber from 'bignumber.js';
-import {
-  interval,
-  Observable,
-  Subscription,
-  timer,
-  Unsubscribable,
-} from 'rxjs';
+import { interval, Observable, timer, Unsubscribable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { SwapExchangeComponent } from '@shared';
@@ -48,13 +45,15 @@ interface State {
   styleUrls: ['../common.scss', './swap-result.component.scss'],
 })
 export class SwapResultComponent implements OnInit, OnDestroy {
-  @Input() rates;
+  SOURCE_TOKEN_SYMBOL = SOURCE_TOKEN_SYMBOL;
   @Input() fromToken: Token;
   @Input() toToken: Token;
   @Input() inputAmount: string; // 支付的 token 数量
   @Input() initData: any;
   @Output() closePage = new EventEmitter<any>();
   @Output() swapFail = new EventEmitter();
+
+  rates = {};
 
   inquiryOptions = {
     path: '/assets/json/Inquerying.json',
@@ -76,7 +75,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   hecoWalletName: EthWalletName;
 
   TOKENS: Token[] = []; // 所有的 tokens
-  o3SwapFee = O3SWAP_FEE_PERCENTAGE;
+  O3_AGGREGATOR_FEE = O3_AGGREGATOR_FEE;
   showInquiry: boolean;
   inquiryInterval: Unsubscribable; // 询价定时器
   seconds = 30;
@@ -87,9 +86,14 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   receiveSwapPathArray: AssetQueryResponse;
   price: string; // swap 比
   lnversePrice: string; // swap 反比
+  polyFee: string;
 
   fromAddress: string;
   toAddress: string;
+  showApprove = false;
+  hasApprove = false;
+  isApproveLoading = false;
+  approveInterval: Unsubscribable;
 
   constructor(
     public store: Store<State>,
@@ -100,6 +104,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     private neolineWalletApiService: NeolineWalletApiService,
     private o3NeoWalletApiService: O3NeoWalletApiService,
     private metaMaskWalletApiService: MetaMaskWalletApiService,
+    private o3EthWalletApiService: O3EthWalletApiService,
     private modal: NzModalService
   ) {
     this.swap$ = store.select('swap');
@@ -107,6 +112,21 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.getRates();
+    if (this.initData) {
+      this.chooseSwapPath = this.initData.chooseSwapPath;
+      this.chooseSwapPathIndex = this.initData.chooseSwapPathIndex;
+      this.receiveSwapPathArray = this.initData.receiveSwapPathArray;
+      this.price = this.initData.price;
+      this.lnversePrice = this.initData.lnversePrice;
+      this.polyFee = this.initData.polyFee;
+      this.showInquiry = false;
+    } else {
+      this.showInquiry = true;
+    }
+    this.getSwapPathFun();
+    this.getNetworkFee();
+    this.setInquiryInterval();
     this.swap$.subscribe((state) => {
       this.neoAccountAddress = state.neoAccountAddress;
       this.ethAccountAddress = state.ethAccountAddress;
@@ -122,28 +142,28 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.slipValue = state.slipValue;
       this.deadline = state.deadline;
     });
-    if (this.initData) {
-      this.chooseSwapPath = this.initData.chooseSwapPath;
-      this.chooseSwapPathIndex = this.initData.chooseSwapPathIndex;
-      this.receiveSwapPathArray = this.initData.receiveSwapPathArray;
-      this.price = this.initData.price;
-      this.lnversePrice = this.initData.lnversePrice;
-      this.showInquiry = false;
-    } else {
-      this.showInquiry = true;
-    }
-    this.getSwapPathFun();
-    this.setInquiryInterval();
   }
 
   ngOnDestroy(): void {
-    if (this.inquiryInterval !== null && this.inquiryInterval !== undefined) {
+    if (this.inquiryInterval) {
       this.inquiryInterval.unsubscribe();
     }
+    if (this.approveInterval) {
+      this.approveInterval.unsubscribe();
+    }
+  }
+
+  getRates(): void {
+    this.apiService.getRates().subscribe((res) => {
+      this.rates = res;
+    });
   }
 
   setInquiryInterval(): void {
     this.inquiryTime = this.seconds;
+    if (this.inquiryInterval) {
+      this.inquiryInterval.unsubscribe();
+    }
     this.inquiryInterval = interval(1000)
       .pipe(take(this.seconds))
       .subscribe((time) => {
@@ -151,6 +171,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.inquiryTime = this.seconds - time;
         if (time === this.seconds) {
           this.getSwapPathFun();
+          this.getNetworkFee();
           timer(1000).subscribe(() => {
             this.setInquiryInterval();
           });
@@ -165,6 +186,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       receiveSwapPathArray: this.receiveSwapPathArray,
       price: this.price,
       lnversePrice: this.lnversePrice,
+      polyFee: this.polyFee,
     };
     this.closePage.emit(initData);
   }
@@ -190,7 +212,38 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     });
   }
 
+  approve(): void {
+    this.inquiryInterval.unsubscribe();
+    if (this.approveInterval) {
+      this.approveInterval.unsubscribe();
+    }
+    this.isApproveLoading = true;
+    const swapApi = this.getEthDapiService();
+    swapApi
+      .approve(this.fromToken, this.fromAddress, this.chooseSwapPath.aggregator)
+      .then((hash) => {
+        if (hash) {
+          this.approveInterval = interval(5000).subscribe(async () => {
+            const receipt = await this.metaMaskWalletApiService.getReceipt(
+              hash
+            );
+            console.log(receipt);
+            if (receipt !== null) {
+              this.approveInterval.unsubscribe();
+              this.isApproveLoading = false;
+              if (receipt === true) {
+                this.hasApprove = true;
+              }
+            }
+          });
+        } else {
+          this.isApproveLoading = false;
+        }
+      });
+  }
+
   swap(): void {
+    this.getFromAndToAddress();
     if (this.checkWalletConnect() === false) {
       return;
     }
@@ -207,20 +260,81 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.swapNeo();
       return;
     }
-    if (this.fromToken.chain === 'NEO' && this.toToken.chain === 'ETH') {
-      this.swapNeoCrossChainEth();
+    if (this.fromToken.chain === 'NEO' && this.toToken.chain !== 'NEO') {
       return;
     }
-    if (this.fromToken.chain !== 'NEO' && this.toToken.chain !== 'NEO') {
+    const fromUsd = USD_TOKENS.find(
+      (item) => item.symbol === this.fromToken.symbol
+    );
+    const toUsd = USD_TOKENS.find(
+      (item) => item.symbol === this.toToken.symbol
+    );
+    if (fromUsd && toUsd) {
       this.swapCrossChainEth();
       return;
+    }
+    if (this.fromToken.chain === 'ETH') {
+      if (this.toToken.chain === 'ETH') {
+        if (this.fromToken.symbol !== 'ETH' && this.toToken.symbol === 'ETH') {
+          this.swapExactTokensForETH();
+          return;
+        }
+        if (this.fromToken.symbol === 'ETH' && this.toToken.symbol !== 'ETH') {
+          this.swapExactETHForTokens();
+          return;
+        }
+        if (this.fromToken.symbol !== 'ETH' && this.toToken.symbol !== 'ETH') {
+          this.swapExactTokensForTokens();
+          return;
+        }
+      } else {
+        if (toUsd) {
+          if (this.fromToken.symbol === 'ETH') {
+            this.swapExactETHForTokensCrossChain();
+            return;
+          }
+          if (this.fromToken.symbol !== 'ETH') {
+            this.swapExactTokensForTokensCrossChain();
+            return;
+          }
+        }
+      }
+    }
+    if (this.fromToken.chain === 'BSC') {
+      if (this.toToken.chain === 'BSC') {
+        if (this.fromToken.symbol !== 'BNB' && this.toToken.symbol === 'BNB') {
+          this.swapExactTokensForETH();
+          return;
+        }
+        if (this.fromToken.symbol === 'BNB' && this.toToken.symbol !== 'BNB') {
+          this.swapExactETHForTokens();
+          return;
+        }
+        if (this.fromToken.symbol !== 'BNB' && this.toToken.symbol !== 'BNB') {
+          this.swapExactTokensForTokens();
+          return;
+        }
+      } else {
+        if (toUsd) {
+          if (this.fromToken.symbol === 'BNB') {
+            this.swapExactETHForTokensCrossChain();
+            return;
+          }
+          if (this.fromToken.symbol !== 'BNB') {
+            this.swapExactTokensForTokensCrossChain();
+            return;
+          }
+        }
+      }
     }
   }
 
   //#region 合约调用
   reGetSwapPath(): void {
-    this.inquiryInterval.unsubscribe();
+    // tslint:disable-next-line: no-unused-expression
+    this.inquiryInterval && this.inquiryInterval.unsubscribe();
     this.getSwapPathFun();
+    this.getNetworkFee();
     this.setInquiryInterval();
   }
 
@@ -304,17 +418,117 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       });
   }
 
+  swapExactTokensForETH(): void {
+    const swapApi = this.getEthDapiService();
+    this.metaMaskWalletApiService
+      .swapExactTokensForETH(
+        this.fromToken,
+        this.toToken,
+        this.chooseSwapPath,
+        this.inputAmount,
+        this.fromAddress,
+        this.toAddress,
+        this.deadline
+      )
+      .then((res) => {
+        if (res) {
+          this.closePage.emit();
+        }
+      });
+  }
+
+  swapExactETHForTokens(): void {
+    const swapApi = this.getEthDapiService();
+    this.metaMaskWalletApiService
+      .swapExactETHForTokens(
+        this.fromToken,
+        this.toToken,
+        this.chooseSwapPath,
+        this.inputAmount,
+        this.fromAddress,
+        this.toAddress,
+        this.deadline
+      )
+      .then((res) => {
+        if (res) {
+          this.closePage.emit();
+        }
+      });
+  }
+
+  swapExactTokensForTokens(): void {
+    const swapApi = this.getEthDapiService();
+    this.metaMaskWalletApiService
+      .swapExactTokensForTokens(
+        this.fromToken,
+        this.toToken,
+        this.chooseSwapPath,
+        this.inputAmount,
+        this.fromAddress,
+        this.toAddress,
+        this.deadline
+      )
+      .then((res) => {
+        if (res) {
+          this.closePage.emit();
+        }
+      });
+  }
+
+  swapExactETHForTokensCrossChain(): void {
+    this.metaMaskWalletApiService
+      .swapExactETHForTokensCrossChain(
+        this.fromToken,
+        this.toToken,
+        this.chooseSwapPath,
+        this.inputAmount,
+        this.fromAddress,
+        this.toAddress,
+        this.slipValue,
+        this.polyFee,
+        this.deadline
+      )
+      .then((res) => {
+        if (res) {
+          this.closePage.emit();
+        }
+      });
+  }
+  swapExactTokensForTokensCrossChain(): void {
+    this.metaMaskWalletApiService
+      .swapExactTokensForTokensCrossChain(
+        this.fromToken,
+        this.toToken,
+        this.chooseSwapPath,
+        this.inputAmount,
+        this.fromAddress,
+        this.toAddress,
+        this.slipValue,
+        this.polyFee,
+        this.deadline
+      )
+      .then((res) => {
+        if (res) {
+          this.closePage.emit();
+        }
+      });
+  }
+
   swapCrossChainEth(): void {
+    const swapApi = this.getEthDapiService();
     this.metaMaskWalletApiService
       .swapCrossChain(
         this.fromToken,
         this.toToken,
         this.inputAmount,
         this.fromAddress,
-        this.toAddress
+        this.toAddress,
+        this.chooseSwapPath.amount[this.chooseSwapPath.amount.length - 1],
+        this.slipValue,
+        this.polyFee,
+        'swap'
       )
       .then((res) => {
-        console.log(res);
         if (res) {
           this.closePage.emit();
         }
@@ -323,19 +537,70 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   //#endregion
 
   //#region
+  getEthDapiService(): any {
+    switch (this.fromToken.chain) {
+      case 'ETH':
+        return this.ethWalletName === 'MetaMask'
+          ? this.metaMaskWalletApiService
+          : this.o3EthWalletApiService;
+      case 'BSC':
+        return this.bscWalletName === 'MetaMask'
+          ? this.metaMaskWalletApiService
+          : this.o3EthWalletApiService;
+      case 'HECO':
+        return this.hecoWalletName === 'MetaMask'
+          ? this.metaMaskWalletApiService
+          : this.o3EthWalletApiService;
+    }
+  }
+  async checkShowApprove(): Promise<boolean> {
+    console.log('check show approve');
+    if (
+      !this.fromAddress ||
+      !this.toAddress ||
+      !this.chooseSwapPath ||
+      !this.chooseSwapPath.aggregator
+    ) {
+      this.showApprove = false;
+      console.log('check show approve return');
+      return;
+    }
+    if (this.fromToken.chain === 'NEO' || this.toToken.chain === 'NEO') {
+      this.showApprove = false;
+      console.log('check show approve return');
+      return;
+    }
+    const swapApi = this.getEthDapiService();
+    const balance = await this.metaMaskWalletApiService
+      .getAllowance(
+        this.fromToken,
+        this.fromAddress,
+        this.chooseSwapPath.aggregator
+      );
+    if (new BigNumber(balance).comparedTo(new BigNumber(this.inputAmount)) >=
+      0) {
+      this.showApprove = false;
+      return false;
+    } else {
+      this.showApprove = true;
+      return true;
+    }
+  }
   getSwapPathFun(): void {
     this.chooseSwapPath = null;
     this.apiService
       .getSwapPath(this.fromToken, this.toToken, this.inputAmount)
-      .subscribe((res) => {
+      .then((res) => {
         this.showInquiry = false;
-        if (res.length === 0) {
+        if (!res || res.length === 0) {
           this.swapFail.emit();
         }
-        if (res.length > 0) {
+        if (res && res.length > 0) {
           this.commonService.log(res);
           this.receiveSwapPathArray = res;
           this.handleReceiveSwapPathFiat();
+          this.calculationPrice();
+          this.getFromAndToAddress();
         }
       });
   }
@@ -345,7 +610,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         .shiftedBy(-this.toToken.decimals)
         .toFixed();
       // 计算法币价格
-      const price = this.rates[this.toToken.rateName];
+      const price = this.commonService.getAssetRate(this.rates, this.toToken);
       if (price) {
         item.fiat = new BigNumber(item.receiveAmount)
           .multipliedBy(new BigNumber(price))
@@ -355,7 +620,15 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     });
     this.chooseSwapPathIndex = 0;
     this.chooseSwapPath = this.receiveSwapPathArray[0];
-    this.calculationPrice();
+  }
+  async getNetworkFee(): Promise<void> {
+    this.polyFee = '';
+    if (this.fromToken.chain !== this.toToken.chain) {
+      this.polyFee = await this.apiService.getFromEthPolyFee(
+        this.fromToken,
+        this.toToken
+      );
+    }
   }
   calculationPrice(): void {
     this.price = new BigNumber(this.chooseSwapPath.receiveAmount)
@@ -368,33 +641,46 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       .toFixed();
   }
   getFromAndToAddress(): void {
+    let tempFromAddress;
     switch (this.fromToken.chain) {
       case 'NEO':
-        this.fromAddress = this.neoAccountAddress;
+        tempFromAddress = this.neoAccountAddress;
         break;
       case 'ETH':
-        this.fromAddress = this.ethAccountAddress;
+        tempFromAddress = this.ethAccountAddress;
         break;
       case 'BSC':
-        this.fromAddress = this.bscAccountAddress;
+        tempFromAddress = this.bscAccountAddress;
         break;
       case 'HECO':
-        this.fromAddress = this.hecoAccountAddress;
+        tempFromAddress = this.hecoAccountAddress;
         break;
     }
+    let tempToAddress;
     switch (this.toToken.chain) {
       case 'NEO':
-        this.toAddress = this.neoAccountAddress;
+        tempToAddress = this.neoAccountAddress;
         break;
       case 'ETH':
-        this.toAddress = this.ethAccountAddress;
+        tempToAddress = this.ethAccountAddress;
         break;
       case 'BSC':
-        this.toAddress = this.bscAccountAddress;
+        tempToAddress = this.bscAccountAddress;
         break;
       case 'HECO':
-        this.toAddress = this.hecoAccountAddress;
+        tempToAddress = this.hecoAccountAddress;
         break;
+    }
+    if (
+      tempFromAddress !== this.fromAddress ||
+      tempToAddress !== this.toAddress
+    ) {
+      this.fromAddress = tempFromAddress;
+      this.toAddress = tempToAddress;
+      this.checkShowApprove();
+    } else {
+      this.fromAddress = tempFromAddress;
+      this.toAddress = tempToAddress;
     }
   }
   checkWalletConnect(): boolean {

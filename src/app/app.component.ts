@@ -1,10 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterEvent, NavigationEnd } from '@angular/router';
 import {
-  ETH_WALLETS,
-  NEO_WALLETS,
-  BSC_WALLETS,
-  HECO_WALLETS,
   NeoWalletName,
   EthWalletName,
   UPDATE_NEO_ACCOUNT,
@@ -13,20 +9,17 @@ import {
   UPDATE_NEO_WALLET_NAME,
   UPDATE_ETH_ACCOUNT,
   UPDATE_ETH_WALLET_NAME,
-  NeoWallet,
-  EthWallet,
   UPDATE_BSC_ACCOUNT,
   UPDATE_BSC_WALLET_NAME,
   UPDATE_HECO_ACCOUNT,
   UPDATE_HECO_WALLET_NAME,
+  RESET_BSC_BALANCES,
+  RESET_HECO_BALANCES,
 } from '@lib';
 import {
   CommonService,
-  ApiService,
-  MetaMaskWalletApiService,
   NeolineWalletApiService,
-  O3EthWalletApiService,
-  O3NeoWalletApiService,
+  MetaMaskWalletApiService,
 } from '@core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -42,13 +35,9 @@ interface State {
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  NEO_WALLETS = NEO_WALLETS;
-  ETH_WALLETS = ETH_WALLETS;
-  BSC_WALLETS = BSC_WALLETS;
-  HECO_WALLETS = HECO_WALLETS;
   currentPage = this.router.url;
   isHome = true;
-  connectChainType: ConnectChainType = 'NEO';
+  connectChainType: ConnectChainType = 'ETH';
   showConnectModal = false; // connect wallet modal
   // account modal
   showNeoAccountModal = false;
@@ -74,12 +63,9 @@ export class AppComponent implements OnInit {
     private store: Store<State>,
     private router: Router,
     private commonService: CommonService,
-    public apiService: ApiService,
-    private o3NeoWalletApiService: O3NeoWalletApiService,
-    private o3EthWalletApiService: O3EthWalletApiService,
-    private neolineWalletApiService: NeolineWalletApiService,
+    private changeDetectorRef: ChangeDetectorRef,
     private metaMaskWalletApiService: MetaMaskWalletApiService,
-    private changeDetectorRef: ChangeDetectorRef
+    private neolineWalletApiService: NeolineWalletApiService
   ) {
     this.swap$ = store.select('swap');
     this.router.events.subscribe((res: RouterEvent) => {
@@ -91,6 +77,10 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (location.pathname !== '/' && location.pathname !== '/home') {
+      this.neolineWalletApiService.init();
+      this.metaMaskWalletApiService.init();
+    }
     this.swap$.subscribe((state) => {
       this.neoAccountAddress = state.neoAccountAddress;
       this.ethAccountAddress = state.ethAccountAddress;
@@ -189,6 +179,7 @@ export class AppComponent implements OnInit {
         this.bscAccountAddress = null;
         this.store.dispatch({ type: UPDATE_BSC_ACCOUNT, data: null });
         this.store.dispatch({ type: UPDATE_BSC_WALLET_NAME, data: null });
+        this.store.dispatch({ type: RESET_BSC_BALANCES });
         break;
       case 'HECO':
         this.showHecoAccountModal = false;
@@ -196,6 +187,7 @@ export class AppComponent implements OnInit {
         this.hecoAccountAddress = null;
         this.store.dispatch({ type: UPDATE_HECO_ACCOUNT, data: null });
         this.store.dispatch({ type: UPDATE_HECO_WALLET_NAME, data: null });
+        this.store.dispatch({ type: RESET_HECO_BALANCES });
         break;
     }
   }
@@ -217,34 +209,6 @@ export class AppComponent implements OnInit {
         this.showHecoAccountModal = false;
         break;
     }
-  }
-  //#endregion
-
-  //#region connect wallet modal
-  connectNeoWallet(wallet: NeoWallet): void {
-    switch (wallet.name) {
-      case 'NeoLine':
-        this.neolineWalletApiService.connect();
-        break;
-      case 'O3':
-        this.o3NeoWalletApiService.connect();
-        break;
-    }
-  }
-
-  connectEthWallet(wallet: EthWallet): void {
-    switch (wallet.name) {
-      case 'MetaMask':
-        this.metaMaskWalletApiService.connect(this.connectChainType);
-        break;
-      case 'O3':
-        this.o3EthWalletApiService.connect(this.connectChainType);
-        break;
-    }
-  }
-
-  closeConnectModal(): void {
-    this.showConnectModal = false;
   }
   //#endregion
 }

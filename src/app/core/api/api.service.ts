@@ -7,14 +7,24 @@ import {
   AssetQueryResponse,
   CommonHttpResponse,
   CROSS_CHAIN_SWAP_DETAIL_HOST,
-  INQUIRY_HOST,
   UTXO_HOST,
   Token,
   TxProgress,
   NNEO_TOKEN,
-  ALL_NEO_TOKENS,
   CHAIN_TOKENS,
   NETWORK,
+  POLY_HOST,
+  ETH_PUSDT_ASSET,
+  SWAP_CONTRACT_CHAIN_ID,
+  POLY_HOST_ADDRESS,
+  ETH_SOURCE_ASSET_HASH,
+  INQUIRY_HOST,
+  USD_TOKENS,
+  O3_AGGREGATOR_FEE,
+  O3_AGGREGATOR_SLIPVALUE,
+  FUSDT_ASSET_HASH,
+  WETH_ASSET_HASH,
+  LP_TOKENS,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { CommonService } from '../util/common.service';
@@ -22,6 +32,7 @@ import { SwapService } from '../util/swap.service';
 
 @Injectable()
 export class ApiService {
+  CHAIN_TOKENS;
   apiDo = environment.apiDomain;
   RATE_HOST = 'https://hub.o3.network/v1';
 
@@ -29,12 +40,149 @@ export class ApiService {
     private http: HttpClient,
     private commonService: CommonService,
     private swapService: SwapService
-  ) {}
+  ) {
+    this.getTokens();
+  }
 
+  //#region home
   postEmail(email: string): Observable<any> {
     return this.http.post(`https://subscribe.o3swap.com/subscribe`, { email });
   }
+  //#endregion
 
+  //#region o3 api
+  async getTokens(): Promise<void> {
+    let apiTokens = await this.http
+      .get(`${INQUIRY_HOST}/v1/tokens/all`)
+      .pipe(
+        map((res: CommonHttpResponse) => {
+          if (res.status === 'success') {
+            return res.data;
+          }
+        })
+      )
+      .toPromise();
+    if (!apiTokens) {
+      apiTokens = CHAIN_TOKENS;
+    }
+    Object.keys(apiTokens).forEach((key) => {
+      apiTokens[key] = apiTokens[key].map((item) => {
+        let chainLowerCase = (item.chain as string).toLowerCase();
+        if (item.chain === 'NEO') {
+          chainLowerCase = 'neo2';
+        }
+        return {
+          symbol: item.symbol,
+          logo: `https://img.o3.network/logo/${chainLowerCase}/${item.address}.png`,
+          assetID: item.address,
+          amount: '0',
+          decimals: item.decimals,
+          chain: item.chain,
+        };
+      });
+    });
+    apiTokens.ALL = apiTokens.recommend;
+    delete apiTokens.recommend;
+    console.log(apiTokens);
+    this.CHAIN_TOKENS = apiTokens;
+  }
+
+  getRates(): Observable<any> {
+    return this.http.get(`${this.RATE_HOST}/crypto/rates`).pipe(
+      map((res: CommonHttpResponse) => {
+        if (res.status === 'success') {
+          return res.data;
+        }
+      })
+    );
+  }
+
+  async getSwapPath(
+    fromToken: Token,
+    toToken: Token,
+    inputAmount: string
+  ): Promise<AssetQueryResponse> {
+    if (
+      (fromToken.symbol === 'NEO' && toToken.symbol === 'nNEO') ||
+      (fromToken.symbol === 'nNEO' && toToken.symbol === 'NEO')
+    ) {
+      return this.getNeoNNeoSwapPath(fromToken, toToken, inputAmount);
+    }
+    if (fromToken.chain === 'NEO' && toToken.chain === 'NEO') {
+      return this.getFromNeoSwapPath(fromToken, toToken, inputAmount);
+    }
+    if (fromToken.chain === 'NEO' && toToken.chain !== 'NEO') {
+      return of([]).toPromise();
+    }
+    console.log(1);
+    if (fromToken.chain === toToken.chain) {
+      const res = await this.getFromEthSwapPath(
+        fromToken,
+        toToken,
+        inputAmount
+      );
+      return this.handleReceiveSwapPathFiat(res, toToken);
+    }
+    console.log(2);
+    const fromUsd = USD_TOKENS.find((item) => item.chain === fromToken.chain);
+    const toUsd = USD_TOKENS.find((item) => item.chain === toToken.chain);
+    if (
+      fromUsd.symbol === fromToken.symbol &&
+      toUsd.symbol === toToken.symbol
+    ) {
+      const res = await this.getFromEthCrossChainSwapPath(
+        fromToken,
+        toToken,
+        inputAmount
+      );
+      return this.handleReceiveSwapPathFiat(res, toToken);
+    }
+    console.log(toUsd.symbol);
+    console.log(toToken.symbol);
+    if (
+      fromUsd.symbol !== fromToken.symbol &&
+      toUsd.symbol === toToken.symbol
+    ) {
+      console.log(3);
+      const res = await this.getFromEthCrossChainAggregatorSwapPath(
+        fromToken,
+        toToken,
+        inputAmount,
+        fromUsd
+      );
+      return this.handleReceiveSwapPathFiat(res, toToken);
+    }
+    console.log(4);
+    return of([]).toPromise();
+  }
+
+  getToStandardSwapPath(
+    fromToken: Token,
+    inputAmount: string
+  ): Promise<string[]> {
+    if (NETWORK === 'MainNet') {
+      if (fromToken.symbol === 'fUSDT') {
+        return of([FUSDT_ASSET_HASH]).toPromise();
+      }
+      return this.getToStandardSwapPathReq(
+        fromToken,
+        FUSDT_ASSET_HASH,
+        inputAmount
+      );
+    } else {
+      if (fromToken.symbol === 'nNEO') {
+        return of([NNEO_TOKEN.assetID]).toPromise();
+      }
+      return this.getToStandardSwapPathReq(
+        fromToken,
+        NNEO_TOKEN.assetID,
+        inputAmount
+      );
+    }
+  }
+  //#endregion
+
+  //#region neo nneo swap
   getUtxo(address: string, amount: string): Promise<any> {
     return this.http
       .post(`${UTXO_HOST}/utxo`, {
@@ -59,13 +207,53 @@ export class ApiService {
       )
       .toPromise();
   }
+  //#endregion
+
+  //#region poly api
+  getBridgeAmountOut(
+    fromToken: Token,
+    toToken: Token,
+    inputAmount: string
+  ): Promise<string> {
+    const fromPUsdt = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    const toPUsdt = ETH_PUSDT_ASSET[toToken.chain].assetID;
+    const amount = this.commonService.decimalToInteger(
+      inputAmount,
+      fromToken.decimals
+    );
+    return this.http
+      .get(
+        `${POLY_HOST}/calcOutGivenIn/${POLY_HOST_ADDRESS}/${fromPUsdt}/${toPUsdt}/${amount}`
+      )
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200 && res.amount_out) {
+            return new BigNumber(res.amount_out)
+              .shiftedBy(-toToken.decimals)
+              .toFixed();
+          }
+        })
+      )
+      .toPromise();
+  }
+
+  // getFromEthPoolFeeRate(): Promise<string> {
+  //   return this.http
+  //     .get(`${POLY_HOST}/swapFee/${POLY_HOST_ADDRESS}`)
+  //     .pipe(
+  //       map((res: any) => {
+  //         if (res.code === 200) {
+  //           return new BigNumber(res.fee).shiftedBy(-10).toFixed();
+  //         }
+  //       })
+  //     )
+  //     .toPromise();
+  // }
 
   getCrossChainSwapDetail(hash: string): Observable<TxProgress> {
-    if (hash.startsWith('0x')) {
-      hash = hash.slice(2);
-    }
+    hash = this.commonService.remove0xHash(hash);
     return this.http
-      .get(`${CROSS_CHAIN_SWAP_DETAIL_HOST}/api/v1/getcrosstx?txhash=${hash}`)
+      .post(`${CROSS_CHAIN_SWAP_DETAIL_HOST}/transactionofhash`, { hash })
       .pipe(
         map((res: any) => {
           const target: TxProgress = {
@@ -73,18 +261,18 @@ export class ApiService {
             step2: { hash: '', status: 0 },
             step3: { hash: '', status: 0 },
           };
-          if (res.desc === 'success' && res.result) {
-            const data = JSON.parse(res.result);
-            if (data.fchaintx && data.fchaintx.txhash) {
-              target.step1.hash = data.fchaintx.txhash;
+          if (res.TransactionState) {
+            const data = res.TransactionState;
+            if (data[0].Hash) {
+              target.step1.hash = data[0].Hash;
               target.step1.status = 2;
             }
-            if (data.mchaintx && data.mchaintx.txhash) {
-              target.step2.hash = data.mchaintx.txhash;
+            if (data[1].Hash) {
+              target.step2.hash = data[1].Hash;
               target.step2.status = 2;
             }
-            if (data.tchaintx && data.tchaintx.txhash) {
-              target.step3.hash = data.tchaintx.txhash;
+            if (data[2].Hash) {
+              target.step3.hash = data[2].Hash;
               target.step3.status = 2;
             }
             if (target.step1.status === 2 && target.step2.status === 0) {
@@ -99,21 +287,131 @@ export class ApiService {
       );
   }
 
-  getSwapPath(
+  getFromEthPolyFee(fromToken: Token, toToken: Token): Promise<string> {
+    return this.http
+      .post(`${CROSS_CHAIN_SWAP_DETAIL_HOST}/getfee`, {
+        SrcChainId: SWAP_CONTRACT_CHAIN_ID[fromToken.chain],
+        Hash: this.commonService.remove0xHash(ETH_SOURCE_ASSET_HASH),
+        DstChainId: SWAP_CONTRACT_CHAIN_ID[toToken.chain],
+      })
+      .pipe(
+        map((res: any) => {
+          if (res.TokenAmount) {
+            return res.TokenAmount;
+          }
+        })
+      )
+      .toPromise();
+  }
+  //#endregion
+
+  //#region bridge page
+  /**
+   * @description: Input USDT get LP, pool add LP
+   * @param fromToken fromToken
+   * @param amount amount
+   * @return Promise
+   */
+  getPoolOutGivenSingleIn(fromToken: Token, amount: string): Promise<string> {
+    const poolPUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    const lpToken = LP_TOKENS.find((item) => item.chain === fromToken.chain);
+    amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
+    return this.http
+      .get(
+        `${POLY_HOST}/calcPoolOutGivenSingleIn/${POLY_HOST_ADDRESS}/${poolPUsdtHash}/${amount}`
+      )
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200) {
+            return new BigNumber(res.pool_amount_out)
+              .shiftedBy(-lpToken.decimals)
+              .toFixed();
+          }
+        })
+      )
+      .toPromise();
+  }
+
+  /**
+   * @description: Input USDT get LP, pool remove LP
+   * @param fromTokenn fromToken
+   * @param amount USDT amount
+   * @return Promise Out
+   */
+  getPoolInGivenSingleOut(fromToken: Token, amount: string): Promise<string> {
+    const poolPUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    const lpToken = LP_TOKENS.find((item) => item.chain === fromToken.chain);
+    amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
+    return this.http
+      .get(
+        `${POLY_HOST}/calcPoolInGivenSingleOut/${POLY_HOST_ADDRESS}/${poolPUsdtHash}/${amount}`
+      )
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200) {
+            return new BigNumber(res.pool_amount_out)
+              .shiftedBy(-lpToken.decimals)
+              .toFixed();
+          }
+        })
+      )
+      .toPromise();
+  }
+
+  /**
+   * @description: Input LP get USDT
+   * @param fromToken fromToken
+   * @param amount LP amount
+   * @return promise
+   */
+  getSingleOutGivenPoolIn(fromToken: Token, amount: string): Promise<string> {
+    const poolPUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    const usdtToken = USD_TOKENS.find((item) => item.chain === fromToken.chain);
+    amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
+    return this.http
+      .get(
+        `${POLY_HOST}/calcSingleOutGivenPoolIn/${POLY_HOST_ADDRESS}/${poolPUsdtHash}/${amount}`
+      )
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200) {
+            return new BigNumber(res.token_amount_out)
+              .shiftedBy(-usdtToken.decimals)
+              .toFixed();
+          }
+        })
+      )
+      .toPromise();
+  }
+
+  getPUsdtBalance(assetID: string, decimals: number): Promise<string> {
+    return this.http
+      .get(`${POLY_HOST}/balance/${POLY_HOST_ADDRESS}/${assetID}`)
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200) {
+            return new BigNumber(res.balance).shiftedBy(-decimals).toFixed();
+          }
+        })
+      )
+      .toPromise();
+  }
+  //#endregion
+
+  //#region private functions
+  private getNeoNNeoSwapPath(
     fromToken: Token,
     toToken: Token,
     inputAmount: string
-  ): Observable<AssetQueryResponse> {
-    let noRequestRes;
+  ): Promise<AssetQueryResponse> {
+    let result;
     // neo => nneo
     if (fromToken.symbol === 'NEO' && toToken.symbol === 'nNEO') {
-      noRequestRes = [
+      result = [
         {
           amount: [
             inputAmount,
-            new BigNumber(inputAmount)
-              .shiftedBy(NNEO_TOKEN[0].decimals)
-              .toFixed(),
+            new BigNumber(inputAmount).shiftedBy(NNEO_TOKEN.decimals).toFixed(),
           ],
           swapPath: ['NEO', 'nNEO'],
         },
@@ -121,105 +419,209 @@ export class ApiService {
     }
     // nneo => neo
     if (fromToken.symbol === 'nNEO' && toToken.symbol === 'NEO') {
-      noRequestRes = [
+      result = [
         {
           amount: [
-            new BigNumber(inputAmount)
-              .shiftedBy(NNEO_TOKEN[0].decimals)
-              .toFixed(),
+            new BigNumber(inputAmount).shiftedBy(NNEO_TOKEN.decimals).toFixed(),
             inputAmount,
           ],
           swapPath: ['nNEO', 'NEO'],
         },
       ];
     }
-    if (fromToken.chain !== 'NEO' && toToken.chain !== 'NEO') {
-      noRequestRes = [
-        {
-          amount: [
-            new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed(),
-            new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed(),
-          ],
-          swapPath: [fromToken.symbol, toToken.symbol],
-        },
-      ];
+    this.commonService.log(result);
+    if (result) {
+      return of(this.handleReceiveSwapPathFiat(result, toToken)).toPromise();
     }
-    this.commonService.log(noRequestRes);
-    if (noRequestRes) {
-      return of(this.handleReceiveSwapPathFiat(noRequestRes, toToken));
-    }
-    // swap from neo
-    let toAssetName: string;
-    toAssetName = toToken.symbol;
-    if (toToken.chain !== 'NEO') {
-      toAssetName = toToken.atNeoAssetName;
-    }
+  }
+
+  private getFromNeoSwapPath(
+    fromToken: Token,
+    toToken: Token,
+    inputAmount: string
+  ): Promise<AssetQueryResponse> {
     const amount = this.swapService.getAmountIn(fromToken, inputAmount);
     return this.http
-      .post(
-        `${INQUIRY_HOST}?StartAsset=${fromToken.symbol}&EndAsset=${toAssetName}&amount=${amount}`,
-        null
-      )
+      .post(`${INQUIRY_HOST}/v1/neo/quote`, {
+        from: this.commonService.remove0xHash(fromToken.assetID),
+        to: this.commonService.remove0xHash(toToken.assetID),
+        amount,
+      })
       .pipe(
-        map((res: AssetQueryResponse) => {
-          if (res.length > 0) {
-            return this.handleReceiveSwapPathFiat(res, toToken);
-          } else {
-            return [];
+        map((res: CommonHttpResponse) => {
+          if (res.status === 'success') {
+            const target = [];
+            res.data.forEach((item) => {
+              const swapPath = this.swapService.getAssetNamePath(
+                item.path,
+                this.CHAIN_TOKENS[fromToken.chain]
+              );
+              const temp = {
+                amount: item.amounts,
+                swapPath,
+                assetHashPath: item.path,
+                aggregator: item.aggregator,
+              };
+              target.push(temp);
+            });
+            return this.handleReceiveSwapPathFiat(target, toToken);
           }
         })
-      );
+      )
+      .toPromise();
   }
 
-  getToStandardSwapPath(
+  private getFromEthSwapPath(
     fromToken: Token,
+    toToken: Token,
     inputAmount: string
-  ): Promise<string[]> {
-    if (NETWORK === 'MainNet') {
-      if (fromToken.symbol === 'fUSDT') {
-        return of(['fUSDT']).toPromise();
-      }
-      return this.getToStandardSwapPathReq(fromToken, 'fUSDT', inputAmount);
-    } else {
-      if (fromToken.symbol === 'nNEO') {
-        return of(['nNEO']).toPromise();
-      }
-      return this.getToStandardSwapPathReq(fromToken, 'nNEO', inputAmount);
-    }
-  }
-
-  getRates(): Observable<any> {
-    return this.http.get(`${this.RATE_HOST}/crypto/rates`).pipe(
-      map((res: CommonHttpResponse) => {
-        const rates: any = { usdt: 1 };
-        if (res.status === 'success') {
-          rates.neo = res.data.neo2.neo.price;
-          rates.flm = res.data.neo2.flm.price;
-          rates.swth = res.data.neo2.swth.price;
-          rates.eth = res.data.eth.eth.price;
-          rates.ont = res.data.ont.ont.price;
-        }
-        return rates;
-      })
+  ): Promise<AssetQueryResponse> {
+    const amount = this.commonService.decimalToInteger(
+      inputAmount,
+      fromToken.decimals
     );
+    let fromAssetHash = fromToken.assetID;
+    let toAssetHash = toToken.assetID;
+    if (
+      fromToken.symbol === WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
+    ) {
+      fromAssetHash = WETH_ASSET_HASH[fromToken.chain].assetID;
+    }
+    if (
+      toToken.symbol === WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
+    ) {
+      toAssetHash = WETH_ASSET_HASH[fromToken.chain].assetID;
+    }
+    return this.http
+      .post(`${INQUIRY_HOST}/v1/${fromToken.chain.toLowerCase()}/quote`, {
+        from: this.commonService.add0xHash(fromAssetHash),
+        to: this.commonService.add0xHash(toAssetHash),
+        amount,
+      })
+      .pipe(
+        map((res: CommonHttpResponse) => {
+          if (res.status === 'success') {
+            const target = [];
+            res.data.forEach((item) => {
+              const swapPath = this.swapService.getAssetNamePath(
+                item.path,
+                this.CHAIN_TOKENS[fromToken.chain]
+              );
+              const temp = {
+                amount: item.amounts,
+                swapPath,
+                assetHashPath: item.path,
+                aggregator: item.aggregator,
+              };
+              if (
+                fromToken.symbol ===
+                WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
+              ) {
+                temp.swapPath.unshift(fromToken.symbol);
+              }
+              if (
+                toToken.symbol ===
+                WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
+              ) {
+                temp.swapPath.push(toToken.symbol);
+              }
+              target.push(temp);
+            });
+            return target;
+          }
+        })
+      )
+      .toPromise();
   }
 
-  //#region
+  private async getFromEthCrossChainAggregatorSwapPath(
+    fromToken: Token,
+    toToken: Token,
+    inputAmount: string,
+    fromUsd: Token
+  ): Promise<AssetQueryResponse> {
+    const res1 = await this.getFromEthSwapPath(fromToken, fromUsd, inputAmount); // 排序
+    for (const res1Item of res1) {
+      const amountOutA = res1Item.amount[res1Item.amount.length - 1];
+      console.log(`amountOutA: ${amountOutA}`);
+      const amountOutB = this.swapService.getMinAmountOut(
+        amountOutA,
+        O3_AGGREGATOR_FEE
+      );
+      console.log(`amountOutB: ${amountOutB}`);
+      let polyAmountIn = this.swapService.getMinAmountOut(
+        amountOutB,
+        O3_AGGREGATOR_SLIPVALUE
+      );
+      console.log(`polyAmountIn: ${polyAmountIn}`);
+      polyAmountIn = new BigNumber(polyAmountIn)
+        .shiftedBy(-fromUsd.decimals)
+        .toFixed();
+      const res2 = await this.getFromEthCrossChainSwapPath(
+        fromUsd,
+        toToken,
+        polyAmountIn
+      );
+      const polyAmountOut = res2[0].amount[1];
+      res1Item.amount.push(polyAmountOut);
+      res1Item.swapPath.push(toToken.symbol);
+    }
+    console.log(res1);
+    return res1;
+  }
+
+  private getFromEthCrossChainSwapPath(
+    fromToken: Token,
+    toToken: Token,
+    inputAmount: string
+  ): Promise<AssetQueryResponse> {
+    const fromPUsdt = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    const toPUsdt = ETH_PUSDT_ASSET[toToken.chain].assetID;
+    const amount = this.commonService.decimalToInteger(
+      inputAmount,
+      fromToken.decimals
+    );
+    return this.http
+      .get(
+        `${POLY_HOST}/calcOutGivenIn/${POLY_HOST_ADDRESS}/${fromPUsdt}/${toPUsdt}/${amount}`
+      )
+      .pipe(
+        map((res: any) => {
+          if (res.code === 200) {
+            const result: AssetQueryResponse = [
+              {
+                amount: [
+                  new BigNumber(inputAmount)
+                    .shiftedBy(fromToken.decimals)
+                    .toFixed(),
+                  res.amount_out,
+                ],
+                swapPath: [fromToken.symbol, toToken.symbol],
+              },
+            ];
+            return result;
+          }
+        })
+      )
+      .toPromise();
+  }
+
   private getToStandardSwapPathReq(
     fromToken: Token,
-    toAssetName: string,
+    standardTokenAssetHash: string,
     inputAmount: string
   ): Promise<string[]> {
     const amount = this.swapService.getAmountIn(fromToken, inputAmount);
     return this.http
-      .post(
-        `${INQUIRY_HOST}?StartAsset=${fromToken.symbol}&EndAsset=${toAssetName}&amount=${amount}`,
-        null
-      )
+      .post(`${INQUIRY_HOST}/v1/neo/quote`, {
+        from: this.commonService.remove0xHash(fromToken.assetID),
+        to: this.commonService.remove0xHash(standardTokenAssetHash),
+        amount,
+      })
       .pipe(
-        map((res: AssetQueryResponse) => {
-          if (res.length > 0) {
-            return res[0].swapPath;
+        map((res: CommonHttpResponse) => {
+          if (res.status === 'success') {
+            return res.data[0].path;
           } else {
             return [];
           }
@@ -228,18 +630,23 @@ export class ApiService {
       .toPromise();
   }
 
-  private getNeoAssetLogoByName(name: string): string {
-    const token1 = ALL_NEO_TOKENS.find((item) => item.symbol === name);
-    const token2 = CHAIN_TOKENS.ETH.find((item) => item.symbol === name);
-    const token3 = CHAIN_TOKENS.BSC.find((item) => item.symbol === name);
-    const token4 = CHAIN_TOKENS.HECO.find((item) => item.symbol === name);
-    const token = token1 || token2 || token3 || token4;
+  private getAssetLogoByName(name: string): string {
+    let token;
+    for (const key in this.CHAIN_TOKENS) {
+      if (this.CHAIN_TOKENS.hasOwnProperty(key)) {
+        const tokenList = this.CHAIN_TOKENS[key];
+        token = tokenList.find((item) => item.symbol === name);
+        if (token) {
+          break;
+        }
+      }
+    }
     return token && token.logo;
   }
 
   private handleReceiveSwapPathFiat(
     swapPathArr: AssetQueryResponse,
-    toToken: Token | string
+    toToken: Token
   ): AssetQueryResponse {
     swapPathArr.forEach((item) => {
       item.receiveAmount = item.amount[item.amount.length - 1];
@@ -249,7 +656,7 @@ export class ApiService {
       }
       item.swapPathLogo = [];
       item.swapPath.forEach((name) => {
-        item.swapPathLogo.push(this.getNeoAssetLogoByName(name));
+        item.swapPathLogo.push(this.getAssetLogoByName(name));
       });
     });
     return this.shellSortSwapPath(swapPathArr);

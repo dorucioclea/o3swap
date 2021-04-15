@@ -1,0 +1,274 @@
+.page-container {
+  .group-container {
+    // padding: 50px 40px 68px;
+    margin: auto;
+    width: 1000px;
+    background: #1e1e1e;
+    border-radius: 20px;
+    display: flex;
+    .item {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex: 1;
+      padding-left: 40px;
+      padding-right: 30px;
+      height: 120px;
+      &:nth-child(2) {
+        position: relative;
+        &::before,
+        &::after {
+          position: absolute;
+          top: 50%;
+          margin-top: -25px;
+          display: block;
+          content: "";
+          width: 1px;
+          height: 50px;
+          background-color: #353535;
+        }
+        &::before {
+          left: 0;
+        }
+        &::after {
+          right: 0;
+        }
+      }
+      .header {
+        font-size: 14px;
+        color: #46b069;
+        span {
+          color: #8aa1a1;
+        }
+      }
+      .content {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+      .value {
+        display: flex;
+        flex-direction: column;
+        color: #fff;
+        font-size: 18px;
+        .rate {
+          margin-top: 8px;
+          font-size: 12px;
+          color: #8aa1a1;
+        }
+      }
+    }
+  }
+  .tab-container {
+    background-color: transparent;
+    border-radius: 0 0 20px 20px;
+    .tab-wrap {
+      position: relative;
+      padding-top: 60px;
+      width: 100%;
+      .tab-nav-scroll {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 96px;
+        .tabs {
+          padding-top: 15px;
+          position: absolute;
+          top: 10px;
+          width: 50%;
+          height: 96px;
+          font-size: 18px;
+          color: #fff;
+          text-align: center;
+          background: no-repeat;
+          background: url("/assets/images/bridge-liquidity/defult.png") no-repeat;
+          cursor: pointer;
+          &.tabs-add {
+            left: 0;
+            &:hover {
+              background: url("/assets/images/bridge-liquidity/add-hover.png") no-repeat;
+            }
+          }
+          &.tabs-remove {
+            right: 0;
+            &:hover {
+              background: url("/assets/images/bridge-liquidity/remove-hover.png") no-repeat;
+              background-position: 100%;
+            }
+          }
+          &.addActive {
+            top: 0;
+            background: url("/assets/images/bridge-liquidity/active.png") no-repeat!important;
+          }
+          &.removeActive {
+            top: 0;
+            background: url("/assets/images/bridge-liquidity/active.png") no-repeat!important;
+          }
+        }
+      }
+      .tab-content {
+        position: relative;
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        padding: 40px 30px 30px 40px;
+        background-color: #202020;
+        z-index: 100;
+        .list-wrap {
+          li {
+            margin-top: 10px;
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            .detail {
+              margin-right: 20px;
+              padding-left: 30px;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              flex: 1;
+              background-color: hsl(0, 0%, 16%);
+              border-radius: 10px;
+              .left {
+                display: flex;
+                align-items: center;
+                .token-logo {
+                  margin-right: 15px;
+                  width: 30px;
+                  height: 30px;
+                  border-radius: 50%;
+                }
+                .token-name {
+                  font-size: 16px;
+                }
+              }
+              .right {
+                display: flex;
+                font-size: 14px;
+                color: #8aa1a1;
+                .input-container {
+                  width: 300px;
+                  height: 36px;
+                  border-radius: 10px;
+                  font-size: 20px;
+                  input {
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 10px;
+                    border: none;
+                    color: #fff;
+                    text-align: right;
+                    &::placeholder {
+                      color: #4A4A4A;
+                    }
+                  }
+                }
+                .max-status {
+                  margin: 0 20px;
+                  width: 50px;
+                  height: 36px;
+                  line-height: 36px;
+                  text-align: center;
+                  background: #303030;
+                  border-radius: 10px;
+                  cursor: not-allowed;
+                  pointer-events: none;
+                  color: #4A4A4A;
+                  cursor: pointer;
+                  &.active {
+                    color: #6162ef;
+                    pointer-events: auto;
+                    cursor: pointer;
+                    &:hover {
+                      background-color: #6162EF;
+                      color: #fff;
+                    }
+                  }
+                }
+                .balance {
+                  width: 150px;
+                  position: relative;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  color: #8aa1a1;
+                  line-height: 18px;
+                  &:before {
+                    position: absolute;
+                    left: 0;
+                    top: 5px;
+                    display: block;
+                    content: "";
+                    width: 1px;
+                    height: 20px;
+                    background: #353535;
+                  }
+                  // span {
+                  //   width: 100%;
+                  //   overflow: hidden;
+                  //   text-overflow: ellipsis;
+                  // }
+                }
+              }
+            }
+          }
+        }
+        .big-btn {
+          display: none;
+          margin: 40px auto 0;
+          font-size: 18px;
+          &.active {
+            display: inline-flex;
+          }
+        }
+      }
+    }
+  }
+  .blp-detail {
+    display: flex;
+    .left, .right {
+      padding: 30px 50px;
+      flex: 1;
+      &.left {
+        .item-list:nth-child(1) {
+          height: 30px;
+        }
+        .item-list:not(:first-child) {
+          margin-top: 10px;
+        }
+        .item-list, .progress-container{
+          display: flex;
+          width: 100%;
+          height:20px;
+          color: #8AA1A1;
+          .progress{
+            height: 6px;
+            width: 300px;
+          }
+        }
+      }
+      &.right .item-list {
+        color: #8AA1A1;
+        justify-content: space-between;
+        height: 30px;
+        .value {
+          color: #46b069;
+        }
+      }
+      .item-list {
+        display: flex;
+        align-items: center;
+        .value {
+          color: #ffffff;
+          justify-content: space-between;
+        }
+      }
+    }
+  }
+  .row1 {
+    margin-top: 40px;
+  }
+  .row2 {
+    margin-top: 20px;
+  }
+}

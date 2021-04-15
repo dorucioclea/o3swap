@@ -18,6 +18,8 @@ import {
   SwapHomeComponent,
   SwapResultComponent,
   DashboardComponent,
+  BridgeComponent,
+  LiquidityComponent,
 } from './pages';
 
 const PAGECOMPONENTS = [
@@ -26,6 +28,8 @@ const PAGECOMPONENTS = [
   SwapHomeComponent,
   SwapResultComponent,
   DashboardComponent,
+  BridgeComponent,
+  LiquidityComponent,
 ];
 
 //#region ng-zorro-antd

@@ -12,9 +12,10 @@ export interface SwapTransaction {
   txid: string;
   isPending: boolean;
   min: boolean;
-  fromTokenName: string;
+  fromToken: Token;
   toToken: Token;
   amount: string;
+  receiveAmount: string;
   progress?: TxProgress;
 }
 
@@ -28,13 +29,14 @@ export interface SwapStateType {
   bscAccountAddress: string;
   hecoAccountAddress: string;
   balances: object;
+  ethBalances: object;
+  bscBalances: object;
+  hecoBalances: object;
   neolineNetwork: Network;
   metamaskNetworkId: number;
   transaction: SwapTransaction;
+  bridgeeTransaction: SwapTransaction;
+  liquidityTransaction: SwapTransaction;
 }
 
-export const O3SWAP_FEE_PERCENTAGE = 0.3; // 系统收费 0.3%
-export const ALL_PERCENTAGE = 1.003;
-
-// export const NEO_SCRIPTHASH =
-//   '0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b';
+export type TxAtPage = 'swap' | 'bridge' | 'liquidity';

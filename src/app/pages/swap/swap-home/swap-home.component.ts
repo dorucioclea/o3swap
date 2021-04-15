@@ -12,6 +12,8 @@ import { SwapSettingComponent, SwapTokenComponent } from '@shared';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { Store } from '@ngrx/store';
 import { Observable, Unsubscribable } from 'rxjs';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { CommonService, ApiService } from '@core';
 
 interface State {
   setting: any;
@@ -24,7 +26,6 @@ interface State {
   styleUrls: ['../common.scss', './swap-home.component.scss'],
 })
 export class SwapHomeComponent implements OnInit, OnDestroy {
-  @Input() rates = {};
   @Input() fromToken: Token;
   @Input() toToken: Token;
   @Input() chooseSwapPath;
@@ -36,8 +37,13 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
   }>();
   @Output() toResultPage = new EventEmitter();
 
+  rates = {};
   swap$: Observable<any>;
-  tokenBalance; // 账户的 tokens
+  neoAccountAddress: string;
+  ethAccountAddress: string;
+  bscAccountAddress: string;
+  hecoAccountAddress: string;
+  tokenBalance = { ETH: {}, NEO: {}, BSC: {}, HECO: {} }; // 账户的 tokens
   swapUnScribe: Unsubscribable;
 
   // setting modal
@@ -50,12 +56,19 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
   inputAmountFiat: string; // 支付的 token 美元价值
   inputAmountError: string;
 
-  constructor(private modal: NzModalService, public store: Store<State>) {
+  constructor(
+    private modal: NzModalService,
+    public store: Store<State>,
+    private nzMessage: NzMessageService,
+    private commonService: CommonService,
+    private apiService: ApiService
+  ) {
     this.setting$ = store.select('setting');
     this.swap$ = store.select('swap');
   }
 
   ngOnInit(): void {
+    this.getRates();
     this.setting$.subscribe((state) => {
       this.slipValue = state.slipValue;
       this.isCustomSlip = state.isCustomSlip;
@@ -64,25 +77,25 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
     this.checkInputAmountDecimal();
     this.calcutionInputAmountFiat();
     this.swapUnScribe = this.swap$.subscribe((state) => {
-      if (
-        this.fromToken &&
-        JSON.stringify(state.balances) !== JSON.stringify(this.tokenBalance)
-      ) {
-        this.tokenBalance = JSON.parse(JSON.stringify(state.balances));
-        if (this.tokenBalance[this.fromToken.assetID]) {
-          this.fromToken.amount = this.tokenBalance[
-            this.fromToken.assetID
-          ].amount;
-        }
-      }
+      this.neoAccountAddress = state.neoAccountAddress;
+      this.ethAccountAddress = state.ethAccountAddress;
+      this.bscAccountAddress = state.bscAccountAddress;
+      this.hecoAccountAddress = state.hecoAccountAddress;
+      this.handleTokenAmountBalance(state);
       // this.changeDetectorRef.detectChanges();
     });
   }
 
   ngOnDestroy(): void {
-    if (this.swapUnScribe !== null && this.swapUnScribe !== undefined) {
+    if (this.swapUnScribe) {
       this.swapUnScribe.unsubscribe();
     }
+  }
+
+  getRates(): void {
+    this.apiService.getRates().subscribe((res) => {
+      this.rates = res;
+    });
   }
 
   showTokens(type: 'from' | 'to'): void {
@@ -127,7 +140,6 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
     this.inputAmount = $event.target.value;
     this.resetSwapData();
     this.checkInputAmountDecimal();
-    this.resetSwapData();
     this.calcutionInputAmountFiat();
   }
 
@@ -135,14 +147,13 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
     this.inputAmountError = '';
     this.inputAmount = (this.fromToken && this.fromToken.amount) || '0';
     this.resetSwapData();
-    this.resetSwapData();
     this.calcutionInputAmountFiat();
   }
 
   inquiry(): void {
-    if (this.checkCanInquiry() === false) {
-      return;
-    }
+    // if (this.checkWalletConnect() === false) {
+    //   return;
+    // }
     this.toInquiryPage.emit({
       inputAmount: this.inputAmount,
       fromToken: this.fromToken,
@@ -173,6 +184,37 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
     });
   }
   //#region
+  handleTokenAmountBalance(state): void {
+    if (
+      JSON.stringify(state.balances) !== JSON.stringify(this.tokenBalance.NEO)
+    ) {
+      this.tokenBalance.NEO = JSON.parse(JSON.stringify(state.balances));
+    }
+    if (
+      JSON.stringify(state.ethBalances) !==
+      JSON.stringify(this.tokenBalance.ETH)
+    ) {
+      this.tokenBalance.ETH = JSON.parse(JSON.stringify(state.ethBalances));
+    }
+    if (
+      JSON.stringify(state.bscBalances) !==
+      JSON.stringify(this.tokenBalance.BSC)
+    ) {
+      this.tokenBalance.BSC = JSON.parse(JSON.stringify(state.bscBalances));
+    }
+    if (
+      JSON.stringify(state.hecoBalances) !==
+      JSON.stringify(this.tokenBalance.HECO)
+    ) {
+      this.tokenBalance.HECO = JSON.parse(JSON.stringify(state.hecoBalances));
+    }
+    this.fromToken.amount = '';
+    if (this.tokenBalance[this.fromToken.chain][this.fromToken.assetID]) {
+      this.fromToken.amount = this.tokenBalance[this.fromToken.chain][
+        this.fromToken.assetID
+      ].amount;
+    }
+  }
   checkCanInquiry(): boolean {
     if (!this.fromToken || !this.toToken || !this.inputAmount) {
       return false;
@@ -181,6 +223,37 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
       return false;
     }
     if (this.checkInputAmountDecimal() === false) {
+      return false;
+    }
+    return true;
+  }
+  checkWalletConnect(): boolean {
+    if (
+      (this.fromToken.chain === 'NEO' || this.toToken.chain === 'NEO') &&
+      !this.neoAccountAddress
+    ) {
+      this.nzMessage.error('Please connect the NEO wallet first');
+      return false;
+    }
+    if (
+      (this.fromToken.chain === 'ETH' || this.toToken.chain === 'ETH') &&
+      !this.ethAccountAddress
+    ) {
+      this.nzMessage.error('Please connect the ETH wallet first');
+      return false;
+    }
+    if (
+      (this.fromToken.chain === 'BSC' || this.toToken.chain === 'BSC') &&
+      !this.bscAccountAddress
+    ) {
+      this.nzMessage.error('Please connect the BSC wallet first');
+      return false;
+    }
+    if (
+      (this.fromToken.chain === 'HECO' || this.toToken.chain === 'HECO') &&
+      !this.hecoAccountAddress
+    ) {
+      this.nzMessage.error('Please connect the HECO wallet first');
       return false;
     }
     return true;
@@ -216,9 +289,11 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
   }
   calcutionInputAmountFiat(): void {
     if (!this.fromToken) {
+      this.inputAmountFiat = '';
       return;
     }
-    const price = this.rates[this.fromToken.rateName];
+    console.log(this.rates);
+    const price = this.commonService.getAssetRate(this.rates, this.fromToken);
     if (this.inputAmount && price) {
       this.inputAmountFiat = new BigNumber(this.inputAmount)
         .multipliedBy(new BigNumber(price))
