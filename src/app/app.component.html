@@ -8,20 +8,29 @@
         <li [ngClass]="{active: isHome}">
           <a routerLink="/">Home</a>
         </li>
-        <li [ngClass]="{active: currentPage==='/swap'}">
+        <!-- <li [ngClass]="{active: currentPage==='/swap'}">
           <a routerLink="/swap">Swap</a>
-        </li>
-        <li class="add-width" [ngClass]="{active: currentPage.startsWith('/hub')}">
+        </li> -->
+        <!-- <li class="add-width" [ngClass]="{active: currentPage.startsWith('/hub')}">
           <a routerLink="/hub">Hub</a>
-        </li>
-        <li class="add-width" [ngClass]="{active: currentPage==='/vault'}">
+        </li> -->
+        <!-- <li class="add-width" [ngClass]="{active: currentPage==='/vault'}">
           <a routerLink="/vault">Vault</a>
+        </li> -->
+        <li>
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Swap</a>
+        </li>
+        <li>
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Vault</a>
         </li>
         <li>
           <a href="https://medium.com/o3-labs-o3-wallet" target="_blank">Blog</a>
         </li>
-        <li class="add-width" [ngClass]="{active: currentPage.startsWith('/governance')}">
+        <!-- <li class="add-width" [ngClass]="{active: currentPage.startsWith('/governance')}">
           <a>Governance</a>
+        </li> -->
+        <li class="add-width">
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Governance</a>
         </li>
         <li>
           <a href="https://docs.o3swap.com/" target="_blank">Doc</a>
@@ -43,7 +52,7 @@
         <li>
           <a href="https://medium.com/o3-labs-o3-wallet" target="_blank">Blog</a>
         </li>
-        <li class="add-width" >
+        <li class="add-width">
           <a>Governance</a>
         </li>
         <li>
