@@ -18,7 +18,6 @@ import {
 } from '@lib';
 import {
   CommonService,
-  ApiService,
   NeolineWalletApiService,
   MetaMaskWalletApiService,
 } from '@core';
@@ -64,7 +63,6 @@ export class AppComponent implements OnInit {
     private store: Store<State>,
     private router: Router,
     private commonService: CommonService,
-    public apiService: ApiService,
     private changeDetectorRef: ChangeDetectorRef,
     private metaMaskWalletApiService: MetaMaskWalletApiService,
     private neolineWalletApiService: NeolineWalletApiService
@@ -83,7 +81,6 @@ export class AppComponent implements OnInit {
       this.neolineWalletApiService.init();
       this.metaMaskWalletApiService.init();
     }
-    this.apiService.getTokens();
     this.swap$.subscribe((state) => {
       this.neoAccountAddress = state.neoAccountAddress;
       this.ethAccountAddress = state.ethAccountAddress;

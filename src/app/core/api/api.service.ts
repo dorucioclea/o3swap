@@ -31,7 +31,7 @@ import { SwapService } from '../util/swap.service';
 
 @Injectable()
 export class ApiService {
-  CHAIN_TOKENS = CHAIN_TOKENS;
+  CHAIN_TOKENS;
   apiDo = environment.apiDomain;
   RATE_HOST = 'https://hub.o3.network/v1';
 
@@ -39,7 +39,9 @@ export class ApiService {
     private http: HttpClient,
     private commonService: CommonService,
     private swapService: SwapService
-  ) {}
+  ) {
+    this.getTokens();
+  }
 
   //#region home
   postEmail(email: string): Observable<any> {
@@ -48,33 +50,40 @@ export class ApiService {
   //#endregion
 
   //#region o3 api
-  getTokens(): void {
-    this.http
+  async getTokens(): Promise<void> {
+    let apiTokens = await this.http
       .get(`${INQUIRY_HOST}/v1/tokens/all`)
-      .subscribe((res: CommonHttpResponse) => {
-        if (res.status === 'success') {
-          Object.keys(res.data).forEach((key) => {
-            res.data[key] = res.data[key].map((item) => {
-              let chainLowerCase = (item.chain as string).toLowerCase();
-              if (item.chain === 'NEO') {
-                chainLowerCase = 'neo2';
-              }
-              return {
-                symbol: item.symbol,
-                logo: `https://img.o3.network/logo/${chainLowerCase}/${item.address}.png`,
-                assetID: item.address,
-                amount: '0',
-                decimals: item.decimals,
-                chain: item.chain,
-              };
-            });
-          });
-          res.data.ALL = res.data.recommend;
-          delete res.data.recommend;
-          console.log(res.data);
-          this.CHAIN_TOKENS = res.data;
+      .pipe(
+        map((res: CommonHttpResponse) => {
+          if (res.status === 'success') {
+            return res.data;
+          }
+        })
+      )
+      .toPromise();
+    if (!apiTokens) {
+      apiTokens = CHAIN_TOKENS;
+    }
+    Object.keys(apiTokens).forEach((key) => {
+      apiTokens[key] = apiTokens[key].map((item) => {
+        let chainLowerCase = (item.chain as string).toLowerCase();
+        if (item.chain === 'NEO') {
+          chainLowerCase = 'neo2';
         }
+        return {
+          symbol: item.symbol,
+          logo: `https://img.o3.network/logo/${chainLowerCase}/${item.address}.png`,
+          assetID: item.address,
+          amount: '0',
+          decimals: item.decimals,
+          chain: item.chain,
+        };
       });
+    });
+    apiTokens.ALL = apiTokens.recommend;
+    delete apiTokens.recommend;
+    console.log(apiTokens);
+    this.CHAIN_TOKENS = apiTokens;
   }
 
   getRates(): Observable<any> {
@@ -127,8 +136,8 @@ export class ApiService {
       );
       return this.handleReceiveSwapPathFiat(res, toToken);
     }
-    console.log(toUsd.symbol)
-    console.log(toToken.symbol)
+    console.log(toUsd.symbol);
+    console.log(toToken.symbol);
     if (
       fromUsd.symbol !== fromToken.symbol &&
       toUsd.symbol === toToken.symbol
