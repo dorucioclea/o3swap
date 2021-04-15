@@ -103,5 +103,8 @@
       }
     }
   },
-  "defaultProject": "o3swap"
+  "defaultProject": "o3swap",
+  "cli": {
+    "analytics": "658cb9d7-d81e-472a-8d8e-cfc29642982c"
+  }
 }
