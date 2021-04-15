@@ -66,6 +66,7 @@ export class MetaMaskWalletApiService {
 
   ethereum;
   web3;
+  wEthJson;
   swapperJson;
   ethErc20Json;
   aggregatorSwapJson = {
@@ -158,6 +159,106 @@ export class MetaMaskWalletApiService {
         this.addListener();
       })
       .catch((error) => {
+        this.handleDapiError(error);
+      });
+  }
+  //#endregion
+
+  //#region eth weth swap
+  async depositWEth(
+    fromToken: Token, // eth
+    toToken: Token, // weth
+    inputAmount: string,
+    fromAddress: string
+  ): Promise<any> {
+    console.log(`\u001b[32m  ✓ eth swap weth \u001b[0m`);
+    if (this.checkNetwork(fromToken) === false) {
+      return;
+    }
+    const json = await this.getWEthJson();
+    const swapContract = new this.web3.eth.Contract(
+      json,
+      WETH_ASSET_HASH[fromToken.chain].assetID
+    );
+    const data = swapContract.methods.deposit().encodeABI();
+    const value = new BigNumber(inputAmount)
+      .shiftedBy(fromToken.decimals)
+      .toFixed();
+    return this.ethereum
+      .request({
+        method: 'eth_sendTransaction',
+        params: [
+          this.getSendTransactionParams(
+            fromAddress,
+            WETH_ASSET_HASH[fromToken.chain].assetID,
+            data,
+            value
+          ),
+        ],
+      })
+      .then((hash) => {
+        console.log(hash);
+        this.handleTx(
+          fromToken,
+          toToken,
+          inputAmount,
+          new BigNumber(inputAmount).shiftedBy(toToken.decimals).toFixed(),
+          hash,
+          'swap',
+          false
+        );
+        return hash;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.handleDapiError(error);
+      });
+  }
+
+  async withdrawalWeth(
+    fromToken: Token, // weth
+    toToken: Token, // eth
+    inputAmount: string,
+    fromAddress: string
+  ): Promise<any> {
+    console.log(`\u001b[32m  ✓ eth swap weth \u001b[0m`);
+    if (this.checkNetwork(fromToken) === false) {
+      return;
+    }
+    const json = await this.getWEthJson();
+    const swapContract = new this.web3.eth.Contract(
+      json,
+      WETH_ASSET_HASH[fromToken.chain].assetID
+    );
+    const data = swapContract.methods
+      .withdraw(new BigNumber(inputAmount).shiftedBy(fromToken.decimals))
+      .encodeABI();
+    return this.ethereum
+      .request({
+        method: 'eth_sendTransaction',
+        params: [
+          this.getSendTransactionParams(
+            fromAddress,
+            WETH_ASSET_HASH[fromToken.chain].assetID,
+            data
+          ),
+        ],
+      })
+      .then((hash) => {
+        console.log(hash);
+        this.handleTx(
+          fromToken,
+          toToken,
+          inputAmount,
+          new BigNumber(inputAmount).shiftedBy(toToken.decimals).toFixed(),
+          hash,
+          'swap',
+          false
+        );
+        return hash;
+      })
+      .catch((error) => {
+        console.log(error);
         this.handleDapiError(error);
       });
   }
@@ -1225,6 +1326,21 @@ export class MetaMaskWalletApiService {
       .pipe(
         map((res) => {
           this.aggregatorSwapJson[chain][aggregator] = res;
+          return res;
+        })
+      )
+      .toPromise();
+  }
+
+  private getWEthJson(): Promise<any> {
+    if (this.wEthJson) {
+      return of(this.wEthJson).toPromise();
+    }
+    return this.http
+      .get('assets/contracts-json/weth.json')
+      .pipe(
+        map((res) => {
+          this.wEthJson = res;
           return res;
         })
       )

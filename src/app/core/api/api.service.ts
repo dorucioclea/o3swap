@@ -32,7 +32,7 @@ import { SwapService } from '../util/swap.service';
 
 @Injectable()
 export class ApiService {
-  CHAIN_TOKENS;
+  CHAIN_TOKENS = { ETH: [], NEO: [], BSC: [], HECO: [], ALL: [] };
   apiDo = environment.apiDomain;
   RATE_HOST = 'https://hub.o3.network/v1';
 
@@ -102,13 +102,13 @@ export class ApiService {
     toToken: Token,
     inputAmount: string
   ): Promise<AssetQueryResponse> {
-    if (
-      (fromToken.symbol === 'NEO' && toToken.symbol === 'nNEO') ||
-      (fromToken.symbol === 'nNEO' && toToken.symbol === 'NEO')
-    ) {
-      return this.getNeoNNeoSwapPath(fromToken, toToken, inputAmount);
-    }
     if (fromToken.chain === 'NEO' && toToken.chain === 'NEO') {
+      if (
+        (fromToken.symbol === 'NEO' && toToken.symbol === 'nNEO') ||
+        (fromToken.symbol === 'nNEO' && toToken.symbol === 'NEO')
+      ) {
+        return this.getNeoNNeoSwapPath(fromToken, toToken, inputAmount);
+      }
       return this.getFromNeoSwapPath(fromToken, toToken, inputAmount);
     }
     if (fromToken.chain === 'NEO' && toToken.chain !== 'NEO') {
@@ -116,6 +116,14 @@ export class ApiService {
     }
     console.log(1);
     if (fromToken.chain === toToken.chain) {
+      if (
+        (fromToken.symbol === 'ETH' && toToken.symbol === 'WETH') ||
+        (fromToken.symbol === 'WETH' && toToken.symbol === 'ETH') ||
+        (fromToken.symbol === 'BNB' && toToken.symbol === 'WBNB') ||
+        (fromToken.symbol === 'WBNB' && toToken.symbol === 'BNB')
+      ) {
+        return this.getEthWEthSwapPath(fromToken, toToken, inputAmount);
+      }
       const res = await this.getFromEthSwapPath(
         fromToken,
         toToken,
@@ -469,6 +477,25 @@ export class ApiService {
         })
       )
       .toPromise();
+  }
+
+  private getEthWEthSwapPath(
+    fromToken: Token,
+    toToken: Token,
+    inputAmount: string
+  ): Promise<AssetQueryResponse> {
+    // eth <=> weth
+    const result = [
+      {
+        amount: [
+          new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed(),
+          new BigNumber(inputAmount).shiftedBy(toToken.decimals).toFixed(),
+        ],
+        swapPath: [fromToken.symbol, toToken.symbol],
+      },
+    ];
+    this.commonService.log(result);
+    return of(this.handleReceiveSwapPathFiat(result, toToken)).toPromise();
   }
 
   private getFromEthSwapPath(

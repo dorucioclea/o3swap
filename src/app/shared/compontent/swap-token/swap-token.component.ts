@@ -34,7 +34,7 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
   tokenBalance = { NEO: {}, ETH: {}, BSC: {}, HECO: {} }; // 账户的 tokens
   swapUnScribe: Unsubscribable;
 
-  chain: CHAINS = 'BSC';
+  chain: CHAINS = 'ETH';
   allTokens: Token[] = []; // 所有的 tokens, 排除了 fromToken 或 toToken
   displayTokens: any[] = []; // 最终展示的 tokens, search 结果
   isfocusSearchInput = false;

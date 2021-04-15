@@ -248,15 +248,15 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       return;
     }
     this.inquiryInterval.unsubscribe();
-    if (this.fromToken.symbol === 'NEO' && this.toToken.symbol === 'nNEO') {
-      this.mintNNeo();
-      return;
-    }
-    if (this.fromToken.symbol === 'nNEO' && this.toToken.symbol === 'NEO') {
-      this.releaseNeo();
-      return;
-    }
     if (this.fromToken.chain === 'NEO' && this.toToken.chain === 'NEO') {
+      if (this.fromToken.symbol === 'NEO' && this.toToken.symbol === 'nNEO') {
+        this.mintNNeo();
+        return;
+      }
+      if (this.fromToken.symbol === 'nNEO' && this.toToken.symbol === 'NEO') {
+        this.releaseNeo();
+        return;
+      }
       this.swapNeo();
       return;
     }
@@ -272,6 +272,20 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     if (fromUsd && toUsd) {
       this.swapCrossChainEth();
       return;
+    }
+    if (this.fromToken.chain === this.toToken.chain) {
+      if (
+        (this.fromToken.symbol === 'ETH' && this.toToken.symbol === 'WETH') ||
+        (this.fromToken.symbol === 'BNB' && this.toToken.symbol === 'WBNB')
+      ) {
+        return this.depositWEth();
+      }
+      if (
+        (this.fromToken.symbol === 'WETH' && this.toToken.symbol === 'ETH') ||
+        (this.fromToken.symbol === 'WBNB' && this.toToken.symbol === 'BNB')
+      ) {
+        return this.withdrawalWeth();
+      }
     }
     if (this.fromToken.chain === 'ETH') {
       if (this.toToken.chain === 'ETH') {
@@ -336,6 +350,36 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     this.getSwapPathFun();
     this.getNetworkFee();
     this.setInquiryInterval();
+  }
+
+  depositWEth(): void {
+    this.metaMaskWalletApiService
+      .depositWEth(
+        this.fromToken,
+        this.toToken,
+        this.inputAmount,
+        this.fromAddress
+      )
+      .then((res) => {
+        if (res) {
+          this.closePage.emit();
+        }
+      });
+  }
+
+  withdrawalWeth(): void {
+    this.metaMaskWalletApiService
+      .withdrawalWeth(
+        this.fromToken,
+        this.toToken,
+        this.inputAmount,
+        this.fromAddress
+      )
+      .then((res) => {
+        if (res) {
+          this.closePage.emit();
+        }
+      });
   }
 
   swapNeoCrossChainEth(): void {
@@ -571,14 +615,14 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       return;
     }
     const swapApi = this.getEthDapiService();
-    const balance = await this.metaMaskWalletApiService
-      .getAllowance(
-        this.fromToken,
-        this.fromAddress,
-        this.chooseSwapPath.aggregator
-      );
-    if (new BigNumber(balance).comparedTo(new BigNumber(this.inputAmount)) >=
-      0) {
+    const balance = await this.metaMaskWalletApiService.getAllowance(
+      this.fromToken,
+      this.fromAddress,
+      this.chooseSwapPath.aggregator
+    );
+    if (
+      new BigNumber(balance).comparedTo(new BigNumber(this.inputAmount)) >= 0
+    ) {
       this.showApprove = false;
       return false;
     } else {
