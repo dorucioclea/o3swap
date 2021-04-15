@@ -60,6 +60,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   bscAccountAddress: string;
   hecoAccountAddress: string;
   metamaskNetworkId: number;
+  tokenBalance = { ETH: {}, NEO: {}, BSC: {}, HECO: {} }; // 账户的 tokens
 
   pusdtBalance = {
     ALL: '',
@@ -336,7 +337,8 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   }
   private handleAccountBalance(ethBalances, bscBalances, hecoBalances): void {
     this.addLiquidityTokens = JSON.parse(JSON.stringify(USD_TOKENS));
-    if (ethBalances) {
+    if (JSON.stringify(ethBalances) !== JSON.stringify(this.tokenBalance.ETH)) {
+      this.tokenBalance.ETH = JSON.parse(JSON.stringify(ethBalances));
       this.addLiquidityTokens
         .filter((item) => item.chain === 'ETH')
         .forEach((item) => {
@@ -347,7 +349,8 @@ export class LiquidityComponent implements OnInit, OnDestroy {
           }
         });
     }
-    if (bscBalances) {
+    if (JSON.stringify(bscBalances) !== JSON.stringify(this.tokenBalance.BSC)) {
+      this.tokenBalance.BSC = JSON.parse(JSON.stringify(bscBalances));
       this.addLiquidityTokens
         .filter((item) => item.chain === 'BSC')
         .forEach((item) => {
@@ -358,7 +361,10 @@ export class LiquidityComponent implements OnInit, OnDestroy {
           }
         });
     }
-    if (hecoBalances) {
+    if (
+      JSON.stringify(hecoBalances) !== JSON.stringify(this.tokenBalance.HECO)
+    ) {
+      this.tokenBalance.HECO = JSON.parse(JSON.stringify(hecoBalances));
       this.addLiquidityTokens
         .filter((item) => item.chain === 'HECO')
         .forEach((item) => {

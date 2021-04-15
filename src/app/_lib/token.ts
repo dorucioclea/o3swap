@@ -47,7 +47,7 @@ export const ETH_PUSDT_ASSET = {
   HECO: {
     assetID:
       NETWORK === 'MainNet'
-        ? '0x1B0C55be400e2a7D924032B257Fbc75Bbfd256E7'
+        ? '0x0926B2DB9D053E0022419093CCd57b92301fB736'
         : '0xbdd265FC4D5b7E7a937608B91EDAFc38F27E4479',
     decimals: NETWORK === 'MainNet' ? 8 : 18,
   },
