@@ -6,6 +6,7 @@ export interface Token {
   amount: string;
   decimals: number;
   chain: CHAINS;
+  type?: string;
 }
 export type CHAINS = 'ALL' | 'NEO' | 'ETH' | 'BSC' | 'HECO';
 
@@ -92,6 +93,7 @@ export const USD_TOKENS: Token[] = [
     decimals: 6,
     amount: '0',
     chain: 'ETH',
+    type: 'ERC-20',
     logo:
       NETWORK === 'MainNet'
         ? `https://img.o3.network/logo/eth/0xdac17f958d2ee523a2206206994597c13d831ec7.png`
@@ -106,6 +108,7 @@ export const USD_TOKENS: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'BSC',
+    type: 'BEP-20',
     logo:
       NETWORK === 'MainNet'
         ? `https://img.o3.network/logo/bsc/0xe9e7cea3dedca5984780bafc599bd69add087d56.png`
@@ -120,6 +123,7 @@ export const USD_TOKENS: Token[] = [
     decimals: NETWORK === 'MainNet' ? 8 : 18,
     amount: '0',
     chain: 'HECO',
+    type: 'HRC-20',
     logo:
       NETWORK === 'MainNet'
         ? `https://img.o3.network/logo/heco/0x0298c2b32eae4da002a15f36fdf7615bea3da047.png`

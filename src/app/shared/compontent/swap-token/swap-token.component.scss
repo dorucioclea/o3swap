@@ -100,7 +100,7 @@ section.wrapper {
     overflow-y: scroll;
     li.token {
       padding-left: 90px;
-      padding-right: 40px;
+      padding-right: 20px;
       height: 66px;
       display: flex;
       align-items: center;
@@ -112,6 +112,7 @@ section.wrapper {
       }
       .amount {
         font-family: "fontRegular";
+        margin-left: 5px;
       }
       img {
         max-width: 36px;

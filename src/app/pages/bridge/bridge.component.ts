@@ -15,7 +15,6 @@ import {
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { BridgeTokenComponent } from '@shared';
 import BigNumber from 'bignumber.js';
 import { interval, Observable, Unsubscribable } from 'rxjs';
 
@@ -29,6 +28,7 @@ interface State {
 })
 export class BridgeComponent implements OnInit {
   BRIDGE_SLIPVALUE = BRIDGE_SLIPVALUE;
+  USD_TOKENS = USD_TOKENS;
   fromToken: Token;
   toToken: Token;
 
@@ -55,6 +55,11 @@ export class BridgeComponent implements OnInit {
   isApproveLoading = false;
   approveInterval: Unsubscribable;
   bridgeRate: string;
+
+  showFromTokenList = false;
+  showToTokenList = false;
+  showFromTokenListModalTimeout;
+  showToTokenListModalTimeout;
 
   constructor(
     public store: Store<State>,
@@ -88,34 +93,48 @@ export class BridgeComponent implements OnInit {
     });
   }
 
-  showTokens(type: 'from' | 'to'): void {
-    const modal = this.modal.create({
-      nzContent: BridgeTokenComponent,
-      nzFooter: null,
-      nzTitle: null,
-      nzClosable: false,
-      nzClassName: 'custom-modal',
-      nzComponentParams: {
-        isFrom: type === 'from' ? true : false,
-        fromToken: this.fromToken,
-        toToken: this.toToken,
-      },
-    });
-    modal.afterClose.subscribe((res) => {
-      if (res) {
-        if (type === 'from') {
-          this.fromToken = res;
-          this.checkInputAmountDecimal();
-          this.calcutionInputAmountFiat();
-        } else {
-          this.toToken = res;
-        }
-        this.checkShowApprove();
-        this.calcutionReceiveAmount();
-      }
-    });
+  showTokenListModal(type: 'from' | 'to'): void {
+    if (type === 'from') {
+      clearTimeout(this.showFromTokenListModalTimeout);
+      this.showFromTokenList = true;
+    } else {
+      clearTimeout(this.showToTokenListModalTimeout);
+      this.showToTokenList = true;
+    }
   }
 
+  hideTokenListModal(type: 'from' | 'to'): void {
+    if (type === 'from') {
+      this.showFromTokenListModalTimeout = setTimeout(() => {
+        this.showFromTokenList = false;
+      }, 200);
+    } else {
+      this.showToTokenListModalTimeout = setTimeout(() => {
+        this.showToTokenList = false;
+      }, 200);
+    }
+  }
+  selectToken(type: 'from' | 'to', token: Token): void {
+    this.showFromTokenList = false;
+    this.showToTokenList = false;
+    if (type === 'from') {
+      this.fromToken = token;
+      if (this.toToken.symbol === token.symbol) {
+        this.toToken = null;
+        this.toAddress = null;
+      }
+      this.checkInputAmountDecimal();
+      this.calcutionInputAmountFiat();
+    } else {
+      this.toToken = token;
+      if (this.fromToken.symbol === token.symbol) {
+        this.fromToken = null;
+        this.fromAddress = null;
+      }
+    }
+    this.checkShowApprove();
+    this.calcutionReceiveAmount();
+  }
   exchangeToken(): void {
     if (this.toToken || this.fromToken) {
       const temp = this.fromToken;
