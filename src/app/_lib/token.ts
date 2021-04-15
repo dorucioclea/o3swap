@@ -22,14 +22,14 @@ export const WETH_ASSET_HASH = {
     standardTokenSymbol: 'ETH',
     assetID:
       NETWORK === 'MainNet'
-        ? '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+        ? '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' // WETH
         : '0xc778417e063141139fce010982780140aa0cd5ab', // WETH
   },
   BSC: {
     standardTokenSymbol: 'BNB',
     assetID:
       NETWORK === 'MainNet'
-        ? '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c'
+        ? '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c' // WBNB
         : '0x094616f0bdfb0b526bd735bf66eca0ad254ca81f', // WBNB
   },
   HECO: {

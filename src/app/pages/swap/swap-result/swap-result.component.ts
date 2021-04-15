@@ -136,7 +136,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.ethWalletName = state.ethWalletName;
       this.bscWalletName = state.bscWalletName;
       this.hecoWalletName = state.hecoWalletName;
-      // this.getFromAndToAddress();
+      this.getFromAndToAddress();
     });
     this.setting$.subscribe((state) => {
       this.slipValue = state.slipValue;
@@ -553,34 +553,37 @@ export class SwapResultComponent implements OnInit, OnDestroy {
           : this.o3EthWalletApiService;
     }
   }
-  checkShowApprove(): void {
+  async checkShowApprove(): Promise<boolean> {
     console.log('check show approve');
-    if (!this.fromAddress || !this.toAddress) {
+    if (
+      !this.fromAddress ||
+      !this.toAddress ||
+      !this.chooseSwapPath ||
+      !this.chooseSwapPath.aggregator
+    ) {
       this.showApprove = false;
-      console.log('check return');
+      console.log('check show approve return');
       return;
     }
-    if (this.fromToken.chain !== 'NEO' && this.toToken.chain !== 'NEO') {
-      const swapApi = this.getEthDapiService();
-      this.metaMaskWalletApiService
-        .getAllowance(
-          this.fromToken,
-          this.fromAddress,
-          this.chooseSwapPath.aggregator
-        )
-        .then((balance) => {
-          if (
-            new BigNumber(balance).comparedTo(
-              new BigNumber(this.inputAmount)
-            ) >= 0
-          ) {
-            this.showApprove = false;
-          } else {
-            this.showApprove = true;
-          }
-        });
-    } else {
+    if (this.fromToken.chain === 'NEO' || this.toToken.chain === 'NEO') {
       this.showApprove = false;
+      console.log('check show approve return');
+      return;
+    }
+    const swapApi = this.getEthDapiService();
+    const balance = await this.metaMaskWalletApiService
+      .getAllowance(
+        this.fromToken,
+        this.fromAddress,
+        this.chooseSwapPath.aggregator
+      );
+    if (new BigNumber(balance).comparedTo(new BigNumber(this.inputAmount)) >=
+      0) {
+      this.showApprove = false;
+      return false;
+    } else {
+      this.showApprove = true;
+      return true;
     }
   }
   getSwapPathFun(): void {
@@ -596,6 +599,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
           this.commonService.log(res);
           this.receiveSwapPathArray = res;
           this.handleReceiveSwapPathFiat();
+          this.calculationPrice();
+          this.getFromAndToAddress();
         }
       });
   }
@@ -615,7 +620,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     });
     this.chooseSwapPathIndex = 0;
     this.chooseSwapPath = this.receiveSwapPathArray[0];
-    this.calculationPrice();
   }
   async getNetworkFee(): Promise<void> {
     this.polyFee = '';

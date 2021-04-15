@@ -79,7 +79,7 @@ export class BridgeComponent implements OnInit {
       this.ethWalletName = state.ethWalletName;
       this.bscWalletName = state.bscWalletName;
       this.hecoWalletName = state.hecoWalletName;
-      // this.getFromAndToAddress();
+      this.getFromAndToAddress();
       this.handleAccountBalance(
         state.ethBalances,
         state.bscBalances,
@@ -107,10 +107,10 @@ export class BridgeComponent implements OnInit {
           this.fromToken = res;
           this.checkInputAmountDecimal();
           this.calcutionInputAmountFiat();
-          this.checkShowApprove();
         } else {
           this.toToken = res;
         }
+        this.checkShowApprove();
         this.calcutionReceiveAmount();
       }
     });
@@ -303,7 +303,6 @@ export class BridgeComponent implements OnInit {
     ) {
       this.fromAddress = tempFromAddress;
       this.toAddress = tempToAddress;
-      this.checkShowApprove();
     } else {
       this.fromAddress = tempFromAddress;
       this.toAddress = tempToAddress;
@@ -326,6 +325,7 @@ export class BridgeComponent implements OnInit {
     }
   }
   checkShowApprove(): void {
+    this.getFromAndToAddress();
     if (!this.fromAddress || !this.toAddress) {
       this.showApprove = false;
       return;
