@@ -18,7 +18,7 @@
         <span
           *ngIf="txAtPage==='liquidity'">{{ transaction?.fromToken.symbol==='pLP' ? 'Withdrawal' : 'Deposit' }}</span>
         {{ transaction?.amount }} {{ transaction?.fromToken?.symbol }}
-        for {{ transaction?.receiveAmount | transNumber | number: '1.0-8' }}
+        for {{ transaction?.receiveAmount | transNumber }}
         {{ transaction?.toToken?.symbol }}
       </div>
       <nz-progress [nzPercent]="swapProgress" [nzShowInfo]="false" nzStrokeWidth="6" nzStrokeColor="#46B069">

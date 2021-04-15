@@ -43,8 +43,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
   ethAccountAddress: string;
   bscAccountAddress: string;
   hecoAccountAddress: string;
-  tokenBalance; // 账户的 tokens
-  ethTokenBalance: Token[];
+  tokenBalance = { ETH: {}, NEO: {}, BSC: {}, HECO: {} }; // 账户的 tokens
   swapUnScribe: Unsubscribable;
 
   // setting modal
@@ -82,29 +81,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
       this.ethAccountAddress = state.ethAccountAddress;
       this.bscAccountAddress = state.bscAccountAddress;
       this.hecoAccountAddress = state.hecoAccountAddress;
-      if (
-        this.fromToken &&
-        JSON.stringify(state.balances) !== JSON.stringify(this.tokenBalance)
-      ) {
-        this.tokenBalance = JSON.parse(JSON.stringify(state.balances));
-        if (this.tokenBalance[this.fromToken.assetID]) {
-          this.fromToken.amount = this.tokenBalance[
-            this.fromToken.assetID
-          ].amount;
-        }
-      }
-      if (
-        this.fromToken &&
-        JSON.stringify(state.ethBalances) !==
-          JSON.stringify(this.ethTokenBalance)
-      ) {
-        this.ethTokenBalance = JSON.parse(JSON.stringify(state.ethBalances));
-        if (this.ethTokenBalance[this.fromToken.assetID]) {
-          this.fromToken.amount = this.ethTokenBalance[
-            this.fromToken.assetID
-          ].amount;
-        }
-      }
+      this.handleTokenAmountBalance(state);
       // this.changeDetectorRef.detectChanges();
     });
   }
@@ -207,6 +184,37 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
     });
   }
   //#region
+  handleTokenAmountBalance(state): void {
+    if (
+      JSON.stringify(state.balances) !== JSON.stringify(this.tokenBalance.NEO)
+    ) {
+      this.tokenBalance.NEO = JSON.parse(JSON.stringify(state.balances));
+    }
+    if (
+      JSON.stringify(state.ethBalances) !==
+      JSON.stringify(this.tokenBalance.ETH)
+    ) {
+      this.tokenBalance.ETH = JSON.parse(JSON.stringify(state.ethBalances));
+    }
+    if (
+      JSON.stringify(state.bscBalances) !==
+      JSON.stringify(this.tokenBalance.BSC)
+    ) {
+      this.tokenBalance.BSC = JSON.parse(JSON.stringify(state.bscBalances));
+    }
+    if (
+      JSON.stringify(state.hecoBalances) !==
+      JSON.stringify(this.tokenBalance.HECO)
+    ) {
+      this.tokenBalance.HECO = JSON.parse(JSON.stringify(state.hecoBalances));
+    }
+    this.fromToken.amount = '';
+    if (this.tokenBalance[this.fromToken.chain][this.fromToken.assetID]) {
+      this.fromToken.amount = this.tokenBalance[this.fromToken.chain][
+        this.fromToken.assetID
+      ].amount;
+    }
+  }
   checkCanInquiry(): boolean {
     if (!this.fromToken || !this.toToken || !this.inputAmount) {
       return false;

@@ -7,8 +7,8 @@
     <li class="exchange-item" *ngFor="let swapItem of receiveSwapPathArray; index as index"
       (click)="changeSwapPath(index)" [ngClass]="{active: chooseSwapPathIndex===index}">
       <div class="left">
-        <p class="name">{{ swapItem.receiveAmount | transNumber | number: '1.0-8' }} {{ toTokenSymbol }}</p>
-        <p class="fiat">≈＄{{ swapItem.fiat }}</p>
+        <p class="name">{{ swapItem.receiveAmount | transNumber }} {{ toTokenSymbol }}</p>
+        <p class="fiat">≈＄{{ swapItem.fiat }}({{ swapItem.aggregator }})</p>
       </div>
       <ul class="routes">
         <li *ngFor="let name of swapItem.swapPath; index as index">

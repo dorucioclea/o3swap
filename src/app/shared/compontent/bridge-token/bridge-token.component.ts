@@ -62,35 +62,11 @@ export class BridgeTokenComponent implements OnInit, OnDestroy {
   }
 
   cloneTokens(): void {
-    this.myCHAIN_TOKENS = {};
-    this.myCHAIN_TOKENS.ALL = JSON.parse(
-      JSON.stringify(CHAIN_BRIDGE_TOKENS.ALL)
-    );
-    this.myCHAIN_TOKENS.ETH = JSON.parse(
-      JSON.stringify(CHAIN_BRIDGE_TOKENS.ETH)
-    );
-    this.myCHAIN_TOKENS.BSC = JSON.parse(
-      JSON.stringify(CHAIN_BRIDGE_TOKENS.BSC)
-    );
-    this.myCHAIN_TOKENS.HECO = JSON.parse(
-      JSON.stringify(CHAIN_BRIDGE_TOKENS.HECO)
-    );
+    this.myCHAIN_TOKENS = JSON.parse(JSON.stringify(CHAIN_BRIDGE_TOKENS));
   }
 
   close(): void {
     this.modal.close();
-  }
-
-  changeChain(chain: CHAINS): void {
-    if (this.chain === chain) {
-      return;
-    }
-    this.chain = chain;
-    const tokens = this.myCHAIN_TOKENS[this.chain];
-    this.allTokens = this.hideToken
-      ? tokens.filter((item) => item.symbol !== this.hideToken.symbol)
-      : tokens;
-    this.displayTokens = this.allTokens;
   }
 
   selectThisToken(token: Token): void {
@@ -120,7 +96,7 @@ export class BridgeTokenComponent implements OnInit, OnDestroy {
 
   //#region
   getTokens(): void {
-    const tokens = this.myCHAIN_TOKENS[this.chain];
+    const tokens = this.myCHAIN_TOKENS;
     this.allTokens = this.hideToken
       ? tokens.filter((item) => item.symbol !== this.hideToken.symbol)
       : tokens;
@@ -151,28 +127,18 @@ export class BridgeTokenComponent implements OnInit, OnDestroy {
   }
   handleTokenAmount(chainType: CHAINS): void {
     const chainBalance = this.tokenBalance[chainType];
-    // my chain tokens [all]
-    this.myCHAIN_TOKENS.ALL.forEach((tokenItem, index) => {
+    // my chain tokens
+    this.myCHAIN_TOKENS.forEach((tokenItem, index) => {
       if (
         chainBalance[tokenItem.assetID] &&
         chainBalance[tokenItem.assetID].symbol === // 资产id相同且symbol相同
           tokenItem.symbol
       ) {
-        this.myCHAIN_TOKENS.ALL[index].amount =
+        this.myCHAIN_TOKENS[index].amount =
           chainBalance[tokenItem.assetID].amount;
       }
     });
-    this.myCHAIN_TOKENS.ALL = this.sortTokens(this.myCHAIN_TOKENS.ALL);
-    // chainType tokens
-    this.myCHAIN_TOKENS[chainType].forEach((tokenItem, index) => {
-      if (chainBalance[tokenItem.assetID]) {
-        this.myCHAIN_TOKENS[chainType][index].amount =
-          chainBalance[tokenItem.assetID].amount;
-      }
-    });
-    this.myCHAIN_TOKENS[chainType] = this.sortTokens(
-      this.myCHAIN_TOKENS[chainType]
-    );
+    this.myCHAIN_TOKENS = this.sortTokens(this.myCHAIN_TOKENS);
     // alltokens
     this.allTokens.forEach((tokenItem, index) => {
       if (

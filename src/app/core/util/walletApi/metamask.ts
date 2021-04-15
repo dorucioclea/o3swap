@@ -249,7 +249,7 @@ export class MetaMaskWalletApiService {
           ],
         })
         .then((balance) => {
-          if (!balance.isNaN()) {
+          if (balance && !new BigNumber(balance).isNaN()) {
             return new BigNumber(balance).shiftedBy(-token.decimals).toFixed();
           }
         })
@@ -263,7 +263,7 @@ export class MetaMaskWalletApiService {
           params: [this.accountAddress, 'latest'],
         })
         .then((balance) => {
-          if (!balance.isNaN()) {
+          if (balance && !new BigNumber(balance).isNaN()) {
             return new BigNumber(balance, 16)
               .shiftedBy(-token.decimals)
               .toFixed();

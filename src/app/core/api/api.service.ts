@@ -24,6 +24,7 @@ import {
   O3_AGGREGATOR_SLIPVALUE,
   FUSDT_ASSET_HASH,
   WETH_ASSET_HASH,
+  LP_TOKENS,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { CommonService } from '../util/common.service';
@@ -31,7 +32,7 @@ import { SwapService } from '../util/swap.service';
 
 @Injectable()
 export class ApiService {
-  CHAIN_TOKENS = CHAIN_TOKENS;
+  CHAIN_TOKENS;
   apiDo = environment.apiDomain;
   RATE_HOST = 'https://hub.o3.network/v1';
 
@@ -39,7 +40,9 @@ export class ApiService {
     private http: HttpClient,
     private commonService: CommonService,
     private swapService: SwapService
-  ) {}
+  ) {
+    this.getTokens();
+  }
 
   //#region home
   postEmail(email: string): Observable<any> {
@@ -48,33 +51,40 @@ export class ApiService {
   //#endregion
 
   //#region o3 api
-  getTokens(): void {
-    this.http
+  async getTokens(): Promise<void> {
+    let apiTokens = await this.http
       .get(`${INQUIRY_HOST}/v1/tokens/all`)
-      .subscribe((res: CommonHttpResponse) => {
-        if (res.status === 'success') {
-          Object.keys(res.data).forEach((key) => {
-            res.data[key] = res.data[key].map((item) => {
-              let chainLowerCase = (item.chain as string).toLowerCase();
-              if (item.chain === 'NEO') {
-                chainLowerCase = 'neo2';
-              }
-              return {
-                symbol: item.symbol,
-                logo: `https://img.o3.network/logo/${chainLowerCase}/${item.address}.png`,
-                assetID: item.address,
-                amount: '0',
-                decimals: item.decimals,
-                chain: item.chain,
-              };
-            });
-          });
-          res.data.ALL = res.data.recommend;
-          delete res.data.recommend;
-          console.log(res.data);
-          this.CHAIN_TOKENS = res.data;
+      .pipe(
+        map((res: CommonHttpResponse) => {
+          if (res.status === 'success') {
+            return res.data;
+          }
+        })
+      )
+      .toPromise();
+    if (!apiTokens) {
+      apiTokens = CHAIN_TOKENS;
+    }
+    Object.keys(apiTokens).forEach((key) => {
+      apiTokens[key] = apiTokens[key].map((item) => {
+        let chainLowerCase = (item.chain as string).toLowerCase();
+        if (item.chain === 'NEO') {
+          chainLowerCase = 'neo2';
         }
+        return {
+          symbol: item.symbol,
+          logo: `https://img.o3.network/logo/${chainLowerCase}/${item.address}.png`,
+          assetID: item.address,
+          amount: '0',
+          decimals: item.decimals,
+          chain: item.chain,
+        };
       });
+    });
+    apiTokens.ALL = apiTokens.recommend;
+    delete apiTokens.recommend;
+    console.log(apiTokens);
+    this.CHAIN_TOKENS = apiTokens;
   }
 
   getRates(): Observable<any> {
@@ -127,8 +137,8 @@ export class ApiService {
       );
       return this.handleReceiveSwapPathFiat(res, toToken);
     }
-    console.log(toUsd.symbol)
-    console.log(toToken.symbol)
+    console.log(toUsd.symbol);
+    console.log(toToken.symbol);
     if (
       fromUsd.symbol !== fromToken.symbol &&
       toUsd.symbol === toToken.symbol
@@ -303,16 +313,19 @@ export class ApiService {
    * @return Promise
    */
   getPoolOutGivenSingleIn(fromToken: Token, amount: string): Promise<string> {
-    const poolUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    const poolPUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    const lpToken = LP_TOKENS.find((item) => item.chain === fromToken.chain);
     amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
     return this.http
       .get(
-        `${POLY_HOST}/calcPoolOutGivenSingleIn/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`
+        `${POLY_HOST}/calcPoolOutGivenSingleIn/${POLY_HOST_ADDRESS}/${poolPUsdtHash}/${amount}`
       )
       .pipe(
         map((res: any) => {
           if (res.code === 200) {
-            return new BigNumber(res.pool_amount_out).shiftedBy(-18).toFixed();
+            return new BigNumber(res.pool_amount_out)
+              .shiftedBy(-lpToken.decimals)
+              .toFixed();
           }
         })
       )
@@ -326,16 +339,19 @@ export class ApiService {
    * @return Promise Out
    */
   getPoolInGivenSingleOut(fromToken: Token, amount: string): Promise<string> {
-    const poolUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    const poolPUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    const lpToken = LP_TOKENS.find((item) => item.chain === fromToken.chain);
     amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
     return this.http
       .get(
-        `${POLY_HOST}/calcPoolInGivenSingleOut/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`
+        `${POLY_HOST}/calcPoolInGivenSingleOut/${POLY_HOST_ADDRESS}/${poolPUsdtHash}/${amount}`
       )
       .pipe(
         map((res: any) => {
           if (res.code === 200) {
-            return new BigNumber(res.pool_amount_out).shiftedBy(-18).toFixed();
+            return new BigNumber(res.pool_amount_out)
+              .shiftedBy(-lpToken.decimals)
+              .toFixed();
           }
         })
       )
@@ -349,17 +365,18 @@ export class ApiService {
    * @return promise
    */
   getSingleOutGivenPoolIn(fromToken: Token, amount: string): Promise<string> {
-    const poolUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
-    amount = new BigNumber(amount).shiftedBy(18).toFixed();
+    const poolPUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    const usdtToken = USD_TOKENS.find((item) => item.chain === fromToken.chain);
+    amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
     return this.http
       .get(
-        `${POLY_HOST}/calcSingleOutGivenPoolIn/${POLY_HOST_ADDRESS}/${poolUsdtHash}/${amount}`
+        `${POLY_HOST}/calcSingleOutGivenPoolIn/${POLY_HOST_ADDRESS}/${poolPUsdtHash}/${amount}`
       )
       .pipe(
         map((res: any) => {
           if (res.code === 200) {
             return new BigNumber(res.token_amount_out)
-              .shiftedBy(-fromToken.decimals)
+              .shiftedBy(-usdtToken.decimals)
               .toFixed();
           }
         })
@@ -524,29 +541,32 @@ export class ApiService {
     fromUsd: Token
   ): Promise<AssetQueryResponse> {
     const res1 = await this.getFromEthSwapPath(fromToken, fromUsd, inputAmount); // 排序
-    const amountOutA = res1[0].amount[res1[0].amount.length - 1];
-    console.log(`amountOutA: ${amountOutA}`);
-    const amountOutB = this.swapService.getMinAmountOut(
-      amountOutA,
-      O3_AGGREGATOR_FEE
-    );
-    console.log(`amountOutB: ${amountOutB}`);
-    let polyAmountIn = this.swapService.getMinAmountOut(
-      amountOutB,
-      O3_AGGREGATOR_SLIPVALUE
-    );
-    console.log(`polyAmountIn: ${polyAmountIn}`);
-    polyAmountIn = new BigNumber(polyAmountIn)
-      .shiftedBy(-fromUsd.decimals)
-      .toFixed();
-    const res2 = await this.getFromEthCrossChainSwapPath(
-      fromUsd,
-      toToken,
-      polyAmountIn
-    );
-    const polyAmountOut = res2[0].amount[1];
-    res1[0].amount.push(polyAmountOut);
-    res1[0].swapPath.push(toToken.symbol);
+    for (const res1Item of res1) {
+      const amountOutA = res1Item.amount[res1Item.amount.length - 1];
+      console.log(`amountOutA: ${amountOutA}`);
+      const amountOutB = this.swapService.getMinAmountOut(
+        amountOutA,
+        O3_AGGREGATOR_FEE
+      );
+      console.log(`amountOutB: ${amountOutB}`);
+      let polyAmountIn = this.swapService.getMinAmountOut(
+        amountOutB,
+        O3_AGGREGATOR_SLIPVALUE
+      );
+      console.log(`polyAmountIn: ${polyAmountIn}`);
+      polyAmountIn = new BigNumber(polyAmountIn)
+        .shiftedBy(-fromUsd.decimals)
+        .toFixed();
+      const res2 = await this.getFromEthCrossChainSwapPath(
+        fromUsd,
+        toToken,
+        polyAmountIn
+      );
+      const polyAmountOut = res2[0].amount[1];
+      res1Item.amount.push(polyAmountOut);
+      res1Item.swapPath.push(toToken.symbol);
+    }
+    console.log(res1);
     return res1;
   }
 
