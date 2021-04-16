@@ -87,6 +87,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   price: string; // swap 比
   lnversePrice: string; // swap 反比
   polyFee: string;
+  showO3SwapFee = false;
 
   fromAddress: string;
   toAddress: string;
@@ -110,6 +111,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getRates();
     this.init();
+    this.checkO3SwapFee();
     this.getSwapPathFun();
     this.getNetworkFee();
     this.setInquiryInterval();
@@ -144,6 +146,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.price = this.initData.price;
       this.lnversePrice = this.initData.lnversePrice;
       this.polyFee = this.initData.polyFee;
+      this.showO3SwapFee = this.initData.showO3SwapFee;
       this.showInquiry = false;
     } else {
       this.showInquiry = true;
@@ -184,6 +187,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       price: this.price,
       lnversePrice: this.lnversePrice,
       polyFee: this.polyFee,
+      showO3SwapFee: this.showO3SwapFee,
     };
     this.closePage.emit(initData);
   }
@@ -666,6 +670,22 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.fromToken,
         this.toToken
       );
+    }
+  }
+  checkO3SwapFee(): void {
+    if (this.fromToken.chain === 'NEO') {
+      this.showO3SwapFee = true;
+    }
+    const fromUsd = USD_TOKENS.find(
+      (item) => item.symbol === this.fromToken.symbol
+    );
+    const toUsd = USD_TOKENS.find(
+      (item) => item.symbol === this.toToken.symbol
+    );
+    if (fromUsd && toUsd) {
+      this.showO3SwapFee = false;
+    } else {
+      this.showO3SwapFee = true;
     }
   }
   calculationPrice(): void {

@@ -11,6 +11,7 @@ import {
   SwapStateType,
   Token,
   USD_TOKENS,
+  SOURCE_TOKEN_SYMBOL,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -28,6 +29,7 @@ interface State {
   styleUrls: ['./bridge.component.scss'],
 })
 export class BridgeComponent implements OnInit {
+  SOURCE_TOKEN_SYMBOL = SOURCE_TOKEN_SYMBOL;
   BRIDGE_SLIPVALUE = BRIDGE_SLIPVALUE;
   USD_TOKENS = USD_TOKENS;
   fromToken: Token;
@@ -52,6 +54,7 @@ export class BridgeComponent implements OnInit {
   fromAddress: string;
   toAddress: string;
   bridgeRate: string;
+  polyFee: string;
 
   showFromTokenList = false;
   showToTokenList = false;
@@ -116,7 +119,7 @@ export class BridgeComponent implements OnInit {
     this.showToTokenList = false;
     if (type === 'from') {
       this.fromToken = token;
-      if (this.toToken.symbol === token.symbol) {
+      if (this.toToken && this.toToken.symbol === token.symbol) {
         this.toToken = null;
         this.toAddress = null;
       }
@@ -124,11 +127,12 @@ export class BridgeComponent implements OnInit {
       this.calcutionInputAmountFiat();
     } else {
       this.toToken = token;
-      if (this.fromToken.symbol === token.symbol) {
+      if (this.fromToken && this.fromToken.symbol === token.symbol) {
         this.fromToken = null;
         this.fromAddress = null;
       }
     }
+    this.getNetworkFee();
     this.getFromAndToAddress();
     this.calcutionReceiveAmount();
   }
@@ -141,6 +145,7 @@ export class BridgeComponent implements OnInit {
       this.calcutionInputAmountFiat();
       this.calcutionReceiveAmount();
       this.getFromAndToAddress();
+      this.getNetworkFee();
     }
   }
 
@@ -183,10 +188,6 @@ export class BridgeComponent implements OnInit {
       this.showApproveModal();
       return;
     }
-    const polyFee = await this.apiService.getFromEthPolyFee(
-      this.fromToken,
-      this.toToken
-    );
     const bigNumberReceive = new BigNumber(this.receiveAmount)
       .shiftedBy(this.toToken.decimals)
       .dp(0)
@@ -200,7 +201,7 @@ export class BridgeComponent implements OnInit {
         this.toAddress,
         bigNumberReceive,
         BRIDGE_SLIPVALUE,
-        polyFee,
+        this.polyFee,
         'bridge'
       )
       .then((res) => {
@@ -211,6 +212,15 @@ export class BridgeComponent implements OnInit {
   }
 
   //#region
+  async getNetworkFee(): Promise<void> {
+    this.polyFee = '';
+    if (this.fromToken && this.toToken) {
+      this.polyFee = await this.apiService.getFromEthPolyFee(
+        this.fromToken,
+        this.toToken
+      );
+    }
+  }
   showApproveModal(): void {
     let walletName: string;
     switch (this.fromToken.chain) {
