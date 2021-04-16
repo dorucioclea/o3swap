@@ -52,6 +52,7 @@ export class TxProgressComponent implements OnInit, OnDestroy {
   hasTransaction = false;
 
   swap$: Observable<any>;
+  swapUnScribe: Unsubscribable;
   transaction: SwapTransaction;
 
   requestCrossInterval: Unsubscribable;
@@ -79,7 +80,7 @@ export class TxProgressComponent implements OnInit, OnDestroy {
         this.dispatchType = UPDATE_LIQUIDITY_PENDING_TX;
         break;
     }
-    this.swap$.subscribe((state) => {
+    this.swapUnScribe = this.swap$.subscribe((state) => {
       switch (this.txAtPage) {
         case 'swap':
           this.hasTransaction = state.transaction ? true : false;
@@ -109,6 +110,9 @@ export class TxProgressComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.requestCrossInterval) {
       this.requestCrossInterval.unsubscribe();
+    }
+    if (this.swapUnScribe) {
+      this.swapUnScribe.unsubscribe();
     }
   }
 

@@ -48,6 +48,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
 
   // setting modal
   setting$: Observable<any>;
+  settingUnScribe: Unsubscribable;
   slipValue: number;
   isCustomSlip: boolean; // 自定义滑点
   deadline: number;
@@ -69,7 +70,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getRates();
-    this.setting$.subscribe((state) => {
+    this.settingUnScribe = this.setting$.subscribe((state) => {
       this.slipValue = state.slipValue;
       this.isCustomSlip = state.isCustomSlip;
       this.deadline = state.deadline;
@@ -89,6 +90,9 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.swapUnScribe) {
       this.swapUnScribe.unsubscribe();
+    }
+    if (this.settingUnScribe) {
+      this.settingUnScribe.unsubscribe();
     }
   }
 

@@ -5,6 +5,7 @@ import {
   Input,
   EventEmitter,
   Output,
+  OnDestroy,
 } from '@angular/core';
 import {
   ETH_WALLETS,
@@ -26,7 +27,7 @@ import {
   O3NeoWalletApiService,
 } from '@core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, Unsubscribable } from 'rxjs';
 
 export type ConnectChainType = 'ETH' | 'NEO' | 'BSC' | 'HECO';
 interface State {
@@ -38,7 +39,7 @@ interface State {
   templateUrl: './wallet-connect.component.html',
   styleUrls: ['./wallet-connect.component.scss'],
 })
-export class WalletConnectComponent implements OnInit {
+export class WalletConnectComponent implements OnInit, OnDestroy {
   NEO_WALLETS = NEO_WALLETS;
   ETH_WALLETS = ETH_WALLETS;
   BSC_WALLETS = BSC_WALLETS;
@@ -48,6 +49,7 @@ export class WalletConnectComponent implements OnInit {
   @Output() closePage = new EventEmitter();
 
   swap$: Observable<any>;
+  swapUnScribe: Unsubscribable;
   neoAccountAddress: string;
   ethAccountAddress: string;
   bscAccountAddress: string;
@@ -69,9 +71,14 @@ export class WalletConnectComponent implements OnInit {
   ) {
     this.swap$ = store.select('swap');
   }
+  ngOnDestroy(): void {
+    if (this.swapUnScribe) {
+      this.swapUnScribe.unsubscribe();
+    }
+  }
 
   ngOnInit(): void {
-    this.swap$.subscribe((state) => {
+    this.swapUnScribe = this.swap$.subscribe((state) => {
       this.neoAccountAddress = state.neoAccountAddress;
       this.ethAccountAddress = state.ethAccountAddress;
       this.bscAccountAddress = state.bscAccountAddress;

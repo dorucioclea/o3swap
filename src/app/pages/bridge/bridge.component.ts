@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import {
   ApiService,
   MetaMaskWalletApiService,
@@ -28,7 +28,7 @@ interface State {
   templateUrl: './bridge.component.html',
   styleUrls: ['./bridge.component.scss'],
 })
-export class BridgeComponent implements OnInit {
+export class BridgeComponent implements OnInit, OnDestroy {
   SOURCE_TOKEN_SYMBOL = SOURCE_TOKEN_SYMBOL;
   BRIDGE_SLIPVALUE = BRIDGE_SLIPVALUE;
   USD_TOKENS = USD_TOKENS;
@@ -44,6 +44,7 @@ export class BridgeComponent implements OnInit {
   rates = {};
 
   swap$: Observable<any>;
+  swapUnScribe: Unsubscribable;
   ethAccountAddress: string;
   bscAccountAddress: string;
   hecoAccountAddress: string;
@@ -74,11 +75,16 @@ export class BridgeComponent implements OnInit {
   ) {
     this.swap$ = store.select('swap');
   }
+  ngOnDestroy(): void {
+    if (this.swapUnScribe) {
+      this.swapUnScribe.unsubscribe();
+    }
+  }
 
   ngOnInit(): void {
     this.fromToken = JSON.parse(JSON.stringify(USD_TOKENS[0]));
     this.getRates();
-    this.swap$.subscribe((state) => {
+    this.swapUnScribe = this.swap$.subscribe((state) => {
       this.ethAccountAddress = state.ethAccountAddress;
       this.bscAccountAddress = state.bscAccountAddress;
       this.hecoAccountAddress = state.hecoAccountAddress;

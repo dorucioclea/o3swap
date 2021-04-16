@@ -13,7 +13,7 @@ import {
   MetaMaskWalletApiService,
   SwapService,
 } from '@core';
-import { Observable } from 'rxjs';
+import { Observable, Unsubscribable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { SwapStateType } from 'src/app/_lib/swap';
 import {
@@ -56,6 +56,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   currentChain: string;
 
   swap$: Observable<any>;
+  swapUnScribe: Unsubscribable;
   ethAccountAddress: string;
   bscAccountAddress: string;
   hecoAccountAddress: string;
@@ -100,7 +101,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
         item.amount = '--';
       }
     });
-    this.swap$.subscribe((state: SwapStateType) => {
+    this.swapUnScribe = this.swap$.subscribe((state: SwapStateType) => {
       this.ethAccountAddress = state.ethAccountAddress;
       this.bscAccountAddress = state.bscAccountAddress;
       this.hecoAccountAddress = state.hecoAccountAddress;
@@ -113,7 +114,11 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+    if (this.swapUnScribe) {
+      this.swapUnScribe.unsubscribe();
+    }
+  }
 
   async getPusdtBalance(): Promise<void> {
     this.pusdtBalance.ETH.value = await this.apiService.getPUsdtBalance(

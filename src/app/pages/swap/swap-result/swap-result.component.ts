@@ -61,10 +61,12 @@ export class SwapResultComponent implements OnInit, OnDestroy {
 
   // setting modal
   setting$: Observable<any>;
+  settingUnScribe: Unsubscribable;
   slipValue: number;
   deadline: number;
 
   swap$: Observable<any>;
+  swapUnScribe: Unsubscribable;
   neoAccountAddress: string;
   ethAccountAddress: string;
   bscAccountAddress: string;
@@ -115,7 +117,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     this.getSwapPathFun();
     this.getNetworkFee();
     this.setInquiryInterval();
-    this.swap$.subscribe((state) => {
+    this.swapUnScribe = this.swap$.subscribe((state) => {
       this.neoAccountAddress = state.neoAccountAddress;
       this.ethAccountAddress = state.ethAccountAddress;
       this.bscAccountAddress = state.bscAccountAddress;
@@ -126,7 +128,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.hecoWalletName = state.hecoWalletName;
       this.getFromAndToAddress();
     });
-    this.setting$.subscribe((state) => {
+    this.settingUnScribe = this.setting$.subscribe((state) => {
       this.slipValue = state.slipValue;
       this.deadline = state.deadline;
     });
@@ -135,6 +137,12 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.inquiryInterval) {
       this.inquiryInterval.unsubscribe();
+    }
+    if (this.swapUnScribe) {
+      this.swapUnScribe.unsubscribe();
+    }
+    if (this.settingUnScribe) {
+      this.settingUnScribe.unsubscribe();
     }
   }
 
@@ -220,7 +228,11 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     if (!this.fromAddress || !this.toAddress) {
       this.getFromAndToAddress();
     }
-    if (new BigNumber(this.fromToken.amount).comparedTo(new BigNumber(this.inputAmount)) < 0) {
+    if (
+      new BigNumber(this.fromToken.amount).comparedTo(
+        new BigNumber(this.inputAmount)
+      ) < 0
+    ) {
       this.nzMessage.error('Insufficient balance');
       return;
     }
