@@ -132,6 +132,7 @@ export class MetaMaskWalletApiService {
       .then((result) => {
         this.commonService.log(result);
         this.accountAddress = result[0];
+        this.getBalance();
         let dispatchAccountType;
         let dispatchWalletNameType;
         switch (chain) {
@@ -303,6 +304,7 @@ export class MetaMaskWalletApiService {
           result[item.assetID].amount = tempAmount;
         }
       }
+      console.log(result);
       this.store.dispatch({
         type: dispatchBalanceType,
         data: result,
@@ -1281,7 +1283,6 @@ export class MetaMaskWalletApiService {
             data: id,
           });
         }
-        this.getBalance();
       })
       .catch((error) => {
         this.handleDapiError(error);

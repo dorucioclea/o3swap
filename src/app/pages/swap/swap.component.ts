@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '@core';
-import { NNEO_TOKEN, Token } from '@lib';
+import { NNEO_TOKEN, Token, USD_TOKENS } from '@lib';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 type PageStatus = 'home' | 'result';
@@ -12,7 +12,7 @@ type PageStatus = 'home' | 'result';
 export class SwapComponent implements OnInit {
   pageStatus: PageStatus = 'home';
 
-  fromToken: Token = NNEO_TOKEN;
+  fromToken: Token = USD_TOKENS[0];
   toToken: Token;
   inputAmount: string; // 支付的 token 数量
 

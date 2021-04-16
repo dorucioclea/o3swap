@@ -153,7 +153,7 @@
             <button class="disconnect" (click)="disConnect('HECO')">Disconnect</button>
           </div>
         </div>
-        <div class="connect-btn" *ngIf="!neoWalletName" (click)="showConnect()">
+        <div class="connect-btn" *ngIf="!neoWalletName||!ethWalletName||!bscWalletName||!hecoWalletName" (click)="showConnect()">
           <img src="/assets/images/swap/link.png" alt="">
           <span>Connect Wallet</span>
         </div>

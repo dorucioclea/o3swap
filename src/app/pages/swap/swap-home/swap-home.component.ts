@@ -189,30 +189,10 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
   }
   //#region
   handleTokenAmountBalance(state): void {
-    if (
-      JSON.stringify(state.balances) !== JSON.stringify(this.tokenBalance.NEO)
-    ) {
-      this.tokenBalance.NEO = JSON.parse(JSON.stringify(state.balances));
-    }
-    if (
-      JSON.stringify(state.ethBalances) !==
-      JSON.stringify(this.tokenBalance.ETH)
-    ) {
-      this.tokenBalance.ETH = JSON.parse(JSON.stringify(state.ethBalances));
-    }
-    if (
-      JSON.stringify(state.bscBalances) !==
-      JSON.stringify(this.tokenBalance.BSC)
-    ) {
-      this.tokenBalance.BSC = JSON.parse(JSON.stringify(state.bscBalances));
-    }
-    if (
-      JSON.stringify(state.hecoBalances) !==
-      JSON.stringify(this.tokenBalance.HECO)
-    ) {
-      this.tokenBalance.HECO = JSON.parse(JSON.stringify(state.hecoBalances));
-    }
-    this.fromToken.amount = '';
+    this.tokenBalance.NEO = state.balances;
+    this.tokenBalance.ETH = state.ethBalances;
+    this.tokenBalance.BSC = state.bscBalances;
+    this.tokenBalance.HECO = state.hecoBalances;
     if (this.tokenBalance[this.fromToken.chain][this.fromToken.assetID]) {
       this.fromToken.amount = this.tokenBalance[this.fromToken.chain][
         this.fromToken.assetID

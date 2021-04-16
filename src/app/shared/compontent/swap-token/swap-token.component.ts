@@ -54,6 +54,7 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.getChainType();
     this.cloneTokens();
     this.checkShowOnlyNNeo();
     this.checkHideNeo();
@@ -133,6 +134,17 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
   }
 
   //#region
+  getChainType(): void {
+    if (this.isFrom) {
+      if (this.toToken) {
+        this.chain = this.toToken.chain;
+      }
+    } else {
+      if (this.fromToken) {
+        this.chain = this.fromToken.chain;
+      }
+    }
+  }
   getTokens(): void {
     const tokens = this.showOnlyNNeo
       ? this.myNNEO_TOKEN
@@ -167,66 +179,36 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     }
   }
   receiveTokenBalance(state): void {
-    if (
-      JSON.stringify(state.balances) !== JSON.stringify(this.tokenBalance.NEO)
-    ) {
-      this.tokenBalance.NEO = JSON.parse(JSON.stringify(state.balances));
-      this.handleTokenAmount('NEO');
-    }
-    if (
-      JSON.stringify(state.ethBalances) !==
-      JSON.stringify(this.tokenBalance.ETH)
-    ) {
-      this.tokenBalance.ETH = JSON.parse(JSON.stringify(state.ethBalances));
-      this.handleTokenAmount('ETH');
-    }
-    if (
-      JSON.stringify(state.bscBalances) !==
-      JSON.stringify(this.tokenBalance.BSC)
-    ) {
-      this.tokenBalance.BSC = JSON.parse(JSON.stringify(state.bscBalances));
-      this.handleTokenAmount('BSC');
-    }
-    if (
-      JSON.stringify(state.hecoBalances) !==
-      JSON.stringify(this.tokenBalance.HECO)
-    ) {
-      this.tokenBalance.HECO = JSON.parse(JSON.stringify(state.hecoBalances));
-      this.handleTokenAmount('HECO');
-    }
+    this.tokenBalance.NEO = state.balances;
+    this.tokenBalance.ETH = state.ethBalances;
+    this.tokenBalance.BSC = state.bscBalances;
+    this.tokenBalance.HECO = state.hecoBalances;
+    this.handleTokenAmount();
   }
-  handleTokenAmount(chainType: CHAINS): void {
-    const chainBalance = this.tokenBalance[chainType];
-    if (chainType === 'NEO') {
-      if (chainBalance[this.myNNEO_TOKEN[0].assetID]) {
-        this.myNNEO_TOKEN[0].amount =
-          chainBalance[this.myNNEO_TOKEN[0].assetID].amount;
-      }
+  handleTokenAmount(): void {
+    if (this.tokenBalance.NEO[this.myNNEO_TOKEN[0].assetID]) {
+      this.myNNEO_TOKEN[0].amount = this.tokenBalance.NEO[
+        this.myNNEO_TOKEN[0].assetID
+      ].amount;
     }
-    // my chain tokens [all]
-    this.myCHAIN_TOKENS.ALL.forEach((tokenItem, index) => {
-      if (
-        chainBalance[tokenItem.assetID] &&
-        chainBalance[tokenItem.assetID].symbol === // 资产id相同且symbol相同
-          tokenItem.symbol
-      ) {
-        this.myCHAIN_TOKENS.ALL[index].amount =
-          chainBalance[tokenItem.assetID].amount;
-      }
-    });
-    this.myCHAIN_TOKENS.ALL = this.sortTokens(this.myCHAIN_TOKENS.ALL);
     // chainType tokens
-    this.myCHAIN_TOKENS[chainType].forEach((tokenItem, index) => {
-      if (chainBalance[tokenItem.assetID]) {
-        this.myCHAIN_TOKENS[chainType][index].amount =
-          chainBalance[tokenItem.assetID].amount;
-      }
+    Object.keys(this.myCHAIN_TOKENS).forEach((key) => {
+      this.myCHAIN_TOKENS[key].forEach((tokenItem, index) => {
+        const chainBalance = this.tokenBalance[tokenItem.chain];
+        if (
+          chainBalance[tokenItem.assetID] &&
+          chainBalance[tokenItem.assetID].symbol === // 资产id相同且symbol相同
+            tokenItem.symbol
+        ) {
+          this.myCHAIN_TOKENS[key][index].amount =
+            chainBalance[tokenItem.assetID].amount;
+        }
+      });
+      this.myCHAIN_TOKENS[key] = this.sortTokens(this.myCHAIN_TOKENS[key]);
     });
-    this.myCHAIN_TOKENS[chainType] = this.sortTokens(
-      this.myCHAIN_TOKENS[chainType]
-    );
     // alltokens
     this.allTokens.forEach((tokenItem, index) => {
+      const chainBalance = this.tokenBalance[tokenItem.chain];
       if (
         chainBalance[tokenItem.assetID] &&
         chainBalance[tokenItem.assetID].symbol === // 资产id相同且symbol相同
@@ -238,6 +220,7 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     this.allTokens = this.sortTokens(this.allTokens);
     // display tokens
     this.displayTokens.forEach((tokenItem, index) => {
+      const chainBalance = this.tokenBalance[tokenItem.chain];
       if (
         chainBalance[tokenItem.assetID] &&
         chainBalance[tokenItem.assetID].symbol === // 资产id相同且symbol相同

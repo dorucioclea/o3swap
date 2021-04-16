@@ -26,8 +26,8 @@
   <div class="fee-group">
     <div class="fee-item">
       <p class="label">From</p>
-      <p class="value">
-        <img *ngIf="fromToken?.chain==='NEO'" [src]="'/assets/images/swap-chains/NEO.png'" alt="">
+      <p class="value" *ngIf="fromAddress">
+        <img *ngIf="fromToken?.chain==='NEO'" src="/assets/images/swap-chains/NEO.png" alt="">
         <img *ngIf="fromToken?.chain==='ETH'" src="/assets/images/swap-chains/ETH.png" alt="">
         <img *ngIf="fromToken?.chain==='BSC'" src="/assets/images/swap-chains/BSC.png" alt="">
         <img *ngIf="fromToken?.chain==='HECO'" src="/assets/images/swap-chains/HECO.png" alt="">
@@ -36,8 +36,8 @@
     </div>
     <div class="fee-item">
       <p class="label">To</p>
-      <p class="value">
-        <img *ngIf="toToken?.chain==='NEO'" src="/assets/images/swap-chains/neo-active.png" alt="">
+      <p class="value" *ngIf="toAddress">
+        <img *ngIf="toToken?.chain==='NEO'" src="/assets/images/swap-chains/NEO.png" alt="">
         <img *ngIf="toToken?.chain==='ETH'" src="/assets/images/swap-chains/ETH.png" alt="">
         <img *ngIf="toToken?.chain==='BSC'" src="/assets/images/swap-chains/BSC.png" alt="">
         <img *ngIf="toToken?.chain==='HECO'" src="/assets/images/swap-chains/HECO.png" alt="">
