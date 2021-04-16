@@ -120,7 +120,9 @@ export class ApiService {
         (fromToken.symbol === 'ETH' && toToken.symbol === 'WETH') ||
         (fromToken.symbol === 'WETH' && toToken.symbol === 'ETH') ||
         (fromToken.symbol === 'BNB' && toToken.symbol === 'WBNB') ||
-        (fromToken.symbol === 'WBNB' && toToken.symbol === 'BNB')
+        (fromToken.symbol === 'WBNB' && toToken.symbol === 'BNB') ||
+        (fromToken.symbol === 'WHT' && toToken.symbol === 'HT') ||
+        (fromToken.symbol === 'HT' && toToken.symbol === 'WHT')
       ) {
         return this.getEthWEthSwapPath(fromToken, toToken, inputAmount);
       }

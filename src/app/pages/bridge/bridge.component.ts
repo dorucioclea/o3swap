@@ -192,9 +192,9 @@ export class BridgeComponent implements OnInit, OnDestroy {
       this.getFromAndToAddress();
     }
     if (
-      new BigNumber(this.fromToken.amount).comparedTo(
-        new BigNumber(this.inputAmount)
-      ) < 0
+      new BigNumber(
+        this.tokenBalances[this.fromToken.chain][this.fromToken.assetID].amount
+      ).comparedTo(new BigNumber(this.inputAmount)) < 0
     ) {
       this.nzMessage.error('Insufficient balance');
       return;

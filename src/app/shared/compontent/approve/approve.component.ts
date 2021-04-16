@@ -42,6 +42,7 @@ export class ApproveComponent implements OnInit {
             if (receipt !== null) {
               this.approveInterval.unsubscribe();
               this.isApproveLoading = false;
+              this.close();
             }
           });
         } else {

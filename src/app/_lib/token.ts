@@ -21,21 +21,24 @@ export const ETH_SOURCE_ASSET_HASH =
 export const WETH_ASSET_HASH = {
   ETH: {
     standardTokenSymbol: 'ETH',
+    symbol: 'WETH',
     assetID:
       NETWORK === 'MainNet'
-        ? '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' // WETH
-        : '0xc778417e063141139fce010982780140aa0cd5ab', // WETH
+        ? '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+        : '0xc778417e063141139fce010982780140aa0cd5ab',
   },
   BSC: {
     standardTokenSymbol: 'BNB',
+    symbol: 'WBNB',
     assetID:
       NETWORK === 'MainNet'
-        ? '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c' // WBNB
-        : '0x094616f0bdfb0b526bd735bf66eca0ad254ca81f', // WBNB
+        ? '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c'
+        : '0x094616f0bdfb0b526bd735bf66eca0ad254ca81f',
   },
   HECO: {
     standardTokenSymbol: 'HT',
-    assetID: NETWORK === 'MainNet' ? '' : '', // WHT
+    symbol: 'WHT',
+    assetID: NETWORK === 'MainNet' ? '' : '',
   },
 };
 export const ETH_PUSDT_ASSET = {

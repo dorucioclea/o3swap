@@ -76,6 +76,9 @@ export class MetaMaskWalletApiService {
     ETH: {
       Uniswap: null,
     },
+    HECO: {
+      Mdexswap: null,
+    },
   };
 
   constructor(
@@ -1339,7 +1342,7 @@ export class MetaMaskWalletApiService {
     if (this.aggregatorSwapJson[chain][aggregator]) {
       return of(this.aggregatorSwapJson[chain][aggregator]).toPromise();
     }
-    const json = this.http
+    return this.http
       .get(`assets/contracts-json/O3Swap${chain}${aggregator}Bridge.json`)
       .pipe(
         map((res) => {
@@ -1348,11 +1351,6 @@ export class MetaMaskWalletApiService {
         })
       )
       .toPromise();
-    if (json) {
-      return;
-    } else {
-      this.nzMessage.error('暂不支持该路径的合约，请选择其他路径');
-    }
   }
 
   private getWEthJson(): Promise<any> {

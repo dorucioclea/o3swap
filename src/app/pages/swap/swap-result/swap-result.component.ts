@@ -16,6 +16,7 @@ import {
   EthWalletName,
   USD_TOKENS,
   SOURCE_TOKEN_SYMBOL,
+  WETH_ASSET_HASH,
 } from '@lib';
 import {
   ApiService,
@@ -75,6 +76,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   ethWalletName: EthWalletName;
   bscWalletName: EthWalletName;
   hecoWalletName: EthWalletName;
+  tokenBalance = { ETH: {}, NEO: {}, BSC: {}, HECO: {} }; // 账户的 tokens
 
   TOKENS: Token[] = []; // 所有的 tokens
   O3_AGGREGATOR_FEE = O3_AGGREGATOR_FEE;
@@ -127,6 +129,10 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.ethWalletName = state.ethWalletName;
       this.bscWalletName = state.bscWalletName;
       this.hecoWalletName = state.hecoWalletName;
+      this.tokenBalance.NEO = state.balances;
+      this.tokenBalance.ETH = state.ethBalances;
+      this.tokenBalance.BSC = state.bscBalances;
+      this.tokenBalance.HECO = state.hecoBalances;
       this.getFromAndToAddress();
     });
     this.settingUnScribe = this.setting$.subscribe((state) => {
@@ -223,6 +229,16 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   async swap(): Promise<void> {
+    if (this.chooseSwapPath.aggregator) {
+      if (
+        this.chooseSwapPath.aggregator !== 'Pancakeswap' &&
+        this.chooseSwapPath.aggregator !== 'Uniswap' &&
+        this.chooseSwapPath.aggregator !== 'Mdexswap'
+      ) {
+        this.nzMessage.error('暂不支持该路径的合约，请选择其他路径');
+        return;
+      }
+    }
     if (this.checkWalletConnect() === false) {
       return;
     }
@@ -236,9 +252,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       return;
     }
     if (
-      new BigNumber(this.fromToken.amount).comparedTo(
-        new BigNumber(this.inputAmount)
-      ) < 0
+      new BigNumber(
+        this.tokenBalance[this.fromToken.chain][this.fromToken.assetID].amount
+      ).comparedTo(new BigNumber(this.inputAmount)) < 0
     ) {
       this.nzMessage.error('Insufficient balance');
       return;
@@ -252,6 +268,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     if (this.inquiryInterval) {
       this.inquiryInterval.unsubscribe();
     }
+    // neo 同链
     if (this.fromToken.chain === 'NEO' && this.toToken.chain === 'NEO') {
       if (this.fromToken.symbol === 'NEO' && this.toToken.symbol === 'nNEO') {
         this.mintNNeo();
@@ -264,85 +281,67 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.swapNeo();
       return;
     }
+    // neo 跨链
     if (this.fromToken.chain === 'NEO' && this.toToken.chain !== 'NEO') {
       return;
     }
-    const fromUsd = USD_TOKENS.find(
-      (item) => item.symbol === this.fromToken.symbol
-    );
-    const toUsd = USD_TOKENS.find(
-      (item) => item.symbol === this.toToken.symbol
-    );
-    if (fromUsd && toUsd) {
-      this.swapCrossChainEth();
-      return;
-    }
+    // eth 同链
     if (this.fromToken.chain === this.toToken.chain) {
       if (
-        (this.fromToken.symbol === 'ETH' && this.toToken.symbol === 'WETH') ||
-        (this.fromToken.symbol === 'BNB' && this.toToken.symbol === 'WBNB')
+        this.fromToken.symbol ===
+          WETH_ASSET_HASH[this.fromToken.chain].standardTokenSymbol &&
+        this.toToken.symbol === WETH_ASSET_HASH[this.toToken.chain].symbol
       ) {
         return this.depositWEth();
       }
       if (
-        (this.fromToken.symbol === 'WETH' && this.toToken.symbol === 'ETH') ||
-        (this.fromToken.symbol === 'WBNB' && this.toToken.symbol === 'BNB')
+        this.fromToken.symbol ===
+          WETH_ASSET_HASH[this.fromToken.chain].symbol &&
+        this.toToken.symbol ===
+          WETH_ASSET_HASH[this.toToken.chain].standardTokenSymbol
       ) {
         return this.withdrawalWeth();
       }
-    }
-    if (this.fromToken.chain === 'ETH') {
-      if (this.toToken.chain === 'ETH') {
-        if (this.fromToken.symbol !== 'ETH' && this.toToken.symbol === 'ETH') {
-          this.swapExactTokensForETH();
-          return;
-        }
-        if (this.fromToken.symbol === 'ETH' && this.toToken.symbol !== 'ETH') {
-          this.swapExactETHForTokens();
-          return;
-        }
-        if (this.fromToken.symbol !== 'ETH' && this.toToken.symbol !== 'ETH') {
-          this.swapExactTokensForTokens();
-          return;
-        }
-      } else {
-        if (toUsd) {
-          if (this.fromToken.symbol === 'ETH') {
-            this.swapExactETHForTokensCrossChain();
-            return;
-          }
-          if (this.fromToken.symbol !== 'ETH') {
-            this.swapExactTokensForTokensCrossChain();
-            return;
-          }
-        }
+      if (
+        this.toToken.symbol ===
+        WETH_ASSET_HASH[this.toToken.chain].standardTokenSymbol
+      ) {
+        this.swapExactTokensForETH();
+        return;
       }
+      if (
+        this.fromToken.symbol ===
+        WETH_ASSET_HASH[this.fromToken.chain].standardTokenSymbol
+      ) {
+        this.swapExactETHForTokens();
+        return;
+      }
+      this.swapExactTokensForTokens();
+      return;
     }
-    if (this.fromToken.chain === 'BSC') {
-      if (this.toToken.chain === 'BSC') {
-        if (this.fromToken.symbol !== 'BNB' && this.toToken.symbol === 'BNB') {
-          this.swapExactTokensForETH();
-          return;
-        }
-        if (this.fromToken.symbol === 'BNB' && this.toToken.symbol !== 'BNB') {
-          this.swapExactETHForTokens();
-          return;
-        }
-        if (this.fromToken.symbol !== 'BNB' && this.toToken.symbol !== 'BNB') {
-          this.swapExactTokensForTokens();
-          return;
-        }
+    // eth 跨链
+    if (this.fromToken.chain !== this.toToken.chain) {
+      const fromUsd = USD_TOKENS.find(
+        (item) => item.symbol === this.fromToken.symbol
+      );
+      const toUsd = USD_TOKENS.find(
+        (item) => item.symbol === this.toToken.symbol
+      );
+      if (fromUsd && toUsd) {
+        this.swapCrossChainEth();
+        return;
+      }
+      if (!toUsd) {
+        return;
+      }
+      if (
+        this.fromToken.symbol ===
+        WETH_ASSET_HASH[this.fromToken.chain].standardTokenSymbol
+      ) {
+        this.swapExactETHForTokensCrossChain();
+        return;
       } else {
-        if (toUsd) {
-          if (this.fromToken.symbol === 'BNB') {
-            this.swapExactETHForTokensCrossChain();
-            return;
-          }
-          if (this.fromToken.symbol !== 'BNB') {
-            this.swapExactTokensForTokensCrossChain();
-            return;
-          }
-        }
+        this.swapExactTokensForTokensCrossChain();
       }
     }
   }
@@ -703,7 +702,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         (this.fromToken.symbol === 'ETH' && this.toToken.symbol === 'WETH') ||
         (this.fromToken.symbol === 'WETH' && this.toToken.symbol === 'ETH') ||
         (this.fromToken.symbol === 'WBNB' && this.toToken.symbol === 'BNB') ||
-        (this.fromToken.symbol === 'BNB' && this.toToken.symbol === 'WBNB')
+        (this.fromToken.symbol === 'BNB' && this.toToken.symbol === 'WBNB') ||
+        (this.fromToken.symbol === 'HT' && this.toToken.symbol === 'WHT') ||
+        (this.fromToken.symbol === 'WHT' && this.toToken.symbol === 'HT')
       ) {
         this.showO3SwapFee = false;
         return;
