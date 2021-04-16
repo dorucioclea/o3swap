@@ -185,6 +185,9 @@ export class BridgeComponent implements OnInit, OnDestroy {
     if (this.checkWalletConnect() === false) {
       return;
     }
+    if (this.metaMaskWalletApiService.checkNetwork(this.fromToken) === false) {
+      return;
+    }
     if (!this.fromAddress || !this.toAddress) {
       this.getFromAndToAddress();
     }

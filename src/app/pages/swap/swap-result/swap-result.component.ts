@@ -230,6 +230,12 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.getFromAndToAddress();
     }
     if (
+      this.fromToken.chain !== 'NEO' &&
+      this.metaMaskWalletApiService.checkNetwork(this.fromToken) === false
+    ) {
+      return;
+    }
+    if (
       new BigNumber(this.fromToken.amount).comparedTo(
         new BigNumber(this.inputAmount)
       ) < 0

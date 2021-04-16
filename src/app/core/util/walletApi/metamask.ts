@@ -98,26 +98,28 @@ export class MetaMaskWalletApiService {
 
   //#region connect
   init(): void {
-    if ((window as any).ethereum && (window as any).ethereum.isConnected()) {
-      const localEthWalletName = sessionStorage.getItem(
-        'ethWalletName'
-      ) as EthWalletName;
-      const localBscWalletName = sessionStorage.getItem(
-        'bscWalletName'
-      ) as EthWalletName;
-      const localHecoWalletName = sessionStorage.getItem(
-        'hecoWalletName'
-      ) as EthWalletName;
-      if (localEthWalletName === 'MetaMask') {
-        this.connect('ETH', false);
+    setTimeout(() => {
+      if ((window as any).ethereum && (window as any).ethereum.isConnected()) {
+        const localEthWalletName = sessionStorage.getItem(
+          'ethWalletName'
+        ) as EthWalletName;
+        const localBscWalletName = sessionStorage.getItem(
+          'bscWalletName'
+        ) as EthWalletName;
+        const localHecoWalletName = sessionStorage.getItem(
+          'hecoWalletName'
+        ) as EthWalletName;
+        if (localEthWalletName === 'MetaMask') {
+          this.connect('ETH', false);
+        }
+        if (localBscWalletName === 'MetaMask') {
+          this.connect('BSC', false);
+        }
+        if (localHecoWalletName === 'MetaMask') {
+          this.connect('HECO', false);
+        }
       }
-      if (localBscWalletName === 'MetaMask') {
-        this.connect('BSC', false);
-      }
-      if (localHecoWalletName === 'MetaMask') {
-        this.connect('HECO', false);
-      }
-    }
+    }, 1000);
   }
 
   connect(chain: string, showMessage = true): void {
@@ -168,6 +170,17 @@ export class MetaMaskWalletApiService {
       .catch((error) => {
         this.handleDapiError(error);
       });
+  }
+  checkNetwork(fromToken: Token): boolean {
+    const chainId = new BigNumber(this.ethereum.chainId, 16).toNumber();
+    const chain = METAMASK_CHAIN[chainId];
+    if (chain !== fromToken.chain) {
+      this.nzMessage.error(
+        `Please switch network to ${fromToken.chain} ${NETWORK} on MetaMask wallet.`
+      );
+      return false;
+    }
+    return true;
   }
   //#endregion
 
@@ -1317,16 +1330,6 @@ export class MetaMaskWalletApiService {
         this.getBalance();
       }
     });
-  }
-
-  private checkNetwork(fromToken: Token): boolean {
-    if (this.metamaskNetworkId !== METAMASK_CHAIN_ID[fromToken.chain]) {
-      this.nzMessage.error(
-        `Please switch network to ${fromToken.chain} ${NETWORK} on MetaMask wallet.`
-      );
-      return false;
-    }
-    return true;
   }
 
   private getAggregatorSwapJson(

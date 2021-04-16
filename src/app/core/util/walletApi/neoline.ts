@@ -66,7 +66,7 @@ export class NeolineWalletApiService {
       'neoWalletName'
     ) as NeoWalletName;
     if (sessionNeoWalletName === 'NeoLine') {
-      this.autoConnectInterval = interval(2000).subscribe(() => {
+      this.autoConnectInterval = interval(1000).subscribe(() => {
         if (this.neolineDapi) {
           this.connect(false);
           this.autoConnectInterval.unsubscribe();
