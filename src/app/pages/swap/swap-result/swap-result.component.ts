@@ -31,7 +31,7 @@ import BigNumber from 'bignumber.js';
 import { interval, Observable, timer, Unsubscribable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { SwapExchangeComponent } from '@shared';
+import { ApproveComponent, SwapExchangeComponent } from '@shared';
 import { take } from 'rxjs/operators';
 
 interface State {
@@ -90,10 +90,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
 
   fromAddress: string;
   toAddress: string;
-  showApprove = false;
-  hasApprove = false;
-  isApproveLoading = false;
-  approveInterval: Unsubscribable;
 
   constructor(
     public store: Store<State>,
@@ -113,17 +109,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getRates();
-    if (this.initData) {
-      this.chooseSwapPath = this.initData.chooseSwapPath;
-      this.chooseSwapPathIndex = this.initData.chooseSwapPathIndex;
-      this.receiveSwapPathArray = this.initData.receiveSwapPathArray;
-      this.price = this.initData.price;
-      this.lnversePrice = this.initData.lnversePrice;
-      this.polyFee = this.initData.polyFee;
-      this.showInquiry = false;
-    } else {
-      this.showInquiry = true;
-    }
+    this.init();
     this.getSwapPathFun();
     this.getNetworkFee();
     this.setInquiryInterval();
@@ -148,8 +134,19 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     if (this.inquiryInterval) {
       this.inquiryInterval.unsubscribe();
     }
-    if (this.approveInterval) {
-      this.approveInterval.unsubscribe();
+  }
+
+  init(): void {
+    if (this.initData) {
+      this.chooseSwapPath = this.initData.chooseSwapPath;
+      this.chooseSwapPathIndex = this.initData.chooseSwapPathIndex;
+      this.receiveSwapPathArray = this.initData.receiveSwapPathArray;
+      this.price = this.initData.price;
+      this.lnversePrice = this.initData.lnversePrice;
+      this.polyFee = this.initData.polyFee;
+      this.showInquiry = false;
+    } else {
+      this.showInquiry = true;
     }
   }
 
@@ -212,42 +209,22 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     });
   }
 
-  approve(): void {
-    this.inquiryInterval.unsubscribe();
-    if (this.approveInterval) {
-      this.approveInterval.unsubscribe();
-    }
-    this.isApproveLoading = true;
-    const swapApi = this.getEthDapiService();
-    swapApi
-      .approve(this.fromToken, this.fromAddress, this.chooseSwapPath.aggregator)
-      .then((hash) => {
-        if (hash) {
-          this.approveInterval = interval(5000).subscribe(async () => {
-            const receipt = await this.metaMaskWalletApiService.getReceipt(
-              hash
-            );
-            console.log(receipt);
-            if (receipt !== null) {
-              this.approveInterval.unsubscribe();
-              this.isApproveLoading = false;
-              if (receipt === true) {
-                this.hasApprove = true;
-              }
-            }
-          });
-        } else {
-          this.isApproveLoading = false;
-        }
-      });
-  }
-
-  swap(): void {
-    this.getFromAndToAddress();
+  async swap(): Promise<void> {
     if (this.checkWalletConnect() === false) {
       return;
     }
-    this.inquiryInterval.unsubscribe();
+    if (!this.fromAddress || !this.toAddress) {
+      this.getFromAndToAddress();
+    }
+    const showApprove = await this.checkShowApprove();
+    if (showApprove === true) {
+      this.inquiryInterval.unsubscribe();
+      this.showApproveModal();
+      return;
+    }
+    if (this.inquiryInterval) {
+      this.inquiryInterval.unsubscribe();
+    }
     if (this.fromToken.chain === 'NEO' && this.toToken.chain === 'NEO') {
       if (this.fromToken.symbol === 'NEO' && this.toToken.symbol === 'nNEO') {
         this.mintNNeo();
@@ -342,16 +319,15 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       }
     }
   }
-
-  //#region 合约调用
   reGetSwapPath(): void {
-    // tslint:disable-next-line: no-unused-expression
-    this.inquiryInterval && this.inquiryInterval.unsubscribe();
+    if (this.inquiryInterval) {
+      this.inquiryInterval.unsubscribe();
+    }
     this.getSwapPathFun();
     this.getNetworkFee();
     this.setInquiryInterval();
   }
-
+  //#region 合约调用
   depositWEth(): void {
     this.metaMaskWalletApiService
       .depositWEth(
@@ -581,6 +557,34 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   //#endregion
 
   //#region
+  showApproveModal(): void {
+    let walletName: string;
+    switch (this.fromToken.chain) {
+      case 'ETH':
+        walletName = this.ethWalletName;
+        break;
+      case 'BSC':
+        walletName = this.bscWalletName;
+        break;
+      case 'HECO':
+        walletName = this.hecoWalletName;
+        break;
+    }
+    this.modal.create({
+      nzContent: ApproveComponent,
+      nzFooter: null,
+      nzTitle: null,
+      nzClosable: false,
+      nzMaskClosable: false,
+      nzClassName: 'custom-modal',
+      nzComponentParams: {
+        fromToken: this.fromToken,
+        fromAddress: this.fromAddress,
+        aggregator: this.chooseSwapPath.aggregator,
+        walletName,
+      },
+    });
+  }
   getEthDapiService(): any {
     switch (this.fromToken.chain) {
       case 'ETH':
@@ -599,20 +603,13 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
   async checkShowApprove(): Promise<boolean> {
     console.log('check show approve');
-    if (
-      !this.fromAddress ||
-      !this.toAddress ||
-      !this.chooseSwapPath ||
-      !this.chooseSwapPath.aggregator
-    ) {
-      this.showApprove = false;
+    if (!this.chooseSwapPath || !this.chooseSwapPath.aggregator) {
       console.log('check show approve return');
-      return;
+      return false;
     }
     if (this.fromToken.chain === 'NEO' || this.toToken.chain === 'NEO') {
-      this.showApprove = false;
       console.log('check show approve return');
-      return;
+      return false;
     }
     const swapApi = this.getEthDapiService();
     const balance = await this.metaMaskWalletApiService.getAllowance(
@@ -623,10 +620,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     if (
       new BigNumber(balance).comparedTo(new BigNumber(this.inputAmount)) >= 0
     ) {
-      this.showApprove = false;
       return false;
     } else {
-      this.showApprove = true;
       return true;
     }
   }
@@ -644,7 +639,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
           this.receiveSwapPathArray = res;
           this.handleReceiveSwapPathFiat();
           this.calculationPrice();
-          this.getFromAndToAddress();
         }
       });
   }
@@ -685,46 +679,33 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       .toFixed();
   }
   getFromAndToAddress(): void {
-    let tempFromAddress;
     switch (this.fromToken.chain) {
       case 'NEO':
-        tempFromAddress = this.neoAccountAddress;
+        this.fromAddress = this.neoAccountAddress;
         break;
       case 'ETH':
-        tempFromAddress = this.ethAccountAddress;
+        this.fromAddress = this.ethAccountAddress;
         break;
       case 'BSC':
-        tempFromAddress = this.bscAccountAddress;
+        this.fromAddress = this.bscAccountAddress;
         break;
       case 'HECO':
-        tempFromAddress = this.hecoAccountAddress;
+        this.fromAddress = this.hecoAccountAddress;
         break;
     }
-    let tempToAddress;
     switch (this.toToken.chain) {
       case 'NEO':
-        tempToAddress = this.neoAccountAddress;
+        this.toAddress = this.neoAccountAddress;
         break;
       case 'ETH':
-        tempToAddress = this.ethAccountAddress;
+        this.toAddress = this.ethAccountAddress;
         break;
       case 'BSC':
-        tempToAddress = this.bscAccountAddress;
+        this.toAddress = this.bscAccountAddress;
         break;
       case 'HECO':
-        tempToAddress = this.hecoAccountAddress;
+        this.toAddress = this.hecoAccountAddress;
         break;
-    }
-    if (
-      tempFromAddress !== this.fromAddress ||
-      tempToAddress !== this.toAddress
-    ) {
-      this.fromAddress = tempFromAddress;
-      this.toAddress = tempToAddress;
-      this.checkShowApprove();
-    } else {
-      this.fromAddress = tempFromAddress;
-      this.toAddress = tempToAddress;
     }
   }
   checkWalletConnect(): boolean {

@@ -161,36 +161,11 @@
         margin-top: 8px;
       }
     }
-    .big-btn,
-    .btn-group {
+    .big-btn {
       position: absolute;
       bottom: -10px;
       left: 50%;
       transform: translate(-50%);
-    }
-    .btn-group {
-      button {
-        width: 180px;
-        height: 60px;
-        background: #46b069;
-        border-radius: 20px;
-        border: none;
-        font-size: 18px;
-        color: #fff;
-        cursor: pointer;
-        &.approve {
-          background: #6162ef;
-        }
-        &:first-child {
-          margin-right: 20px;
-        }
-        &.disable {
-          background: #353535;
-          color: #4a4a4a;
-          pointer-events: none;
-          cursor: default;
-        }
-      }
     }
     .swap-btn {
       z-index: 1;

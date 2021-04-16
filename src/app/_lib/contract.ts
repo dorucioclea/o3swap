@@ -51,7 +51,7 @@ export const AGGREGATOR_CONTRACT = {
   ETH: {
     Uniswap:
       NETWORK === 'MainNet'
-        ? '0xeCBF96Dd4fBfD666A849252EC022Bf311A4cA002'
+        ? '0x96cFA408CA039d9Afea0b8227be741Ef52e8a037'
         : '0x1296300290e32a24E0c8d3428DAcB8aC0f3B67d3',
   },
 };

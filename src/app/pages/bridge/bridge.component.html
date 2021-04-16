@@ -76,13 +76,7 @@
         {{ toAddress | shortAddress: 10 }}
       </span>
     </p>
-    <div class="btn-group" *ngIf="showApprove">
-      <button class="btn-primary approve" nz-button [ngClass]="{disable: hasApprove===true}"
-        [nzLoading]="isApproveLoading" (click)="approve()">Approve</button>
-      <button class="btn-primary" [ngClass]="{disable: hasApprove===false}" (click)="swap()">Confirm</button>
-    </div>
-    <div *ngIf="!showApprove" class="btn-primary big-btn swap-btn" [ngClass]="{active: checkCanInquiry()}"
-      (click)="swap()">Swap</div>
+    <div class="btn-primary big-btn swap-btn" [ngClass]="{active: checkCanInquiry()}" (click)="swap()">Swap</div>
   </div>
   <div class="group-container row1 pool">
     <div class="header">Pool</div>

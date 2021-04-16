@@ -17,6 +17,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import BigNumber from 'bignumber.js';
 import { interval, Observable, Unsubscribable } from 'rxjs';
+import { ApproveComponent } from '@shared';
 
 interface State {
   swap: SwapStateType;
@@ -50,10 +51,6 @@ export class BridgeComponent implements OnInit {
 
   fromAddress: string;
   toAddress: string;
-  showApprove = false;
-  hasApprove = false;
-  isApproveLoading = false;
-  approveInterval: Unsubscribable;
   bridgeRate: string;
 
   showFromTokenList = false;
@@ -132,7 +129,7 @@ export class BridgeComponent implements OnInit {
         this.fromAddress = null;
       }
     }
-    this.checkShowApprove();
+    this.getFromAndToAddress();
     this.calcutionReceiveAmount();
   }
   exchangeToken(): void {
@@ -143,7 +140,7 @@ export class BridgeComponent implements OnInit {
       this.checkInputAmountDecimal();
       this.calcutionInputAmountFiat();
       this.calcutionReceiveAmount();
-      this.checkShowApprove();
+      this.getFromAndToAddress();
     }
   }
 
@@ -175,8 +172,15 @@ export class BridgeComponent implements OnInit {
   }
 
   async swap(): Promise<void> {
-    this.getFromAndToAddress();
     if (this.checkWalletConnect() === false) {
+      return;
+    }
+    if (!this.fromAddress || !this.toAddress) {
+      this.getFromAndToAddress();
+    }
+    const showApprove = await this.checkShowApprove();
+    if (showApprove === true) {
+      this.showApproveModal();
       return;
     }
     const polyFee = await this.apiService.getFromEthPolyFee(
@@ -206,32 +210,34 @@ export class BridgeComponent implements OnInit {
       });
   }
 
-  approve(): void {
-    if (this.approveInterval) {
-      this.approveInterval.unsubscribe();
+  //#region
+  showApproveModal(): void {
+    let walletName: string;
+    switch (this.fromToken.chain) {
+      case 'ETH':
+        walletName = this.ethWalletName;
+        break;
+      case 'BSC':
+        walletName = this.bscWalletName;
+        break;
+      case 'HECO':
+        walletName = this.hecoWalletName;
+        break;
     }
-    this.isApproveLoading = true;
-    const swapApi = this.getEthDapiService();
-    swapApi.approve(this.fromToken, this.fromAddress).then((hash) => {
-      if (hash) {
-        this.approveInterval = interval(5000).subscribe(async () => {
-          const receipt = await this.metaMaskWalletApiService.getReceipt(hash);
-          console.log(receipt);
-          if (receipt !== null) {
-            this.approveInterval.unsubscribe();
-            this.isApproveLoading = false;
-            if (receipt === true) {
-              this.hasApprove = true;
-            }
-          }
-        });
-      } else {
-        this.isApproveLoading = false;
-      }
+    this.modal.create({
+      nzContent: ApproveComponent,
+      nzFooter: null,
+      nzTitle: null,
+      nzClosable: false,
+      nzMaskClosable: false,
+      nzClassName: 'custom-modal',
+      nzComponentParams: {
+        fromToken: this.fromToken,
+        fromAddress: this.fromAddress,
+        walletName,
+      },
     });
   }
-
-  //#region
   resetSwapData(): void {
     this.fromToken = JSON.parse(JSON.stringify(USD_TOKENS[0]));
     this.toToken = null;
@@ -241,8 +247,6 @@ export class BridgeComponent implements OnInit {
     this.receiveAmountFiat = null;
     this.fromAddress = null;
     this.toAddress = null;
-    this.showApprove = false;
-    this.hasApprove = false;
     this.bridgeRate = null;
   }
   handleAccountBalance(ethBalances, bscBalances, hecoBalances): void {
@@ -292,43 +296,31 @@ export class BridgeComponent implements OnInit {
     return true;
   }
   getFromAndToAddress(): void {
-    let tempFromAddress;
     switch (this.fromToken?.chain) {
       case 'ETH':
-        tempFromAddress = this.ethAccountAddress;
+        this.fromAddress = this.ethAccountAddress;
         break;
       case 'BSC':
-        tempFromAddress = this.bscAccountAddress;
+        this.fromAddress = this.bscAccountAddress;
         break;
       case 'HECO':
-        tempFromAddress = this.hecoAccountAddress;
+        this.fromAddress = this.hecoAccountAddress;
         break;
     }
-    let tempToAddress;
     switch (this.toToken?.chain) {
       case 'ETH':
-        tempToAddress = this.ethAccountAddress;
+        this.toAddress = this.ethAccountAddress;
         break;
       case 'BSC':
-        tempToAddress = this.bscAccountAddress;
+        this.toAddress = this.bscAccountAddress;
         break;
       case 'HECO':
-        tempToAddress = this.hecoAccountAddress;
+        this.toAddress = this.hecoAccountAddress;
         break;
-    }
-    if (
-      tempFromAddress !== this.fromAddress ||
-      tempToAddress !== this.toAddress
-    ) {
-      this.fromAddress = tempFromAddress;
-      this.toAddress = tempToAddress;
-    } else {
-      this.fromAddress = tempFromAddress;
-      this.toAddress = tempToAddress;
     }
   }
   getEthDapiService(): any {
-    switch (this.fromToken.chain) {
+    switch (this.fromToken?.chain) {
       case 'ETH':
         return this.ethWalletName === 'MetaMask'
           ? this.metaMaskWalletApiService
@@ -343,22 +335,19 @@ export class BridgeComponent implements OnInit {
           : this.o3EthWalletApiService;
     }
   }
-  checkShowApprove(): void {
-    this.getFromAndToAddress();
-    if (!this.fromAddress || !this.toAddress) {
-      this.showApprove = false;
-      return;
-    }
+  async checkShowApprove(): Promise<boolean> {
     const swapApi = this.getEthDapiService();
-    swapApi.getAllowance(this.fromToken, this.fromAddress).then((balance) => {
-      if (
-        new BigNumber(balance).comparedTo(new BigNumber(this.inputAmount)) >= 0
-      ) {
-        this.showApprove = false;
-      } else {
-        this.showApprove = true;
-      }
-    });
+    const balance = await this.metaMaskWalletApiService.getAllowance(
+      this.fromToken,
+      this.fromAddress
+    );
+    if (
+      new BigNumber(balance).comparedTo(new BigNumber(this.inputAmount)) >= 0
+    ) {
+      return false;
+    } else {
+      return true;
+    }
   }
   checkInputAmountDecimal(): boolean {
     const decimalPart = this.inputAmount && this.inputAmount.split('.')[1];

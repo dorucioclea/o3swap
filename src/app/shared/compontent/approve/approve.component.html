@@ -1,0 +1,10 @@
+<section class="wrapper modal-content">
+  <div class="close-group">
+    <img (click)="close()" class="close" src="/assets/images/swap/close.png" alt="">
+  </div>
+  <p class="title">Approve</p>
+  <div class="content">
+    <div class="desc">you need approve first</div>
+    <button class="approve" nz-button [nzLoading]="isApproveLoading" (click)="approve()">Approve</button>
+  </div>
+</section>

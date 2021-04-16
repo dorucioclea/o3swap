@@ -9,6 +9,7 @@ import { SwapTokenComponent } from './compontent/swap-token/swap-token.component
 import { DashboardStakeComponent } from './compontent/dashboard-stake/dashboard-stake.component';
 import { TxProgressComponent } from './compontent/tx-progress/tx-progress.component';
 import { WalletConnectComponent } from './compontent/wallet-connect/wallet-connect.component';
+import { ApproveComponent } from './compontent/approve/approve.component';
 
 import { ShortAddressPipe } from './pipes/short-address.pipe';
 import { TransNumberPipe } from './pipes/trans-number.pipe';
@@ -32,6 +33,7 @@ const COMPONENTS = [
   DashboardStakeComponent,
   TxProgressComponent,
   WalletConnectComponent,
+  ApproveComponent,
 ];
 const PIPES = [ShortAddressPipe, TransNumberPipe, TranslatePipe];
 const DIRECTIVES = [ErrSrcDirective];
