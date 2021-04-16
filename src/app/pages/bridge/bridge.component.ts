@@ -50,6 +50,7 @@ export class BridgeComponent implements OnInit {
   ethWalletName: EthWalletName;
   bscWalletName: EthWalletName;
   hecoWalletName: EthWalletName;
+  tokenBalances = { ETH: {}, BSC: {}, HECO: {} };
 
   fromAddress: string;
   toAddress: string;
@@ -85,11 +86,7 @@ export class BridgeComponent implements OnInit {
       this.bscWalletName = state.bscWalletName;
       this.hecoWalletName = state.hecoWalletName;
       this.getFromAndToAddress();
-      this.handleAccountBalance(
-        state.ethBalances,
-        state.bscBalances,
-        state.hecoBalances
-      );
+      this.handleAccountBalance(state);
     });
   }
 
@@ -125,6 +122,7 @@ export class BridgeComponent implements OnInit {
       }
       this.checkInputAmountDecimal();
       this.calcutionInputAmountFiat();
+      this.getFromTokenAmount();
     } else {
       this.toToken = token;
       if (this.fromToken && this.fromToken.symbol === token.symbol) {
@@ -146,6 +144,7 @@ export class BridgeComponent implements OnInit {
       this.calcutionReceiveAmount();
       this.getFromAndToAddress();
       this.getNetworkFee();
+      this.getFromTokenAmount();
     }
   }
 
@@ -182,6 +181,14 @@ export class BridgeComponent implements OnInit {
     }
     if (!this.fromAddress || !this.toAddress) {
       this.getFromAndToAddress();
+    }
+    if (
+      new BigNumber(this.fromToken.amount).comparedTo(
+        new BigNumber(this.inputAmount)
+      ) < 0
+    ) {
+      this.nzMessage.error('Insufficient balance');
+      return;
     }
     const showApprove = await this.checkShowApprove();
     if (showApprove === true) {
@@ -259,25 +266,21 @@ export class BridgeComponent implements OnInit {
     this.toAddress = null;
     this.bridgeRate = null;
   }
-  handleAccountBalance(ethBalances, bscBalances, hecoBalances): void {
+  handleAccountBalance(state): void {
+    this.tokenBalances.ETH = state.ethBalances;
+    this.tokenBalances.BSC = state.bscBalances;
+    this.tokenBalances.HECO = state.hecoBalances;
+    this.getFromTokenAmount();
+  }
+  getFromTokenAmount(): void {
     if (!this.fromToken) {
       return;
     }
     this.fromToken.amount = '0';
-    let balances;
-    switch (this.fromToken.chain) {
-      case 'ETH':
-        balances = JSON.parse(JSON.stringify(ethBalances)) || {};
-        break;
-      case 'BSC':
-        balances = JSON.parse(JSON.stringify(bscBalances)) || {};
-        break;
-      case 'HECO':
-        balances = JSON.parse(JSON.stringify(hecoBalances)) || {};
-        break;
-    }
-    if (balances[this.fromToken.assetID]) {
-      this.fromToken.amount = balances[this.fromToken.assetID].amount;
+    if (this.tokenBalances[this.fromToken.chain][this.fromToken.assetID]) {
+      this.fromToken.amount = this.tokenBalances[this.fromToken.chain][
+        this.fromToken.assetID
+      ].amount;
     }
     this.changeDetectorRef.detectChanges();
   }

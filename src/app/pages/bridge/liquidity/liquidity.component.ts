@@ -104,17 +104,11 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       this.ethAccountAddress = state.ethAccountAddress;
       this.bscAccountAddress = state.bscAccountAddress;
       this.hecoAccountAddress = state.hecoAccountAddress;
-      this.currentChain = METAMASK_CHAIN[state.metamaskNetworkId];
-      this.handleAccountBalance(
-        state.ethBalances,
-        state.bscBalances,
-        state.hecoBalances
-      );
+      this.getCurrentChain(state.metamaskNetworkId);
+      this.getLPBalance();
+      this.handleAccountBalance(state);
       this.handleCurrentAddress();
-      if (state.metamaskNetworkId !== this.metamaskNetworkId) {
-        this.metamaskNetworkId = state.metamaskNetworkId;
-        this.getLPBalance();
-      }
+      this.getLPBalance();
       this.changeDetectorRef.detectChanges();
     });
   }
@@ -323,58 +317,35 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     }
     return true;
   }
+  getCurrentChain(metamaskNetworkId): void {
+    if (this.currentChain !== METAMASK_CHAIN[metamaskNetworkId]) {
+      this.currentChain = METAMASK_CHAIN[metamaskNetworkId];
+      const token = this.LPTokens.find(
+        (item) => item.chain === this.currentChain
+      );
+      this.LPToken = JSON.parse(JSON.stringify(token));
+    }
+  }
   private getLPBalance(): void {
-    if (!this.currentChain) {
+    if (!this.LPToken) {
       return;
     }
-    const token = this.LPTokens.find(
-      (item) => item.chain === this.currentChain
-    );
-    this.LPToken = JSON.parse(JSON.stringify(token));
     this.metaMaskWalletApiService.getBalancByHash(this.LPToken).then((res) => {
+      console.log(res);
       this.LPToken.amount = res;
     });
   }
-  private handleAccountBalance(ethBalances, bscBalances, hecoBalances): void {
-    this.addLiquidityTokens = JSON.parse(JSON.stringify(USD_TOKENS));
-    if (JSON.stringify(ethBalances) !== JSON.stringify(this.tokenBalance.ETH)) {
-      this.tokenBalance.ETH = JSON.parse(JSON.stringify(ethBalances));
-      this.addLiquidityTokens
-        .filter((item) => item.chain === 'ETH')
-        .forEach((item) => {
-          if (ethBalances[item.assetID]) {
-            item.amount = ethBalances[item.assetID].amount;
-          } else {
-            item.amount = '--';
-          }
-        });
-    }
-    if (JSON.stringify(bscBalances) !== JSON.stringify(this.tokenBalance.BSC)) {
-      this.tokenBalance.BSC = JSON.parse(JSON.stringify(bscBalances));
-      this.addLiquidityTokens
-        .filter((item) => item.chain === 'BSC')
-        .forEach((item) => {
-          if (bscBalances[item.assetID]) {
-            item.amount = bscBalances[item.assetID].amount;
-          } else {
-            item.amount = '--';
-          }
-        });
-    }
-    if (
-      JSON.stringify(hecoBalances) !== JSON.stringify(this.tokenBalance.HECO)
-    ) {
-      this.tokenBalance.HECO = JSON.parse(JSON.stringify(hecoBalances));
-      this.addLiquidityTokens
-        .filter((item) => item.chain === 'HECO')
-        .forEach((item) => {
-          if (hecoBalances[item.assetID]) {
-            item.amount = hecoBalances[item.assetID].amount;
-          } else {
-            item.amount = '--';
-          }
-        });
-    }
+  private handleAccountBalance(state): void {
+    this.tokenBalance.ETH = state.ethBalances;
+    this.tokenBalance.BSC = state.bscBalances;
+    this.tokenBalance.HECO = state.hecoBalances;
+    this.addLiquidityTokens.forEach((item) => {
+      if (this.tokenBalance[item.chain][item.assetID]) {
+        item.amount = this.tokenBalance[item.chain][item.assetID].amount;
+      } else {
+        item.amount = '--';
+      }
+    });
   }
   private handleCurrentAddress(): void {
     switch (this.currentChain) {

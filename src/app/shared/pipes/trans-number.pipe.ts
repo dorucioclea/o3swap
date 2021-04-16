@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js';
 export class TransNumberPipe implements PipeTransform {
   transform(value: any): any {
     if (!value || new BigNumber(value).isNaN()) {
-      return '';
+      return value;
     }
     return new BigNumber(value).dp(8).toFormat();
   }

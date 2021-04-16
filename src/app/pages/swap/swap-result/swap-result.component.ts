@@ -220,6 +220,10 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     if (!this.fromAddress || !this.toAddress) {
       this.getFromAndToAddress();
     }
+    if (new BigNumber(this.fromToken.amount).comparedTo(new BigNumber(this.inputAmount)) < 0) {
+      this.nzMessage.error('Insufficient balance');
+      return;
+    }
     const showApprove = await this.checkShowApprove();
     if (showApprove === true) {
       this.inquiryInterval.unsubscribe();

@@ -99,13 +99,13 @@ export class MetaMaskWalletApiService {
   //#region connect
   init(): void {
     if ((window as any).ethereum && (window as any).ethereum.isConnected()) {
-      const localEthWalletName = localStorage.getItem(
+      const localEthWalletName = sessionStorage.getItem(
         'ethWalletName'
       ) as EthWalletName;
-      const localBscWalletName = localStorage.getItem(
+      const localBscWalletName = sessionStorage.getItem(
         'bscWalletName'
       ) as EthWalletName;
-      const localHecoWalletName = localStorage.getItem(
+      const localHecoWalletName = sessionStorage.getItem(
         'hecoWalletName'
       ) as EthWalletName;
       if (localEthWalletName === 'MetaMask') {
@@ -350,7 +350,11 @@ export class MetaMaskWalletApiService {
           ],
         })
         .then((balance) => {
-          if (balance && !new BigNumber(balance).isNaN()) {
+          if (
+            balance &&
+            !new BigNumber(balance).isNaN() &&
+            new BigNumber(balance).comparedTo(0) > 0
+          ) {
             return new BigNumber(balance).shiftedBy(-token.decimals).toFixed();
           }
         })
@@ -364,7 +368,11 @@ export class MetaMaskWalletApiService {
           params: [this.accountAddress, 'latest'],
         })
         .then((balance) => {
-          if (balance && !new BigNumber(balance).isNaN()) {
+          if (
+            balance &&
+            !new BigNumber(balance).isNaN() &&
+            new BigNumber(balance).comparedTo(0) > 0
+          ) {
             return new BigNumber(balance, 16)
               .shiftedBy(-token.decimals)
               .toFixed();
@@ -1272,8 +1280,8 @@ export class MetaMaskWalletApiService {
             type: UPDATE_METAMASK_NETWORK_ID,
             data: id,
           });
-          this.getBalance();
         }
+        this.getBalance();
       })
       .catch((error) => {
         this.handleDapiError(error);
@@ -1321,7 +1329,7 @@ export class MetaMaskWalletApiService {
     if (this.aggregatorSwapJson[chain][aggregator]) {
       return of(this.aggregatorSwapJson[chain][aggregator]).toPromise();
     }
-    return this.http
+    const json = this.http
       .get(`assets/contracts-json/O3Swap${chain}${aggregator}Bridge.json`)
       .pipe(
         map((res) => {
@@ -1330,6 +1338,11 @@ export class MetaMaskWalletApiService {
         })
       )
       .toPromise();
+    if (json) {
+      return;
+    } else {
+      this.nzMessage.error('暂不支持该路径的合约，请选择其他路径');
+    }
   }
 
   private getWEthJson(): Promise<any> {

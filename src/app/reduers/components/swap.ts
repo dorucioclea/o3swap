@@ -65,16 +65,16 @@ const initialState: SwapStateType = {
 export default function swap(state = initialState, action): any {
   switch (action.type) {
     case UPDATE_NEO_WALLET_NAME:
-      sessionStorage.setItem('neoWalletName', action.data);
+      setSessionStorage('neoWalletName', action.data);
       return { ...state, neoWalletName: action.data };
     case UPDATE_ETH_WALLET_NAME:
-      setLocalStorage('ethWalletName', action.data);
+      setSessionStorage('ethWalletName', action.data);
       return { ...state, ethWalletName: action.data };
     case UPDATE_BSC_WALLET_NAME:
-      setLocalStorage('bscWalletName', action.data);
+      setSessionStorage('bscWalletName', action.data);
       return { ...state, bscWalletName: action.data };
     case UPDATE_HECO_WALLET_NAME:
-      setLocalStorage('hecoWalletName', action.data);
+      setSessionStorage('hecoWalletName', action.data);
       return { ...state, hecoWalletName: action.data };
 
     case UPDATE_NEO_ACCOUNT:
@@ -122,6 +122,6 @@ export default function swap(state = initialState, action): any {
   }
 }
 
-function setLocalStorage(key: string, value: string): void {
-  localStorage.setItem(key, value);
+function setSessionStorage(key: string, value: string): void {
+  sessionStorage.setItem(key, value);
 }
