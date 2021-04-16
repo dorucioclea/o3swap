@@ -65,7 +65,7 @@
         1 {{ toToken?.symbol }} = {{ lnversePrice }} {{ fromToken?.symbol }}
       </p>
     </div>
-    <div class="fee-item" *ngIf="polyFee">
+    <div class="fee-item" *ngIf="showPolyFee">
       <p class="label">Poly Fee</p>
       <div class="value">{{ polyFee | transNumber }} {{ SOURCE_TOKEN_SYMBOL[fromToken.chain] }}</div>
     </div>

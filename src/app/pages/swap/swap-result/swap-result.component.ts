@@ -89,6 +89,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   price: string; // swap 比
   lnversePrice: string; // swap 反比
   polyFee: string;
+  showPolyFee = false;
   showO3SwapFee = false;
 
   fromAddress: string;
@@ -701,6 +702,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.showO3SwapFee = false;
         return;
       }
+    } else {
+      this.showPolyFee = true;
     }
     if (this.fromToken.chain === 'NEO') {
       this.showO3SwapFee = true;
