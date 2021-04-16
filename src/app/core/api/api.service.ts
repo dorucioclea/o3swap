@@ -531,6 +531,10 @@ export class ApiService {
         map((res: CommonHttpResponse) => {
           if (res.status === 'success') {
             const target = [];
+            res.data = res.data.filter(
+              (item) =>
+                item.aggregator === 'Pancakeswap' || item.aggregator === 'Uniswap'
+            );
             res.data.forEach((item) => {
               const swapPath = this.swapService.getAssetNamePath(
                 item.path,

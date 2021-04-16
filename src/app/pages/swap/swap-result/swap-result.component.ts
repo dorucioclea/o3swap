@@ -229,16 +229,17 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   async swap(): Promise<void> {
-    if (this.chooseSwapPath.aggregator) {
-      if (
-        this.chooseSwapPath.aggregator !== 'Pancakeswap' &&
-        this.chooseSwapPath.aggregator !== 'Uniswap' &&
-        this.chooseSwapPath.aggregator !== 'Mdexswap'
-      ) {
-        this.nzMessage.error('暂不支持该路径的合约，请选择其他路径');
-        return;
-      }
-    }
+    // if (this.chooseSwapPath.aggregator) {
+    //   if (
+    //     this.chooseSwapPath.aggregator !== 'Flamingo' &&
+    //     this.chooseSwapPath.aggregator !== 'Pancakeswap' &&
+    //     this.chooseSwapPath.aggregator !== 'Uniswap'
+    //     // this.chooseSwapPath.aggregator !== 'Mdexswap'
+    //   ) {
+    //     this.nzMessage.error('暂不支持该路径的合约，请选择其他路径');
+    //     return;
+    //   }
+    // }
     if (this.checkWalletConnect() === false) {
       return;
     }
