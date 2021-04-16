@@ -20,7 +20,7 @@
   <div class="setting-item">
     <p class="setting-item-title">Transaction time limit</p>
     <div class="setting-item-content tx-time-limit">
-      <input type="number" (blur)="updateDeadline()" [(ngModel)]="deadline">
+      <input type="number" (input)="inputDeadline($event)" (blur)="updateDeadline()" [(ngModel)]="deadline">
       <span>&nbsp;&nbsp;min</span>
     </div>
   </div>

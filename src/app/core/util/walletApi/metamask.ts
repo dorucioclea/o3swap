@@ -109,18 +109,18 @@ export class MetaMaskWalletApiService {
         'hecoWalletName'
       ) as EthWalletName;
       if (localEthWalletName === 'MetaMask') {
-        this.connect('ETH');
+        this.connect('ETH', false);
       }
       if (localBscWalletName === 'MetaMask') {
-        this.connect('BSC');
+        this.connect('BSC', false);
       }
       if (localHecoWalletName === 'MetaMask') {
-        this.connect('HECO');
+        this.connect('HECO', false);
       }
     }
   }
 
-  connect(chain: string): void {
+  connect(chain: string, showMessage = true): void {
     if (!(window as any).ethereum) {
       this.swapService.toDownloadWallet(this.myWalletName);
       return;
@@ -130,8 +130,14 @@ export class MetaMaskWalletApiService {
     this.ethereum
       .request({ method: 'eth_requestAccounts' })
       .then((result) => {
+        if (result.length <= 0) {
+          return;
+        }
         this.commonService.log(result);
         this.accountAddress = result[0];
+        if (showMessage) {
+          this.nzMessage.success('Connection succeeded!');
+        }
         this.getBalance();
         let dispatchAccountType;
         let dispatchWalletNameType;

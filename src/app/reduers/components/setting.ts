@@ -1,8 +1,13 @@
-import { DEFAULT_DEADLINE, DEFAULT_SLIPVALUE, UPDATE_SETTING } from '@lib';
+import {
+  DEFAULT_DEADLINE,
+  DEFAULT_SLIPVALUE,
+  IS_CUSTOM_SLIPVALUE,
+  UPDATE_SETTING,
+} from '@lib';
 
 const initialState = {
   slipValue: DEFAULT_SLIPVALUE,
-  isCustomSlip: false,
+  isCustomSlip: IS_CUSTOM_SLIPVALUE,
   deadline: DEFAULT_DEADLINE,
 };
 

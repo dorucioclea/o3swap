@@ -68,14 +68,14 @@ export class NeolineWalletApiService {
     if (sessionNeoWalletName === 'NeoLine') {
       this.autoConnectInterval = interval(2000).subscribe(() => {
         if (this.neolineDapi) {
-          this.connect();
+          this.connect(false);
           this.autoConnectInterval.unsubscribe();
         }
       });
     }
   }
 
-  connect(): void {
+  connect(showMessage = true): void {
     if (this.neolineDapi === undefined) {
       this.swapService.toDownloadWallet(this.myWalletName);
       return;
@@ -86,6 +86,9 @@ export class NeolineWalletApiService {
     this.neolineDapi
       .getAccount()
       .then((result) => {
+        if (showMessage) {
+          this.nzMessage.success('Connection succeeded!');
+        }
         this.commonService.log(result);
         this.accountAddress = result.address;
         this.store.dispatch({
@@ -490,20 +493,20 @@ export class NeolineWalletApiService {
         }
       }
     );
-    this.neolineDapi.getNetworks().then((res) => {
-      this.neolineNetwork = res.defaultNetwork;
-      this.store.dispatch({
-        type: UPDATE_NEOLINE_NETWORK,
-        data: this.neolineNetwork,
-      });
-      if (NETWORK !== this.neolineNetwork) {
-        this.nzMessage.error(
-          `Please switch network to ${NETWORK} on NeoLine wallet.`
-        );
-      } else {
-        this.getBalances();
-      }
-    });
+    // this.neolineDapi.getNetworks().then((res) => {
+    //   this.neolineNetwork = res.defaultNetwork;
+    //   this.store.dispatch({
+    //     type: UPDATE_NEOLINE_NETWORK,
+    //     data: this.neolineNetwork,
+    //   });
+    //   if (NETWORK !== this.neolineNetwork) {
+    //     this.nzMessage.error(
+    //       `Please switch network to ${NETWORK} on NeoLine wallet.`
+    //     );
+    //   } else {
+    //     this.getBalances();
+    //   }
+    // });
     window.addEventListener(
       'NEOLine.NEO.EVENT.NETWORK_CHANGED',
       (result: any) => {

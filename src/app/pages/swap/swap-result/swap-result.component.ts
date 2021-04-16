@@ -689,6 +689,19 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     }
   }
   checkO3SwapFee(): void {
+    if (this.fromToken.chain === this.toToken.chain) {
+      if (
+        (this.fromToken.symbol === 'NEO' && this.toToken.symbol === 'nNEO') ||
+        (this.fromToken.symbol === 'nNEO' && this.toToken.symbol === 'NEO') ||
+        (this.fromToken.symbol === 'ETH' && this.toToken.symbol === 'WETH') ||
+        (this.fromToken.symbol === 'WETH' && this.toToken.symbol === 'ETH') ||
+        (this.fromToken.symbol === 'WBNB' && this.toToken.symbol === 'BNB') ||
+        (this.fromToken.symbol === 'BNB' && this.toToken.symbol === 'WBNB')
+      ) {
+        this.showO3SwapFee = false;
+        return;
+      }
+    }
     if (this.fromToken.chain === 'NEO') {
       this.showO3SwapFee = true;
     }

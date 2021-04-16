@@ -50,7 +50,6 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
   setting$: Observable<any>;
   settingUnScribe: Unsubscribable;
   slipValue: number;
-  isCustomSlip: boolean; // 自定义滑点
   deadline: number;
 
   changeData = false;
@@ -72,7 +71,6 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
     this.getRates();
     this.settingUnScribe = this.setting$.subscribe((state) => {
       this.slipValue = state.slipValue;
-      this.isCustomSlip = state.isCustomSlip;
       this.deadline = state.deadline;
     });
     this.checkInputAmountDecimal();
@@ -170,21 +168,12 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
   }
 
   showSetting(): void {
-    const moadl = this.modal.create({
+    this.modal.create({
       nzContent: SwapSettingComponent,
       nzFooter: null,
       nzTitle: null,
       nzClosable: false,
       nzClassName: 'custom-modal',
-      nzMaskClosable: false,
-      nzComponentParams: {
-        slipValue: this.slipValue,
-        isCustomSlip: this.isCustomSlip,
-        deadline: this.deadline,
-      },
-    });
-    moadl.afterClose.subscribe((res) => {
-      this.store.dispatch({ type: UPDATE_SETTING, data: res });
     });
   }
   //#region
