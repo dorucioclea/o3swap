@@ -38,7 +38,10 @@ export const WETH_ASSET_HASH = {
   HECO: {
     standardTokenSymbol: 'HT',
     symbol: 'WHT',
-    assetID: NETWORK === 'MainNet' ? '' : '',
+    assetID:
+      NETWORK === 'MainNet'
+        ? '0x5545153ccfca01fbd7dd11c0b23ba694d9509a6f'
+        : '0x2550d9439a1c19f91f19316b5bd343180c12e315',
   },
 };
 export const ETH_PUSDT_ASSET = {

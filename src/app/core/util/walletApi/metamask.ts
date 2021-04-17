@@ -77,7 +77,7 @@ export class MetaMaskWalletApiService {
       Uniswap: null,
     },
     HECO: {
-      Mdexswap: null,
+      'Mdex-Heco': null,
     },
   };
 

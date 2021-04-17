@@ -533,7 +533,9 @@ export class ApiService {
             const target = [];
             res.data = res.data.filter(
               (item) =>
-                item.aggregator === 'Pancakeswap' || item.aggregator === 'Uniswap'
+                item.aggregator === 'Pancakeswap' ||
+                item.aggregator === 'Uniswap' ||
+                item.aggregator === 'Mdex-Heco'
             );
             res.data.forEach((item) => {
               const swapPath = this.swapService.getAssetNamePath(

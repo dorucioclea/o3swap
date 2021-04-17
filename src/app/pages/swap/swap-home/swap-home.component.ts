@@ -182,7 +182,10 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
     this.tokenBalance.ETH = state.ethBalances;
     this.tokenBalance.BSC = state.bscBalances;
     this.tokenBalance.HECO = state.hecoBalances;
-    if (this.tokenBalance[this.fromToken.chain][this.fromToken.assetID]) {
+    if (
+      this.fromToken &&
+      this.tokenBalance[this.fromToken.chain][this.fromToken.assetID]
+    ) {
       this.fromToken.amount = this.tokenBalance[this.fromToken.chain][
         this.fromToken.assetID
       ].amount;

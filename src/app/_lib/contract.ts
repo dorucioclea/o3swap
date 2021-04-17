@@ -55,7 +55,9 @@ export const AGGREGATOR_CONTRACT = {
         : '0x1296300290e32a24E0c8d3428DAcB8aC0f3B67d3',
   },
   HECO: {
-    Mdexswap:
-      NETWORK === 'MainNet' ? '' : '0x77ddcf68bece64049adf7a261a432b344885381f',
+    'Mdex-Heco':
+      NETWORK === 'MainNet'
+        ? '0xecbf96dd4fbfd666a849252ec022bf311a4ca002'
+        : '0x77ddcf68bece64049adf7a261a432b344885381f',
   },
 };
