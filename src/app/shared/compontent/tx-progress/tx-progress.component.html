@@ -9,10 +9,15 @@
     </div>
     <div class="content">
       <div class="status-img">
-        <ng-lottie *ngIf='transaction?.isPending' class="pending-json" [options]="pendingOptions"></ng-lottie>
-        <ng-lottie *ngIf='!transaction?.isPending' class="success-json" [options]="successOptions"></ng-lottie>
+        <ng-lottie *ngIf='!transaction?.isFailed && transaction?.isPending' class="pending-json"
+          [options]="pendingOptions"></ng-lottie>
+        <ng-lottie *ngIf='!transaction?.isFailed && !transaction?.isPending' class="success-json"
+          [options]="successOptions"></ng-lottie>
+        <img *ngIf='transaction?.isFailed' src="/assets/images/swap-result/failed.png" alt="">
       </div>
-      <p class="status">{{ transaction?.isPending ? 'Pending' : 'Success' }}</p>
+      <p class="status" *ngIf='!transaction?.isFailed && transaction?.isPending'>Pending</p>
+      <p class="status" *ngIf='!transaction?.isFailed && !transaction?.isPending'>Success</p>
+      <p class="status" *ngIf='transaction?.isFailed'>Failed</p>
       <div class="desc">
         <span *ngIf="txAtPage!=='liquidity'">Swap</span>
         <span
@@ -30,17 +35,23 @@
       <div class="tx-group" *ngIf="showTxDetail && !transaction?.progress">
         <div class="tx-item">
           <div class="left">
-            <ng-lottie *ngIf="!transaction?.isPending" class="tx-json" [options]="txCompleteOptions"></ng-lottie>
-            <ng-lottie *ngIf="transaction?.isPending" class="tx-json" [options]="txPendingOptions"></ng-lottie>
+            <ng-lottie *ngIf="!transaction?.isFailed && !transaction?.isPending" class="tx-json"
+              [options]="txCompleteOptions"></ng-lottie>
+            <ng-lottie *ngIf="!transaction?.isFailed && transaction?.isPending" class="tx-json"
+              [options]="txPendingOptions"></ng-lottie>
+            <img *ngIf='transaction?.isFailed' src="/assets/images/swap-result/progress-failed.png" alt="">
           </div>
           <div class="right">
             <p class="name">{{ transaction?.toToken.symbol }}</p>
-            <div class="hash">
+            <div class="hash" *ngIf="transaction?.isFailed">
+              Failed
+            </div>
+            <div class="hash" *ngIf="!transaction?.isFailed">
               <span>Hash</span>
               {{ transaction?.txid | shortAddress: 6 }}
               <img class="copy" (click)="copy(transaction?.txid)" src="/assets/images/swap/copy.png" alt="">
             </div>
-            <div class="link" *ngIf="!transaction?.isPending">
+            <div class="link" *ngIf="!transaction?.isFailed && !transaction?.isPending">
               <a target="_blank" href="{{TX_PAGES_PREFIX[transaction?.fromToken.chain]}}{{transaction?.txid}}">
                 <span></span>
               </a>
@@ -55,19 +66,23 @@
             </ng-lottie>
             <ng-lottie *ngIf="transaction?.progress.step1.status===2" class="tx-json" [options]="txCompleteOptions">
             </ng-lottie>
+            <img *ngIf='transaction?.isFailed' src="/assets/images/swap-result/progress-failed.png" alt="">
           </div>
           <div class="right">
             <p class="name">{{ transaction?.fromToken.chain }}</p>
-            <div class="hash" *ngIf="transaction?.progress.step1.status===2">
+            <div class="hash" *ngIf="transaction?.isFailed">
+              Failed
+            </div>
+            <div class="hash" *ngIf="!transaction?.isFailed && transaction?.progress.step1.status===2">
               <span>Hash</span>
               {{ transaction?.progress.step1.hash | shortAddress: 6 }}
               <img class="copy" (click)="copy(transaction?.progress.step1.hash)" src="/assets/images/swap/copy.png"
                 alt="">
             </div>
-            <div class="hash" *ngIf="transaction?.progress.step1.status===1">
+            <div class="hash" *ngIf="!transaction?.isFailed && transaction?.progress.step1.status===1">
               In progress
             </div>
-            <div class="link" *ngIf="transaction?.progress.step1.status===2">
+            <div class="link" *ngIf="!transaction?.isFailed && transaction?.progress.step1.status===2">
               <a target="_blank"
                 href="{{TX_PAGES_PREFIX[transaction?.fromToken.chain]}}{{transaction?.progress.step1.hash}}">
                 <span></span>
@@ -82,22 +97,26 @@
             </ng-lottie>
             <ng-lottie *ngIf="transaction?.progress.step2.status===2" class="tx-json" [options]="txCompleteOptions">
             </ng-lottie>
+            <img *ngIf='transaction?.isFailed' src="/assets/images/swap-result/progress-failed.png" alt="">
           </div>
           <div class="right">
             <p class="name">poly</p>
-            <div class="hash" *ngIf="transaction?.progress.step2.status===2">
+            <div class="hash" *ngIf="transaction?.isFailed">
+              Failed
+            </div>
+            <div class="hash" *ngIf="!transaction?.isFailed && transaction?.progress.step2.status===2">
               <span>Hash</span>
               {{ transaction?.progress.step2.hash | shortAddress: 6 }}
               <img class="copy" (click)="copy(transaction?.progress.step2.hash)" src="/assets/images/swap/copy.png"
                 alt="">
             </div>
-            <div class="hash" *ngIf="transaction?.progress.step2.status===1">
+            <div class="hash" *ngIf="!transaction?.isFailed && transaction?.progress.step2.status===1">
               In progress
             </div>
-            <div class="hash" *ngIf="transaction?.progress.step2.status===0">
+            <div class="hash" *ngIf="!transaction?.isFailed && transaction?.progress.step2.status===0">
               Waiting
             </div>
-            <div class="link" *ngIf="transaction?.progress.step2.status===2">
+            <div class="link" *ngIf="!transaction?.isFailed && transaction?.progress.step2.status===2">
               <a target="_blank" href="{{POLY_TX_PAGES_PREFIX}}/{{transaction?.progress.step2.hash}}">
                 <span></span>
               </a>
@@ -111,22 +130,27 @@
             </ng-lottie>
             <ng-lottie *ngIf="transaction?.progress.step3.status===2" class="tx-json" [options]="txCompleteOptions">
             </ng-lottie>
+            <img *ngIf='transaction?.isFailed' src="/assets/images/swap-result/progress-failed.png" alt="">
           </div>
           <div class="right">
             <p class="name">{{ transaction?.toToken.chain }}</p>
-            <div class="hash" *ngIf="transaction?.progress.step3.status===2">
+            <div class="hash" *ngIf="transaction?.isFailed">
+              Failed
+            </div>
+            <div class="hash" *ngIf="!transaction?.isFailed && transaction?.progress.step3.status===2">
               <span>Hash</span>
               {{ transaction?.progress.step3.hash | shortAddress: 6 }}
               <img class="copy" (click)="copy(transaction?.progress.step3.hash)" src="/assets/images/swap/copy.png"
                 alt="">
             </div>
-            <div class="hash" *ngIf="transaction?.progress.step3.status===1">
+            <div class="hash" *ngIf="!transaction?.isFailed && transaction?.progress.step3.status===1">
               In progress
             </div>
-            <div class="hash" *ngIf="transaction?.progress.step3.status===0">
+            <div class="hash" *ngIf="!transaction?.isFailed && transaction?.progress.step3.status===0">
               Waiting
             </div>
-            <div class="link" *ngIf="transaction?.progress.step3.status===2">
+            <div class="link"
+              *ngIf="!transaction?.isFailed && !transaction?.isFailed && transaction?.progress.step3.status===2">
               <a target="_blank"
                 href="{{TX_PAGES_PREFIX[transaction?.toToken.chain]}}{{transaction?.progress.step3.hash}}">
                 <span></span>
@@ -140,8 +164,11 @@
 </nz-modal>
 
 <section class="min-tx" *ngIf="hasTransaction && transaction?.min===true" (click)="maxTxHashModal()"
-  [ngClass]="{pending: transaction?.isPending}">
-  <ng-lottie *ngIf="transaction?.isPending" class="pending-min-json" [options]="pendingMinOptions"></ng-lottie>
-  <img *ngIf="!transaction?.isPending" src="/assets/images/swap-result/success-icon.png" alt="">
-  {{ transaction?.isPending ? 'A record is pending' : 'A record succeeded' }}
+  [ngClass]="{pending: transaction?.isPending, failed: transaction?.isFailed}">
+  <ng-lottie *ngIf="!transaction?.isFailed && transaction?.isPending" class="pending-min-json"
+    [options]="pendingMinOptions"></ng-lottie>
+  <img *ngIf="!transaction?.isFailed && !transaction?.isPending" src="/assets/images/swap-result/success-icon.png"
+    alt="">
+  <img *ngIf="transaction?.isFailed" src="/assets/images/swap-result/failed-icon.png" alt="">
+  {{ minMessage }}
 </section>

@@ -66,6 +66,7 @@ export class TxProgressComponent implements OnInit, OnDestroy {
 
   requestCrossInterval: Unsubscribable;
   swapProgress = 20;
+  minMessage: string;
 
   constructor(
     public store: Store<State>,
@@ -99,18 +100,21 @@ export class TxProgressComponent implements OnInit, OnDestroy {
           this.hasTransaction = state.transaction ? true : false;
           if (this.hasTransaction) {
             this.handleTransacction(state.transaction);
+            this.getMinMessage();
           }
           break;
         case 'bridge':
           this.hasTransaction = state.bridgeeTransaction ? true : false;
           if (this.hasTransaction) {
             this.handleTransacction(state.bridgeeTransaction);
+            this.getMinMessage();
           }
           break;
         case 'liquidity':
           this.hasTransaction = state.liquidityTransaction ? true : false;
           if (this.hasTransaction) {
             this.handleTransacction(state.liquidityTransaction);
+            this.getMinMessage();
           }
           break;
       }
@@ -172,6 +176,18 @@ export class TxProgressComponent implements OnInit, OnDestroy {
   }
 
   //#region private function
+  getMinMessage(): void {
+    let message = 'Swap';
+    if (this.txAtPage === 'liquidity') {
+      message =
+        this.transaction?.fromToken.symbol === 'pLP' ? 'Withdrawal' : 'Deposit';
+    }
+    message += ` ${this.transaction?.amount} ${this.transaction?.fromToken?.symbol} for ${this.transaction?.receiveAmount} ${this.transaction?.toToken?.symbol}`;
+    if (message.length > 21) {
+      message = message.slice(0, 19) + '...';
+    }
+    this.minMessage = message;
+  }
   handleTransacction(stateTx): void {
     // 跨链交易定时查询交易状态
     if (

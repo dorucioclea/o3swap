@@ -185,7 +185,10 @@ export class MetaMaskWalletApiService {
   getChain(): string {
     this.ethereum = (window as any).ethereum;
     if ((window as any).ethereum) {
-      const chainId = new BigNumber((window as any).ethereum.chainId, 16).toNumber();
+      const chainId = new BigNumber(
+        (window as any).ethereum.chainId,
+        16
+      ).toNumber();
       return METAMASK_CHAIN[chainId];
     } else {
       return null;
@@ -1186,13 +1189,14 @@ export class MetaMaskWalletApiService {
         break;
     }
     this.store.dispatch({ type: dispatchType, data: pendingTx });
-    this.listerTxReceipt(txHash, dispatchType, hasCrossChain);
+    this.listerTxReceipt(txHash, dispatchType, hasCrossChain, pendingTx);
   }
 
   private listerTxReceipt(
     txHash: string,
     dispatchType: string,
-    hasCrossChain = true
+    hasCrossChain = true,
+    pendingTx: SwapTransaction
   ): void {
     if (this.requestTxStatusInterval) {
       this.requestTxStatusInterval.unsubscribe();
@@ -1208,8 +1212,9 @@ export class MetaMaskWalletApiService {
           if (receipt) {
             this.requestTxStatusInterval.unsubscribe();
             if (new BigNumber(receipt.status, 16).isZero()) {
-              this.nzMessage.error('Transaction failed');
-              this.store.dispatch({ type: dispatchType, data: null });
+              pendingTx.isFailed = true;
+              pendingTx.isPending = false;
+              this.store.dispatch({ type: dispatchType, data: pendingTx });
             } else {
               if (hasCrossChain === false) {
                 this.getBalance();

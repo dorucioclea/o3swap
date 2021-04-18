@@ -7,20 +7,23 @@ section.min-tx {
   justify-content: center;
   width: 200px;
   height: 50px;
-  background: #46b069;
+  background: linear-gradient(90deg, #46b069, #00af92);
   border-radius: 25px;
   font-family: "fontRegular";
   cursor: pointer;
   img {
     width: 20px;
-    margin-right: 15px;
+    margin-right: 5px;
   }
   .pending-min-json {
     width: 30px;
-    margin-right: 10px;
+    margin-right: 5px;
   }
   &.pending {
     background: #6162ef80;
+  }
+  &.failed {
+    background: #cd424280;
   }
 }
 

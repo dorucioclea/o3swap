@@ -1111,7 +1111,8 @@ export class O3EthWalletApiService {
       dispatchType,
       hasCrossChain,
       fromToken.chain,
-      toToken.chain
+      toToken.chain,
+      pendingTx
     );
   }
 
@@ -1120,7 +1121,8 @@ export class O3EthWalletApiService {
     dispatchType: string,
     hasCrossChain = true,
     fromChain: CHAINS,
-    toChain: CHAINS
+    toChain: CHAINS,
+    pendingTx: SwapTransaction
   ): void {
     if (this.requestTxStatusInterval) {
       this.requestTxStatusInterval.unsubscribe();
@@ -1136,8 +1138,9 @@ export class O3EthWalletApiService {
           if (receipt) {
             this.requestTxStatusInterval.unsubscribe();
             if (new BigNumber(receipt.status, 16).isZero()) {
-              this.nzMessage.error('Transaction failed');
-              this.store.dispatch({ type: dispatchType, data: null });
+              pendingTx.isFailed = true;
+              pendingTx.isPending = false;
+              this.store.dispatch({ type: dispatchType, data: pendingTx });
             } else {
               if (hasCrossChain === false) {
                 this.getBalance(fromChain);

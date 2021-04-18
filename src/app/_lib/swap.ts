@@ -17,6 +17,7 @@ export interface SwapTransaction {
   amount: string;
   receiveAmount: string;
   progress?: TxProgress;
+  isFailed?: boolean;
 }
 
 export interface SwapStateType {
