@@ -1,5 +1,6 @@
 import { NETWORK } from './network';
 
+export type ConnectChainType = 'ETH' | 'NEO' | 'BSC' | 'HECO';
 export type WalletName = 'O3' | 'NeoLine' | 'MetaMask';
 export type NeoWalletName = 'O3' | 'NeoLine';
 export type EthWalletName = 'O3' | 'MetaMask';

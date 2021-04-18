@@ -660,7 +660,7 @@ export class O3EthWalletApiService {
   private checkNetwork(fromToken: Token): boolean {
     if (this.o3DesktopId !== METAMASK_CHAIN_ID[fromToken.chain]) {
       this.nzMessage.error(
-        `Please switch network to ${fromToken.chain} ${NETWORK} on O3 wallet.`
+        `Please switch network to ${fromToken.chain} ${NETWORK} on O3 desktop extension.`
       );
       return false;
     }

@@ -125,14 +125,14 @@ export class MetaMaskWalletApiService {
     }, 1000);
   }
 
-  connect(chain: string, showMessage = true): void {
+  connect(chain: string, showMessage = true): Promise<string> {
     if (!(window as any).ethereum) {
       this.swapService.toDownloadWallet(this.myWalletName);
       return;
     }
     this.web3 = new Web3((window as any).ethereum);
     this.ethereum = (window as any).ethereum;
-    this.ethereum
+    return this.ethereum
       .request({ method: 'eth_requestAccounts' })
       .then((result) => {
         if (result.length <= 0) {
@@ -169,6 +169,7 @@ export class MetaMaskWalletApiService {
           data: this.myWalletName,
         });
         this.addListener();
+        return this.accountAddress;
       })
       .catch((error) => {
         this.handleDapiError(error);
@@ -179,7 +180,7 @@ export class MetaMaskWalletApiService {
     const chain = METAMASK_CHAIN[chainId];
     if (chain !== fromToken.chain) {
       this.nzMessage.error(
-        `Please switch network to ${fromToken.chain} ${NETWORK} on MetaMask wallet.`
+        `Please switch network to ${fromToken.chain} ${NETWORK} on MetaMask extension.`
       );
       return false;
     }

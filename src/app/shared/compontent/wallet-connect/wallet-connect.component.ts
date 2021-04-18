@@ -45,6 +45,7 @@ export class WalletConnectComponent implements OnInit, OnDestroy {
   BSC_WALLETS = BSC_WALLETS;
   HECO_WALLETS = HECO_WALLETS;
   @Input() show: boolean;
+  @Input() connectOne?: boolean;
   @Input() connectChainType: ConnectChainType;
   @Output() closePage = new EventEmitter();
 
@@ -100,25 +101,37 @@ export class WalletConnectComponent implements OnInit, OnDestroy {
   }
 
   //#region connect wallet modal
-  connectNeoWallet(wallet: NeoWallet): void {
+  async connectNeoWallet(wallet: NeoWallet): Promise<void> {
+    let connectRes;
     switch (wallet.name) {
       case 'NeoLine':
-        this.neolineWalletApiService.connect();
+        connectRes = await this.neolineWalletApiService.connect();
         break;
       case 'O3':
-        this.o3NeoWalletApiService.connect();
+        connectRes = await this.o3NeoWalletApiService.connect();
         break;
+    }
+    if (this.connectOne && connectRes) {
+      this.close();
     }
   }
 
-  connectEthWallet(wallet: EthWallet): void {
+  async connectEthWallet(wallet: EthWallet): Promise<void> {
+    let connectRes;
     switch (wallet.name) {
       case 'MetaMask':
-        this.metaMaskWalletApiService.connect(this.connectChainType);
+        connectRes = await this.metaMaskWalletApiService.connect(
+          this.connectChainType
+        );
         break;
       case 'O3':
-        this.o3EthWalletApiService.connect(this.connectChainType);
+        connectRes = await this.o3EthWalletApiService.connect(
+          this.connectChainType
+        );
         break;
+    }
+    if (this.connectOne && connectRes) {
+      this.close();
     }
   }
   //#endregion

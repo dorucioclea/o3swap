@@ -61,7 +61,8 @@
     </div>
     <p class="detail">Exchange Rate {{ toToken?.symbol || '--' }}/{{ fromToken?.symbol || '--' }} (including fees):
       <span>{{ bridgeRate }}</span></p>
-    <p class="detail">Poly Fee: <span *ngIf="polyFee">{{ polyFee }} {{ SOURCE_TOKEN_SYMBOL[fromToken.chain] }}</span></p>
+    <p class="detail">Poly Fee: <span *ngIf="polyFee">{{ polyFee }} {{ SOURCE_TOKEN_SYMBOL[fromToken.chain] }}</span>
+    </p>
     <p class="detail">Max slippage: <span>{{ BRIDGE_SLIPVALUE }}%</span></p>
     <p class="detail">
       From:<span class="address">
@@ -121,3 +122,6 @@
 </section>
 
 <app-tx-progress [txAtPage]="'bridge'"></app-tx-progress>
+
+<app-wallet-connect [show]="showConnectWallet" [connectChainType]="connectChainType" connectOne="true"
+  (closePage)="showConnectWallet=false"></app-wallet-connect>

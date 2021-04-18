@@ -17,6 +17,7 @@ import {
   USD_TOKENS,
   SOURCE_TOKEN_SYMBOL,
   WETH_ASSET_HASH,
+  ConnectChainType,
 } from '@lib';
 import {
   ApiService,
@@ -96,6 +97,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
 
   fromAddress: string;
   toAddress: string;
+  showConnectWallet = false;
+  connectChainType: ConnectChainType;
 
   constructor(
     public store: Store<State>,
@@ -229,17 +232,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   async swap(): Promise<void> {
-    // if (this.chooseSwapPath.aggregator) {
-    //   if (
-    //     this.chooseSwapPath.aggregator !== 'Flamingo' &&
-    //     this.chooseSwapPath.aggregator !== 'Pancakeswap' &&
-    //     this.chooseSwapPath.aggregator !== 'Uniswap'
-    //     // this.chooseSwapPath.aggregator !== 'Mdexswap'
-    //   ) {
-    //     this.nzMessage.error('暂不支持该路径的合约，请选择其他路径');
-    //     return;
-    //   }
-    // }
     if (this.checkWalletConnect() === false) {
       return;
     }
@@ -253,6 +245,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       return;
     }
     if (
+      !this.tokenBalance ||
+      !this.tokenBalance[this.fromToken.chain] ||
+      !this.tokenBalance[this.fromToken.chain][this.fromToken.assetID] ||
       new BigNumber(
         this.tokenBalance[this.fromToken.chain][this.fromToken.assetID].amount
       ).comparedTo(new BigNumber(this.inputAmount)) < 0
@@ -774,6 +769,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       !this.neoAccountAddress
     ) {
       this.nzMessage.error('Please connect the NEO wallet first');
+      this.showConnectWallet = true;
+      this.connectChainType = 'NEO';
       return false;
     }
     if (
@@ -781,6 +778,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       !this.ethAccountAddress
     ) {
       this.nzMessage.error('Please connect the ETH wallet first');
+      this.showConnectWallet = true;
+      this.connectChainType = 'ETH';
       return false;
     }
     if (
@@ -788,6 +787,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       !this.bscAccountAddress
     ) {
       this.nzMessage.error('Please connect the BSC wallet first');
+      this.showConnectWallet = true;
+      this.connectChainType = 'BSC';
       return false;
     }
     if (
@@ -795,6 +796,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       !this.hecoAccountAddress
     ) {
       this.nzMessage.error('Please connect the HECO wallet first');
+      this.showConnectWallet = true;
+      this.connectChainType = 'HECO';
       return false;
     }
     return true;

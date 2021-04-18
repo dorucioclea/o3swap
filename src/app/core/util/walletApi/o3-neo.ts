@@ -51,8 +51,8 @@ export class O3NeoWalletApiService {
     });
   }
 
-  connect(): void {
-    o3dapi.NEO.getAccount()
+  connect(): Promise<string> {
+    return o3dapi.NEO.getAccount()
       .then((result) => {
         this.commonService.log(result);
         this.accountAddress = result.address;
@@ -65,6 +65,7 @@ export class O3NeoWalletApiService {
           data: this.walletName,
         });
         this.getBalances();
+        return this.accountAddress;
       })
       .catch((error) => {
         this.swapService.handleNeoDapiError(error, 'O3');

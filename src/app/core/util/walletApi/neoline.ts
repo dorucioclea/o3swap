@@ -75,7 +75,7 @@ export class NeolineWalletApiService {
     }
   }
 
-  connect(showMessage = true): void {
+  connect(showMessage = true): Promise<string> {
     if (this.neolineDapi === undefined) {
       this.swapService.toDownloadWallet(this.myWalletName);
       return;
@@ -83,7 +83,7 @@ export class NeolineWalletApiService {
     if (this.autoConnectInterval) {
       this.autoConnectInterval.unsubscribe();
     }
-    this.neolineDapi
+    return this.neolineDapi
       .getAccount()
       .then((result) => {
         if (showMessage) {
@@ -101,6 +101,7 @@ export class NeolineWalletApiService {
         });
         this.addListener();
         this.getBalances();
+        return this.accountAddress;
       })
       .catch((error) => {
         this.swapService.handleNeoDapiError(error, 'NeoLine');
@@ -427,7 +428,7 @@ export class NeolineWalletApiService {
   private checkNetwork(): boolean {
     if (this.neolineNetwork !== NETWORK) {
       this.nzMessage.error(
-        `Please switch network to ${NETWORK} on NeoLine wallet.`
+        `Please switch network to ${NETWORK} on NeoLine extension.`
       );
       return false;
     }
@@ -493,20 +494,16 @@ export class NeolineWalletApiService {
         }
       }
     );
-    // this.neolineDapi.getNetworks().then((res) => {
-    //   this.neolineNetwork = res.defaultNetwork;
-    //   this.store.dispatch({
-    //     type: UPDATE_NEOLINE_NETWORK,
-    //     data: this.neolineNetwork,
-    //   });
-    //   if (NETWORK !== this.neolineNetwork) {
-    //     this.nzMessage.error(
-    //       `Please switch network to ${NETWORK} on NeoLine wallet.`
-    //     );
-    //   } else {
-    //     this.getBalances();
-    //   }
-    // });
+    this.neolineDapi.getNetworks().then((res) => {
+      this.neolineNetwork = res.defaultNetwork;
+      this.store.dispatch({
+        type: UPDATE_NEOLINE_NETWORK,
+        data: this.neolineNetwork,
+      });
+      if (NETWORK === this.neolineNetwork) {
+        this.getBalances();
+      }
+    });
     window.addEventListener(
       'NEOLine.NEO.EVENT.NETWORK_CHANGED',
       (result: any) => {
@@ -515,11 +512,7 @@ export class NeolineWalletApiService {
           type: UPDATE_NEOLINE_NETWORK,
           data: this.neolineNetwork,
         });
-        if (NETWORK !== this.neolineNetwork) {
-          this.nzMessage.error(
-            `Please switch network to ${NETWORK} on NeoLine wallet.`
-          );
-        } else {
+        if (NETWORK === this.neolineNetwork) {
           this.getBalances();
         }
       }

@@ -82,3 +82,5 @@
   </div>
 </section>
 
+<app-wallet-connect [show]="showConnectWallet" [connectChainType]="connectChainType" connectOne="true"
+  (closePage)="showConnectWallet=false"></app-wallet-connect>

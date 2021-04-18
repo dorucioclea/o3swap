@@ -12,6 +12,7 @@ import {
   Token,
   USD_TOKENS,
   SOURCE_TOKEN_SYMBOL,
+  ConnectChainType,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -62,6 +63,8 @@ export class BridgeComponent implements OnInit, OnDestroy {
   showToTokenList = false;
   showFromTokenListModalTimeout;
   showToTokenListModalTimeout;
+  showConnectWallet = false;
+  connectChainType: ConnectChainType;
 
   constructor(
     public store: Store<State>,
@@ -185,13 +188,16 @@ export class BridgeComponent implements OnInit, OnDestroy {
     if (this.checkWalletConnect() === false) {
       return;
     }
-    if (this.metaMaskWalletApiService.checkNetwork(this.fromToken) === false) {
-      return;
-    }
     if (!this.fromAddress || !this.toAddress) {
       this.getFromAndToAddress();
     }
+    if (this.metaMaskWalletApiService.checkNetwork(this.fromToken) === false) {
+      return;
+    }
     if (
+      !this.tokenBalances ||
+      !this.tokenBalances[this.fromToken.chain] ||
+      !this.tokenBalances[this.fromToken.chain][this.fromToken.assetID] ||
       new BigNumber(
         this.tokenBalances[this.fromToken.chain][this.fromToken.assetID].amount
       ).comparedTo(new BigNumber(this.inputAmount)) < 0
@@ -299,6 +305,8 @@ export class BridgeComponent implements OnInit, OnDestroy {
       !this.ethAccountAddress
     ) {
       this.nzMessage.error('Please connect the ETH wallet first');
+      this.showConnectWallet = true;
+      this.connectChainType = 'ETH';
       return false;
     }
     if (
@@ -306,6 +314,8 @@ export class BridgeComponent implements OnInit, OnDestroy {
       !this.bscAccountAddress
     ) {
       this.nzMessage.error('Please connect the BSC wallet first');
+      this.showConnectWallet = true;
+      this.connectChainType = 'BSC';
       return false;
     }
     if (
@@ -313,6 +323,8 @@ export class BridgeComponent implements OnInit, OnDestroy {
       !this.hecoAccountAddress
     ) {
       this.nzMessage.error('Please connect the HECO wallet first');
+      this.showConnectWallet = true;
+      this.connectChainType = 'HECO';
       return false;
     }
     return true;

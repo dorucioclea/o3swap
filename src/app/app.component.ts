@@ -15,6 +15,7 @@ import {
   UPDATE_HECO_WALLET_NAME,
   RESET_BSC_BALANCES,
   RESET_HECO_BALANCES,
+  ConnectChainType,
 } from '@lib';
 import {
   CommonService,
@@ -24,7 +25,6 @@ import {
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
-export type ConnectChainType = 'ETH' | 'NEO' | 'BSC' | 'HECO';
 interface State {
   swap: SwapStateType;
 }
