@@ -291,11 +291,12 @@ export class BridgeComponent implements OnInit, OnDestroy {
     if (!this.fromToken) {
       return;
     }
-    this.fromToken.amount = '0';
     if (this.tokenBalances[this.fromToken.chain][this.fromToken.assetID]) {
-      this.fromToken.amount = this.tokenBalances[this.fromToken.chain][
-        this.fromToken.assetID
-      ].amount;
+      Object.defineProperty(this.fromToken, 'amount', {
+        value: this.tokenBalances[this.fromToken.chain][this.fromToken.assetID]
+          .amount,
+        writable: true,
+      });
     }
     this.changeDetectorRef.detectChanges();
   }
