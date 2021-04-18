@@ -5,7 +5,7 @@ import {
   ChangeDetectorRef,
   OnDestroy,
 } from '@angular/core';
-import { SwapStateType, CHAINS, NNEO_TOKEN } from '@lib';
+import { SwapStateType, CHAINS, NNEO_TOKEN, USD_TOKENS } from '@lib';
 import { Token } from '@lib';
 import { Observable, Unsubscribable } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -29,6 +29,7 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
   hideToken: Token;
   hideNeoToken = false; // from 或 to 不是 NNEO 时不显示 NEO
   showOnlyNNeo = false; // from 或 to 是 NEO 时只显示 NNEO
+  showOnlyNeoChain = false;
 
   swap$: Observable<any>;
   tokenBalance = { NEO: {}, ETH: {}, BSC: {}, HECO: {} }; // 账户的 tokens
@@ -58,7 +59,6 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     this.cloneTokens();
     this.checkShowOnlyNNeo();
     this.checkHideNeo();
-    this.changeChain(this.fromToken.chain);
     this.activeToken = this.isFrom ? this.fromToken : this.toToken;
     this.hideToken = this.isFrom ? this.toToken : this.fromToken;
     this.getTokens();
@@ -66,6 +66,9 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
       this.receiveTokenBalance(state);
       this.changeDetectorRef.detectChanges();
     });
+    if (this.fromToken) {
+      this.changeChain(this.fromToken.chain);
+    }
   }
 
   cloneTokens(): void {
@@ -106,6 +109,13 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     this.allTokens = this.hideNeoToken
       ? this.allTokens.filter((item) => item.symbol !== 'NEO')
       : this.allTokens;
+    if (!this.isFrom && this.fromToken.chain !== chain) {
+      this.allTokens = this.allTokens.filter(
+        (item) =>
+          USD_TOKENS.findIndex((usdItem) => usdItem.assetID === item.assetID) >=
+          0
+      );
+    }
     this.displayTokens = this.allTokens;
   }
 
@@ -169,6 +179,11 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
       this.showOnlyNNeo = true;
     } else {
       this.showOnlyNNeo = false;
+    }
+    if (!this.isFrom && this.fromToken.chain === 'NEO') {
+      this.showOnlyNeoChain = true;
+    } else {
+      this.showOnlyNeoChain = false;
     }
   }
   checkHideNeo(): void {
