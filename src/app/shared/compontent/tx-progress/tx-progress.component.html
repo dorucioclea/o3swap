@@ -43,10 +43,10 @@
           </div>
           <div class="right">
             <p class="name">{{ transaction?.toToken.symbol }}</p>
-            <div class="hash" *ngIf="transaction?.isFailed">
+            <div class="hash" *ngIf="transaction?.isFailed && !transaction?.txid">
               Failed
             </div>
-            <div class="hash" *ngIf="!transaction?.isFailed">
+            <div class="hash" *ngIf="transaction?.txid">
               <span>Hash</span>
               {{ transaction?.txid | shortAddress: 6 }}
               <img class="copy" (click)="copy(transaction?.txid)" src="/assets/images/swap/copy.png" alt="">
