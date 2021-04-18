@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:mainnet": "ng serve --prod",
     "build": "ng build --prod",
     "lint": "ng lint",
     "http": "http-server dist"
