@@ -13,6 +13,7 @@ import {
   USD_TOKENS,
   SOURCE_TOKEN_SYMBOL,
   ConnectChainType,
+  ETH_SOURCE_ASSET_HASH,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -194,15 +195,7 @@ export class BridgeComponent implements OnInit, OnDestroy {
     if (this.metaMaskWalletApiService.checkNetwork(this.fromToken) === false) {
       return;
     }
-    if (
-      !this.tokenBalances ||
-      !this.tokenBalances[this.fromToken.chain] ||
-      !this.tokenBalances[this.fromToken.chain][this.fromToken.assetID] ||
-      new BigNumber(
-        this.tokenBalances[this.fromToken.chain][this.fromToken.assetID].amount
-      ).comparedTo(new BigNumber(this.inputAmount)) < 0
-    ) {
-      this.nzMessage.error('Insufficient balance');
+    if (this.checkBalance() === false) {
       return;
     }
     const showApprove = await this.checkShowApprove();
@@ -462,6 +455,35 @@ export class BridgeComponent implements OnInit, OnDestroy {
     } else {
       this.bridgeRate = '';
     }
+  }
+  checkBalance(): boolean {
+    if (!this.tokenBalances || !this.tokenBalances[this.fromToken.chain]) {
+      return false;
+    }
+    const chainBalances = this.tokenBalances[this.fromToken.chain];
+    if (
+      !chainBalances[this.fromToken.assetID] ||
+      new BigNumber(chainBalances[this.fromToken.assetID].amount).comparedTo(
+        new BigNumber(this.inputAmount)
+      ) < 0
+    ) {
+      this.nzMessage.error('Insufficient balance');
+      return false;
+    }
+    // 有 poly fee，转非原生资产
+    if (
+      this.polyFee &&
+      (!chainBalances[ETH_SOURCE_ASSET_HASH] ||
+        new BigNumber(chainBalances[ETH_SOURCE_ASSET_HASH].amount).comparedTo(
+          new BigNumber(this.polyFee)
+        ) < 0)
+    ) {
+      this.nzMessage.error(
+        `Insufficient ${SOURCE_TOKEN_SYMBOL[this.fromToken.chain]} for poly fee`
+      );
+      return false;
+    }
+    return true;
   }
   //#endregion
 }

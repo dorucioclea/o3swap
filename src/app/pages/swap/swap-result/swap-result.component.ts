@@ -18,6 +18,7 @@ import {
   SOURCE_TOKEN_SYMBOL,
   WETH_ASSET_HASH,
   ConnectChainType,
+  ETH_SOURCE_ASSET_HASH,
 } from '@lib';
 import {
   ApiService,
@@ -244,15 +245,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     ) {
       return;
     }
-    if (
-      !this.tokenBalance ||
-      !this.tokenBalance[this.fromToken.chain] ||
-      !this.tokenBalance[this.fromToken.chain][this.fromToken.assetID] ||
-      new BigNumber(
-        this.tokenBalance[this.fromToken.chain][this.fromToken.assetID].amount
-      ).comparedTo(new BigNumber(this.inputAmount)) < 0
-    ) {
-      this.nzMessage.error('Insufficient balance');
+    if (this.checkBalance() === false) {
       return;
     }
     const showApprove = await this.checkShowApprove();
@@ -799,6 +792,65 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.showConnectWallet = true;
       this.connectChainType = 'HECO';
       return false;
+    }
+    return true;
+  }
+  checkBalance(): boolean {
+    if (!this.tokenBalance || !this.tokenBalance[this.fromToken.chain]) {
+      return false;
+    }
+    const chainBalances = this.tokenBalance[this.fromToken.chain];
+    if (
+      !chainBalances[this.fromToken.assetID] ||
+      new BigNumber(chainBalances[this.fromToken.assetID].amount).comparedTo(
+        new BigNumber(this.inputAmount)
+      ) < 0
+    ) {
+      this.nzMessage.error('Insufficient balance');
+      return false;
+    }
+    // 有 poly fee，转非原生资产
+    if (
+      this.showPolyFee &&
+      this.polyFee &&
+      this.fromToken.symbol !== SOURCE_TOKEN_SYMBOL[this.fromToken.chain]
+    ) {
+      if (
+        !chainBalances[ETH_SOURCE_ASSET_HASH] ||
+        new BigNumber(chainBalances[ETH_SOURCE_ASSET_HASH].amount).comparedTo(
+          new BigNumber(this.polyFee)
+        ) < 0
+      ) {
+        this.nzMessage.error(
+          `Insufficient ${
+            SOURCE_TOKEN_SYMBOL[this.fromToken.chain]
+          } for poly fee`
+        );
+        return false;
+      }
+    }
+    // 有 poly fee，转原生资产(ETH, HT, BNB)
+    if (
+      this.showPolyFee &&
+      this.polyFee &&
+      this.fromToken.symbol === SOURCE_TOKEN_SYMBOL[this.fromToken.chain]
+    ) {
+      const allNeedBalance = new BigNumber(this.inputAmount).plus(
+        new BigNumber(this.polyFee)
+      );
+      if (
+        !chainBalances[ETH_SOURCE_ASSET_HASH] ||
+        new BigNumber(chainBalances[ETH_SOURCE_ASSET_HASH].amount).comparedTo(
+          allNeedBalance
+        ) < 0
+      ) {
+        this.nzMessage.error(
+          `Insufficient ${
+            SOURCE_TOKEN_SYMBOL[this.fromToken.chain]
+          } for transfer amount and poly fee`
+        );
+        return false;
+      }
     }
     return true;
   }
