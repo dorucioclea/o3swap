@@ -59,6 +59,8 @@ export class MetaMaskWalletApiService {
   hecoWalletName: EthWalletName;
   metamaskNetworkId: number;
   transaction: SwapTransaction;
+  bridgeeTransaction: SwapTransaction;
+  liquidityTransaction: SwapTransaction;
 
   ethereum;
   web3: Web3;
@@ -92,6 +94,8 @@ export class MetaMaskWalletApiService {
       this.hecoWalletName = state.hecoWalletName;
       this.metamaskNetworkId = state.metamaskNetworkId;
       this.transaction = Object.assign({}, state.transaction);
+      this.bridgeeTransaction = Object.assign({}, state.bridgeeTransaction);
+      this.liquidityTransaction = Object.assign({}, state.liquidityTransaction);
     });
   }
 
@@ -1161,6 +1165,7 @@ export class MetaMaskWalletApiService {
     const pendingTx: SwapTransaction = {
       txid: this.commonService.remove0xHash(txHash),
       isPending: true,
+      isFailed: false,
       min: false,
       fromToken,
       toToken,
@@ -1180,28 +1185,43 @@ export class MetaMaskWalletApiService {
     switch (txAtPage) {
       case 'swap':
         dispatchType = UPDATE_PENDING_TX;
+        this.transaction = pendingTx;
         break;
       case 'bridge':
         dispatchType = UPDATE_BRIDGE_PENDING_TX;
+        this.bridgeeTransaction = pendingTx;
         break;
       case 'liquidity':
         dispatchType = UPDATE_LIQUIDITY_PENDING_TX;
+        this.liquidityTransaction = pendingTx;
         break;
     }
     this.store.dispatch({ type: dispatchType, data: pendingTx });
-    this.listerTxReceipt(txHash, dispatchType, hasCrossChain, pendingTx);
+    this.listerTxReceipt(txHash, dispatchType, hasCrossChain, txAtPage);
   }
 
   private listerTxReceipt(
     txHash: string,
     dispatchType: string,
     hasCrossChain = true,
-    pendingTx: SwapTransaction
+    txAtPage: TxAtPage
   ): void {
     if (this.requestTxStatusInterval) {
       this.requestTxStatusInterval.unsubscribe();
     }
     this.requestTxStatusInterval = interval(5000).subscribe(() => {
+      let currentTx: SwapTransaction;
+      switch (txAtPage) {
+        case 'swap':
+          currentTx = this.transaction;
+          break;
+        case 'bridge':
+          currentTx = this.bridgeeTransaction;
+          break;
+        case 'liquidity':
+          currentTx = this.liquidityTransaction;
+          break;
+      }
       this.ethereum
         .request({
           method: 'eth_getTransactionReceipt',
@@ -1211,20 +1231,15 @@ export class MetaMaskWalletApiService {
           console.log(receipt);
           if (receipt) {
             this.requestTxStatusInterval.unsubscribe();
+            currentTx.isPending = false;
             if (new BigNumber(receipt.status, 16).isZero()) {
-              pendingTx.isFailed = true;
-              pendingTx.isPending = false;
-              this.store.dispatch({ type: dispatchType, data: pendingTx });
+              currentTx.isFailed = true;
             } else {
               if (hasCrossChain === false) {
                 this.getBalance();
-                this.transaction.isPending = false;
-                this.store.dispatch({
-                  type: dispatchType,
-                  data: this.transaction,
-                });
               }
             }
+            this.store.dispatch({ type: dispatchType, data: currentTx });
           }
         })
         .catch((error) => {

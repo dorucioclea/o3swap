@@ -57,6 +57,8 @@ export class O3EthWalletApiService {
   bscWalletName: EthWalletName;
   hecoWalletName: EthWalletName;
   transaction: SwapTransaction;
+  bridgeeTransaction: SwapTransaction;
+  liquidityTransaction: SwapTransaction;
 
   isConnected: boolean;
   web3 = new Web3();
@@ -90,6 +92,8 @@ export class O3EthWalletApiService {
       this.bscWalletName = state.bscWalletName;
       this.hecoWalletName = state.hecoWalletName;
       this.transaction = Object.assign({}, state.transaction);
+      this.bridgeeTransaction = Object.assign({}, state.bridgeeTransaction);
+      this.liquidityTransaction = Object.assign({}, state.liquidityTransaction);
     });
   }
 
@@ -1078,6 +1082,7 @@ export class O3EthWalletApiService {
     const pendingTx: SwapTransaction = {
       txid: this.commonService.remove0xHash(txHash),
       isPending: true,
+      isFailed: false,
       min: false,
       fromToken,
       toToken,
@@ -1097,12 +1102,15 @@ export class O3EthWalletApiService {
     switch (txAtPage) {
       case 'swap':
         dispatchType = UPDATE_PENDING_TX;
+        this.transaction = this.transaction;
         break;
       case 'bridge':
         dispatchType = UPDATE_BRIDGE_PENDING_TX;
+        this.bridgeeTransaction = this.bridgeeTransaction;
         break;
       case 'liquidity':
         dispatchType = UPDATE_LIQUIDITY_PENDING_TX;
+        this.liquidityTransaction = this.liquidityTransaction;
         break;
     }
     this.store.dispatch({ type: dispatchType, data: pendingTx });
@@ -1112,7 +1120,7 @@ export class O3EthWalletApiService {
       hasCrossChain,
       fromToken.chain,
       toToken.chain,
-      pendingTx
+      txAtPage
     );
   }
 
@@ -1122,12 +1130,24 @@ export class O3EthWalletApiService {
     hasCrossChain = true,
     fromChain: CHAINS,
     toChain: CHAINS,
-    pendingTx: SwapTransaction
+    txAtPage: TxAtPage
   ): void {
     if (this.requestTxStatusInterval) {
       this.requestTxStatusInterval.unsubscribe();
     }
     this.requestTxStatusInterval = interval(5000).subscribe(() => {
+      let currentTx: SwapTransaction;
+      switch (txAtPage) {
+        case 'swap':
+          currentTx = this.transaction;
+          break;
+        case 'bridge':
+          currentTx = this.bridgeeTransaction;
+          break;
+        case 'liquidity':
+          currentTx = this.liquidityTransaction;
+          break;
+      }
       o3dapi.ETH.request({
         method: 'eth_getTransactionReceipt',
         params: [txHash],
@@ -1137,21 +1157,16 @@ export class O3EthWalletApiService {
           console.log(receipt);
           if (receipt) {
             this.requestTxStatusInterval.unsubscribe();
+            currentTx.isPending = false;
             if (new BigNumber(receipt.status, 16).isZero()) {
-              pendingTx.isFailed = true;
-              pendingTx.isPending = false;
-              this.store.dispatch({ type: dispatchType, data: pendingTx });
+              currentTx.isFailed = true;
             } else {
               if (hasCrossChain === false) {
                 this.getBalance(fromChain);
                 this.getBalance(toChain);
-                this.transaction.isPending = false;
-                this.store.dispatch({
-                  type: dispatchType,
-                  data: this.transaction,
-                });
               }
             }
+            this.store.dispatch({ type: dispatchType, data: currentTx });
           }
         })
         .catch((error) => {

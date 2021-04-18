@@ -45,21 +45,27 @@ const initialState: SwapStateType = {
   // transaction: {
   //   txid: '',
   //   isPending: false,
-  //   isFailed: true,
+  //   isFailed: false,
   //   min: true,
   //   fromToken: NNEO_TOKEN,
   //   toToken: NNEO_TOKEN,
   //   amount: '100',
-  //   receiveAmount: '1000'
+  //   receiveAmount: '1000',
   // },
   // bridgeeTransaction: {
   //   txid: '0f4787014a5442fc02843dc376548fa7a4dd400a92850f783873b034d84dccd5',
-  //   isPending: true,
+  //   isPending: false,
+  //   isFailed: true,
   //   min: false,
   //   fromToken: NNEO_TOKEN,
   //   toToken: NNEO_TOKEN,
   //   amount: '1',
-  //   receiveAmount: '1'
+  //   receiveAmount: '1',
+  //   progress: {
+  //     step1: { hash: '', status: 1 },
+  //     step2: { hash: '', status: 0 },
+  //     step3: { hash: '', status: 0 },
+  //   },
   // },
   // liquidityTransaction: {
   //   txid: '0f4787014a5442fc02843dc376548fa7a4dd400a92850f783873b034d84dccd5',
