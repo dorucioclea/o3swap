@@ -57,9 +57,6 @@ export class MetaMaskWalletApiService {
   ethWalletName: EthWalletName;
   bscWalletName: EthWalletName;
   hecoWalletName: EthWalletName;
-  ethAccountAddress: string;
-  bscAccountAddress: string;
-  hecoAccountAddress: string;
   metamaskNetworkId: number;
   transaction: SwapTransaction;
 
@@ -308,7 +305,7 @@ export class MetaMaskWalletApiService {
   //#endregion
 
   //#region balance
-  async getBalance(): Promise<boolean> {
+  async getBalance(targetChain?: CHAINS): Promise<boolean> {
     console.log('getBalance-----------');
     const chainId = new BigNumber(this.ethereum.chainId, 16).toNumber();
     const chain = METAMASK_CHAIN[chainId];

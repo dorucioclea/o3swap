@@ -12,6 +12,7 @@ import {
   CommonService,
   MetaMaskWalletApiService,
   SwapService,
+  O3EthWalletApiService,
 } from '@core';
 import { Observable, Unsubscribable } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -26,6 +27,7 @@ import {
   LP_TOKENS,
   ETH_PUSDT_ASSET,
   ConnectChainType,
+  EthWalletName,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -63,6 +65,9 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   ethAccountAddress: string;
   bscAccountAddress: string;
   hecoAccountAddress: string;
+  ethWalletName: EthWalletName;
+  bscWalletName: EthWalletName;
+  hecoWalletName: EthWalletName;
   metamaskNetworkId: number;
   tokenBalance = { ETH: {}, NEO: {}, BSC: {}, HECO: {} }; // 账户的 tokens
 
@@ -78,6 +83,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     private commonService: CommonService,
     public store: Store<State>,
     private metaMaskWalletApiService: MetaMaskWalletApiService,
+    private o3EthWalletApiService: O3EthWalletApiService,
     private nzMessage: NzMessageService,
     private router: Router,
     private swapService: SwapService,
@@ -108,6 +114,9 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       this.ethAccountAddress = state.ethAccountAddress;
       this.bscAccountAddress = state.bscAccountAddress;
       this.hecoAccountAddress = state.hecoAccountAddress;
+      this.ethWalletName = state.ethWalletName;
+      this.bscWalletName = state.bscWalletName;
+      this.hecoWalletName = state.hecoWalletName;
       this.getCurrentChain(state.metamaskNetworkId);
       this.getLPBalance();
       this.handleAccountBalance(state);
@@ -223,7 +232,8 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     if (this.checkWalletConnect(token) === false) {
       return;
     }
-    if (this.metaMaskWalletApiService.checkNetwork(token) === false) {
+    const swapApi = this.getEthDapiService();
+    if (swapApi.checkNetwork(token) === false) {
       return;
     }
     const tokenBalance = new BigNumber(token.amount);
@@ -232,19 +242,16 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       this.nzMessage.error('Insufficient balance');
       return;
     }
-    const allowance = await this.metaMaskWalletApiService.getAllowance(
-      token,
-      this.currentAddress
-    );
+    const allowance = await swapApi.getAllowance(token, this.currentAddress);
     if (new BigNumber(allowance).comparedTo(tokenAmount) < 0) {
-      await this.metaMaskWalletApiService.approve(token, this.currentAddress);
+      await swapApi.approve(token, this.currentAddress);
     }
     const amountOut = new BigNumber(this.receiveAmount)
       .shiftedBy(this.LPToken.decimals)
       .dp(0)
       .toFixed();
     const fee = await this.apiService.getFromEthPolyFee(token, token);
-    this.metaMaskWalletApiService
+    swapApi
       .addLiquidity(
         token,
         this.LPToken,
@@ -266,7 +273,8 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     if (this.checkWalletConnect(token) === false) {
       return;
     }
-    if (this.metaMaskWalletApiService.checkNetwork(token) === false) {
+    const swapApi = this.getEthDapiService();
+    if (swapApi.checkNetwork(token) === false) {
       return;
     }
     const lpBalance = new BigNumber(this.LPToken.amount);
@@ -275,22 +283,19 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       this.nzMessage.error('Insufficient balance');
       return;
     }
-    const allowance = await this.metaMaskWalletApiService.getAllowance(
+    const allowance = await swapApi.getAllowance(
       this.LPToken,
       this.currentAddress
     );
     if (new BigNumber(allowance).comparedTo(lpPayAmount) < 0) {
-      await this.metaMaskWalletApiService.approve(
-        this.LPToken,
-        this.currentAddress
-      );
+      await swapApi.approve(this.LPToken, this.currentAddress);
     }
     const amountOut = new BigNumber(this.removeLiquidityInputAmount[index])
       .shiftedBy(token.decimals)
       .dp(0)
       .toFixed();
     const fee = await this.apiService.getFromEthPolyFee(token, token);
-    this.metaMaskWalletApiService
+    swapApi
       .removeLiquidity(
         this.LPToken,
         lpPayAmount.toFixed(),
@@ -342,7 +347,8 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     if (!this.LPToken) {
       return;
     }
-    this.metaMaskWalletApiService.getBalancByHash(this.LPToken).then((res) => {
+    const swapApi = this.getEthDapiService();
+    swapApi.getBalancByHash(this.LPToken).then((res) => {
       this.LPToken.amount = res || '0';
     });
   }
@@ -378,6 +384,23 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       default:
         return;
     }
+  }
+  getEthDapiService(): any {
+    let walletName;
+    switch (this.currentChain) {
+      case 'ETH':
+        walletName = this.ethWalletName;
+        break;
+      case 'BSC':
+        walletName = this.bscWalletName;
+        break;
+      case 'HECO':
+        walletName = this.hecoWalletName;
+        break;
+    }
+    return walletName === 'MetaMask'
+      ? this.metaMaskWalletApiService
+      : this.o3EthWalletApiService;
   }
   //#endregion
 }

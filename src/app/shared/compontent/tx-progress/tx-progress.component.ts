@@ -1,5 +1,10 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { ApiService, CommonService, MetaMaskWalletApiService } from '@core';
+import {
+  ApiService,
+  CommonService,
+  MetaMaskWalletApiService,
+  O3EthWalletApiService,
+} from '@core';
 import {
   SwapStateType,
   SwapTransaction,
@@ -10,6 +15,7 @@ import {
   POLY_TX_PAGES_PREFIX,
   TxProgress,
   TxAtPage,
+  EthWalletName,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -54,6 +60,9 @@ export class TxProgressComponent implements OnInit, OnDestroy {
   swap$: Observable<any>;
   swapUnScribe: Unsubscribable;
   transaction: SwapTransaction;
+  ethWalletName: EthWalletName;
+  bscWalletName: EthWalletName;
+  hecoWalletName: EthWalletName;
 
   requestCrossInterval: Unsubscribable;
   swapProgress = 20;
@@ -63,7 +72,8 @@ export class TxProgressComponent implements OnInit, OnDestroy {
     private apiService: ApiService,
     private nzMessage: NzMessageService,
     private commonService: CommonService,
-    private metaMaskWalletApiService: MetaMaskWalletApiService
+    private metaMaskWalletApiService: MetaMaskWalletApiService,
+    private o3EthWalletApiService: O3EthWalletApiService
   ) {
     this.swap$ = store.select('swap');
   }
@@ -81,6 +91,9 @@ export class TxProgressComponent implements OnInit, OnDestroy {
         break;
     }
     this.swapUnScribe = this.swap$.subscribe((state) => {
+      this.ethWalletName = state.ethWalletName;
+      this.bscWalletName = state.bscWalletName;
+      this.hecoWalletName = state.hecoWalletName;
       switch (this.txAtPage) {
         case 'swap':
           this.hasTransaction = state.transaction ? true : false;
@@ -133,7 +146,8 @@ export class TxProgressComponent implements OnInit, OnDestroy {
           ) {
             this.transaction.isPending = false;
             this.requestCrossInterval.unsubscribe();
-            this.metaMaskWalletApiService.getBalance();
+            const swapApi = this.getEthDapiService();
+            swapApi.getBalance();
           }
           this.store.dispatch({
             type: this.dispatchType,
@@ -156,6 +170,8 @@ export class TxProgressComponent implements OnInit, OnDestroy {
   copy(hash: string): void {
     this.commonService.copy(hash);
   }
+
+  //#region private function
   handleTransacction(stateTx): void {
     // 跨链交易定时查询交易状态
     if (
@@ -190,4 +206,21 @@ export class TxProgressComponent implements OnInit, OnDestroy {
       }
     }
   }
+  getEthDapiService(): any {
+    switch (this.transaction?.fromToken.chain) {
+      case 'ETH':
+        return this.ethWalletName === 'MetaMask'
+          ? this.metaMaskWalletApiService
+          : this.o3EthWalletApiService;
+      case 'BSC':
+        return this.bscWalletName === 'MetaMask'
+          ? this.metaMaskWalletApiService
+          : this.o3EthWalletApiService;
+      case 'HECO':
+        return this.hecoWalletName === 'MetaMask'
+          ? this.metaMaskWalletApiService
+          : this.o3EthWalletApiService;
+    }
+  }
+  //#endregion
 }

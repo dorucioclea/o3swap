@@ -192,7 +192,8 @@ export class BridgeComponent implements OnInit, OnDestroy {
     if (!this.fromAddress || !this.toAddress) {
       this.getFromAndToAddress();
     }
-    if (this.metaMaskWalletApiService.checkNetwork(this.fromToken) === false) {
+    const swapApi = this.getEthDapiService();
+    if (swapApi.checkNetwork(this.fromToken) === false) {
       return;
     }
     if (this.checkBalance() === false) {
@@ -369,7 +370,7 @@ export class BridgeComponent implements OnInit, OnDestroy {
   }
   async checkShowApprove(): Promise<boolean> {
     const swapApi = this.getEthDapiService();
-    const balance = await this.metaMaskWalletApiService.getAllowance(
+    const balance = await swapApi.getAllowance(
       this.fromToken,
       this.fromAddress
     );

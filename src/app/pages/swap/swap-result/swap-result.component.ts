@@ -239,9 +239,10 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     if (!this.fromAddress || !this.toAddress) {
       this.getFromAndToAddress();
     }
+    const swapApi = this.getEthDapiService();
     if (
       this.fromToken.chain !== 'NEO' &&
-      this.metaMaskWalletApiService.checkNetwork(this.fromToken) === false
+      swapApi.checkNetwork(this.fromToken) === false
     ) {
       return;
     }
@@ -627,7 +628,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       return false;
     }
     const swapApi = this.getEthDapiService();
-    const balance = await this.metaMaskWalletApiService.getAllowance(
+    const balance = await swapApi.getAllowance(
       this.fromToken,
       this.fromAddress,
       this.chooseSwapPath.aggregator

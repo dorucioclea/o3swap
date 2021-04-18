@@ -35,7 +35,7 @@ export class ApproveComponent implements OnInit {
       .then((hash) => {
         if (hash) {
           this.approveInterval = interval(5000).subscribe(async () => {
-            const receipt = await this.metaMaskWalletApiService.getReceipt(
+            const receipt = await swapApi.getReceipt(
               hash
             );
             console.log(receipt);
