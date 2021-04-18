@@ -1,5 +1,5 @@
-<nz-modal [nzVisible]="show" (nzOnCancel)="close()" [nzFooter]="null" [nzClosable]="false"
-  [nzTitle]="null" nzClassName="custom-modal connect-wallet-modal">
+<nz-modal [nzVisible]="show" (nzOnCancel)="close()" [nzFooter]="null" [nzClosable]="false" [nzTitle]="null"
+  nzClassName="custom-modal connect-wallet-modal">
   <div class="connect-modal-content modal-content">
     <div class="close-group">
       <img (click)="close()" class="close" src="/assets/images/swap/close.png" alt="">
@@ -21,9 +21,9 @@
         </div>
         <div *ngIf="ethWalletName===wallet.name" class="active">
           <span class="name">{{ wallet.name }}</span>
-          <p class="address">
+          <p class="address" (click)="copy(ethAccountAddress)">
             {{ ethAccountAddress | shortAddress: 10 }}
-            <img class="copy" (click)="copy(ethAccountAddress)" src="/assets/images/swap/copy.png" alt="">
+            <img class="copy" src="/assets/images/swap/copy.png" alt="">
           </p>
         </div>
       </li>
@@ -37,9 +37,9 @@
         </div>
         <div *ngIf="bscWalletName===wallet.name" class="active">
           <span class="name">{{ wallet.name }}</span>
-          <p class="address">
+          <p class="address" (click)="copy(bscAccountAddress)">
             {{ bscAccountAddress | shortAddress: 10 }}
-            <img class="copy" (click)="copy(bscAccountAddress)" src="/assets/images/swap/copy.png" alt="">
+            <img class="copy" src="/assets/images/swap/copy.png" alt="">
           </p>
         </div>
       </li>
@@ -53,9 +53,9 @@
         </div>
         <div *ngIf="hecoWalletName===wallet.name" class="active">
           <span class="name">{{ wallet.name }}</span>
-          <p class="address">
+          <p class="address" (click)="copy(hecoAccountAddress)">
             {{ hecoAccountAddress | shortAddress: 10 }}
-            <img class="copy" (click)="copy(hecoAccountAddress)" src="/assets/images/swap/copy.png" alt="">
+            <img class="copy" src="/assets/images/swap/copy.png" alt="">
           </p>
         </div>
       </li>
@@ -69,9 +69,9 @@
         </div>
         <div *ngIf="neoWalletName===wallet.name" class="active">
           <span class="name">{{ wallet.name }}</span>
-          <p class="address">
+          <p class="address" (click)="copy(neoAccountAddress)">
             {{ neoAccountAddress | shortAddress: 10 }}
-            <img class="copy" (click)="copy(neoAccountAddress)" src="/assets/images/swap/copy.png" alt="">
+            <img class="copy" src="/assets/images/swap/copy.png" alt="">
           </p>
         </div>
       </li>
