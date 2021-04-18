@@ -1186,6 +1186,9 @@ export class O3EthWalletApiService {
       case 'NO_PROVIDER':
         this.swapService.toDownloadWallet(this.myWalletName);
         break;
+      case 4001:
+        this.nzMessage.error('The request was rejected by the user');
+        break;
       case -32602:
         this.nzMessage.error('The parameters were invalid');
         break;
