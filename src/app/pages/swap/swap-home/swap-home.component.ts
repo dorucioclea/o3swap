@@ -113,14 +113,20 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
         toToken: this.toToken,
       },
     });
-    modal.afterClose.subscribe((res) => {
+    modal.afterClose.subscribe((res: Token) => {
       if (res) {
         this.resetSwapData();
-        if (type === 'from') {
+        if (
+          type === 'from' &&
+          (res.assetID !== this.fromToken.assetID ||
+            res.chain !== this.fromToken.chain)
+        ) {
+          this.inputAmount = '';
           this.fromToken = res;
           this.checkInputAmountDecimal();
           this.calcutionInputAmountFiat();
-        } else {
+        }
+        if (type !== 'from' ) {
           this.toToken = res;
         }
       }

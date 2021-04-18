@@ -118,6 +118,25 @@ export class WalletConnectComponent implements OnInit, OnDestroy {
 
   async connectEthWallet(wallet: EthWallet): Promise<void> {
     let connectRes;
+    switch (this.connectChainType) {
+      case 'ETH':
+        if (wallet.name && this.ethWalletName === wallet.name) {
+          return;
+        }
+        break;
+      case 'BSC':
+        if (wallet.name && this.bscWalletName === wallet.name) {
+          return;
+        }
+        break;
+      case 'HECO':
+        if (wallet.name && this.hecoWalletName === wallet.name) {
+          return;
+        }
+        break;
+      default:
+        break;
+    }
     switch (wallet.name) {
       case 'MetaMask':
         connectRes = await this.metaMaskWalletApiService.connect(

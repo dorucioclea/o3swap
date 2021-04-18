@@ -126,23 +126,6 @@ export class MetaMaskWalletApiService {
       this.swapService.toDownloadWallet(this.myWalletName);
       return;
     }
-    switch (chain) {
-      case 'ETH':
-        if (this.ethWalletName) {
-          return;
-        }
-        break;
-      case 'BSC':
-        if (this.bscWalletName) {
-          return;
-        }
-        break;
-      case 'HECO':
-        if (this.hecoWalletName) {
-          return;
-        }
-        break;
-    }
     this.web3 = new Web3((window as any).ethereum);
     this.ethereum = (window as any).ethereum;
     return this.ethereum
