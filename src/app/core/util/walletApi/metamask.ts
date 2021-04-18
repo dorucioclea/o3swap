@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import {
   EthWalletName,
   ETH_CROSS_SWAP_CONTRACT_HASH,
-  METAMASK_CHAIN_ID,
   NETWORK,
   SwapStateType,
   SwapTransaction,
@@ -65,7 +64,7 @@ export class MetaMaskWalletApiService {
   transaction: SwapTransaction;
 
   ethereum;
-  web3;
+  web3: Web3;
   wEthJson;
   swapperJson;
   ethErc20Json;
@@ -196,9 +195,6 @@ export class MetaMaskWalletApiService {
     fromAddress: string
   ): Promise<any> {
     console.log(`\u001b[32m  ✓ eth swap weth \u001b[0m`);
-    if (this.checkNetwork(fromToken) === false) {
-      return;
-    }
     const json = await this.getWEthJson();
     const swapContract = new this.web3.eth.Contract(
       json,
@@ -246,9 +242,6 @@ export class MetaMaskWalletApiService {
     fromAddress: string
   ): Promise<any> {
     console.log(`\u001b[32m  ✓ eth swap weth \u001b[0m`);
-    if (this.checkNetwork(fromToken) === false) {
-      return;
-    }
     const json = await this.getWEthJson();
     const swapContract = new this.web3.eth.Contract(
       json,
@@ -423,9 +416,6 @@ export class MetaMaskWalletApiService {
     txAtPage: TxAtPage
   ): Promise<string> {
     console.log('poly swap');
-    if (this.checkNetwork(fromToken) === false) {
-      return;
-    }
     const json = await this.getSwapperJson();
     const swapContract = new this.web3.eth.Contract(
       json,
@@ -486,6 +476,7 @@ export class MetaMaskWalletApiService {
       })
       .catch((error) => {
         console.log(error);
+        this.handleDapiError(error);
       });
   }
   //#endregion
@@ -502,9 +493,6 @@ export class MetaMaskWalletApiService {
   ): Promise<any> {
     console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
     console.log('swapExactTokensForETH');
-    if (this.checkNetwork(fromToken) === false) {
-      return;
-    }
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
       chooseSwapPath.aggregator
@@ -576,9 +564,6 @@ export class MetaMaskWalletApiService {
   ): Promise<any> {
     console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
     console.log('swapExactETHForTokens');
-    if (this.checkNetwork(fromToken) === false) {
-      return;
-    }
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
       chooseSwapPath.aggregator
@@ -653,9 +638,6 @@ export class MetaMaskWalletApiService {
   ): Promise<any> {
     console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
     console.log('swapExactTokensForTokens');
-    if (this.checkNetwork(fromToken) === false) {
-      return;
-    }
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
       chooseSwapPath.aggregator
@@ -732,9 +714,6 @@ export class MetaMaskWalletApiService {
   ): Promise<string> {
     console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
     console.log('swapExactETHForTokensCrossChain');
-    if (this.checkNetwork(fromToken) === false) {
-      return;
-    }
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
       chooseSwapPath.aggregator
@@ -830,9 +809,6 @@ export class MetaMaskWalletApiService {
   ): Promise<string> {
     console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
     console.log('swapExactTokensForTokensCrossChain');
-    if (this.checkNetwork(fromToken) === false) {
-      return;
-    }
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
       chooseSwapPath.aggregator
@@ -926,9 +902,6 @@ export class MetaMaskWalletApiService {
     receiveAmount: string,
     fee: string
   ): Promise<string> {
-    if (this.checkNetwork(fromToken) === false) {
-      return;
-    }
     console.log('add liquidity');
     const json = await this.getSwapperJson();
     const swapContract = new this.web3.eth.Contract(
@@ -1000,9 +973,6 @@ export class MetaMaskWalletApiService {
     receiveAmount: string,
     fee: string
   ): Promise<string> {
-    if (this.checkNetwork(fromToken) === false) {
-      return;
-    }
     console.log('remove liquidity');
     const json = await this.getSwapperJson();
     const swapContract = new this.web3.eth.Contract(
@@ -1122,9 +1092,6 @@ export class MetaMaskWalletApiService {
       fromToken.symbol === WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
     ) {
       tokenhash = WETH_ASSET_HASH[fromToken.chain].assetID;
-    }
-    if (this.checkNetwork(fromToken) === false) {
-      return;
     }
     let contract = ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain];
     if (aggregator) {

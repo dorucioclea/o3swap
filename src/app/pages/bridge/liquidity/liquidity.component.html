@@ -157,3 +157,6 @@
 </section>
 
 <app-tx-progress txAtPage="liquidity"></app-tx-progress>
+
+<app-wallet-connect [show]="showConnectWallet" [connectChainType]="connectChainType" connectOne="true"
+  (closePage)="showConnectWallet=false"></app-wallet-connect>

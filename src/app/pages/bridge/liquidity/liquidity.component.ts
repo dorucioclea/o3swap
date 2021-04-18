@@ -25,6 +25,7 @@ import {
   USD_TOKENS,
   LP_TOKENS,
   ETH_PUSDT_ASSET,
+  ConnectChainType,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -54,6 +55,8 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   payAmount: string;
   currentAddress: string;
   currentChain: string;
+  showConnectWallet = false;
+  connectChainType: ConnectChainType;
 
   swap$: Observable<any>;
   swapUnScribe: Unsubscribable;
@@ -220,8 +223,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     if (this.checkWalletConnect(token) === false) {
       return;
     }
-    if (token.amount === '--') {
-      this.nzMessage.error(`Please connect the ${token.chain} wallet first`);
+    if (this.metaMaskWalletApiService.checkNetwork(token) === false) {
       return;
     }
     const tokenBalance = new BigNumber(token.amount);
@@ -264,8 +266,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     if (this.checkWalletConnect(token) === false) {
       return;
     }
-    if (this.LPToken.amount === '--') {
-      this.nzMessage.error(`Please connect the ${token.chain} wallet first`);
+    if (this.metaMaskWalletApiService.checkNetwork(token) === false) {
       return;
     }
     const lpBalance = new BigNumber(this.LPToken.amount);
@@ -310,14 +311,20 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   checkWalletConnect(token: Token): boolean {
     if (token.chain === 'ETH' && !this.ethAccountAddress) {
       this.nzMessage.error('Please connect the ETH wallet first');
+      this.showConnectWallet = true;
+      this.connectChainType = 'ETH';
       return false;
     }
     if (token.chain === 'BSC' && !this.bscAccountAddress) {
       this.nzMessage.error('Please connect the BSC wallet first');
+      this.showConnectWallet = true;
+      this.connectChainType = 'BSC';
       return false;
     }
     if (token.chain === 'HECO' && !this.hecoAccountAddress) {
       this.nzMessage.error('Please connect the HECO wallet first');
+      this.showConnectWallet = true;
+      this.connectChainType = 'HECO';
       return false;
     }
     return true;
@@ -336,8 +343,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       return;
     }
     this.metaMaskWalletApiService.getBalancByHash(this.LPToken).then((res) => {
-      console.log(res);
-      this.LPToken.amount = res;
+      this.LPToken.amount = res || '0';
     });
   }
   private handleAccountBalance(state): void {
@@ -349,6 +355,9 @@ export class LiquidityComponent implements OnInit, OnDestroy {
         item.amount = this.tokenBalance[item.chain][item.assetID].amount;
       } else {
         item.amount = '--';
+      }
+      if (item.chain === this.currentChain && item.amount === '--') {
+        item.amount = '0';
       }
     });
   }
