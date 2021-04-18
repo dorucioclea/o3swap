@@ -202,6 +202,15 @@ export class MetaMaskWalletApiService {
     }
     return true;
   }
+  getChain(): string {
+    this.ethereum = (window as any).ethereum;
+    if ((window as any).ethereum) {
+      const chainId = new BigNumber((window as any).ethereum.chainId, 16).toNumber();
+      return METAMASK_CHAIN[chainId];
+    } else {
+      return null;
+    }
+  }
   //#endregion
 
   //#region eth weth swap

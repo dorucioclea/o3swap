@@ -58,6 +58,7 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     this.cloneTokens();
     this.checkShowOnlyNNeo();
     this.checkHideNeo();
+    this.changeChain(this.fromToken.chain);
     this.activeToken = this.isFrom ? this.fromToken : this.toToken;
     this.hideToken = this.isFrom ? this.toToken : this.fromToken;
     this.getTokens();
