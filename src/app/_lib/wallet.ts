@@ -48,12 +48,12 @@ export const NEO_WALLETS: NeoWallet[] = [
 
 export const ETH_WALLETS: EthWallet[] = [
   {
-    name: 'O3',
-    logo: '/assets/images/logo-O3.png',
-  },
-  {
     name: 'MetaMask',
     logo: '/assets/images/logo-MetaMask.png',
+  },
+  {
+    name: 'O3',
+    logo: '/assets/images/logo-O3.png',
   },
 ];
 

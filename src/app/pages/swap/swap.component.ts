@@ -12,7 +12,7 @@ type PageStatus = 'home' | 'result';
 export class SwapComponent implements OnInit {
   pageStatus: PageStatus = 'home';
 
-  fromToken: Token = this.apiService.CHAIN_TOKENS.ETH[0];
+  fromToken: Token;
   toToken: Token;
   inputAmount: string; // 支付的 token 数量
 
@@ -29,6 +29,8 @@ export class SwapComponent implements OnInit {
     if (chain) {
       await this.apiService.getTokens();
       this.fromToken = this.apiService.CHAIN_TOKENS[chain][0];
+    } else {
+      this.fromToken = USD_TOKENS[0];
     }
   }
 

@@ -1,7 +1,4 @@
 <div class="connect">
-  <app-header-connect-item *ngIf="neoWalletName" chain="NEO" [accountAddress]="neoAccountAddress"
-    [walletName]="neoWalletName" (disConnect)="disConnect('NEO')" (changeWallet)="changeWallet('NEO')">
-  </app-header-connect-item>
   <app-header-connect-item *ngIf="ethWalletName" chain="ETH" [accountAddress]="ethAccountAddress"
     [walletName]="ethWalletName" (disConnect)="disConnect('ETH')" (changeWallet)="changeWallet('ETH')">
   </app-header-connect-item>
@@ -10,6 +7,9 @@
   </app-header-connect-item>
   <app-header-connect-item *ngIf="hecoWalletName" chain="HECO" [accountAddress]="hecoAccountAddress"
     [walletName]="hecoWalletName" (disConnect)="disConnect('HECO')" (changeWallet)="changeWallet('HECO')">
+  </app-header-connect-item>
+  <app-header-connect-item *ngIf="neoWalletName" chain="NEO" [accountAddress]="neoAccountAddress"
+    [walletName]="neoWalletName" (disConnect)="disConnect('NEO')" (changeWallet)="changeWallet('NEO')">
   </app-header-connect-item>
   <div class="connect-btn" *ngIf="!neoWalletName||!ethWalletName||!bscWalletName||!hecoWalletName"
     (click)="showConnect()">
