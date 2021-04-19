@@ -22,7 +22,7 @@
       [ngClass]="{active: activeToken?.symbol===tokenItem?.symbol, disable: isDisableToken(tokenItem)}" (click)="selectThisToken(tokenItem)">
       <img [src]="tokenItem?.logo" alt="">
       <span class="name flex-1">{{ tokenItem?.symbol }}</span>
-      <span class="amount">{{ tokenItem?.amount | transNumber }}</span>
+      <app-long-balance class="amount" [balance]="tokenItem?.amount"></app-long-balance>
     </li>
   </ul>
 </section>

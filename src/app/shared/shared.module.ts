@@ -16,6 +16,7 @@ import {
   VaultWalletConnectComponent,
   VaultHeaderConnectComponent,
 } from './compontent/header';
+import { LongBalanceComponent } from './compontent/long-balance/long-balance.component';
 
 import { ShortAddressPipe } from './pipes/short-address.pipe';
 import { TransNumberPipe } from './pipes/trans-number.pipe';
@@ -47,6 +48,7 @@ const COMPONENTS = [
   WalletConnectComponent,
   VaultWalletConnectComponent,
   VaultHeaderConnectComponent,
+  LongBalanceComponent,
 ];
 const PIPES = [ShortAddressPipe, TransNumberPipe, TranslatePipe];
 const DIRECTIVES = [ErrSrcDirective];

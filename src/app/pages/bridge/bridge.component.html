@@ -6,7 +6,7 @@
           <div class="left">
             You pay<span *ngIf="fromToken" class="token-type" [ngClass]="fromToken?.chain">{{ fromToken.type }}</span>
           </div>
-          <div class="right">Balance: {{ (fromToken?.amount | transNumber) || '0' }}
+          <div class="right">Balance: <app-long-balance [balance]="fromToken?.amount"></app-long-balance>
             {{ fromToken?.symbol }}
             <span class="max" (click)="allInputAmount()">Max</span></div>
         </div>

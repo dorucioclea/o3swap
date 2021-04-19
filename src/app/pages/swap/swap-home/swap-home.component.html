@@ -7,7 +7,7 @@
         <span class="left">From</span>
         <p class="right">
           Balance:&nbsp;
-          <span class="from-amount">{{ (fromToken?.amount | transNumber) || '0' }}</span>
+          <app-long-balance class="from-amount" [balance]="fromToken?.amount"></app-long-balance>
           &nbsp;{{ fromToken?.symbol }}
           <span class="all" (click)="allInputAmount()">Max</span>
         </p>
