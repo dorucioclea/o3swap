@@ -46,9 +46,9 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   BRIDGE_SLIPVALUE = BRIDGE_SLIPVALUE;
   swapProgress = 20;
   addLiquidityTokens: Token[] = JSON.parse(JSON.stringify(USD_TOKENS));
-  USDTToken: Token = this.addLiquidityTokens.find((item) => item.symbol === 'USDT');
-  BUSDToken: Token = this.addLiquidityTokens.find((item) => item.symbol === 'BUSD');
-  HUSDToken: Token = this.addLiquidityTokens.find((item) => item.symbol === 'HUSD');
+  USDTToken: Token = this.addLiquidityTokens.find((item) => item.symbol.indexOf('USDT') >= 0);
+  BUSDToken: Token = this.addLiquidityTokens.find((item) => item.symbol.indexOf('BUSD') >= 0);
+  HUSDToken: Token = this.addLiquidityTokens.find((item) => item.symbol.indexOf('HUSD') >= 0);
   liquidityType: LiquidityType = 'add';
   rates = {};
 
