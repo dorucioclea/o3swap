@@ -14,7 +14,7 @@
     <p class="wallet-type">{{ connectChainType }} Wallet</p>
     <ul class="wallets" *ngIf="connectChainType==='ETH'">
       <li class="wallet" *ngFor="let wallet of ETH_WALLETS" (click)="connectEthWallet(wallet)">
-        <div *ngIf="ethWalletName!==wallet.name">
+        <div *ngIf="ethWalletName!==wallet.name" [ngClass]="{disabled: wallet.name=='O3'}">
           <img class="logo" [src]="wallet.logo" alt="">
           <span class="name">Connect {{ wallet.name }}</span>
           <img class="option" src="/assets/images/swap/add.png" alt="">
@@ -30,7 +30,7 @@
     </ul>
     <ul class="wallets" *ngIf="connectChainType==='BSC'">
       <li class="wallet" *ngFor="let wallet of BSC_WALLETS" (click)="connectEthWallet(wallet)">
-        <div *ngIf="bscWalletName!==wallet.name">
+        <div *ngIf="bscWalletName!==wallet.name" [ngClass]="{disabled: wallet.name=='O3'}">
           <img class="logo" [src]="wallet.logo" alt="">
           <span class="name">Connect {{ wallet.name }}</span>
           <img class="option" src="/assets/images/swap/add.png" alt="">
@@ -46,7 +46,7 @@
     </ul>
     <ul class="wallets" *ngIf="connectChainType==='HECO'">
       <li class="wallet" *ngFor="let wallet of HECO_WALLETS" (click)="connectEthWallet(wallet)">
-        <div *ngIf="hecoWalletName!==wallet.name">
+        <div *ngIf="hecoWalletName!==wallet.name" [ngClass]="{disabled: wallet.name=='O3'}">
           <img class="logo" [src]="wallet.logo" alt="">
           <span class="name">Connect {{ wallet.name }}</span>
           <img class="option" src="/assets/images/swap/add.png" alt="">
