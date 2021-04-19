@@ -102,7 +102,7 @@ export class VaultdMetaMaskWalletApiService {
 
   private addListener(): void {
     this.ethereum.on('accountsChanged', (accounts) => {
-      if (this.vaultWallet.walletName === this.myWalletName) {
+      if (this.vaultWallet && this.vaultWallet.walletName === this.myWalletName) {
         const accountAddress = accounts.length > 0 ? accounts[0] : null;
         if (accountAddress !== null) {
           this.vaultWallet.address = accountAddress;

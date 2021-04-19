@@ -4,7 +4,7 @@
   <p class="inquirying">Inquerying...</p>
 </section>
 
-<section class="wrapper result-wrapper" *ngIf="!showInquiry">
+<section class="wrapper result-wrapper" *ngIf="!showInquiry" [ngClass]="{route: chooseSwapPath?.swapPath.length > 4}">
   <p class="title">Swap</p>
   <div class="exchange-amount">
     <p class="left">
