@@ -88,13 +88,9 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const prevFromToken: Token = changes.fromToken.previousValue;
     const currentFromToken: Token = changes.fromToken.currentValue;
     if (
-      prevFromToken &&
       currentFromToken &&
-      (prevFromToken.assetID !== currentFromToken.assetID ||
-        prevFromToken.chain !== currentFromToken.chain) &&
       this.tokenBalance[this.fromToken.chain][this.fromToken.assetID]
     ) {
       this.fromToken.amount = this.tokenBalance[this.fromToken.chain][
