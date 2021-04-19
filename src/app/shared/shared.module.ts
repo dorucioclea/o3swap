@@ -24,6 +24,8 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { LottieModule } from 'ngx-lottie';
+import { ExchartLiquidfillComponent } from './compontent/echarts-liquidfill/echarts-liquidfill.component';
+import { NgxEchartsModule } from 'ngx-echarts';
 
 const COMPONENTS = [
   LoadingComponent,
@@ -34,6 +36,7 @@ const COMPONENTS = [
   TxProgressComponent,
   WalletConnectComponent,
   ApproveComponent,
+  ExchartLiquidfillComponent,
 ];
 const PIPES = [ShortAddressPipe, TransNumberPipe, TranslatePipe];
 const DIRECTIVES = [ErrSrcDirective];
@@ -45,6 +48,7 @@ const THIRD_MODULES = [
   NzModalModule,
   NzProgressModule,
   LottieModule,
+  NgxEchartsModule
 ];
 
 @NgModule({
