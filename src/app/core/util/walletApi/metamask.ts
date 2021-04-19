@@ -1231,15 +1231,17 @@ export class MetaMaskWalletApiService {
           console.log(receipt);
           if (receipt) {
             this.requestTxStatusInterval.unsubscribe();
-            currentTx.isPending = false;
             if (new BigNumber(receipt.status, 16).isZero()) {
+              currentTx.isPending = false;
               currentTx.isFailed = true;
+              this.store.dispatch({ type: dispatchType, data: currentTx });
             } else {
               if (hasCrossChain === false) {
+                currentTx.isPending = false;
                 this.getBalance();
+                this.store.dispatch({ type: dispatchType, data: currentTx });
               }
             }
-            this.store.dispatch({ type: dispatchType, data: currentTx });
           }
         })
         .catch((error) => {

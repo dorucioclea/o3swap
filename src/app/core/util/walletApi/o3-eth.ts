@@ -1157,16 +1157,18 @@ export class O3EthWalletApiService {
           console.log(receipt);
           if (receipt) {
             this.requestTxStatusInterval.unsubscribe();
-            currentTx.isPending = false;
             if (new BigNumber(receipt.status, 16).isZero()) {
+              currentTx.isPending = false;
               currentTx.isFailed = true;
+              this.store.dispatch({ type: dispatchType, data: currentTx });
             } else {
               if (hasCrossChain === false) {
                 this.getBalance(fromChain);
                 this.getBalance(toChain);
+                currentTx.isPending = false;
+                this.store.dispatch({ type: dispatchType, data: currentTx });
               }
             }
-            this.store.dispatch({ type: dispatchType, data: currentTx });
           }
         })
         .catch((error) => {
