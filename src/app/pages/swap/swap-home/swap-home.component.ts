@@ -6,6 +6,7 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  ChangeDetectorRef,
   SimpleChanges,
 } from '@angular/core';
 import { SwapStateType, Token, UPDATE_SETTING } from '@lib';
@@ -63,7 +64,8 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
     public store: Store<State>,
     private nzMessage: NzMessageService,
     private commonService: CommonService,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     this.setting$ = store.select('setting');
     this.swap$ = store.select('swap');
@@ -84,7 +86,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
       this.bscAccountAddress = state.bscAccountAddress;
       this.hecoAccountAddress = state.hecoAccountAddress;
       this.handleTokenAmountBalance(state);
-      // this.changeDetectorRef.detectChanges();
+      this.changeDetectorRef.detectChanges();
     });
   }
 
@@ -207,6 +209,9 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
     this.tokenBalance.ETH = state.ethBalances;
     this.tokenBalance.BSC = state.bscBalances;
     this.tokenBalance.HECO = state.hecoBalances;
+    if (this.fromToken) {
+      this.fromToken.amount = '0';
+    }
     if (
       this.fromToken &&
       this.tokenBalance[this.fromToken.chain][this.fromToken.assetID]

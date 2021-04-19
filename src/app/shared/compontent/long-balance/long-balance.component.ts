@@ -28,6 +28,7 @@ export class LongBalanceComponent implements OnInit, OnChanges {
   ngOnInit(): void {}
 
   handleBalance(): void {
+    this.showTooltip = false;
     if (!this.balance || new BigNumber(this.balance).isNaN()) {
       return;
     }
