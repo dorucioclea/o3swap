@@ -37,6 +37,7 @@
       .header {
         font-size: 14px;
         color: #46b069;
+        font-family: "fontRegular";
         span {
           color: #8aa1a1;
         }
@@ -45,6 +46,7 @@
         display: flex;
         justify-content: space-between;
         margin-top: 20px;
+        font-family: "fontMedium";
       }
       .value {
         display: flex;
@@ -55,6 +57,7 @@
           margin-top: 8px;
           font-size: 12px;
           color: #8aa1a1;
+          font-family: "fontRegular";
         }
       }
     }
@@ -72,12 +75,14 @@
         width: 100%;
         height: 96px;
         .tabs {
+          font-family: "fontMedium";
           padding-top: 15px;
           position: absolute;
           top: 10px;
           width: 50%;
           height: 96px;
           font-size: 18px;
+
           color: #fff;
           text-align: center;
           background: no-repeat;
@@ -107,6 +112,7 @@
         }
       }
       .tab-content {
+        font-family: "fontRegular";
         position: relative;
         border-radius: 20px;
         display: flex;
@@ -230,6 +236,9 @@
             }
           }
         }
+        .btn-liquidity {
+          font-family: "fontMedium";
+        }
         .big-btn {
           display: none;
           margin: 40px auto 0;
@@ -262,11 +271,17 @@
             margin-right: 10px;
           }
         }
-        .item-list:nth-child(1) {
-          height: 30px;
-        }
-        .item-list:not(:first-child) {
-          margin-top: 30px;
+        .item-list{
+          font-family: "fontMedium";
+          .token-name {
+            font-family: "fontDemiBold";
+          }
+          .value {
+            font-family: "fontRegular";
+          }
+          &:not(:first-child)  {
+            margin-top: 30px;
+          }
         }
         .item-list, .progress-container{
           display: flex;
@@ -280,6 +295,7 @@
         }
       }
       &.right .item-list {
+        font-family: "fontRegular";
         color: #8AA1A1;
         justify-content: space-between;
         height: 30px;
