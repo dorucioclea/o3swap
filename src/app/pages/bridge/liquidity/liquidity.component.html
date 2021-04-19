@@ -73,6 +73,9 @@
                   </div>
                 </div>
               </div>
+              <div class="receive">
+                <span>Receive</span><span>{{receiveAmount[i] | transNumber}}</span>
+              </div>
               <div class="btn-primary btn-liquidity" (click)="depost(tokenItem, i)">
                 Deposit
               </div>
@@ -96,6 +99,9 @@
                     <span>Balance</span><span>{{tokenItem.amount | transNumber}}</span>
                   </div>
                 </div>
+              </div>
+              <div class="receive">
+                <span>PayAmount</span><span>{{payAmount[i] | transNumber}}</span>
               </div>
               <div class="btn-primary btn-liquidity" (click)=" withdrawal(tokenItem, i)">
                 Withdrawal
@@ -144,10 +150,10 @@
       </div>
     </div>
     <div class="right">
-      <div class="item-list">
+      <!-- <div class="item-list">
         <span class="name">{{ liquidityType == 'add' ? 'Receive' : 'PayAmount' }}</span>
         <span class="value">{{ (liquidityType == 'add' ? receiveAmount : payAmount) | transNumber }}</span>
-      </div>
+      </div> -->
       <div class="item-list">
         <span class="name">Max slippage</span>
         <span class="value">{{BRIDGE_SLIPVALUE}}%</span>

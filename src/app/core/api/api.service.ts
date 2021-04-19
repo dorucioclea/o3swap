@@ -378,7 +378,7 @@ export class ApiService {
   getSingleOutGivenPoolIn(fromToken: Token, amount: string): Promise<string> {
     const poolPUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
     const usdtToken = USD_TOKENS.find((item) => item.chain === fromToken.chain);
-    amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
+    amount = new BigNumber(amount).shiftedBy(18).toFixed();
     return this.http
       .get(
         `${POLY_HOST}/calcSingleOutGivenPoolIn/${POLY_HOST_ADDRESS}/${poolPUsdtHash}/${amount}`

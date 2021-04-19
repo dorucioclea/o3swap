@@ -53,8 +53,8 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   LPTokens: Token[];
   addLiquidityInputAmount = [];
   removeLiquidityInputAmount = [];
-  receiveAmount: string;
-  payAmount: string;
+  receiveAmount: string[] = [];
+  payAmount: string[] = [];
   currentAddress: string;
   currentChain: string;
   showConnectWallet = false;
@@ -93,6 +93,8 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     this.addLiquidityTokens.forEach((item, index) => {
       this.addLiquidityInputAmount.push('');
       this.removeLiquidityInputAmount.push('');
+      this.receiveAmount.push('--');
+      this.payAmount.push('--');
     });
     this.router.events.subscribe((res: RouterEvent) => {
       if (res instanceof NavigationEnd) {
@@ -183,24 +185,34 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   }
 
   async changeInAmount(token: Token, index: number): Promise<void> {
-    if (!new BigNumber(this.addLiquidityInputAmount[index]).isNaN()) {
-      this.receiveAmount = await this.apiService.getPoolOutGivenSingleIn(
+    const inputAmount = new BigNumber(this.addLiquidityInputAmount[index]);
+    if (!inputAmount.isNaN()) {
+      if (inputAmount.comparedTo(50) === 1) {
+        this.nzMessage.error(`You've exceeded the maximum limit`);
+        return;
+      }
+      this.receiveAmount[index] = await this.apiService.getPoolOutGivenSingleIn(
         token,
         this.addLiquidityInputAmount[index]
       );
     } else {
-      this.receiveAmount = '';
+      this.receiveAmount[index] = '--';
     }
   }
 
   async changeOutAmount(token: Token, index: number): Promise<void> {
-    if (!new BigNumber(this.removeLiquidityInputAmount[index]).isNaN()) {
-      this.payAmount = await this.apiService.getPoolInGivenSingleOut(
+    const inputAmount = new BigNumber(this.removeLiquidityInputAmount[index]);
+    if (!inputAmount.isNaN()) {
+      if (inputAmount.comparedTo(50) === 1) {
+        this.nzMessage.error(`You've exceeded the maximum limit`);
+        return;
+      }
+      this.payAmount[index] = await this.apiService.getPoolInGivenSingleOut(
         token,
         this.removeLiquidityInputAmount[index]
       );
     } else {
-      this.payAmount = '';
+      this.payAmount[index] = '--';
     }
   }
 
@@ -209,7 +221,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       this.addLiquidityInputAmount[index] = this.addLiquidityTokens[
         index
       ].amount;
-      this.receiveAmount = await this.apiService.getPoolOutGivenSingleIn(
+      this.receiveAmount[index] = await this.apiService.getPoolOutGivenSingleIn(
         this.addLiquidityTokens[index],
         this.addLiquidityInputAmount[index]
       );
@@ -218,12 +230,12 @@ export class LiquidityComponent implements OnInit, OnDestroy {
 
   async maxRemoveLiquidityInput(index: number): Promise<void> {
     if (!new BigNumber(this.LPToken.amount).isNaN()) {
-      this.payAmount = this.LPToken.amount;
+      this.payAmount[index] = this.LPToken.amount;
       this.removeLiquidityInputAmount[
         index
       ] = await this.apiService.getSingleOutGivenPoolIn(
         this.addLiquidityTokens[index],
-        this.payAmount
+        this.payAmount[index]
       );
     }
   }
@@ -250,7 +262,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     if (new BigNumber(allowance).comparedTo(tokenAmount) < 0) {
       await swapApi.approve(token, this.currentAddress);
     }
-    const amountOut = new BigNumber(this.receiveAmount)
+    const amountOut = new BigNumber(this.receiveAmount[index])
       .shiftedBy(this.LPToken.decimals)
       .dp(0)
       .toFixed();
@@ -282,7 +294,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       return;
     }
     const lpBalance = new BigNumber(this.LPToken.amount);
-    const lpPayAmount = new BigNumber(this.payAmount);
+    const lpPayAmount = new BigNumber(this.payAmount[index]);
     if (lpPayAmount.isNaN()) {
       this.nzMessage.error('Wrong input');
       return;
