@@ -627,6 +627,17 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       console.log('check show approve return');
       return false;
     }
+    if (
+      WETH_ASSET_HASH[this.fromToken.chain] &&
+      ((this.fromToken.symbol ===
+        WETH_ASSET_HASH[this.fromToken.chain].symbol &&
+        this.toToken.symbol ===
+          WETH_ASSET_HASH[this.toToken.chain].standardTokenSymbol) ||
+        this.fromToken.symbol === WETH_ASSET_HASH[this.fromToken.chain].standardTokenSymbol)
+    ) {
+      console.log('check show approve return');
+      return false;
+    }
     const swapApi = this.getEthDapiService();
     const balance = await swapApi.getAllowance(
       this.fromToken,
