@@ -111,8 +111,7 @@ section.wrapper {
         background: #303030;
       }
       &.disable {
-        -webkit-filter:grayscale(100%);
-        filter: grayscale(100%);
+        opacity: 10%;
         cursor: not-allowed;
       }
       .amount {

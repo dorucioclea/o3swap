@@ -238,6 +238,10 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     }
     const tokenBalance = new BigNumber(token.amount);
     const tokenAmount = new BigNumber(this.addLiquidityInputAmount[index]);
+    if (tokenAmount.isNaN()) {
+      this.nzMessage.error('Wrong input');
+      return;
+    }
     if (tokenBalance.comparedTo(tokenAmount) < 0) {
       this.nzMessage.error('Insufficient balance');
       return;
@@ -279,6 +283,10 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     }
     const lpBalance = new BigNumber(this.LPToken.amount);
     const lpPayAmount = new BigNumber(this.payAmount);
+    if (lpPayAmount.isNaN()) {
+      this.nzMessage.error('Wrong input');
+      return;
+    }
     if (lpBalance.comparedTo(lpPayAmount) < 0) {
       this.nzMessage.error('Insufficient balance');
       return;
