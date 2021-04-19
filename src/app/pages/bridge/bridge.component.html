@@ -78,7 +78,10 @@
         {{ toAddress | shortAddress: 10 }}
       </span>
     </p>
-    <div class="btn-primary big-btn swap-btn" [ngClass]="{active: checkCanInquiry()}" (click)="swap()">Swap</div>
+    <div class="swap-confirm">
+      <button class="btn-primary big-btn swap-btn" [ngClass]="{active: checkCanInquiry()}"
+        (click)="swap()">Swap</button>
+    </div>
   </div>
   <div class="group-container row1 pool">
     <div class="header">Pool</div>
