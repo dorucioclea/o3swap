@@ -7,6 +7,7 @@ export interface Token {
   decimals: number;
   chain: CHAINS;
   type?: string;
+  maxAmount?: string;
 }
 export type CHAINS = 'ALL' | 'NEO' | 'ETH' | 'BSC' | 'HECO';
 

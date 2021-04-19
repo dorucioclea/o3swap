@@ -19,7 +19,7 @@
   </div>
   <ul class="tokens scroll">
     <li class="token" *ngFor="let tokenItem of displayTokens"
-      [ngClass]="{active: activeToken?.symbol===tokenItem?.symbol}" (click)="selectThisToken(tokenItem)">
+      [ngClass]="{active: activeToken?.symbol===tokenItem?.symbol, disable: isDisableToken(tokenItem)}" (click)="selectThisToken(tokenItem)">
       <img [src]="tokenItem?.logo" alt="">
       <span class="name flex-1">{{ tokenItem?.symbol }}</span>
       <span class="amount">{{ tokenItem?.amount | transNumber }}</span>

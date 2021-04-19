@@ -110,6 +110,11 @@ section.wrapper {
       &.active {
         background: #303030;
       }
+      &.disable {
+        -webkit-filter:grayscale(100%);
+        filter: grayscale(100%);
+        cursor: not-allowed;
+      }
       .amount {
         font-family: "fontRegular";
         margin-left: 5px;

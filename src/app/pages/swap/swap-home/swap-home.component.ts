@@ -76,6 +76,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
       this.deadline = state.deadline;
     });
     this.checkInputAmountDecimal();
+    this.checkInputAmountLimit();
     this.calcutionInputAmountFiat();
     this.swapUnScribe = this.swap$.subscribe((state) => {
       this.neoAccountAddress = state.neoAccountAddress;
@@ -132,12 +133,14 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
         this.resetSwapData();
         if (
           type === 'from' &&
-          (res.assetID !== this.fromToken.assetID ||
+          (!this.fromToken ||
+            res.assetID !== this.fromToken.assetID ||
             res.chain !== this.fromToken.chain)
         ) {
           this.inputAmount = '';
           this.fromToken = res;
           this.checkInputAmountDecimal();
+          this.checkInputAmountLimit();
           this.calcutionInputAmountFiat();
         }
         if (type !== 'from') {
@@ -154,6 +157,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
       this.toToken = temp;
       this.resetSwapData();
       this.checkInputAmountDecimal();
+      this.checkInputAmountLimit();
       this.calcutionInputAmountFiat();
     }
   }
@@ -162,6 +166,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
     this.inputAmount = $event.target.value;
     this.resetSwapData();
     this.checkInputAmountDecimal();
+    this.checkInputAmountLimit();
     this.calcutionInputAmountFiat();
   }
 
@@ -221,6 +226,9 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
     if (this.checkInputAmountDecimal() === false) {
       return false;
     }
+    if (this.checkInputAmountLimit() === false) {
+      return false;
+    }
     return true;
   }
   checkWalletConnect(): boolean {
@@ -254,6 +262,21 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
     }
     return true;
   }
+  checkInputAmountLimit(): boolean {
+    try {
+      const inputAmountBig = new BigNumber(this.inputAmount);
+      const maxAmountBig = new BigNumber(this.fromToken.maxAmount);
+      if (inputAmountBig.comparedTo(maxAmountBig) === 1) {
+        this.inputAmountError = `You've exceeded the maximum limit`;
+        return false;
+      } else {
+        return true;
+      }
+    } catch (error) {
+      // console.log(error);
+    }
+  }
+
   checkInputAmountDecimal(): boolean {
     const decimalPart = this.inputAmount && this.inputAmount.split('.')[1];
     if (

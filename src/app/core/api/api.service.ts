@@ -78,6 +78,7 @@ export class ApiService {
           amount: '0',
           decimals: item.decimals,
           chain: item.chain,
+          maxAmount: item.max_amount
         };
       });
     });

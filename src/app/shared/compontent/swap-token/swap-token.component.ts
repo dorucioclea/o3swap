@@ -109,17 +109,25 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     this.allTokens = this.hideNeoToken
       ? this.allTokens.filter((item) => item.symbol !== 'NEO')
       : this.allTokens;
-    if (!this.isFrom && this.fromToken.chain !== chain) {
-      this.allTokens = this.allTokens.filter(
-        (item) =>
-          USD_TOKENS.findIndex((usdItem) => usdItem.assetID === item.assetID) >=
-          0
-      );
-    }
     this.displayTokens = this.allTokens;
   }
 
+  isDisableToken(token: Token): boolean {
+    if (
+      !this.isFrom &&
+      this.fromToken.chain !== this.chain &&
+      USD_TOKENS.findIndex((usdItem) => usdItem.assetID === token.assetID) < 0
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   selectThisToken(token: Token): void {
+    if (this.isDisableToken(token)) {
+      return;
+    }
     this.modal.close(token);
   }
 
