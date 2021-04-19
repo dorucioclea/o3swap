@@ -10,6 +10,8 @@ import { DashboardStakeComponent } from './compontent/dashboard-stake/dashboard-
 import { TxProgressComponent } from './compontent/tx-progress/tx-progress.component';
 import { WalletConnectComponent } from './compontent/wallet-connect/wallet-connect.component';
 import { ApproveComponent } from './compontent/approve/approve.component';
+import { HeaderConnectComponent } from './compontent/header-connect/header-connect.component';
+import { HeaderConnectItemComponent } from './compontent/header-connect-item/header-connect.component';
 
 import { ShortAddressPipe } from './pipes/short-address.pipe';
 import { TransNumberPipe } from './pipes/trans-number.pipe';
@@ -37,6 +39,8 @@ const COMPONENTS = [
   WalletConnectComponent,
   ApproveComponent,
   ExchartLiquidfillComponent,
+  HeaderConnectComponent,
+  HeaderConnectItemComponent,
 ];
 const PIPES = [ShortAddressPipe, TransNumberPipe, TranslatePipe];
 const DIRECTIVES = [ErrSrcDirective];
