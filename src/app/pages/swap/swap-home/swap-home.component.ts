@@ -2,9 +2,11 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   Output,
+  SimpleChanges,
 } from '@angular/core';
 import { SwapStateType, Token, UPDATE_SETTING } from '@lib';
 import BigNumber from 'bignumber.js';
@@ -25,7 +27,7 @@ interface State {
   templateUrl: './swap-home.component.html',
   styleUrls: ['../common.scss', './swap-home.component.scss'],
 })
-export class SwapHomeComponent implements OnInit, OnDestroy {
+export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
   @Input() fromToken: Token;
   @Input() toToken: Token;
   @Input() chooseSwapPath;
@@ -85,6 +87,22 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
     });
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    const prevFromToken: Token = changes.fromToken.previousValue;
+    const currentFromToken: Token = changes.fromToken.currentValue;
+    if (
+      prevFromToken &&
+      currentFromToken &&
+      (prevFromToken.assetID !== currentFromToken.assetID ||
+        prevFromToken.chain !== currentFromToken.chain) &&
+      this.tokenBalance[this.fromToken.chain][this.fromToken.assetID]
+    ) {
+      this.fromToken.amount = this.tokenBalance[this.fromToken.chain][
+        this.fromToken.assetID
+      ].amount;
+    }
+  }
+
   ngOnDestroy(): void {
     if (this.swapUnScribe) {
       this.swapUnScribe.unsubscribe();
@@ -126,7 +144,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy {
           this.checkInputAmountDecimal();
           this.calcutionInputAmountFiat();
         }
-        if (type !== 'from' ) {
+        if (type !== 'from') {
           this.toToken = res;
         }
       }
