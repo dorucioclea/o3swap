@@ -12,6 +12,8 @@ import { WalletConnectComponent } from './compontent/wallet-connect/wallet-conne
 import { ApproveComponent } from './compontent/approve/approve.component';
 import { HeaderConnectComponent } from './compontent/header-connect/header-connect.component';
 import { HeaderConnectItemComponent } from './compontent/header-connect-item/header-connect.component';
+import { VaultHeaderConnectComponent } from './compontent/vault-header-connect/vault-header-connect.component';
+import { VaultWalletConnectComponent } from './compontent/vault-wallet-connect/vault-wallet-connect.component';
 
 import { ShortAddressPipe } from './pipes/short-address.pipe';
 import { TransNumberPipe } from './pipes/trans-number.pipe';
@@ -41,6 +43,8 @@ const COMPONENTS = [
   ExchartLiquidfillComponent,
   HeaderConnectComponent,
   HeaderConnectItemComponent,
+  VaultHeaderConnectComponent,
+  VaultWalletConnectComponent,
 ];
 const PIPES = [ShortAddressPipe, TransNumberPipe, TranslatePipe];
 const DIRECTIVES = [ErrSrcDirective];
@@ -52,7 +56,7 @@ const THIRD_MODULES = [
   NzModalModule,
   NzProgressModule,
   LottieModule,
-  NgxEchartsModule
+  NgxEchartsModule,
 ];
 
 @NgModule({

@@ -102,6 +102,9 @@ export class WalletConnectComponent implements OnInit, OnDestroy {
 
   //#region connect wallet modal
   async connectNeoWallet(wallet: NeoWallet): Promise<void> {
+    if (this.neoWalletName === wallet.name) {
+      return;
+    }
     let connectRes;
     switch (wallet.name) {
       case 'NeoLine':
@@ -120,17 +123,17 @@ export class WalletConnectComponent implements OnInit, OnDestroy {
     let connectRes;
     switch (this.connectChainType) {
       case 'ETH':
-        if (wallet.name && this.ethWalletName === wallet.name) {
+        if (this.ethWalletName === wallet.name) {
           return;
         }
         break;
       case 'BSC':
-        if (wallet.name && this.bscWalletName === wallet.name) {
+        if (this.bscWalletName === wallet.name) {
           return;
         }
         break;
       case 'HECO':
-        if (wallet.name && this.hecoWalletName === wallet.name) {
+        if (this.hecoWalletName === wallet.name) {
           return;
         }
         break;

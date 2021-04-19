@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import {
   NeoWalletName,
   EthWalletName,
@@ -18,7 +18,7 @@ import {
 } from '@lib';
 import { CommonService } from '@core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, Unsubscribable } from 'rxjs';
 
 interface State {
   swap: SwapStateType;
@@ -29,11 +29,12 @@ interface State {
   templateUrl: './header-connect.component.html',
   styleUrls: ['./header-connect.component.scss'],
 })
-export class HeaderConnectComponent implements OnInit {
+export class HeaderConnectComponent implements OnInit, OnDestroy {
   connectChainType: ConnectChainType = 'ETH';
   showConnectModal = false; // connect wallet modal
 
   swap$: Observable<any>;
+  swapUnScribe: Unsubscribable;
   neoAccountAddress: string;
   ethAccountAddress: string;
   bscAccountAddress: string;
@@ -52,7 +53,7 @@ export class HeaderConnectComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.swap$.subscribe((state) => {
+    this.swapUnScribe = this.swap$.subscribe((state) => {
       this.neoAccountAddress = state.neoAccountAddress;
       this.ethAccountAddress = state.ethAccountAddress;
       this.bscAccountAddress = state.bscAccountAddress;
@@ -63,6 +64,12 @@ export class HeaderConnectComponent implements OnInit {
       this.hecoWalletName = state.hecoWalletName;
       this.changeDetectorRef.detectChanges();
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.swapUnScribe) {
+      this.swapUnScribe.unsubscribe();
+    }
   }
 
   showConnect(): void {

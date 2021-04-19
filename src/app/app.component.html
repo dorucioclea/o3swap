@@ -68,7 +68,8 @@
           <a href="https://docs.o3swap.com/" target="_blank">Doc</a>
         </li>
       </ul>
-      <app-header-connect *ngIf="isHome===false"></app-header-connect>
+      <app-header-connect *ngIf="isHome===false && currentPage!=='/vault'"></app-header-connect>
+      <app-vault-header-connect *ngIf="isHome===false && currentPage==='/vault'"></app-vault-header-connect>
     </div>
   </header>
   <router-outlet></router-outlet>

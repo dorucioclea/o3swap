@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterEvent, NavigationEnd } from '@angular/router';
-import { NeolineWalletApiService, MetaMaskWalletApiService } from '@core';
+import {
+  NeolineWalletApiService,
+  MetaMaskWalletApiService,
+  VaultdMetaMaskWalletApiService,
+} from '@core';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +18,8 @@ export class AppComponent implements OnInit {
   constructor(
     private router: Router,
     private metaMaskWalletApiService: MetaMaskWalletApiService,
-    private neolineWalletApiService: NeolineWalletApiService
+    private neolineWalletApiService: NeolineWalletApiService,
+    private vaultdMetaMaskWalletApiService: VaultdMetaMaskWalletApiService
   ) {
     this.router.events.subscribe((res: RouterEvent) => {
       if (res instanceof NavigationEnd) {
@@ -28,6 +33,7 @@ export class AppComponent implements OnInit {
     if (location.pathname !== '/' && location.pathname !== '/home') {
       this.neolineWalletApiService.init();
       this.metaMaskWalletApiService.init();
+      this.vaultdMetaMaskWalletApiService.init();
     }
   }
 
