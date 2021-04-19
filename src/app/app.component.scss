@@ -57,7 +57,11 @@ header {
       &.active a,
       &:hover a {
         color: #46b069;
-        background-image: -webkit-linear-gradient(-30deg, #46b069 0%, #00af92 99.6337890625%);
+        background-image: -webkit-linear-gradient(
+          -30deg,
+          #46b069 0%,
+          #00af92 99.6337890625%
+        );
         background-clip: text;
         -webkit-text-fill-color: transparent;
       }
@@ -101,12 +105,18 @@ header {
         flex: 1;
         color: #fff;
         &:hover {
+          font-family: "fontBold";
           color: #46b069;
         }
       }
       &.active {
-        background: linear-gradient(90deg, rgba(18, 18, 18, 0.2), rgba(70, 176, 105, 0.2));
+        background: linear-gradient(
+          90deg,
+          rgba(18, 18, 18, 0.2),
+          rgba(70, 176, 105, 0.2)
+        );
         a {
+          font-family: "fontBold";
           color: #46b069;
         }
       }

@@ -14,6 +14,7 @@ import {
   SOURCE_TOKEN_SYMBOL,
   ConnectChainType,
   ETH_SOURCE_ASSET_HASH,
+  CONST_BRIDGE_TOKENS,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -31,6 +32,7 @@ interface State {
   styleUrls: ['./bridge.component.scss'],
 })
 export class BridgeComponent implements OnInit, OnDestroy {
+  CONST_BRIDGE_TOKENS = CONST_BRIDGE_TOKENS;
   SOURCE_TOKEN_SYMBOL = SOURCE_TOKEN_SYMBOL;
   BRIDGE_SLIPVALUE = BRIDGE_SLIPVALUE;
   USD_TOKENS = USD_TOKENS;
@@ -455,7 +457,7 @@ export class BridgeComponent implements OnInit, OnDestroy {
     if (this.inputAmount && this.receiveAmount) {
       this.bridgeRate = new BigNumber(this.receiveAmount)
         .dividedBy(new BigNumber(this.inputAmount))
-        .dp(8)
+        .dp(4)
         .toFixed();
     } else {
       this.bridgeRate = '';

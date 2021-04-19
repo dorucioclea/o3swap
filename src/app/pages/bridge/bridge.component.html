@@ -1,5 +1,5 @@
 <section class="page-container">
-  <div class="group-container row1">
+  <div class="group-container row1 swap">
     <div class="token-select-container">
       <div class="left-container">
         <div class="header">
@@ -19,6 +19,11 @@
             <ul *ngIf="showFromTokenList" class="dropdown" (mouseenter)="showTokenListModal('from')"
               (mouseleave)="hideTokenListModal('from')">
               <li *ngFor="let token of USD_TOKENS" (click)="selectToken('from', token)">
+                <img [src]="token.logo" alt="">
+                <span>{{ token.symbol }}</span>
+                <span class="token-type" [ngClass]="token.chain">{{ token.type }}</span>
+              </li>
+              <li *ngFor="let token of CONST_BRIDGE_TOKENS" class="disabled">
                 <img [src]="token.logo" alt="">
                 <span>{{ token.symbol }}</span>
                 <span class="token-type" [ngClass]="token.chain">{{ token.type }}</span>
@@ -52,6 +57,11 @@
                 <span>{{ token.symbol }}</span>
                 <span class="token-type" [ngClass]="token.chain">{{ token.type }}</span>
               </li>
+              <li *ngFor="let token of CONST_BRIDGE_TOKENS" class="disabled">
+                <img [src]="token.logo" alt="">
+                <span>{{ token.symbol }}</span>
+                <span class="token-type" [ngClass]="token.chain">{{ token.type }}</span>
+              </li>
             </ul>
           </div>
           <div class="token-amount">{{ (receiveAmount | transNumber) || 0 }}</div>
@@ -60,7 +70,7 @@
       </div>
     </div>
     <p class="detail">Exchange Rate {{ toToken?.symbol || '--' }}/{{ fromToken?.symbol || '--' }} (including fees):
-      <span>{{ bridgeRate }}</span></p>
+      <span *ngIf="bridgeRate">1 : {{ bridgeRate }}</span></p>
     <p class="detail">Poly Fee: <span *ngIf="polyFee">{{ polyFee }} {{ SOURCE_TOKEN_SYMBOL[fromToken.chain] }}</span>
     </p>
     <p class="detail">Max slippage: <span>{{ BRIDGE_SLIPVALUE }}%</span></p>
@@ -83,8 +93,8 @@
         (click)="swap()">Swap</button>
     </div>
   </div>
-  <div class="group-container row1 pool">
-    <div class="header">Pool</div>
+  <div class="group-container row2 pool">
+    <div class="header">Cross-chain Pool</div>
     <div class="group-item">
       <div class="pool-detail">
         <div class="list">
@@ -101,8 +111,10 @@
             <div class="name">APR</div>
           </div>
           <div class="item">
-            <div class="value">0.18%</div>
-            <div class="name">DAILY</div>
+            <div class="value">
+              <img src="" alt="" class="token-logo">
+            </div>
+            <div class="name">REWARDS</div>
           </div>
         </div>
         <div class="right">
@@ -117,9 +129,16 @@
       <div class="token-detail">
         <img src="" alt="" class="token-logo">
         <div class="token-name">
-          pUSDT <span>(pUSDT+pbUSDT+phUSDT)</span>
+          O3Pool <span>(USDT+BUSD+HUSD)</span>
         </div>
       </div>
+    </div>
+  </div>
+  <div class="group-container row2 statistical-data">
+    <div class="header">Total Pool Deposits & Daily Volume</div>
+    <div class="desc">
+      <p>Total pool deposit: $--</p>
+      <p>Daily volume: $--</p>
     </div>
   </div>
 </section>

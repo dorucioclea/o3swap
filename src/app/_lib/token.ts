@@ -89,6 +89,29 @@ export const NNEO_TOKEN: Token = {
 };
 //#endregion
 
+export const CONST_BRIDGE_TOKENS: Token[] = [
+  {
+    symbol: 'WBTC',
+    decimals: 8,
+    assetID: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+    chain: 'ETH',
+    type: 'ERC-20',
+    amount: '0',
+    logo:
+      'https://img.o3.network/logo/eth/0x2260fac5e5542a773aa44fbcfedf7c193bc2c599.png',
+  },
+  {
+    symbol: 'ETH',
+    decimals: 18,
+    assetID: '0x0000000000000000000000000000000000000000',
+    chain: 'ETH',
+    type: 'ERC-20',
+    amount: '0',
+    logo:
+      'https://img.o3.network/logo/eth/0x0000000000000000000000000000000000000000.png',
+  },
+];
+
 //#region liquidity page
 export const USD_TOKENS: Token[] = [
   {
