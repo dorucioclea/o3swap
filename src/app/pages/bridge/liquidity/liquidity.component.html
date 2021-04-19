@@ -118,36 +118,64 @@
   </div>
   <div class="group-container blp-detail row2">
     <div class="left">
-      <div class="item-list">
-        pUSDT+pbUSDT+phUSDT: <span class="value">&nbsp;&nbsp;{{ pusdtBalance.ALL | transNumber }}</span>
-      </div>
-      <div class="item-list">
-        <div>pUSDT: <span class="value">{{ pusdtBalance.ETH.value | transNumber }}</span>
-          ({{ pusdtBalance.ETH.percentage }}%)</div>
-      </div>
-      <div class="progress-container">
-        <nz-progress class="progress" [nzPercent]="pusdtBalance.ETH.percentage" [nzShowInfo]="false" nzStrokeWidth="6"
-          nzStrokeColor="#46B069">
-        </nz-progress>
-      </div>
-      <div class="item-list">
-        <div>pbUSDT: <span class="value">{{ pusdtBalance.BSC.value | transNumber }}</span>
-          ({{ pusdtBalance.BSC.percentage }}%)</div>
-      </div>
-      <div class="progress-container">
-        <nz-progress class="progress" [nzPercent]="pusdtBalance.BSC.percentage" [nzShowInfo]="false" nzStrokeWidth="6"
-          nzStrokeColor="#46B069">
-        </nz-progress>
-      </div>
-      <div class="item-list">
-        <div>phUSDT: <span class="value">{{ pusdtBalance.HECO.value | transNumber }}</span>
-          ({{ pusdtBalance.HECO.percentage }}%)</div>
-      </div>
-      <div class="progress-container">
-        <nz-progress class="progress" [nzPercent]="pusdtBalance.HECO.percentage" [nzShowInfo]="false" nzStrokeWidth="6"
-          nzStrokeColor="#46B069">
-        </nz-progress>
-      </div>
+      <ul>
+        <li class="item-list">
+          <div >
+            USDT+BUSD+HUSD: <span class="value">&nbsp;&nbsp;{{ pusdtBalance.ALL | transNumber }}</span>
+          </div>
+        </li>
+        <li class="item-list">
+          <div class="item-logo-box">
+            <img [src]="USDTToken.logo" alt="" class="token-logo">
+            <img class="token-type" src="/assets/images/bridge-liquidity/erc20.png" alt="">
+          </div>
+          <div>
+            <div >
+              <div>USDT: <span class="value">{{ pusdtBalance.ETH.value | transNumber }}</span>
+                ({{ pusdtBalance.ETH.percentage }}%)</div>
+            </div>
+            <div class="progress-container">
+              <nz-progress class="progress" [nzPercent]="pusdtBalance.ETH.percentage" [nzShowInfo]="false" nzStrokeWidth="6"
+                nzStrokeColor="#46B069">
+              </nz-progress>
+            </div>
+          </div>
+        </li>
+        <li class="item-list">
+          <div class="item-logo-box">
+            <img [src]="BUSDToken.logo" alt="" class="token-logo">
+            <img class="token-type" src="/assets/images/bridge-liquidity/bep20.png" alt="">
+          </div>
+          <div>
+            <div>
+              <div>BUSD: <span class="value">{{ pusdtBalance.BSC.value | transNumber }}</span>
+                ({{ pusdtBalance.BSC.percentage }}%)</div>
+            </div>
+            <div class="progress-container">
+              <nz-progress class="progress" [nzPercent]="pusdtBalance.BSC.percentage" [nzShowInfo]="false" nzStrokeWidth="6"
+                nzStrokeColor="#46B069">
+              </nz-progress>
+            </div>
+          </div>
+        </li>
+        <li class="item-list">
+          <div class="item-logo-box">
+            <img [src]="HUSDToken.logo" alt="" class="token-logo">
+            <img class="token-type" src="/assets/images/bridge-liquidity/hep20.png" alt="">
+          </div>
+          <div>
+            <div>
+              <div>HUSD: <span class="value">{{ pusdtBalance.HECO.value | transNumber }}</span>
+                ({{ pusdtBalance.HECO.percentage }}%)</div>
+            </div>
+            <div class="progress-container">
+              <nz-progress class="progress" [nzPercent]="pusdtBalance.HECO.percentage" [nzShowInfo]="false" nzStrokeWidth="6"
+                nzStrokeColor="#46B069">
+              </nz-progress>
+            </div>
+          </div>
+        </li>
+      </ul>
     </div>
     <div class="right">
       <!-- <div class="item-list">

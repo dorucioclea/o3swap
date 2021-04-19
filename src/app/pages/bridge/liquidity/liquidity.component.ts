@@ -46,6 +46,9 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   BRIDGE_SLIPVALUE = BRIDGE_SLIPVALUE;
   swapProgress = 20;
   addLiquidityTokens: Token[] = JSON.parse(JSON.stringify(USD_TOKENS));
+  USDTToken: Token = this.addLiquidityTokens.find((item) => item.symbol === 'USDT');
+  BUSDToken: Token = this.addLiquidityTokens.find((item) => item.symbol === 'BUSD');
+  HUSDToken: Token = this.addLiquidityTokens.find((item) => item.symbol === 'HUSD');
   liquidityType: LiquidityType = 'add';
   rates = {};
 
@@ -229,7 +232,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   }
 
   async maxRemoveLiquidityInput(index: number): Promise<void> {
-    if (!new BigNumber(this.LPToken.amount).isNaN()) {
+    if (!new BigNumber(this.LPToken.amount).isNaN() && !new BigNumber(this.LPToken.amount).isZero()) {
       this.payAmount[index] = this.LPToken.amount;
       this.removeLiquidityInputAmount[
         index

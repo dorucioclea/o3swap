@@ -247,11 +247,26 @@
       padding: 30px 50px;
       flex: 1;
       &.left {
+        .item-logo-box {
+          position: relative;
+          .token-type {
+            width: 34px;
+            position: absolute;
+            left: 0px;
+            bottom: 0px;
+          }
+          .token-logo {
+            width: 34px;
+            height: 34px;
+            vertical-align: middle;
+            margin-right: 10px;
+          }
+        }
         .item-list:nth-child(1) {
           height: 30px;
         }
         .item-list:not(:first-child) {
-          margin-top: 10px;
+          margin-top: 30px;
         }
         .item-list, .progress-container{
           display: flex;
@@ -279,6 +294,10 @@
           color: #ffffff;
           justify-content: space-between;
         }
+      }
+      > div {
+        display: inline-block;
+        vertical-align: middle;
       }
     }
   }
