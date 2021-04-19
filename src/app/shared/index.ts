@@ -3,3 +3,11 @@ export { SwapExchangeComponent } from './compontent/swap-exchange/swap-exchange.
 export { SwapSettingComponent } from './compontent/swap-setting/swap-setting.component';
 export { DashboardStakeComponent } from './compontent/dashboard-stake/dashboard-stake.component';
 export { ApproveComponent } from './compontent/approve/approve.component';
+
+export {
+  HeaderConnectComponent,
+  HeaderConnectItemComponent,
+  WalletConnectComponent,
+  VaultHeaderConnectComponent,
+  VaultWalletConnectComponent,
+} from './compontent/header';
