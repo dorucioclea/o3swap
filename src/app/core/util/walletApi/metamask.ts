@@ -200,7 +200,7 @@ export class MetaMaskWalletApiService {
   }
   //#endregion
 
-  //#region eth weth swap
+  //#region ETH<=>WETH HT<=>WHT BNB<=>WBNB swap
   async depositWEth(
     fromToken: Token, // eth
     toToken: Token, // weth
@@ -494,7 +494,7 @@ export class MetaMaskWalletApiService {
   }
   //#endregion
 
-  //#region eth uni
+  //#region aggregator contract swap
   async swapExactTokensForETH(
     fromToken: Token,
     toToken: Token,
