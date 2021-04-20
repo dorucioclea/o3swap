@@ -16,6 +16,7 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 export class AppComponent implements OnInit {
   currentPage = this.router.url;
   isHome = true;
+  showRisk = true;
 
   constructor(
     private router: Router,
