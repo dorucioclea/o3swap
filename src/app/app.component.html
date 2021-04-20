@@ -11,21 +11,12 @@
         <li [ngClass]="{active: currentPage==='/swap'}">
           <a routerLink="/swap">Swap</a>
         </li>
-        <li class="add-width" [ngClass]="{active: currentPage.startsWith('/hub')}">
+        <li [ngClass]="{active: currentPage.startsWith('/hub')}">
           <a routerLink="/hub">Hub</a>
         </li>
-        <li class="add-width" [ngClass]="{active: currentPage==='/vault'}">
-          <a routerLink="/vault">Vault</a>
-        </li>
-        <!-- <li>
-          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Swap</a>
-        </li>
-        <li>
-          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Hub</a>
-        </li>
-        <li>
+        <li [ngClass]="{active: currentPage==='/vault'}">
           <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Vault</a>
-        </li> -->
+        </li>
         <li class="add-width">
           <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Dashboard</a>
         </li>
