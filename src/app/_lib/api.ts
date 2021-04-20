@@ -13,7 +13,7 @@ export const UTXO_HOST =
 
 export const POLY_HOST =
   NETWORK === 'MainNet'
-    ? 'http://124.156.209.180:9999'
+    ? 'https://swap.poly.network'
     : 'http://138.91.6.226:9999';
 
 export const INQUIRY_HOST =

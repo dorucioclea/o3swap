@@ -277,7 +277,7 @@ export class MetaMaskWalletApiService {
       WETH_ASSET_HASH[fromToken.chain].assetID
     );
     const data = swapContract.methods
-      .withdraw(new BigNumber(inputAmount).shiftedBy(fromToken.decimals))
+      .withdraw(new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed())
       .encodeABI();
     return this.ethereum
       .request({
@@ -454,7 +454,7 @@ export class MetaMaskWalletApiService {
       toChainId: SWAP_CONTRACT_CHAIN_ID[toToken.chain],
       toAssetHash: this.commonService.add0xHash(toToken.assetID),
       toAddress,
-      amount: new BigNumber(inputAmount).shiftedBy(fromToken.decimals),
+      amount: new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed(),
       minOutAmount: this.swapService.getMinAmountOut(receiveAmount, slipValue),
       fee: bigNumberPolyFee,
       id: 1,
@@ -529,7 +529,7 @@ export class MetaMaskWalletApiService {
     const receiveAmount =
       chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
     const params = {
-      amountIn: new BigNumber(inputAmount).shiftedBy(fromToken.decimals),
+      amountIn: new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed(),
       swapAmountOutMin: this.swapService.getMinAmountOut(
         receiveAmount,
         O3_AGGREGATOR_SLIPVALUE
@@ -947,7 +947,7 @@ export class MetaMaskWalletApiService {
       toPoolId: 1,
       toChainId,
       toAddress: address,
-      amount: new BigNumber(inputAmount).shiftedBy(fromToken.decimals),
+      amount: new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed(),
       minOutAmount: this.swapService.getMinAmountOut(
         receiveAmount,
         BRIDGE_SLIPVALUE
@@ -1020,7 +1020,7 @@ export class MetaMaskWalletApiService {
       toChainId,
       toAssetHash: this.commonService.add0xHash(usdtToken.assetID),
       toAddress: address,
-      amount: new BigNumber(inputAmount).shiftedBy(fromToken.decimals),
+      amount: new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed(),
       minOutAmount: this.swapService.getMinAmountOut(
         receiveAmount,
         BRIDGE_SLIPVALUE
