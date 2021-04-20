@@ -618,13 +618,13 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     }
   }
   async checkShowApprove(): Promise<boolean> {
-    console.log('check show approve');
+    this.commonService.log('check show approve');
     if (!this.chooseSwapPath || !this.chooseSwapPath.aggregator) {
-      console.log('check show approve return');
+      this.commonService.log('check show approve return');
       return false;
     }
     if (this.fromToken.chain === 'NEO' || this.toToken.chain === 'NEO') {
-      console.log('check show approve return');
+      this.commonService.log('check show approve return');
       return false;
     }
     if (
@@ -635,7 +635,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
           WETH_ASSET_HASH[this.toToken.chain].standardTokenSymbol) ||
         this.fromToken.symbol === WETH_ASSET_HASH[this.fromToken.chain].standardTokenSymbol)
     ) {
-      console.log('check show approve return');
+      this.commonService.log('check show approve return');
       return false;
     }
     const swapApi = this.getEthDapiService();

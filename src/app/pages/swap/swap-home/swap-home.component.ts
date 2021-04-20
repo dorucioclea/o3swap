@@ -279,7 +279,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
         return true;
       }
     } catch (error) {
-      // console.log(error);
+      // this.commonService.log(error);
     }
   }
 
@@ -317,7 +317,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
       this.inputAmountFiat = '';
       return;
     }
-    console.log(this.rates);
+    this.commonService.log(this.rates);
     const price = this.commonService.getAssetRate(this.rates, this.fromToken);
     if (this.inputAmount && price) {
       this.inputAmountFiat = new BigNumber(this.inputAmount)

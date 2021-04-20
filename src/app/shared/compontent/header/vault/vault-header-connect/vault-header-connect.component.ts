@@ -44,7 +44,7 @@ export class VaultHeaderConnectComponent implements OnInit, OnDestroy {
   }
 
   showConnect(): void {
-    console.log('---');
+    this.commonService.log('---');
     this.showConnectModal = true;
   }
 

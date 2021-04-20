@@ -143,7 +143,7 @@ export class O3EthWalletApiService {
 
   //#region balance
   async getBalance(chain: CHAINS): Promise<boolean> {
-    console.log('getBalance-----------');
+    this.commonService.log('getBalance-----------');
     let dispatchBalanceType;
     let tempTokenBalance: Token[];
     return new Promise(async (resolve) => {
@@ -175,7 +175,7 @@ export class O3EthWalletApiService {
           result[item.assetID].amount = tempAmount;
         }
       }
-      console.log(result);
+      this.commonService.log(result);
       this.store.dispatch({
         type: dispatchBalanceType,
         data: result,
@@ -213,7 +213,7 @@ export class O3EthWalletApiService {
           }
         })
         .catch((error) => {
-          console.log(error);
+          this.commonService.log(error);
         });
     } else {
       return o3dapi.ETH.request({
@@ -233,7 +233,7 @@ export class O3EthWalletApiService {
           }
         })
         .catch((error) => {
-          console.log(error);
+          this.commonService.log(error);
         });
     }
   }
@@ -246,7 +246,7 @@ export class O3EthWalletApiService {
     inputAmount: string,
     fromAddress: string
   ): Promise<any> {
-    console.log(`\u001b[32m  ✓ eth swap weth \u001b[0m`);
+    this.commonService.log(`\u001b[32m  ✓ eth swap weth \u001b[0m`);
     const json = await this.getWEthJson();
     const swapContract = new this.web3.eth.Contract(
       json,
@@ -269,7 +269,7 @@ export class O3EthWalletApiService {
     })
       .then((response) => {
         const hash = response.result;
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           toToken,
@@ -282,7 +282,7 @@ export class O3EthWalletApiService {
         return hash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.handleDapiError(error);
       });
   }
@@ -293,7 +293,7 @@ export class O3EthWalletApiService {
     inputAmount: string,
     fromAddress: string
   ): Promise<any> {
-    console.log(`\u001b[32m  ✓ eth swap weth \u001b[0m`);
+    this.commonService.log(`\u001b[32m  ✓ eth swap weth \u001b[0m`);
     const json = await this.getWEthJson();
     const swapContract = new this.web3.eth.Contract(
       json,
@@ -314,7 +314,7 @@ export class O3EthWalletApiService {
     })
       .then((response) => {
         const hash = response.result;
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           toToken,
@@ -327,7 +327,7 @@ export class O3EthWalletApiService {
         return hash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.handleDapiError(error);
       });
   }
@@ -345,7 +345,7 @@ export class O3EthWalletApiService {
     polyFee: string,
     txAtPage: TxAtPage
   ): Promise<string> {
-    console.log('poly swap');
+    this.commonService.log('poly swap');
     const json = await this.getSwapperJson();
     const swapContract = new this.web3.eth.Contract(
       json,
@@ -366,8 +366,8 @@ export class O3EthWalletApiService {
       fee: bigNumberPolyFee,
       id: 1,
     };
-    console.log(params);
-    console.log(`value: ${bigNumberPolyFee}`);
+    this.commonService.log(params);
+    this.commonService.log(`value: ${bigNumberPolyFee}`);
     const data = swapContract.methods
       .swap(
         params.fromAssetHash,
@@ -405,7 +405,7 @@ export class O3EthWalletApiService {
         return hash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.handleDapiError(error);
       });
   }
@@ -421,8 +421,8 @@ export class O3EthWalletApiService {
     toAddress: string,
     deadline: number
   ): Promise<any> {
-    console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
-    console.log('swapExactTokensForETH');
+    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log('swapExactTokensForETH');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
       chooseSwapPath.aggregator
@@ -443,7 +443,7 @@ export class O3EthWalletApiService {
       to: toAddress,
       deadline: Math.floor(Date.now() / 1000 + deadline * 60),
     };
-    console.log(params);
+    this.commonService.log(params);
     const data = swapContract.methods
       .swapExactTokensForETHSupportingFeeOnTransferTokens(
         params.amountIn,
@@ -465,7 +465,7 @@ export class O3EthWalletApiService {
     })
       .then((response) => {
         const hash = response.result;
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           toToken,
@@ -478,7 +478,7 @@ export class O3EthWalletApiService {
         return hash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.handleDapiError(error);
       });
   }
@@ -492,8 +492,8 @@ export class O3EthWalletApiService {
     toAddress: string,
     deadline: number
   ): Promise<any> {
-    console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
-    console.log('swapExactETHForTokens');
+    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log('swapExactETHForTokens');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
       chooseSwapPath.aggregator
@@ -513,11 +513,11 @@ export class O3EthWalletApiService {
       to: toAddress,
       deadline: Math.floor(Date.now() / 1000 + deadline * 60),
     };
-    console.log(params);
+    this.commonService.log(params);
     const value = new BigNumber(inputAmount)
       .shiftedBy(fromToken.decimals)
       .toFixed();
-    console.log(`value: ${value}`);
+    this.commonService.log(`value: ${value}`);
     const data = swapContract.methods
       .swapExactETHForTokensSupportingFeeOnTransferTokens(
         params.swapAmountOutMin,
@@ -539,7 +539,7 @@ export class O3EthWalletApiService {
     })
       .then((response) => {
         const hash = response.result;
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           toToken,
@@ -552,7 +552,7 @@ export class O3EthWalletApiService {
         return hash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.handleDapiError(error);
       });
   }
@@ -566,8 +566,8 @@ export class O3EthWalletApiService {
     toAddress: string,
     deadline: number
   ): Promise<any> {
-    console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
-    console.log('swapExactTokensForTokens');
+    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log('swapExactTokensForTokens');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
       chooseSwapPath.aggregator
@@ -591,7 +591,7 @@ export class O3EthWalletApiService {
       to: toAddress,
       deadline: Math.floor(Date.now() / 1000 + deadline * 60),
     };
-    console.log(params);
+    this.commonService.log(params);
     const data = swapContract.methods
       .swapExactTokensForTokensSupportingFeeOnTransferTokens(
         params.amountIn,
@@ -613,7 +613,7 @@ export class O3EthWalletApiService {
     })
       .then((response) => {
         const hash = response.result;
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           toToken,
@@ -626,7 +626,7 @@ export class O3EthWalletApiService {
         return hash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.handleDapiError(error);
       });
   }
@@ -642,8 +642,8 @@ export class O3EthWalletApiService {
     polyFee: string,
     deadline: number
   ): Promise<string> {
-    console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
-    console.log('swapExactETHForTokensCrossChain');
+    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log('swapExactETHForTokensCrossChain');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
       chooseSwapPath.aggregator
@@ -676,13 +676,13 @@ export class O3EthWalletApiService {
       ),
       fee: bigNumberPolyFee,
     };
-    console.log(params);
+    this.commonService.log(params);
     const value = new BigNumber(inputAmount)
       .shiftedBy(fromToken.decimals)
       .plus(new BigNumber(bigNumberPolyFee))
       .dp(0)
       .toFixed();
-    console.log(`value: ${value}`);
+    this.commonService.log(`value: ${value}`);
     const data = swapContract.methods
       .swapExactETHForTokensSupportingFeeOnTransferTokensCrossChain(
         params.swapAmountOutMin,
@@ -709,7 +709,7 @@ export class O3EthWalletApiService {
     })
       .then((response) => {
         const hash = response.result;
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           toToken,
@@ -721,7 +721,7 @@ export class O3EthWalletApiService {
         return hash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.handleDapiError(error);
       });
   }
@@ -737,8 +737,8 @@ export class O3EthWalletApiService {
     polyFee: string,
     deadline: number
   ): Promise<string> {
-    console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
-    console.log('swapExactTokensForTokensCrossChain');
+    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log('swapExactTokensForTokensCrossChain');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
       chooseSwapPath.aggregator
@@ -775,8 +775,8 @@ export class O3EthWalletApiService {
       ),
       fee: bigNumberPolyFee,
     };
-    console.log(params);
-    console.log(`value: ${bigNumberPolyFee}`);
+    this.commonService.log(params);
+    this.commonService.log(`value: ${bigNumberPolyFee}`);
     const data = swapContract.methods
       .swapExactTokensForTokensSupportingFeeOnTransferTokensCrossChain(
         params.amountIn,
@@ -804,7 +804,7 @@ export class O3EthWalletApiService {
     })
       .then((response) => {
         const hash = response.result;
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           toToken,
@@ -816,7 +816,7 @@ export class O3EthWalletApiService {
         return hash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.handleDapiError(error);
       });
   }
@@ -832,7 +832,7 @@ export class O3EthWalletApiService {
     receiveAmount: string,
     fee: string
   ): Promise<string> {
-    console.log('add liquidity');
+    this.commonService.log('add liquidity');
     const json = await this.getSwapperJson();
     const swapContract = new this.web3.eth.Contract(
       json,
@@ -852,8 +852,8 @@ export class O3EthWalletApiService {
       fee: bigNumberPolyFee,
       id: 1,
     };
-    console.log(params);
-    console.log(`value: ${bigNumberPolyFee}`);
+    this.commonService.log(params);
+    this.commonService.log(`value: ${bigNumberPolyFee}`);
     const data = swapContract.methods
       .add_liquidity(
         params.fromAssetHash,
@@ -879,7 +879,7 @@ export class O3EthWalletApiService {
     })
       .then((response) => {
         const hash = response.result;
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           toToken,
@@ -903,7 +903,7 @@ export class O3EthWalletApiService {
     receiveAmount: string,
     fee: string
   ): Promise<string> {
-    console.log('remove liquidity');
+    this.commonService.log('remove liquidity');
     const json = await this.getSwapperJson();
     const swapContract = new this.web3.eth.Contract(
       json,
@@ -925,8 +925,8 @@ export class O3EthWalletApiService {
       fee: bigNumberPolyFee,
       id: 1,
     };
-    console.log(params);
-    console.log(`value: ${bigNumberPolyFee}`);
+    this.commonService.log(params);
+    this.commonService.log(`value: ${bigNumberPolyFee}`);
     const data = swapContract.methods
       .remove_liquidity(
         params.fromAssetHash,
@@ -953,7 +953,7 @@ export class O3EthWalletApiService {
     })
       .then((response) => {
         const hash = response.result;
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           usdtToken,
@@ -976,7 +976,7 @@ export class O3EthWalletApiService {
     fromAddress: string,
     aggregator?: string
   ): Promise<string> {
-    console.log('\u001b[32m  ✓ start get allowance \u001b[0m');
+    this.commonService.log('\u001b[32m  ✓ start get allowance \u001b[0m');
     let tokenhash = fromToken.assetID;
     if (
       fromToken.symbol === WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
@@ -998,8 +998,8 @@ export class O3EthWalletApiService {
     })
       .then((response) => {
         const balance = response.result;
-        console.log('allowance: ' + balance);
-        console.log('aggregator: ' + aggregator);
+        this.commonService.log('allowance: ' + balance);
+        this.commonService.log('aggregator: ' + aggregator);
         if (new BigNumber(balance, 16).isNaN()) {
           return 0;
         }
@@ -1043,7 +1043,7 @@ export class O3EthWalletApiService {
       return response.result;
     } catch (error) {
       this.handleDapiError(error);
-      console.log(error);
+      this.commonService.log(error);
     }
   }
 
@@ -1154,7 +1154,7 @@ export class O3EthWalletApiService {
       })
         .then((response) => {
           const receipt = response.result;
-          console.log(receipt);
+          this.commonService.log(receipt);
           if (receipt) {
             this.requestTxStatusInterval.unsubscribe();
             if (new BigNumber(receipt.status, 16).isZero()) {
@@ -1201,7 +1201,7 @@ export class O3EthWalletApiService {
   }
 
   private handleDapiError(error): void {
-    console.log(error);
+    this.commonService.log(error);
     switch (error.type) {
       case 'NO_PROVIDER':
         this.swapService.toDownloadWallet(this.myWalletName);

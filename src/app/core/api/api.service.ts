@@ -84,7 +84,7 @@ export class ApiService {
     });
     apiTokens.ALL = apiTokens.recommend;
     delete apiTokens.recommend;
-    console.log(apiTokens);
+    this.commonService.log(apiTokens);
     this.CHAIN_TOKENS = apiTokens;
   }
 
@@ -115,7 +115,7 @@ export class ApiService {
     if (fromToken.chain === 'NEO' && toToken.chain !== 'NEO') {
       return of([]).toPromise();
     }
-    console.log(1);
+    this.commonService.log(1);
     if (fromToken.chain === toToken.chain) {
       if (
         (fromToken.symbol === 'ETH' && toToken.symbol === 'WETH') ||
@@ -134,7 +134,7 @@ export class ApiService {
       );
       return this.handleReceiveSwapPathFiat(res, toToken);
     }
-    console.log(2);
+    this.commonService.log(2);
     const fromUsd = USD_TOKENS.find((item) => item.chain === fromToken.chain);
     const toUsd = USD_TOKENS.find((item) => item.chain === toToken.chain);
     if (
@@ -148,13 +148,13 @@ export class ApiService {
       );
       return this.handleReceiveSwapPathFiat(res, toToken);
     }
-    console.log(toUsd.symbol);
-    console.log(toToken.symbol);
+    this.commonService.log(toUsd.symbol);
+    this.commonService.log(toToken.symbol);
     if (
       fromUsd.symbol !== fromToken.symbol &&
       toUsd.symbol === toToken.symbol
     ) {
-      console.log(3);
+      this.commonService.log(3);
       const res = await this.getFromEthCrossChainAggregatorSwapPath(
         fromToken,
         toToken,
@@ -163,7 +163,7 @@ export class ApiService {
       );
       return this.handleReceiveSwapPathFiat(res, toToken);
     }
-    console.log(4);
+    this.commonService.log(4);
     return of([]).toPromise();
   }
 
@@ -579,17 +579,17 @@ export class ApiService {
     const res1 = await this.getFromEthSwapPath(fromToken, fromUsd, inputAmount); // 排序
     for (const res1Item of res1) {
       const amountOutA = res1Item.amount[res1Item.amount.length - 1];
-      console.log(`amountOutA: ${amountOutA}`);
+      this.commonService.log(`amountOutA: ${amountOutA}`);
       const amountOutB = this.swapService.getMinAmountOut(
         amountOutA,
         O3_AGGREGATOR_FEE
       );
-      console.log(`amountOutB: ${amountOutB}`);
+      this.commonService.log(`amountOutB: ${amountOutB}`);
       let polyAmountIn = this.swapService.getMinAmountOut(
         amountOutB,
         O3_AGGREGATOR_SLIPVALUE
       );
-      console.log(`polyAmountIn: ${polyAmountIn}`);
+      this.commonService.log(`polyAmountIn: ${polyAmountIn}`);
       polyAmountIn = new BigNumber(polyAmountIn)
         .shiftedBy(-fromUsd.decimals)
         .toFixed();
@@ -602,7 +602,7 @@ export class ApiService {
       res1Item.amount.push(polyAmountOut);
       res1Item.swapPath.push(toToken.symbol);
     }
-    console.log(res1);
+    this.commonService.log(res1);
     return res1;
   }
 

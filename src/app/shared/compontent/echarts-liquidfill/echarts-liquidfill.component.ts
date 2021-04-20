@@ -35,6 +35,5 @@ export class ExchartLiquidfillComponent implements OnInit {
   }
   chartOption = {};
   ngOnInit(): void {
-    console.log(this.progressRate);
   }
 }

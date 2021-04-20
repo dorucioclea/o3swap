@@ -214,7 +214,7 @@ export class MetaMaskWalletApiService {
     inputAmount: string,
     fromAddress: string
   ): Promise<any> {
-    console.log(`\u001b[32m  ✓ eth swap weth \u001b[0m`);
+    this.commonService.log(`\u001b[32m  ✓ eth swap weth \u001b[0m`);
     const json = await this.getWEthJson();
     const swapContract = new this.web3.eth.Contract(
       json,
@@ -237,7 +237,7 @@ export class MetaMaskWalletApiService {
         ],
       })
       .then((hash) => {
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           toToken,
@@ -250,7 +250,7 @@ export class MetaMaskWalletApiService {
         return hash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.handleDapiError(error);
       });
   }
@@ -261,7 +261,7 @@ export class MetaMaskWalletApiService {
     inputAmount: string,
     fromAddress: string
   ): Promise<any> {
-    console.log(`\u001b[32m  ✓ eth swap weth \u001b[0m`);
+    this.commonService.log(`\u001b[32m  ✓ eth swap weth \u001b[0m`);
     const json = await this.getWEthJson();
     const swapContract = new this.web3.eth.Contract(
       json,
@@ -282,7 +282,7 @@ export class MetaMaskWalletApiService {
         ],
       })
       .then((hash) => {
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           toToken,
@@ -295,7 +295,7 @@ export class MetaMaskWalletApiService {
         return hash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.handleDapiError(error);
       });
   }
@@ -303,7 +303,7 @@ export class MetaMaskWalletApiService {
 
   //#region balance
   async getBalance(targetChain?: CHAINS): Promise<boolean> {
-    console.log('getBalance-----------');
+    this.commonService.log('getBalance-----------');
     const chainId = new BigNumber(this.ethereum.chainId, 16).toNumber();
     const chain = METAMASK_CHAIN[chainId];
     if (!chain) {
@@ -340,7 +340,7 @@ export class MetaMaskWalletApiService {
           result[item.assetID].amount = tempAmount;
         }
       }
-      console.log(result);
+      this.commonService.log(result);
       this.store.dispatch({
         type: dispatchBalanceType,
         data: result,
@@ -397,7 +397,7 @@ export class MetaMaskWalletApiService {
           }
         })
         .catch((error) => {
-          console.log(error);
+          this.commonService.log(error);
         });
     } else {
       return this.ethereum
@@ -417,7 +417,7 @@ export class MetaMaskWalletApiService {
           }
         })
         .catch((error) => {
-          console.log(error);
+          this.commonService.log(error);
         });
     }
   }
@@ -435,7 +435,7 @@ export class MetaMaskWalletApiService {
     polyFee: string,
     txAtPage: TxAtPage
   ): Promise<string> {
-    console.log('poly swap');
+    this.commonService.log('poly swap');
     const json = await this.getSwapperJson();
     const swapContract = new this.web3.eth.Contract(
       json,
@@ -456,8 +456,8 @@ export class MetaMaskWalletApiService {
       fee: bigNumberPolyFee,
       id: 1,
     };
-    console.log(params);
-    console.log(`value: ${bigNumberPolyFee}`);
+    this.commonService.log(params);
+    this.commonService.log(`value: ${bigNumberPolyFee}`);
     const data = swapContract.methods
       .swap(
         params.fromAssetHash,
@@ -495,7 +495,7 @@ export class MetaMaskWalletApiService {
         return hash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.handleDapiError(error);
       });
   }
@@ -511,8 +511,8 @@ export class MetaMaskWalletApiService {
     toAddress: string,
     deadline: number
   ): Promise<any> {
-    console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
-    console.log('swapExactTokensForETH');
+    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log('swapExactTokensForETH');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
       chooseSwapPath.aggregator
@@ -533,7 +533,7 @@ export class MetaMaskWalletApiService {
       to: toAddress,
       deadline: Math.floor(Date.now() / 1000 + deadline * 60),
     };
-    console.log(params);
+    this.commonService.log(params);
     const data = swapContract.methods
       .swapExactTokensForETHSupportingFeeOnTransferTokens(
         params.amountIn,
@@ -555,7 +555,7 @@ export class MetaMaskWalletApiService {
         ],
       })
       .then((hash) => {
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           toToken,
@@ -568,7 +568,7 @@ export class MetaMaskWalletApiService {
         return hash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.handleDapiError(error);
       });
   }
@@ -582,8 +582,8 @@ export class MetaMaskWalletApiService {
     toAddress: string,
     deadline: number
   ): Promise<any> {
-    console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
-    console.log('swapExactETHForTokens');
+    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log('swapExactETHForTokens');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
       chooseSwapPath.aggregator
@@ -603,11 +603,11 @@ export class MetaMaskWalletApiService {
       to: toAddress,
       deadline: Math.floor(Date.now() / 1000 + deadline * 60),
     };
-    console.log(params);
+    this.commonService.log(params);
     const value = new BigNumber(inputAmount)
       .shiftedBy(fromToken.decimals)
       .toFixed();
-    console.log(`value: ${value}`);
+    this.commonService.log(`value: ${value}`);
     const data = swapContract.methods
       .swapExactETHForTokensSupportingFeeOnTransferTokens(
         params.swapAmountOutMin,
@@ -629,7 +629,7 @@ export class MetaMaskWalletApiService {
         ],
       })
       .then((hash) => {
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           toToken,
@@ -642,7 +642,7 @@ export class MetaMaskWalletApiService {
         return hash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.handleDapiError(error);
       });
   }
@@ -656,8 +656,8 @@ export class MetaMaskWalletApiService {
     toAddress: string,
     deadline: number
   ): Promise<any> {
-    console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
-    console.log('swapExactTokensForTokens');
+    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log('swapExactTokensForTokens');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
       chooseSwapPath.aggregator
@@ -681,7 +681,7 @@ export class MetaMaskWalletApiService {
       to: toAddress,
       deadline: Math.floor(Date.now() / 1000 + deadline * 60),
     };
-    console.log(params);
+    this.commonService.log(params);
     const data = swapContract.methods
       .swapExactTokensForTokensSupportingFeeOnTransferTokens(
         params.amountIn,
@@ -703,7 +703,7 @@ export class MetaMaskWalletApiService {
         ],
       })
       .then((hash) => {
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           toToken,
@@ -716,7 +716,7 @@ export class MetaMaskWalletApiService {
         return hash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.handleDapiError(error);
       });
   }
@@ -732,8 +732,8 @@ export class MetaMaskWalletApiService {
     polyFee: string,
     deadline: number
   ): Promise<string> {
-    console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
-    console.log('swapExactETHForTokensCrossChain');
+    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log('swapExactETHForTokensCrossChain');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
       chooseSwapPath.aggregator
@@ -766,13 +766,13 @@ export class MetaMaskWalletApiService {
       ),
       fee: bigNumberPolyFee,
     };
-    console.log(params);
+    this.commonService.log(params);
     const value = new BigNumber(inputAmount)
       .shiftedBy(fromToken.decimals)
       .plus(new BigNumber(bigNumberPolyFee))
       .dp(0)
       .toFixed();
-    console.log(`value: ${value}`);
+    this.commonService.log(`value: ${value}`);
     const data = swapContract.methods
       .swapExactETHForTokensSupportingFeeOnTransferTokensCrossChain(
         params.swapAmountOutMin,
@@ -799,7 +799,7 @@ export class MetaMaskWalletApiService {
         ],
       })
       .then((hash) => {
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           toToken,
@@ -811,7 +811,7 @@ export class MetaMaskWalletApiService {
         return hash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.handleDapiError(error);
       });
   }
@@ -827,8 +827,8 @@ export class MetaMaskWalletApiService {
     polyFee: string,
     deadline: number
   ): Promise<string> {
-    console.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
-    console.log('swapExactTokensForTokensCrossChain');
+    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log('swapExactTokensForTokensCrossChain');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
       chooseSwapPath.aggregator
@@ -865,8 +865,8 @@ export class MetaMaskWalletApiService {
       ),
       fee: bigNumberPolyFee,
     };
-    console.log(params);
-    console.log(`value: ${bigNumberPolyFee}`);
+    this.commonService.log(params);
+    this.commonService.log(`value: ${bigNumberPolyFee}`);
     const data = swapContract.methods
       .swapExactTokensForTokensSupportingFeeOnTransferTokensCrossChain(
         params.amountIn,
@@ -894,7 +894,7 @@ export class MetaMaskWalletApiService {
         ],
       })
       .then((hash) => {
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           toToken,
@@ -906,7 +906,7 @@ export class MetaMaskWalletApiService {
         return hash;
       })
       .catch((error) => {
-        console.log(error);
+        this.commonService.log(error);
         this.handleDapiError(error);
       });
   }
@@ -922,7 +922,7 @@ export class MetaMaskWalletApiService {
     receiveAmount: string,
     fee: string
   ): Promise<string> {
-    console.log('add liquidity');
+    this.commonService.log('add liquidity');
     const json = await this.getSwapperJson();
     const swapContract = new this.web3.eth.Contract(
       json,
@@ -942,8 +942,8 @@ export class MetaMaskWalletApiService {
       fee: bigNumberPolyFee,
       id: 1,
     };
-    console.log(params);
-    console.log(`value: ${bigNumberPolyFee}`);
+    this.commonService.log(params);
+    this.commonService.log(`value: ${bigNumberPolyFee}`);
     const data = swapContract.methods
       .add_liquidity(
         params.fromAssetHash,
@@ -969,7 +969,7 @@ export class MetaMaskWalletApiService {
         ],
       })
       .then((hash) => {
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           toToken,
@@ -993,7 +993,7 @@ export class MetaMaskWalletApiService {
     receiveAmount: string,
     fee: string
   ): Promise<string> {
-    console.log('remove liquidity');
+    this.commonService.log('remove liquidity');
     const json = await this.getSwapperJson();
     const swapContract = new this.web3.eth.Contract(
       json,
@@ -1015,8 +1015,8 @@ export class MetaMaskWalletApiService {
       fee: bigNumberPolyFee,
       id: 1,
     };
-    console.log(params);
-    console.log(`value: ${bigNumberPolyFee}`);
+    this.commonService.log(params);
+    this.commonService.log(`value: ${bigNumberPolyFee}`);
     const data = swapContract.methods
       .remove_liquidity(
         params.fromAssetHash,
@@ -1043,7 +1043,7 @@ export class MetaMaskWalletApiService {
         ],
       })
       .then((hash) => {
-        console.log(hash);
+        this.commonService.log(hash);
         this.handleTx(
           fromToken,
           usdtToken,
@@ -1066,7 +1066,7 @@ export class MetaMaskWalletApiService {
     fromAddress: string,
     aggregator?: string
   ): Promise<string> {
-    console.log('\u001b[32m  ✓ start get allowance \u001b[0m');
+    this.commonService.log('\u001b[32m  ✓ start get allowance \u001b[0m');
     let tokenhash = fromToken.assetID;
     if (
       fromToken.symbol === WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
@@ -1088,8 +1088,8 @@ export class MetaMaskWalletApiService {
         params: [this.getSendTransactionParams(fromAddress, tokenhash, data)],
       })
       .then((result) => {
-        console.log('allowance: ' + result);
-        console.log('aggregator: ' + aggregator);
+        this.commonService.log('allowance: ' + result);
+        this.commonService.log('aggregator: ' + aggregator);
         if (new BigNumber(result, 16).isNaN()) {
           return 0;
         }
@@ -1133,7 +1133,7 @@ export class MetaMaskWalletApiService {
       return hash;
     } catch (error) {
       this.handleDapiError(error);
-      console.log(error);
+      this.commonService.log(error);
     }
   }
 
@@ -1235,7 +1235,7 @@ export class MetaMaskWalletApiService {
           params: [txHash],
         })
         .then((receipt) => {
-          console.log(receipt);
+          this.commonService.log(receipt);
           if (receipt) {
             this.requestTxStatusInterval.unsubscribe();
             if (new BigNumber(receipt.status, 16).isZero()) {
@@ -1281,7 +1281,7 @@ export class MetaMaskWalletApiService {
   }
 
   private handleDapiError(error): void {
-    console.log(error);
+    this.commonService.log(error);
     switch (error.code) {
       case 4001:
         this.nzMessage.error('The request was rejected by the user');

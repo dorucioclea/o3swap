@@ -38,7 +38,6 @@ export class ApproveComponent implements OnInit {
             const receipt = await swapApi.getReceipt(
               hash
             );
-            console.log(receipt);
             if (receipt !== null) {
               this.approveInterval.unsubscribe();
               this.isApproveLoading = false;

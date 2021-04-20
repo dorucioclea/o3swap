@@ -67,7 +67,7 @@ export class VaultWalletConnectComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    console.log(this.show);
+    this.commonService.log(this.show);
     this.vaultUnScribe = this.vault$.subscribe((state) => {
       this.vaultWallet = state.vaultWallet;
     });

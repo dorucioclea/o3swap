@@ -96,7 +96,7 @@ export class VaultdMetaMaskWalletApiService {
 
   //#region private function
   private handleDapiError(error): void {
-    console.log(error);
+    this.commonService.log(error);
     switch (error.code) {
       case 4001:
         this.nzMessage.error('The request was rejected by the user');
