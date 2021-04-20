@@ -27,7 +27,7 @@
               <li *ngFor="let token of CONST_BRIDGE_TOKENS" class="disabled">
                 <img [src]="token.logo" alt="">
                 <span>{{ token.symbol }}</span>
-                <span class="token-type" [ngClass]="token.chain">{{ token.type }}</span>
+                <span class="token-type" *ngIf="token.type" [ngClass]="token.chain">{{ token.type }}</span>
               </li>
             </ul>
           </div>
@@ -61,7 +61,7 @@
               <li *ngFor="let token of CONST_BRIDGE_TOKENS" class="disabled">
                 <img [src]="token.logo" alt="">
                 <span>{{ token.symbol }}</span>
-                <span class="token-type" [ngClass]="token.chain">{{ token.type }}</span>
+                <span class="token-type" *ngIf="token.type" [ngClass]="token.chain">{{ token.type }}</span>
               </li>
             </ul>
           </div>
@@ -113,7 +113,9 @@
           </div>
           <div class="item">
             <div class="value">
-              <img src="" alt="" class="token-logo">
+              <img [src]="USD_TOKENS[0].logo" alt="" class="token-logo">
+              <img [src]="USD_TOKENS[1].logo" alt="" class="token-logo">
+              <img [src]="USD_TOKENS[2].logo" alt="" class="token-logo">
             </div>
             <div class="name">REWARDS</div>
           </div>
@@ -128,7 +130,7 @@
         </div>
       </div>
       <div class="token-detail">
-        <img src="" alt="" class="token-logo">
+        <img src="/assets/images/logo-O3.png" alt="" class="token-logo">
         <div class="token-name">
           O3Pool <span>(USDT+BUSD+HUSD)</span>
         </div>

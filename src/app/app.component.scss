@@ -16,6 +16,18 @@
   }
 }
 
+.risk-tip {
+  height: 40px;
+  line-height: 40px;
+  background: #46b0691a;
+  text-align: center;
+  font-family: 'fontRegular';
+  img {
+    width: 16px;
+    margin-right: 8px;
+  }
+}
+
 header {
   font-size: 16px;
   border-bottom: 1px solid #ffffff0d;
@@ -89,7 +101,7 @@ header {
     padding: 10px 0;
     position: absolute;
     left: 40px;
-    top: 130px;
+    top: 170px;
     bottom: 130px;
     width: 220px;
     background-color: #202020;

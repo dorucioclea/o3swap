@@ -105,7 +105,6 @@ export const CONST_BRIDGE_TOKENS: Token[] = [
     decimals: 18,
     assetID: '0x0000000000000000000000000000000000000000',
     chain: 'ETH',
-    type: 'ERC-20',
     amount: '0',
     logo:
       'https://img.o3.network/logo/eth/0x0000000000000000000000000000000000000000.png',

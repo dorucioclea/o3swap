@@ -72,5 +72,9 @@
       <app-vault-header-connect *ngIf="isHome===false && currentPage==='/vault'"></app-vault-header-connect>
     </div>
   </header>
+  <div class="risk-tip" *ngIf="!isHome">
+    <img src="/assets/images/risk-icon.png" alt="">
+    O3 Swap is currently in the testing phase. The transaction amount is limited. Back up your private key seriously and take your own risk!
+  </div>
   <router-outlet></router-outlet>
 </div>
