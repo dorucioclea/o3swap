@@ -180,7 +180,7 @@ export class TxProgressComponent implements OnInit, OnDestroy {
     let message = 'Swap';
     if (this.txAtPage === 'liquidity') {
       message =
-        this.transaction?.fromToken.symbol === 'pLP' ? 'Withdrawal' : 'Deposit';
+        this.transaction?.fromToken.symbol === 'LP' ? 'Withdrawal' : 'Deposit';
     }
     message += ` ${this.transaction?.amount} ${this.transaction?.fromToken?.symbol} for ${this.transaction?.receiveAmount} ${this.transaction?.toToken?.symbol}`;
     if (message.length > 21) {

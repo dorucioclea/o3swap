@@ -19,8 +19,8 @@ interface State {
   styleUrls: ['./swap-token.component.scss'],
 })
 export class SwapTokenComponent implements OnInit, OnDestroy {
-  myNNEO_TOKEN;
-  myCHAIN_TOKENS;
+  MYNNEO_TOKEN;
+  MYCHAIN_TOKENS;
   @Input() isFrom: boolean;
   @Input() fromToken: Token;
   @Input() toToken: Token;
@@ -72,23 +72,23 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
   }
 
   cloneTokens(): void {
-    this.myCHAIN_TOKENS = {};
-    this.myCHAIN_TOKENS.ALL = JSON.parse(
+    this.MYCHAIN_TOKENS = {};
+    this.MYCHAIN_TOKENS.ALL = JSON.parse(
       JSON.stringify(this.apiService.CHAIN_TOKENS.ALL)
     );
-    this.myCHAIN_TOKENS.NEO = JSON.parse(
+    this.MYCHAIN_TOKENS.NEO = JSON.parse(
       JSON.stringify(this.apiService.CHAIN_TOKENS.NEO)
     );
-    this.myCHAIN_TOKENS.ETH = JSON.parse(
+    this.MYCHAIN_TOKENS.ETH = JSON.parse(
       JSON.stringify(this.apiService.CHAIN_TOKENS.ETH)
     );
-    this.myCHAIN_TOKENS.BSC = JSON.parse(
+    this.MYCHAIN_TOKENS.BSC = JSON.parse(
       JSON.stringify(this.apiService.CHAIN_TOKENS.BSC)
     );
-    this.myCHAIN_TOKENS.HECO = JSON.parse(
+    this.MYCHAIN_TOKENS.HECO = JSON.parse(
       JSON.stringify(this.apiService.CHAIN_TOKENS.HECO)
     );
-    this.myNNEO_TOKEN = [JSON.parse(JSON.stringify(NNEO_TOKEN))];
+    this.MYNNEO_TOKEN = [JSON.parse(JSON.stringify(NNEO_TOKEN))];
   }
 
   close(): void {
@@ -101,8 +101,8 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     }
     this.chain = chain;
     const tokens = this.showOnlyNNeo
-      ? this.myNNEO_TOKEN
-      : this.myCHAIN_TOKENS[this.chain];
+      ? this.MYNNEO_TOKEN
+      : this.MYCHAIN_TOKENS[this.chain];
     this.allTokens = this.hideToken
       ? tokens.filter((item) => item.symbol !== this.hideToken.symbol)
       : tokens;
@@ -166,8 +166,8 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
   }
   getTokens(): void {
     const tokens = this.showOnlyNNeo
-      ? this.myNNEO_TOKEN
-      : this.myCHAIN_TOKENS[this.chain];
+      ? this.MYNNEO_TOKEN
+      : this.MYCHAIN_TOKENS[this.chain];
     this.allTokens = this.hideToken
       ? tokens.filter((item) => item.symbol !== this.hideToken.symbol)
       : tokens;
@@ -210,25 +210,25 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     this.handleTokenAmount();
   }
   handleTokenAmount(): void {
-    if (this.tokenBalance.NEO[this.myNNEO_TOKEN[0].assetID]) {
-      this.myNNEO_TOKEN[0].amount = this.tokenBalance.NEO[
-        this.myNNEO_TOKEN[0].assetID
+    if (this.tokenBalance.NEO[this.MYNNEO_TOKEN[0].assetID]) {
+      this.MYNNEO_TOKEN[0].amount = this.tokenBalance.NEO[
+        this.MYNNEO_TOKEN[0].assetID
       ].amount;
     }
     // chainType tokens
-    Object.keys(this.myCHAIN_TOKENS).forEach((key) => {
-      this.myCHAIN_TOKENS[key].forEach((tokenItem, index) => {
+    Object.keys(this.MYCHAIN_TOKENS).forEach((key) => {
+      this.MYCHAIN_TOKENS[key].forEach((tokenItem, index) => {
         const chainBalance = this.tokenBalance[tokenItem.chain];
         if (
           chainBalance[tokenItem.assetID] &&
           chainBalance[tokenItem.assetID].symbol === // 资产id相同且symbol相同
             tokenItem.symbol
         ) {
-          this.myCHAIN_TOKENS[key][index].amount =
+          this.MYCHAIN_TOKENS[key][index].amount =
             chainBalance[tokenItem.assetID].amount;
         }
       });
-      this.myCHAIN_TOKENS[key] = this.sortTokens(this.myCHAIN_TOKENS[key]);
+      this.MYCHAIN_TOKENS[key] = this.sortTokens(this.MYCHAIN_TOKENS[key]);
     });
     // alltokens
     this.allTokens.forEach((tokenItem, index) => {

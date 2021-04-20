@@ -166,7 +166,7 @@ export const LP_TOKENS: Token[] = [
       NETWORK === 'MainNet'
         ? '0x61415f9060b1a81bbda3b79baa11acd27cddd83d'
         : '0xd5d63dce45e0275ca76a8b2e9bd8c11679a57d0d',
-    symbol: 'pLP',
+    symbol: 'LP',
     decimals: 18,
     amount: '0',
     chain: 'ETH',
@@ -176,7 +176,7 @@ export const LP_TOKENS: Token[] = [
       NETWORK === 'MainNet'
         ? '0xAEA207661e36F4f51468B0d8a0b78Da521FA9D36'
         : '0xd5d63dce45e0275ca76a8b2e9bd8c11679a57d0d',
-    symbol: 'pLP',
+    symbol: 'LP',
     decimals: 18,
     amount: '0',
     chain: 'BSC',
@@ -186,7 +186,7 @@ export const LP_TOKENS: Token[] = [
       NETWORK === 'MainNet'
         ? '0x2Ec96Bb06E6af8C8Ac20f93C34ea2ab663E40d62'
         : '0x74a7f2a3afa8b0cb577985663b5811901a860619',
-    symbol: 'pLP',
+    symbol: 'LP',
     decimals: 18,
     amount: '0',
     chain: 'HECO',

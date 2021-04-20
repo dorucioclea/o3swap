@@ -229,6 +229,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
         this.addLiquidityInputAmount[index]
       );
     }
+    this.changeInAmount(this.addLiquidityTokens[index], index);
   }
 
   async maxRemoveLiquidityInput(index: number): Promise<void> {
@@ -241,6 +242,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
         this.payAmount[index]
       );
     }
+    this.changeInAmount(this.addLiquidityTokens[index], index);
   }
 
   async depost(token: Token, index: number): Promise<void> {

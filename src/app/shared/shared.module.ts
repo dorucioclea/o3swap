@@ -33,6 +33,7 @@ import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { LottieModule } from 'ngx-lottie';
 import { ExchartLiquidfillComponent } from './compontent/echarts-liquidfill/echarts-liquidfill.component';
 import { NgxEchartsModule } from 'ngx-echarts';
+import { RiskWarningComponent } from './compontent/risk-warning/risk-warning.component';
 
 const COMPONENTS = [
   LoadingComponent,
@@ -49,6 +50,7 @@ const COMPONENTS = [
   VaultWalletConnectComponent,
   VaultHeaderConnectComponent,
   LongBalanceComponent,
+  RiskWarningComponent
 ];
 const PIPES = [ShortAddressPipe, TransNumberPipe, TranslatePipe];
 const DIRECTIVES = [ErrSrcDirective];
