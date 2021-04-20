@@ -32,7 +32,8 @@
             </ul>
           </div>
           <div class="input-container">
-            <input type="number" (input)="changeInputAmount($event)" [ngModel]="inputAmount" placeholder="0">
+            <input type="number" title="Token Amount" (input)="changeInputAmount($event)" [ngModel]="inputAmount"
+              placeholder="0">
           </div>
         </div>
         <div class="asset">≈ $ {{ inputAmountFiat || '0.00' }}</div>

@@ -10,9 +10,9 @@
         <li *ngFor="let slip of slipValueGroup" class="slip-item" (click)="selectSlipValue(slip)"
           [ngClass]="{active: !isCustomSlip && slipValue===slip}">{{ slip }}%</li>
       </ul>
-      <input type="number" [ngClass]="{focus: isCustomSlip}" (input)="checkSlipValue()" (click)="clickCustomSlipValue()"
-        [ngModel]="isCustomSlip && slipValue" (input)="inputSlipValue($event)" (blur)="updateSlipValue()"
-        placeholder="Custom">
+      <input type="number" title="slippage" [ngClass]="{focus: isCustomSlip}" (input)="checkSlipValue()"
+        (click)="clickCustomSlipValue()" [ngModel]="isCustomSlip && slipValue" (input)="inputSlipValue($event)"
+        (blur)="updateSlipValue()" placeholder="Custom">
       <span class="tail" *ngIf="isCustomSlip">%</span>
       <p class="slip-error">{{ slipValueError }}</p>
     </div>

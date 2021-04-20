@@ -71,8 +71,8 @@
                 </div>
                 <div class="right">
                   <div class="input-container">
-                    <input type="number" (input)="changeInAmount(tokenItem, i)" [(ngModel)]="addLiquidityInputAmount[i]"
-                      placeholder="0.0">
+                    <input type="number" title="Pay amount" (input)="changeInAmount(tokenItem, i)"
+                      [(ngModel)]="addLiquidityInputAmount[i]" placeholder="0.0">
                   </div>
                   <div class="max-status" (click)="maxAddLiquidityInput(i)"
                     [ngClass]="{active: tokenItem.amount != '--'}">MAX</div>
@@ -108,7 +108,7 @@
                 </div>
                 <div class="right">
                   <div class="input-container">
-                    <input type="number" (input)="changeOutAmount(tokenItem, i)"
+                    <input type="number" title="Receive amount" (input)="changeOutAmount(tokenItem, i)"
                       [(ngModel)]="removeLiquidityInputAmount[i]" placeholder="0.0">
                   </div>
                   <div class="max-status" (click)="maxRemoveLiquidityInput(i)"

@@ -18,8 +18,8 @@
           <span class="name">{{ fromToken?.symbol || 'SELECT' }}</span>
           <img class="arrow" src="/assets/images/swap/arrow-down.png" alt="">
         </div>
-        <input class="choose-amount" (input)="changeInputAmount($event)" [ngModel]="inputAmount" type="number"
-          placeholder="0.0">
+        <input class="choose-amount" title="Token Amount" (input)="changeInputAmount($event)" [ngModel]="inputAmount"
+          type="number" placeholder="0.0">
       </div>
       <p class="from-fiat">≈＄{{ inputAmountFiat || '0.00' }}</p>
     </div>
