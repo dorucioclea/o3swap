@@ -4,6 +4,7 @@
   background: #121212;
   color: #fff;
   overflow: auto;
+  min-height: 750px;
   &.home {
     height: auto;
     background-image: url("/assets/images/home/bg1.png");
@@ -109,6 +110,7 @@ header {
   ul.left-menu {
     padding: 10px 0;
     position: absolute;
+    min-height: 500px;
     left: 40px;
     top: 130px;
     bottom: 130px;
