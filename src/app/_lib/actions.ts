@@ -34,3 +34,6 @@ export const UPDATE_SETTING = 'UPDATE_SETTING';
 // vault
 export const UPDATE_VAULT_WALLET = 'UPDATE_VAULT_WALLET';
 export const RESET_VAULT_WALLET = 'RESET_VAULT_WALLET';
+
+// chain tokens
+export const UPDATE_CHAIN_TOKENS = 'UPDATE_CHAIN_TOKENS';

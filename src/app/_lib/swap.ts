@@ -41,3 +41,11 @@ export interface SwapStateType {
 }
 
 export type TxAtPage = 'swap' | 'bridge' | 'liquidity';
+
+export class ChainTokens {
+  ETH: [];
+  NEO: [];
+  BSC: [];
+  HECO: [];
+  ALL: [];
+}

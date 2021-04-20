@@ -34,6 +34,7 @@ import {
   AssetQueryResponseItem,
   BRIDGE_SLIPVALUE,
   O3_AGGREGATOR_SLIPVALUE,
+  ChainTokens,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { Unsubscribable, Observable, of, interval } from 'rxjs';
@@ -44,6 +45,7 @@ import { ApiService } from '../../api/api.service';
 
 interface State {
   swap: SwapStateType;
+  tokens: any;
 }
 
 @Injectable()
@@ -59,6 +61,9 @@ export class O3EthWalletApiService {
   transaction: SwapTransaction;
   bridgeeTransaction: SwapTransaction;
   liquidityTransaction: SwapTransaction;
+
+  tokens$: Observable<any>;
+  chainTokens: ChainTokens;
 
   isConnected: boolean;
   web3 = new Web3();
@@ -87,6 +92,7 @@ export class O3EthWalletApiService {
   ) {
     o3dapi.initPlugins([o3dapiEth]);
     this.swap$ = store.select('swap');
+    this.tokens$ = store.select('tokens');
     this.swap$.subscribe((state) => {
       this.ethWalletName = state.ethWalletName;
       this.bscWalletName = state.bscWalletName;
@@ -94,6 +100,9 @@ export class O3EthWalletApiService {
       this.transaction = Object.assign({}, state.transaction);
       this.bridgeeTransaction = Object.assign({}, state.bridgeeTransaction);
       this.liquidityTransaction = Object.assign({}, state.liquidityTransaction);
+    });
+    this.tokens$.subscribe((state) => {
+      this.chainTokens = state.chainTokens;
     });
   }
 
@@ -150,21 +159,15 @@ export class O3EthWalletApiService {
       switch (chain) {
         case 'ETH':
           dispatchBalanceType = UPDATE_ETH_BALANCES;
-          tempTokenBalance = JSON.parse(
-            JSON.stringify(this.apiService.CHAIN_TOKENS.ETH)
-          );
+          tempTokenBalance = JSON.parse(JSON.stringify(this.chainTokens.ETH));
           break;
         case 'BSC':
           dispatchBalanceType = UPDATE_BSC_BALANCES;
-          tempTokenBalance = JSON.parse(
-            JSON.stringify(this.apiService.CHAIN_TOKENS.BSC)
-          );
+          tempTokenBalance = JSON.parse(JSON.stringify(this.chainTokens.BSC));
           break;
         case 'HECO':
           dispatchBalanceType = UPDATE_HECO_BALANCES;
-          tempTokenBalance = JSON.parse(
-            JSON.stringify(this.apiService.CHAIN_TOKENS.HECO)
-          );
+          tempTokenBalance = JSON.parse(JSON.stringify(this.chainTokens.HECO));
           break;
       }
       const result = {};
@@ -421,7 +424,9 @@ export class O3EthWalletApiService {
     toAddress: string,
     deadline: number
   ): Promise<any> {
-    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log(
+      `\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`
+    );
     this.commonService.log('swapExactTokensForETH');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
@@ -492,7 +497,9 @@ export class O3EthWalletApiService {
     toAddress: string,
     deadline: number
   ): Promise<any> {
-    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log(
+      `\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`
+    );
     this.commonService.log('swapExactETHForTokens');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
@@ -566,7 +573,9 @@ export class O3EthWalletApiService {
     toAddress: string,
     deadline: number
   ): Promise<any> {
-    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log(
+      `\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`
+    );
     this.commonService.log('swapExactTokensForTokens');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
@@ -642,7 +651,9 @@ export class O3EthWalletApiService {
     polyFee: string,
     deadline: number
   ): Promise<string> {
-    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log(
+      `\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`
+    );
     this.commonService.log('swapExactETHForTokensCrossChain');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
@@ -737,7 +748,9 @@ export class O3EthWalletApiService {
     polyFee: string,
     deadline: number
   ): Promise<string> {
-    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log(
+      `\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`
+    );
     this.commonService.log('swapExactTokensForTokensCrossChain');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,

@@ -33,6 +33,7 @@ import {
   WETH_ASSET_HASH,
   AGGREGATOR_CONTRACT,
   CHAINS,
+  ChainTokens,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import BigNumber from 'bignumber.js';
@@ -46,6 +47,7 @@ import { map } from 'rxjs/operators';
 import { ApiService } from '../../api/api.service';
 interface State {
   swap: SwapStateType;
+  tokens: any;
 }
 @Injectable()
 export class MetaMaskWalletApiService {
@@ -61,6 +63,9 @@ export class MetaMaskWalletApiService {
   transaction: SwapTransaction;
   bridgeeTransaction: SwapTransaction;
   liquidityTransaction: SwapTransaction;
+
+  tokens$: Observable<any>;
+  chainTokens: ChainTokens;
 
   ethereum;
   web3: Web3;
@@ -88,6 +93,7 @@ export class MetaMaskWalletApiService {
     private apiService: ApiService
   ) {
     this.swap$ = store.select('swap');
+    this.tokens$ = store.select('tokens');
     this.swap$.subscribe((state) => {
       this.ethWalletName = state.ethWalletName;
       this.bscWalletName = state.bscWalletName;
@@ -96,6 +102,9 @@ export class MetaMaskWalletApiService {
       this.transaction = Object.assign({}, state.transaction);
       this.bridgeeTransaction = Object.assign({}, state.bridgeeTransaction);
       this.liquidityTransaction = Object.assign({}, state.liquidityTransaction);
+    });
+    this.tokens$.subscribe((state) => {
+      this.chainTokens = state.chainTokens;
     });
   }
 
@@ -315,21 +324,15 @@ export class MetaMaskWalletApiService {
       switch (chain) {
         case 'ETH':
           dispatchBalanceType = UPDATE_ETH_BALANCES;
-          tempTokenBalance = JSON.parse(
-            JSON.stringify(this.apiService.CHAIN_TOKENS.ETH)
-          );
+          tempTokenBalance = JSON.parse(JSON.stringify(this.chainTokens.ETH));
           break;
         case 'BSC':
           dispatchBalanceType = UPDATE_BSC_BALANCES;
-          tempTokenBalance = JSON.parse(
-            JSON.stringify(this.apiService.CHAIN_TOKENS.BSC)
-          );
+          tempTokenBalance = JSON.parse(JSON.stringify(this.chainTokens.BSC));
           break;
         case 'HECO':
           dispatchBalanceType = UPDATE_HECO_BALANCES;
-          tempTokenBalance = JSON.parse(
-            JSON.stringify(this.apiService.CHAIN_TOKENS.HECO)
-          );
+          tempTokenBalance = JSON.parse(JSON.stringify(this.chainTokens.HECO));
           break;
       }
       const result = {};
@@ -511,7 +514,9 @@ export class MetaMaskWalletApiService {
     toAddress: string,
     deadline: number
   ): Promise<any> {
-    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log(
+      `\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`
+    );
     this.commonService.log('swapExactTokensForETH');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
@@ -582,7 +587,9 @@ export class MetaMaskWalletApiService {
     toAddress: string,
     deadline: number
   ): Promise<any> {
-    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log(
+      `\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`
+    );
     this.commonService.log('swapExactETHForTokens');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
@@ -656,7 +663,9 @@ export class MetaMaskWalletApiService {
     toAddress: string,
     deadline: number
   ): Promise<any> {
-    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log(
+      `\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`
+    );
     this.commonService.log('swapExactTokensForTokens');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
@@ -732,7 +741,9 @@ export class MetaMaskWalletApiService {
     polyFee: string,
     deadline: number
   ): Promise<string> {
-    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log(
+      `\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`
+    );
     this.commonService.log('swapExactETHForTokensCrossChain');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,
@@ -827,7 +838,9 @@ export class MetaMaskWalletApiService {
     polyFee: string,
     deadline: number
   ): Promise<string> {
-    this.commonService.log(`\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`);
+    this.commonService.log(
+      `\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`
+    );
     this.commonService.log('swapExactTokensForTokensCrossChain');
     const json = await this.getAggregatorSwapJson(
       fromToken.chain,

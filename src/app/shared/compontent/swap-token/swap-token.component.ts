@@ -5,7 +5,13 @@ import {
   ChangeDetectorRef,
   OnDestroy,
 } from '@angular/core';
-import { SwapStateType, CHAINS, NNEO_TOKEN, USD_TOKENS } from '@lib';
+import {
+  SwapStateType,
+  CHAINS,
+  NNEO_TOKEN,
+  USD_TOKENS,
+  ChainTokens,
+} from '@lib';
 import { Token } from '@lib';
 import { Observable, Unsubscribable } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -13,6 +19,7 @@ import { NzModalRef } from 'ng-zorro-antd/modal';
 import { ApiService } from '@core';
 interface State {
   swap: SwapStateType;
+  tokens: any;
 }
 @Component({
   templateUrl: './swap-token.component.html',
@@ -35,6 +42,10 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
   tokenBalance = { NEO: {}, ETH: {}, BSC: {}, HECO: {} }; // 账户的 tokens
   swapUnScribe: Unsubscribable;
 
+  tokensUnScribe: Unsubscribable;
+  tokens$: Observable<any>;
+  chainTokens: ChainTokens;
+
   chain: CHAINS = 'ETH';
   allTokens: Token[] = []; // 所有的 tokens, 排除了 fromToken 或 toToken
   displayTokens: any[] = []; // 最终展示的 tokens, search 结果
@@ -47,10 +58,17 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     private apiService: ApiService
   ) {
     this.swap$ = store.select('swap');
+    this.tokens$ = store.select('tokens');
+    this.tokensUnScribe = this.tokens$.subscribe((state) => {
+      this.chainTokens = state.chainTokens;
+    });
   }
   ngOnDestroy(): void {
     if (this.swapUnScribe) {
       this.swapUnScribe.unsubscribe();
+    }
+    if (this.tokensUnScribe) {
+      this.tokensUnScribe.unsubscribe();
     }
   }
 
@@ -73,20 +91,12 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
 
   cloneTokens(): void {
     this.MYCHAIN_TOKENS = {};
-    this.MYCHAIN_TOKENS.ALL = JSON.parse(
-      JSON.stringify(this.apiService.CHAIN_TOKENS.ALL)
-    );
-    this.MYCHAIN_TOKENS.NEO = JSON.parse(
-      JSON.stringify(this.apiService.CHAIN_TOKENS.NEO)
-    );
-    this.MYCHAIN_TOKENS.ETH = JSON.parse(
-      JSON.stringify(this.apiService.CHAIN_TOKENS.ETH)
-    );
-    this.MYCHAIN_TOKENS.BSC = JSON.parse(
-      JSON.stringify(this.apiService.CHAIN_TOKENS.BSC)
-    );
+    this.MYCHAIN_TOKENS.ALL = JSON.parse(JSON.stringify(this.chainTokens.ALL));
+    this.MYCHAIN_TOKENS.NEO = JSON.parse(JSON.stringify(this.chainTokens.NEO));
+    this.MYCHAIN_TOKENS.ETH = JSON.parse(JSON.stringify(this.chainTokens.ETH));
+    this.MYCHAIN_TOKENS.BSC = JSON.parse(JSON.stringify(this.chainTokens.BSC));
     this.MYCHAIN_TOKENS.HECO = JSON.parse(
-      JSON.stringify(this.apiService.CHAIN_TOKENS.HECO)
+      JSON.stringify(this.chainTokens.HECO)
     );
     this.MYNNEO_TOKEN = [JSON.parse(JSON.stringify(NNEO_TOKEN))];
   }

@@ -1,7 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ApiService, MetaMaskWalletApiService } from '@core';
-import { CHAIN_TOKENS, NNEO_TOKEN, Token, USD_TOKENS } from '@lib';
+import { ChainTokens, CHAIN_TOKENS, NNEO_TOKEN, Token, USD_TOKENS } from '@lib';
+import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { Unsubscribable, Observable } from 'rxjs';
+
+interface State {
+  tokens: any;
+}
 
 type PageStatus = 'home' | 'result';
 @Component({
@@ -9,7 +15,7 @@ type PageStatus = 'home' | 'result';
   templateUrl: './swap.component.html',
   styleUrls: ['./swap.component.scss'],
 })
-export class SwapComponent implements OnInit {
+export class SwapComponent implements OnInit, OnDestroy {
   pageStatus: PageStatus = 'home';
 
   fromToken: Token;
@@ -18,19 +24,35 @@ export class SwapComponent implements OnInit {
 
   initResultData;
 
+  tokensUnScribe: Unsubscribable;
+  tokens$: Observable<any>;
+  chainTokens: ChainTokens;
+
   constructor(
+    private store: Store<State>,
     private apiService: ApiService,
     private metaMaskWalletApiService: MetaMaskWalletApiService,
     private nzMessage: NzMessageService
-  ) {}
+  ) {
+    this.tokens$ = store.select('tokens');
+    this.tokensUnScribe = this.tokens$.subscribe((state) => {
+      this.chainTokens = state.chainTokens;
+    });
+  }
 
   async ngOnInit(): Promise<void> {
     const chain = this.metaMaskWalletApiService.getChain();
     if (chain) {
       await this.apiService.getTokens();
-      this.fromToken = this.apiService.CHAIN_TOKENS[chain][0];
+      this.fromToken = this.chainTokens[chain][0];
     } else {
       this.fromToken = USD_TOKENS[0];
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.tokensUnScribe) {
+      this.tokensUnScribe.unsubscribe();
     }
   }
 

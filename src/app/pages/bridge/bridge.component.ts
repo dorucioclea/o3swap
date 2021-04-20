@@ -15,6 +15,7 @@ import {
   ConnectChainType,
   ETH_SOURCE_ASSET_HASH,
   CONST_BRIDGE_TOKENS,
+  ChainTokens,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -25,6 +26,7 @@ import { ApproveComponent } from '@shared';
 
 interface State {
   swap: SwapStateType;
+  tokens: any;
 }
 @Component({
   selector: 'app-bridge',
@@ -47,8 +49,8 @@ export class BridgeComponent implements OnInit, OnDestroy {
   receiveAmountFiat: string; // 支付的 token 美元价值
   rates = {};
 
-  swap$: Observable<any>;
   swapUnScribe: Unsubscribable;
+  swap$: Observable<any>;
   ethAccountAddress: string;
   bscAccountAddress: string;
   hecoAccountAddress: string;
@@ -56,6 +58,10 @@ export class BridgeComponent implements OnInit, OnDestroy {
   bscWalletName: EthWalletName;
   hecoWalletName: EthWalletName;
   tokenBalances = { ETH: {}, BSC: {}, HECO: {} };
+
+  tokensUnScribe: Unsubscribable;
+  tokens$: Observable<any>;
+  chainTokens: ChainTokens;
 
   fromAddress: string;
   toAddress: string;
@@ -80,10 +86,14 @@ export class BridgeComponent implements OnInit, OnDestroy {
     private commonService: CommonService
   ) {
     this.swap$ = store.select('swap');
+    this.tokens$ = store.select('tokens');
   }
   ngOnDestroy(): void {
     if (this.swapUnScribe) {
       this.swapUnScribe.unsubscribe();
+    }
+    if (this.tokensUnScribe) {
+      this.tokensUnScribe.unsubscribe();
     }
   }
 
@@ -99,6 +109,9 @@ export class BridgeComponent implements OnInit, OnDestroy {
       this.hecoWalletName = state.hecoWalletName;
       this.getFromAndToAddress();
       this.handleAccountBalance(state);
+    });
+    this.tokensUnScribe = this.tokens$.subscribe((state) => {
+      this.chainTokens = state.chainTokens;
     });
   }
 
@@ -410,10 +423,8 @@ export class BridgeComponent implements OnInit, OnDestroy {
       this.inputAmountError = '';
       return;
     }
-    const chainTokens: Token[] = this.apiService.CHAIN_TOKENS[
-      this.fromToken.chain
-    ];
-    const usdToken = chainTokens.find(
+    const oneChainTokens: Token[] = this.chainTokens[this.fromToken.chain];
+    const usdToken = oneChainTokens.find(
       (item) => item.assetID === this.fromToken.assetID
     );
     if (!usdToken) {

@@ -25,21 +25,31 @@ import {
   FUSDT_ASSET_HASH,
   WETH_ASSET_HASH,
   LP_TOKENS,
+  UPDATE_CHAIN_TOKENS,
+  ChainTokens,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { CommonService } from '../util/common.service';
 import { SwapService } from '../util/swap.service';
+import { Store } from '@ngrx/store';
+
+interface State {
+  tokens: any;
+}
 
 @Injectable()
 export class ApiService {
-  CHAIN_TOKENS = { ETH: [], NEO: [], BSC: [], HECO: [], ALL: [] };
   apiDo = environment.apiDomain;
   RATE_HOST = 'https://hub.o3.network/v1';
+
+  tokens$: Observable<any>;
+  chainTokens: ChainTokens;
 
   constructor(
     private http: HttpClient,
     private commonService: CommonService,
-    private swapService: SwapService
+    private swapService: SwapService,
+    private store: Store<State>
   ) {
     this.getTokens();
   }
@@ -78,14 +88,15 @@ export class ApiService {
           amount: '0',
           decimals: item.decimals,
           chain: item.chain,
-          maxAmount: item.max_amount
+          maxAmount: item.max_amount,
         };
       });
     });
     apiTokens.ALL = apiTokens.recommend;
     delete apiTokens.recommend;
     this.commonService.log(apiTokens);
-    this.CHAIN_TOKENS = apiTokens;
+    this.chainTokens = apiTokens;
+    this.store.dispatch({ type: UPDATE_CHAIN_TOKENS, data: apiTokens });
   }
 
   getRates(): Observable<any> {
@@ -465,7 +476,7 @@ export class ApiService {
             res.data.forEach((item) => {
               const swapPath = this.swapService.getAssetNamePath(
                 item.path,
-                this.CHAIN_TOKENS[fromToken.chain]
+                this.chainTokens[fromToken.chain]
               );
               const temp = {
                 amount: item.amounts,
@@ -541,7 +552,7 @@ export class ApiService {
             res.data.forEach((item) => {
               const swapPath = this.swapService.getAssetNamePath(
                 item.path,
-                this.CHAIN_TOKENS[fromToken.chain]
+                this.chainTokens[fromToken.chain]
               );
               const temp = {
                 amount: item.amounts,
@@ -668,9 +679,9 @@ export class ApiService {
 
   private getAssetLogoByName(name: string): string {
     let token;
-    for (const key in this.CHAIN_TOKENS) {
-      if (this.CHAIN_TOKENS.hasOwnProperty(key)) {
-        const tokenList = this.CHAIN_TOKENS[key];
+    for (const key in this.chainTokens) {
+      if (this.chainTokens.hasOwnProperty(key)) {
+        const tokenList = this.chainTokens[key];
         token = tokenList.find((item) => item.symbol === name);
         if (token) {
           break;
