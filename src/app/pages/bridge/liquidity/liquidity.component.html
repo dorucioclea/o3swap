@@ -112,11 +112,11 @@
               </div>
             </li>
           </ng-container>
-
         </ul>
-        <!-- <div class="btn-primary big-btn" [ngClass]="{active: liquidityType === 'add'}">Add Liquidity</div>
-        <div class="btn-primary remove-btn big-btn" [ngClass]="{active: liquidityType === 'remove'}">Remove Liquidity
-        </div> -->
+        <div class="slipvalue">
+          <span class="name">Max slippage：</span>
+          <span class="value">{{BRIDGE_SLIPVALUE}}%</span>
+        </div>
       </div>
     </div>
   </div>
@@ -186,10 +186,10 @@
         <span class="name">{{ liquidityType == 'add' ? 'Receive' : 'PayAmount' }}</span>
         <span class="value">{{ (liquidityType == 'add' ? receiveAmount : payAmount) | transNumber }}</span>
       </div> -->
-      <div class="item-list">
+      <!-- <div class="item-list">
         <span class="name">Max slippage</span>
         <span class="value">{{BRIDGE_SLIPVALUE}}%</span>
-      </div>
+      </div> -->
     </div>
   </div>
 </section>

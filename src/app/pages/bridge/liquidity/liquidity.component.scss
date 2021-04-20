@@ -86,28 +86,33 @@
           color: #fff;
           text-align: center;
           background: no-repeat;
-          background: url("/assets/images/bridge-liquidity/defult.png") no-repeat;
+          background: url("/assets/images/bridge-liquidity/defult.png")
+            no-repeat;
           cursor: pointer;
           &.tabs-add {
             left: 0;
             &:hover {
-              background: url("/assets/images/bridge-liquidity/add-hover.png") no-repeat;
+              background: url("/assets/images/bridge-liquidity/add-hover.png")
+                no-repeat;
             }
           }
           &.tabs-remove {
             right: 0;
             &:hover {
-              background: url("/assets/images/bridge-liquidity/remove-hover.png") no-repeat;
+              background: url("/assets/images/bridge-liquidity/remove-hover.png")
+                no-repeat;
               background-position: 100%;
             }
           }
           &.addActive {
             top: 0;
-            background: url("/assets/images/bridge-liquidity/active.png") no-repeat!important;
+            background: url("/assets/images/bridge-liquidity/active.png")
+              no-repeat !important;
           }
           &.removeActive {
             top: 0;
-            background: url("/assets/images/bridge-liquidity/active.png") no-repeat!important;
+            background: url("/assets/images/bridge-liquidity/active.png")
+              no-repeat !important;
           }
         }
       }
@@ -165,7 +170,7 @@
                     color: #fff;
                     text-align: right;
                     &::placeholder {
-                      color: #4A4A4A;
+                      color: #4a4a4a;
                     }
                   }
                 }
@@ -179,14 +184,14 @@
                   border-radius: 10px;
                   cursor: not-allowed;
                   pointer-events: none;
-                  color: #4A4A4A;
+                  color: #4a4a4a;
                   cursor: pointer;
                   &.active {
                     color: #6162ef;
                     pointer-events: auto;
                     cursor: pointer;
                     &:hover {
-                      background-color: #6162EF;
+                      background-color: #6162ef;
                       color: #fff;
                     }
                   }
@@ -224,14 +229,14 @@
               display: flex;
               flex-direction: column;
               align-items: center;
-              color: #546A6A;
+              color: #546a6a;
               margin-right: 10px;
               padding-top: 15px;
               padding-bottom: 15px;
               background: #252525;
               border-radius: 10px;
               span {
-                color: #546A6A;
+                color: #546a6a;
               }
             }
           }
@@ -247,12 +252,25 @@
             display: inline-flex;
           }
         }
+        .slipvalue {
+          text-align: right;
+          margin-top: 20px;
+          padding-right: 20px;
+          .name {
+            color: #8aa1a1;
+            font-family: "fontRegular";
+          }
+          .value {
+            color: #46b069;
+          }
+        }
       }
     }
   }
   .blp-detail {
     display: flex;
-    .left, .right {
+    .left,
+    .right {
       padding: 30px 50px;
       flex: 1;
       &.left {
@@ -271,7 +289,7 @@
             margin-right: 10px;
           }
         }
-        .item-list{
+        .item-list {
           font-family: "fontMedium";
           .token-name {
             font-family: "fontDemiBold";
@@ -279,16 +297,17 @@
           .value {
             font-family: "fontRegular";
           }
-          &:not(:first-child)  {
+          &:not(:first-child) {
             margin-top: 30px;
           }
         }
-        .item-list, .progress-container{
+        .item-list,
+        .progress-container {
           display: flex;
           width: 100%;
-          height:20px;
-          color: #8AA1A1;
-          .progress{
+          height: 20px;
+          color: #8aa1a1;
+          .progress {
             height: 6px;
             width: 300px;
           }
@@ -296,7 +315,7 @@
       }
       &.right .item-list {
         font-family: "fontRegular";
-        color: #8AA1A1;
+        color: #8aa1a1;
         justify-content: space-between;
         height: 30px;
         .value {
