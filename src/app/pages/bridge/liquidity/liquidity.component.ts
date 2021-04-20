@@ -189,7 +189,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
 
   async changeInAmount(token: Token, index: number): Promise<void> {
     const inputAmount = new BigNumber(this.addLiquidityInputAmount[index]);
-    if (!inputAmount.isNaN()) {
+    if (!inputAmount.isNaN() && inputAmount.comparedTo(0) > 0) {
       if (inputAmount.comparedTo(50) === 1) {
         this.nzMessage.error(`You've exceeded the maximum limit`);
         return;
@@ -205,7 +205,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
 
   async changeOutAmount(token: Token, index: number): Promise<void> {
     const inputAmount = new BigNumber(this.removeLiquidityInputAmount[index]);
-    if (!inputAmount.isNaN()) {
+    if (!inputAmount.isNaN() && inputAmount.comparedTo(0) > 0) {
       if (inputAmount.comparedTo(50) === 1) {
         this.nzMessage.error(`You've exceeded the maximum limit`);
         return;
@@ -255,7 +255,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     }
     const tokenBalance = new BigNumber(token.amount);
     const tokenAmount = new BigNumber(this.addLiquidityInputAmount[index]);
-    if (tokenAmount.isNaN()) {
+    if (tokenAmount.isNaN() || tokenAmount.comparedTo(0) <= 0) {
       this.nzMessage.error('Wrong input');
       return;
     }
@@ -300,7 +300,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     }
     const lpBalance = new BigNumber(this.LPToken.amount);
     const lpPayAmount = new BigNumber(this.payAmount[index]);
-    if (lpPayAmount.isNaN()) {
+    if (lpPayAmount.isNaN() || lpPayAmount.comparedTo(0) <= 0) {
       this.nzMessage.error('Wrong input');
       return;
     }
