@@ -58,7 +58,15 @@
             <li *ngFor="let tokenItem  of addLiquidityTokens; let i = index ">
               <div class="detail">
                 <div class="left">
-                  <img [src]="tokenItem.logo" alt="" class="token-logo">
+                  <div class="item-logo-box">
+                    <img [src]="tokenItem.logo" alt="" class="token-logo">
+                    <img class="token-type" *ngIf="tokenItem.type==='ERC-20'"
+                      src="/assets/images/bridge-liquidity/erc20.png" alt="">
+                    <img class="token-type" *ngIf="tokenItem.type==='BEP-20'"
+                      src="/assets/images/bridge-liquidity/bep20.png" alt="">
+                    <img class="token-type" *ngIf="tokenItem.type==='HRC-20'"
+                      src="/assets/images/bridge-liquidity/hrc20.png" alt="">
+                  </div>
                   <div class="token-name">{{ tokenItem.symbol }}</div>
                 </div>
                 <div class="right">
@@ -87,7 +95,15 @@
             <li *ngFor="let tokenItem  of addLiquidityTokens; let i = index ">
               <div class="detail">
                 <div class="left">
-                  <img [src]="tokenItem.logo" alt="" class="token-logo">
+                  <div class="item-logo-box">
+                    <img [src]="tokenItem.logo" alt="" class="token-logo">
+                    <img class="token-type" *ngIf="tokenItem.type==='ERC-20'"
+                      src="/assets/images/bridge-liquidity/erc20.png" alt="">
+                    <img class="token-type" *ngIf="tokenItem.type==='BEP-20'"
+                      src="/assets/images/bridge-liquidity/bep20.png" alt="">
+                    <img class="token-type" *ngIf="tokenItem.type==='HRC-20'"
+                      src="/assets/images/bridge-liquidity/hrc20.png" alt="">
+                  </div>
                   <div class="token-name">{{ tokenItem.symbol }}</div>
                 </div>
                 <div class="right">

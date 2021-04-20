@@ -143,11 +143,20 @@
               .left {
                 display: flex;
                 align-items: center;
-                .token-logo {
-                  margin-right: 15px;
-                  width: 30px;
-                  height: 30px;
-                  border-radius: 50%;
+                .item-logo-box {
+                  position: relative;
+                  .token-type {
+                    width: 26px;
+                    position: absolute;
+                    left: 2px;
+                    bottom: 0px;
+                  }
+                  .token-logo {
+                    width: 30px;
+                    height: 30px;
+                    vertical-align: middle;
+                    margin-right: 15px;
+                  }
                 }
                 .token-name {
                   font-size: 16px;
@@ -277,9 +286,9 @@
         .item-logo-box {
           position: relative;
           .token-type {
-            width: 34px;
+            width: 30px;
             position: absolute;
-            left: 0px;
+            left: 2px;
             bottom: 0px;
           }
           .token-logo {
