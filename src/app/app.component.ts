@@ -23,13 +23,18 @@ export class AppComponent implements OnInit {
     private metaMaskWalletApiService: MetaMaskWalletApiService,
     private neolineWalletApiService: NeolineWalletApiService,
     private vaultdMetaMaskWalletApiService: VaultdMetaMaskWalletApiService,
-    private modal: NzModalService,
+    private modal: NzModalService
   ) {
     this.router.events.subscribe((res: RouterEvent) => {
       if (res instanceof NavigationEnd) {
         this.currentPage = res.urlAfterRedirects || res.url;
         this.isHome = this.isHomePage();
-        if (sessionStorage.getItem(`${this.currentPage}WarningDialog`) !== 'true' && location.pathname !== '/' && location.pathname !== '/home') {
+        if (
+          sessionStorage.getItem(`${this.currentPage}WarningDialog`) !==
+            'true' &&
+          location.pathname !== '/' &&
+          location.pathname !== '/home'
+        ) {
           this.riskWarning();
         }
       }
@@ -37,11 +42,20 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const sessionShowRisk = sessionStorage.getItem('showRisk');
+    if (sessionShowRisk !== undefined) {
+      this.showRisk = sessionShowRisk === 'false' ? false : true;
+    }
     if (location.pathname !== '/' && location.pathname !== '/home') {
       this.neolineWalletApiService.init();
       this.metaMaskWalletApiService.init();
       this.vaultdMetaMaskWalletApiService.init();
     }
+  }
+
+  closeRisk(): void {
+    this.showRisk = false;
+    sessionStorage.setItem('showRisk', this.showRisk ? 'true' : 'false');
   }
 
   isHomePage(): boolean {
@@ -58,7 +72,7 @@ export class AppComponent implements OnInit {
       nzTitle: null,
       nzClosable: false,
       nzMaskClosable: false,
-      nzClassName: 'custom-modal'
+      nzClassName: 'custom-modal',
     });
     modal.afterClose.subscribe(() => {
       sessionStorage.setItem(`${this.currentPage}WarningDialog`, 'true');
