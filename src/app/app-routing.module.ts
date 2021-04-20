@@ -7,7 +7,7 @@ const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'home', component: HomeComponent },
   { path: 'swap', component: SwapComponent },
-  { path: 'vault', component: DashboardComponent },
+  // { path: 'vault', component: DashboardComponent },
   { path: 'hub', component: BridgeComponent },
   { path: 'hub/liquidity/:type', component: LiquidityComponent },
   { path: '**', redirectTo: '/home' },
