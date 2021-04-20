@@ -103,24 +103,31 @@ export class MetaMaskWalletApiService {
   init(): void {
     setTimeout(() => {
       if ((window as any).ethereum && (window as any).ethereum.isConnected()) {
-        const localEthWalletName = sessionStorage.getItem(
-          'ethWalletName'
-        ) as EthWalletName;
-        const localBscWalletName = sessionStorage.getItem(
-          'bscWalletName'
-        ) as EthWalletName;
-        const localHecoWalletName = sessionStorage.getItem(
-          'hecoWalletName'
-        ) as EthWalletName;
-        if (localEthWalletName === 'MetaMask') {
-          this.connect('ETH', false);
-        }
-        if (localBscWalletName === 'MetaMask') {
-          this.connect('BSC', false);
-        }
-        if (localHecoWalletName === 'MetaMask') {
-          this.connect('HECO', false);
-        }
+        (window as any).ethereum
+          .request({ method: 'eth_accounts' })
+          .then((result) => {
+            if (result.length === 0) {
+              return;
+            }
+            const localEthWalletName = sessionStorage.getItem(
+              'ethWalletName'
+            ) as EthWalletName;
+            const localBscWalletName = sessionStorage.getItem(
+              'bscWalletName'
+            ) as EthWalletName;
+            const localHecoWalletName = sessionStorage.getItem(
+              'hecoWalletName'
+            ) as EthWalletName;
+            if (localEthWalletName === 'MetaMask') {
+              this.connect('ETH', false);
+            }
+            if (localBscWalletName === 'MetaMask') {
+              this.connect('BSC', false);
+            }
+            if (localHecoWalletName === 'MetaMask') {
+              this.connect('HECO', false);
+            }
+          });
       }
     }, 1000);
   }

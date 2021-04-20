@@ -176,6 +176,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
     this.inputAmountError = '';
     this.inputAmount = (this.fromToken && this.fromToken.amount) || '0';
     this.resetSwapData();
+    this.checkInputAmountLimit();
     this.calcutionInputAmountFiat();
   }
 

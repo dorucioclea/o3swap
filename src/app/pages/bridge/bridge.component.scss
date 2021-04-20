@@ -15,6 +15,21 @@
   .group-container.swap {
     font-family: "fontRegular";
     padding: 50px 40px 20px;
+    .input-token-error {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      margin-left: -150px;
+      width: 300px;
+      min-height: 50px;
+      background: #cd4242b3;
+      border-radius: 10px;
+      font-family: "fontRegular";
+      text-align: center;
+      line-height: 20px;
+      padding: 15px 5px;
+      z-index: 99;
+    }
     .token-select-container {
       margin-bottom: 20px;
       position: relative;

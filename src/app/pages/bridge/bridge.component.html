@@ -1,5 +1,6 @@
 <section class="page-container">
   <div class="group-container row1 swap">
+    <div *ngIf="inputAmountError" class="input-token-error">{{ inputAmountError }}</div>
     <div class="token-select-container">
       <div class="left-container">
         <div class="header">

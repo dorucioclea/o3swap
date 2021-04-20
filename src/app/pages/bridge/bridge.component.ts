@@ -133,6 +133,7 @@ export class BridgeComponent implements OnInit, OnDestroy {
         this.toAddress = null;
       }
       this.checkInputAmountDecimal();
+      this.checkInputAmountLimit();
       this.calcutionInputAmountFiat();
       this.getFromTokenAmount();
     } else {
@@ -152,6 +153,7 @@ export class BridgeComponent implements OnInit, OnDestroy {
       this.fromToken = this.toToken;
       this.toToken = temp;
       this.checkInputAmountDecimal();
+      this.checkInputAmountLimit();
       this.calcutionInputAmountFiat();
       this.calcutionReceiveAmount();
       this.getFromAndToAddress();
@@ -165,11 +167,13 @@ export class BridgeComponent implements OnInit, OnDestroy {
     this.inputAmount = (this.fromToken && this.fromToken.amount) || '0';
     this.calcutionInputAmountFiat();
     this.calcutionReceiveAmount();
+    this.checkInputAmountLimit();
   }
 
   changeInputAmount($event): void {
     this.inputAmount = $event.target.value;
     this.checkInputAmountDecimal();
+    this.checkInputAmountLimit();
     this.calcutionInputAmountFiat();
     this.calcutionReceiveAmount();
   }
@@ -182,6 +186,9 @@ export class BridgeComponent implements OnInit, OnDestroy {
       return false;
     }
     if (this.checkInputAmountDecimal() === false) {
+      return false;
+    }
+    if (this.checkInputAmountLimit() === false) {
       return false;
     }
     return true;
@@ -396,6 +403,31 @@ export class BridgeComponent implements OnInit, OnDestroy {
     }
     this.inputAmountError = '';
     return true;
+  }
+
+  checkInputAmountLimit(): boolean {
+    if (!this.fromToken) {
+      this.inputAmountError = '';
+      return;
+    }
+    const chainTokens: Token[] = this.apiService.CHAIN_TOKENS[
+      this.fromToken.chain
+    ];
+    const usdToken = chainTokens.find(
+      (item) => item.assetID === this.fromToken.assetID
+    );
+    if (!usdToken) {
+      this.inputAmountError = '';
+      return;
+    }
+    const inputAmountBig = new BigNumber(this.inputAmount);
+    const maxAmountBig = new BigNumber(usdToken.maxAmount);
+    if (inputAmountBig.comparedTo(maxAmountBig) === 1) {
+      this.inputAmountError = `You've exceeded the maximum limit`;
+      return false;
+    } else {
+      return true;
+    }
   }
 
   calcutionInputAmountFiat(): void {
