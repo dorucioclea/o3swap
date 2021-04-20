@@ -275,6 +275,9 @@
                   transform: translateX(-8px);
                   z-index: 1;
                 }
+                &:nth-child(4) {
+                  transform: translateX(-12px);
+                }
               }
             }
             .name {
