@@ -17,6 +17,8 @@ import {
   VaultHeaderConnectComponent,
 } from './compontent/header';
 import { LongBalanceComponent } from './compontent/long-balance/long-balance.component';
+import { ExchartLiquidfillComponent } from './compontent/echarts-liquidfill/echarts-liquidfill.component';
+import { RiskWarningComponent } from './compontent/risk-warning/risk-warning.component';
 
 import { ShortAddressPipe } from './pipes/short-address.pipe';
 import { TransNumberPipe } from './pipes/trans-number.pipe';
@@ -30,10 +32,9 @@ import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
+import { NzElementPatchModule } from 'ng-zorro-antd/core/element-patch';
 import { LottieModule } from 'ngx-lottie';
-import { ExchartLiquidfillComponent } from './compontent/echarts-liquidfill/echarts-liquidfill.component';
 import { NgxEchartsModule } from 'ngx-echarts';
-import { RiskWarningComponent } from './compontent/risk-warning/risk-warning.component';
 
 const COMPONENTS = [
   LoadingComponent,
@@ -50,7 +51,7 @@ const COMPONENTS = [
   VaultWalletConnectComponent,
   VaultHeaderConnectComponent,
   LongBalanceComponent,
-  RiskWarningComponent
+  RiskWarningComponent,
 ];
 const PIPES = [ShortAddressPipe, TransNumberPipe, TranslatePipe];
 const DIRECTIVES = [ErrSrcDirective];
@@ -63,6 +64,7 @@ const THIRD_MODULES = [
   NzProgressModule,
   LottieModule,
   NgxEchartsModule,
+  NzElementPatchModule,
 ];
 
 @NgModule({

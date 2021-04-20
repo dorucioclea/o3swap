@@ -44,16 +44,25 @@
           <a routerLink="/hub">Hub</a>
         </li>
         <li [ngClass]="{active: currentPage==='/vault'}">
-          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="right">Vault</a>
+          <a nz-tooltip nzTooltipTitle="Comming soon..." nzTooltipPlacement="right"
+            [nzTooltipOrigin]="button1.elementRef">
+            <span nz-element #button1="nzElement">Vault</span>
+          </a>
         </li>
         <li>
-          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="right">Dashboard</a>
+          <a nz-tooltip nzTooltipTitle="Comming soon..." nzTooltipPlacement="right"
+            [nzTooltipOrigin]="button2.elementRef">
+            <span nz-element #button2="nzElement">Dashboard</span>
+          </a>
         </li>
         <li>
           <a href="https://medium.com/o3-labs-o3-wallet" target="_blank">Blog</a>
         </li>
         <li>
-          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="right">Governance</a>
+          <a nz-tooltip nzTooltipTitle="Comming soon..." nzTooltipPlacement="right"
+            [nzTooltipOrigin]="button3.elementRef">
+            <span nz-element #button3="nzElement">Governance</span>
+          </a>
         </li>
         <li>
           <a href="https://docs.o3swap.com/" target="_blank">Doc</a>
