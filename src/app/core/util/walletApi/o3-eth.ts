@@ -63,7 +63,7 @@ export class O3EthWalletApiService {
   liquidityTransaction: SwapTransaction;
 
   tokens$: Observable<any>;
-  chainTokens: ChainTokens;
+  chainTokens = new ChainTokens();
 
   isConnected: boolean;
   web3 = new Web3();

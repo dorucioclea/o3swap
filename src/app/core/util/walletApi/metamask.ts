@@ -65,7 +65,7 @@ export class MetaMaskWalletApiService {
   liquidityTransaction: SwapTransaction;
 
   tokens$: Observable<any>;
-  chainTokens: ChainTokens;
+  chainTokens = new ChainTokens();
 
   ethereum;
   web3: Web3;

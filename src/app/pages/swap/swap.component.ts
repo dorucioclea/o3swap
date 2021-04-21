@@ -26,7 +26,7 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   tokensUnScribe: Unsubscribable;
   tokens$: Observable<any>;
-  chainTokens: ChainTokens;
+  chainTokens = new ChainTokens();
 
   constructor(
     private store: Store<State>,

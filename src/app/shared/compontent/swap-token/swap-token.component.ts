@@ -44,7 +44,7 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
 
   tokensUnScribe: Unsubscribable;
   tokens$: Observable<any>;
-  chainTokens: ChainTokens;
+  chainTokens = new ChainTokens();
 
   chain: CHAINS = 'ETH';
   allTokens: Token[] = []; // 所有的 tokens, 排除了 fromToken 或 toToken

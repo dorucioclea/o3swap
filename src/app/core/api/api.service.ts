@@ -43,7 +43,7 @@ export class ApiService {
   RATE_HOST = 'https://hub.o3.network/v1';
 
   tokens$: Observable<any>;
-  chainTokens: ChainTokens;
+  chainTokens = new ChainTokens();
 
   constructor(
     private http: HttpClient,
