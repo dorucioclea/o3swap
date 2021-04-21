@@ -79,8 +79,13 @@ function playerFactory(): any {
     CoreModule,
     SharedModule,
     LottieModule.forRoot({ player: playerFactory }),
-    StoreModule.forRoot(rootReducer, {}),
-    NgxEchartsModule.forRoot({ echarts })
+    StoreModule.forRoot(rootReducer, {
+      runtimeChecks: {
+        strictActionImmutability: false,
+        strictStateImmutability: false
+      },
+    }),
+    NgxEchartsModule.forRoot({ echarts }),
   ],
   providers: [{ provide: NZ_I18N, useValue: en_US }, ...INTERCEPTOR_PROVIDES],
   bootstrap: [AppComponent],

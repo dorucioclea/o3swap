@@ -421,11 +421,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       if (this.LPToken.amount !== res) {
         this.getPusdtBalance();
       }
-      this.LPToken = this.commonService.changeObjectValue<Token>(
-        this.LPToken,
-        'amount',
-        res || '0'
-      );
+      this.LPToken.amount = res || '0';
     });
   }
   private handleAccountBalance(state): void {
@@ -434,22 +430,14 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     this.tokenBalance.HECO = state.hecoBalances;
     this.addLiquidityTokens.forEach((item, index) => {
       if (this.tokenBalance[item.chain][item.assetID]) {
-        this.addLiquidityTokens[
-          index
-        ] = this.commonService.changeObjectValue<Token>(
-          item,
-          'amount',
-          this.tokenBalance[item.chain][item.assetID].amount
-        );
+        this.addLiquidityTokens[index].amount = this.tokenBalance[item.chain][
+          item.assetID
+        ].amount;
       } else {
-        this.addLiquidityTokens[
-          index
-        ] = this.commonService.changeObjectValue<Token>(item, 'amount', '--');
+        this.addLiquidityTokens[index].amount = '--';
       }
       if (item.chain === this.currentChain && item.amount === '--') {
-        this.addLiquidityTokens[
-          index
-        ] = this.commonService.changeObjectValue<Token>(item, 'amount', '0');
+        this.addLiquidityTokens[index].amount = '0';
       }
     });
   }

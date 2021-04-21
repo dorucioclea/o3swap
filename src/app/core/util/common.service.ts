@@ -78,17 +78,4 @@ export class CommonService {
       return hash;
     }
   }
-  changeObjectValue<T>(data: object, changeKey: string, value): T {
-    const result = {};
-    for (const key in data) {
-      if (Object.prototype.hasOwnProperty.call(data, key)) {
-        if (key === changeKey) {
-          result[key] = value;
-        } else {
-          result[key] = data[key];
-        }
-      }
-    }
-    return result as T;
-  }
 }
