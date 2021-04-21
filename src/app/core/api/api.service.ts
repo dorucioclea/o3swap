@@ -677,7 +677,7 @@ export class ApiService {
       .toPromise();
   }
 
-  private getAssetLogoByName(hash: string): string {
+  private getAssetLogoByHash(hash: string): string {
     let token;
     for (const key in this.chainTokens) {
       if (this.chainTokens.hasOwnProperty(key)) {
@@ -703,8 +703,11 @@ export class ApiService {
       }
       item.swapPathLogo = [];
       item.assetHashPath.forEach((hash) => {
-        item.swapPathLogo.push(this.getAssetLogoByName(hash));
+        item.swapPathLogo.push(this.getAssetLogoByHash(hash));
       });
+      if (item.assetHashPath.length !== item.swapPath.length) {
+        item.swapPathLogo.push(this.getAssetLogoByHash(toToken.assetID));
+      }
     });
     return this.shellSortSwapPath(swapPathArr);
   }
