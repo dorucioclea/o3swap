@@ -9,7 +9,12 @@ import {
   ChangeDetectorRef,
   SimpleChanges,
 } from '@angular/core';
-import { SwapStateType, Token, UPDATE_SETTING } from '@lib';
+import {
+  NEO_TOKEN,
+  NNEO_TOKEN,
+  SwapStateType,
+  Token,
+} from '@lib';
 import BigNumber from 'bignumber.js';
 import { SwapSettingComponent, SwapTokenComponent } from '@shared';
 import { NzModalService } from 'ng-zorro-antd/modal';
@@ -310,10 +315,10 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
     if (
       this.fromToken &&
       this.fromToken.chain === 'NEO' &&
-      this.fromToken.symbol === 'nNEO' &&
+      this.fromToken.assetID === NNEO_TOKEN.assetID &&
       this.toToken &&
       this.toToken.chain === 'NEO' &&
-      this.toToken.symbol === 'NEO' &&
+      this.toToken.assetID === NEO_TOKEN.assetID &&
       decimalPart &&
       decimalPart.length > 0
     ) {

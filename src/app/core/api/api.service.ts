@@ -27,6 +27,8 @@ import {
   LP_TOKENS,
   UPDATE_CHAIN_TOKENS,
   ChainTokens,
+  NEO_TOKEN,
+  CHAINS,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { CommonService } from '../util/common.service';
@@ -116,8 +118,10 @@ export class ApiService {
   ): Promise<AssetQueryResponse> {
     if (fromToken.chain === 'NEO' && toToken.chain === 'NEO') {
       if (
-        (fromToken.symbol === 'NEO' && toToken.symbol === 'nNEO') ||
-        (fromToken.symbol === 'nNEO' && toToken.symbol === 'NEO')
+        (fromToken.assetID === NEO_TOKEN.assetID &&
+          toToken.assetID === NNEO_TOKEN.assetID) ||
+        (toToken.assetID === NEO_TOKEN.assetID &&
+          fromToken.assetID === NNEO_TOKEN.assetID)
       ) {
         return this.getNeoNNeoSwapPath(fromToken, toToken, inputAmount);
       }
@@ -129,12 +133,24 @@ export class ApiService {
     this.commonService.log(1);
     if (fromToken.chain === toToken.chain) {
       if (
-        (fromToken.chain === 'ETH' && fromToken.symbol === 'ETH' && toToken.symbol === 'WETH') ||
-        (fromToken.chain === 'ETH' && fromToken.symbol === 'WETH' && toToken.symbol === 'ETH') ||
-        (fromToken.chain === 'BSC' && fromToken.symbol === 'BNB' && toToken.symbol === 'WBNB') ||
-        (fromToken.chain === 'BSC' && fromToken.symbol === 'WBNB' && toToken.symbol === 'BNB') ||
-        (fromToken.chain === 'HECO' && fromToken.symbol === 'WHT' && toToken.symbol === 'HT') ||
-        (fromToken.chain === 'HECO' && fromToken.symbol === 'HT' && toToken.symbol === 'WHT')
+        (fromToken.chain === 'ETH' &&
+          fromToken.assetID === ETH_SOURCE_ASSET_HASH &&
+          toToken.assetID === WETH_ASSET_HASH[toToken.chain].assetID) ||
+        (fromToken.chain === 'ETH' &&
+          fromToken.assetID === WETH_ASSET_HASH[fromToken.chain].assetID &&
+          toToken.assetID === ETH_SOURCE_ASSET_HASH) ||
+        (fromToken.chain === 'BSC' &&
+          fromToken.assetID === ETH_SOURCE_ASSET_HASH &&
+          toToken.assetID === WETH_ASSET_HASH[toToken.chain].assetID) ||
+        (fromToken.chain === 'BSC' &&
+          fromToken.assetID === WETH_ASSET_HASH[fromToken.chain].assetID &&
+          toToken.assetID === ETH_SOURCE_ASSET_HASH) ||
+        (fromToken.chain === 'HECO' &&
+          fromToken.assetID === WETH_ASSET_HASH[fromToken.chain].assetID &&
+          toToken.assetID === ETH_SOURCE_ASSET_HASH) ||
+        (fromToken.chain === 'HECO' &&
+          fromToken.assetID === ETH_SOURCE_ASSET_HASH &&
+          toToken.assetID === WETH_ASSET_HASH[toToken.chain].assetID)
       ) {
         return this.getEthWEthSwapPath(fromToken, toToken, inputAmount);
       }
@@ -149,8 +165,8 @@ export class ApiService {
     const fromUsd = USD_TOKENS.find((item) => item.chain === fromToken.chain);
     const toUsd = USD_TOKENS.find((item) => item.chain === toToken.chain);
     if (
-      fromUsd.symbol === fromToken.symbol &&
-      toUsd.symbol === toToken.symbol
+      fromUsd.assetID === fromToken.assetID &&
+      toUsd.assetID === toToken.assetID
     ) {
       const res = await this.getFromEthCrossChainSwapPath(
         fromToken,
@@ -159,11 +175,11 @@ export class ApiService {
       );
       return this.handleReceiveSwapPathFiat(res, toToken);
     }
-    this.commonService.log(toUsd.symbol);
-    this.commonService.log(toToken.symbol);
+    this.commonService.log(toUsd.assetID);
+    this.commonService.log(toToken.assetID);
     if (
-      fromUsd.symbol !== fromToken.symbol &&
-      toUsd.symbol === toToken.symbol
+      fromUsd.assetID !== fromToken.assetID &&
+      toUsd.assetID === toToken.assetID
     ) {
       this.commonService.log(3);
       const res = await this.getFromEthCrossChainAggregatorSwapPath(
@@ -183,7 +199,7 @@ export class ApiService {
     inputAmount: string
   ): Promise<string[]> {
     if (NETWORK === 'MainNet') {
-      if (fromToken.symbol === 'fUSDT') {
+      if (fromToken.assetID === FUSDT_ASSET_HASH) {
         return of([FUSDT_ASSET_HASH]).toPromise();
       }
       return this.getToStandardSwapPathReq(
@@ -192,7 +208,7 @@ export class ApiService {
         inputAmount
       );
     } else {
-      if (fromToken.symbol === 'nNEO') {
+      if (fromToken.assetID === NNEO_TOKEN.assetID) {
         return of([NNEO_TOKEN.assetID]).toPromise();
       }
       return this.getToStandardSwapPathReq(
@@ -428,7 +444,10 @@ export class ApiService {
   ): Promise<AssetQueryResponse> {
     let result;
     // neo => nneo
-    if (fromToken.symbol === 'NEO' && toToken.symbol === 'nNEO') {
+    if (
+      fromToken.assetID === NEO_TOKEN.assetID &&
+      toToken.assetID === NNEO_TOKEN.assetID
+    ) {
       result = [
         {
           amount: [
@@ -436,11 +455,18 @@ export class ApiService {
             new BigNumber(inputAmount).shiftedBy(NNEO_TOKEN.decimals).toFixed(),
           ],
           swapPath: ['NEO', 'nNEO'],
+          swapPathLogo: [
+            this.getAssetLogoByHash(fromToken.assetID, fromToken.chain),
+            this.getAssetLogoByHash(toToken.assetID, toToken.chain),
+          ],
         },
       ];
     }
     // nneo => neo
-    if (fromToken.symbol === 'nNEO' && toToken.symbol === 'NEO') {
+    if (
+      fromToken.assetID === NNEO_TOKEN.assetID &&
+      toToken.assetID === NEO_TOKEN.assetID
+    ) {
       result = [
         {
           amount: [
@@ -448,6 +474,10 @@ export class ApiService {
             inputAmount,
           ],
           swapPath: ['nNEO', 'NEO'],
+          swapPathLogo: [
+            this.getAssetLogoByHash(fromToken.assetID, fromToken.chain),
+            this.getAssetLogoByHash(toToken.assetID, toToken.chain),
+          ],
         },
       ];
     }
@@ -482,6 +512,7 @@ export class ApiService {
                 amount: item.amounts,
                 swapPath,
                 assetHashPath: item.path,
+                swapPathLogo: item.path.map(hash => this.getAssetLogoByHash(hash, fromToken.chain)),
                 aggregator: item.aggregator,
               };
               target.push(temp);
@@ -506,6 +537,10 @@ export class ApiService {
           new BigNumber(inputAmount).shiftedBy(toToken.decimals).toFixed(),
         ],
         swapPath: [fromToken.symbol, toToken.symbol],
+        swapPathLogo: [
+          this.getAssetLogoByHash(fromToken.assetID, fromToken.chain),
+          this.getAssetLogoByHash(toToken.assetID, toToken.chain),
+        ],
       },
     ];
     this.commonService.log(result);
@@ -523,15 +558,11 @@ export class ApiService {
     );
     let fromAssetHash = fromToken.assetID;
     let toAssetHash = toToken.assetID;
-    if (
-      fromToken.symbol === WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
-    ) {
+    if (fromToken.assetID === ETH_SOURCE_ASSET_HASH) {
       fromAssetHash = WETH_ASSET_HASH[fromToken.chain].assetID;
     }
-    if (
-      toToken.symbol === WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
-    ) {
-      toAssetHash = WETH_ASSET_HASH[fromToken.chain].assetID;
+    if (toToken.assetID === ETH_SOURCE_ASSET_HASH) {
+      toAssetHash = WETH_ASSET_HASH[toToken.chain].assetID;
     }
     return this.http
       .post(`${INQUIRY_HOST}/v1/${fromToken.chain.toLowerCase()}/quote`, {
@@ -558,19 +589,22 @@ export class ApiService {
                 amount: item.amounts,
                 swapPath,
                 assetHashPath: item.path,
+                swapPathLogo: item.path.map((hash) =>
+                  this.getAssetLogoByHash(hash, fromToken.chain)
+                ),
                 aggregator: item.aggregator,
               };
-              if (
-                fromToken.symbol ===
-                WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
-              ) {
+              if (fromToken.assetID === ETH_SOURCE_ASSET_HASH) {
                 temp.swapPath.unshift(fromToken.symbol);
+                temp.swapPathLogo.unshift(
+                  this.getAssetLogoByHash(fromToken.assetID, fromToken.chain)
+                );
               }
-              if (
-                toToken.symbol ===
-                WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
-              ) {
+              if (toToken.assetID === ETH_SOURCE_ASSET_HASH) {
                 temp.swapPath.push(toToken.symbol);
+                temp.swapPathLogo.push(
+                  this.getAssetLogoByHash(toToken.assetID, toToken.chain)
+                );
               }
               target.push(temp);
             });
@@ -612,6 +646,9 @@ export class ApiService {
       const polyAmountOut = res2[0].amount[1];
       res1Item.amount.push(polyAmountOut);
       res1Item.swapPath.push(toToken.symbol);
+      res1Item.swapPathLogo.push(
+        this.getAssetLogoByHash(toToken.assetID, toToken.chain)
+      );
     }
     this.commonService.log(res1);
     return res1;
@@ -644,6 +681,10 @@ export class ApiService {
                   res.amount_out,
                 ],
                 swapPath: [fromToken.symbol, toToken.symbol],
+                swapPathLogo: [
+                  this.getAssetLogoByHash(fromToken.assetID, fromToken.chain),
+                  this.getAssetLogoByHash(toToken.assetID, toToken.chain),
+                ],
               },
             ];
             return result;
@@ -677,17 +718,9 @@ export class ApiService {
       .toPromise();
   }
 
-  private getAssetLogoByHash(hash: string): string {
-    let token;
-    for (const key in this.chainTokens) {
-      if (this.chainTokens.hasOwnProperty(key)) {
-        const tokenList = this.chainTokens[key];
-        token = tokenList.find((item) => item.assetID === hash);
-        if (token) {
-          break;
-        }
-      }
-    }
+  private getAssetLogoByHash(hash: string, chain: CHAINS): string {
+    const tokenList: Token[] = this.chainTokens[chain];
+    const token = tokenList.find((item) => item.assetID === hash);
     return token && token.logo;
   }
 
@@ -697,17 +730,6 @@ export class ApiService {
   ): AssetQueryResponse {
     swapPathArr.forEach((item) => {
       item.receiveAmount = item.amount[item.amount.length - 1];
-      const endTokenName = item.swapPath[item.swapPath.length - 1];
-      if (typeof toToken !== 'string' && endTokenName !== toToken.symbol) {
-        item.swapPath.push(toToken.symbol);
-      }
-      item.swapPathLogo = [];
-      item.assetHashPath.forEach((hash) => {
-        item.swapPathLogo.push(this.getAssetLogoByHash(hash));
-      });
-      if (item.assetHashPath.length !== item.swapPath.length) {
-        item.swapPathLogo.push(this.getAssetLogoByHash(toToken.assetID));
-      }
     });
     return this.shellSortSwapPath(swapPathArr);
   }

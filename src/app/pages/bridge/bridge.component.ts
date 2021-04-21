@@ -141,7 +141,11 @@ export class BridgeComponent implements OnInit, OnDestroy {
     this.showToTokenList = false;
     if (type === 'from') {
       this.fromToken = token;
-      if (this.toToken && this.toToken.symbol === token.symbol) {
+      if (
+        this.toToken &&
+        this.toToken.assetID === token.assetID &&
+        this.toToken.chain === token.chain
+      ) {
         this.toToken = null;
         this.toAddress = null;
       }
@@ -151,7 +155,11 @@ export class BridgeComponent implements OnInit, OnDestroy {
       this.getFromTokenAmount();
     } else {
       this.toToken = token;
-      if (this.fromToken && this.fromToken.symbol === token.symbol) {
+      if (
+        this.fromToken &&
+        this.fromToken.assetID === token.assetID &&
+        this.fromToken.chain === token.chain
+      ) {
         this.fromToken = null;
         this.fromAddress = null;
       }

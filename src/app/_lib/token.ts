@@ -87,6 +87,15 @@ export const NNEO_TOKEN: Token = {
       ? `https://img.o3.network/logo/neo2/f46719e2d16bf50cddcef9d4bbfece901f73cbb6.png`
       : 'https://img.o3.network/logo/neo2/17da3881ab2d050fea414c80b3fa8324d756f60e.png',
 };
+export const NEO_TOKEN: Token = {
+  assetID: '0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b',
+  symbol: 'NEO',
+  decimals: 0,
+  amount: '0',
+  chain: 'NEO',
+  logo:
+    'https://img.o3.network/logo/neo2/0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b.png',
+};
 //#endregion
 
 export const CONST_BRIDGE_TOKENS: Token[] = [

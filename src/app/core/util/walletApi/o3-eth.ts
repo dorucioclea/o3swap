@@ -303,7 +303,9 @@ export class O3EthWalletApiService {
       WETH_ASSET_HASH[fromToken.chain].assetID
     );
     const data = swapContract.methods
-      .withdraw(new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed())
+      .withdraw(
+        new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed()
+      )
       .encodeABI();
     return o3dapi.ETH.request({
       method: 'eth_sendTransaction',
@@ -364,7 +366,9 @@ export class O3EthWalletApiService {
       toChainId: SWAP_CONTRACT_CHAIN_ID[toToken.chain],
       toAssetHash: this.commonService.add0xHash(toToken.assetID),
       toAddress,
-      amount: new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed(),
+      amount: new BigNumber(inputAmount)
+        .shiftedBy(fromToken.decimals)
+        .toFixed(),
       minOutAmount: this.swapService.getMinAmountOut(receiveAmount, slipValue),
       fee: bigNumberPolyFee,
       id: 1,
@@ -439,7 +443,9 @@ export class O3EthWalletApiService {
     const receiveAmount =
       chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
     const params = {
-      amountIn: new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed(),
+      amountIn: new BigNumber(inputAmount)
+        .shiftedBy(fromToken.decimals)
+        .toFixed(),
       swapAmountOutMin: this.swapService.getMinAmountOut(
         receiveAmount,
         O3_AGGREGATOR_SLIPVALUE
@@ -857,7 +863,9 @@ export class O3EthWalletApiService {
       toPoolId: 1,
       toChainId,
       toAddress: address,
-      amount: new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed(),
+      amount: new BigNumber(inputAmount)
+        .shiftedBy(fromToken.decimals)
+        .toFixed(),
       minOutAmount: this.swapService.getMinAmountOut(
         receiveAmount,
         BRIDGE_SLIPVALUE
@@ -930,7 +938,9 @@ export class O3EthWalletApiService {
       toChainId,
       toAssetHash: this.commonService.add0xHash(usdtToken.assetID),
       toAddress: address,
-      amount: new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed(),
+      amount: new BigNumber(inputAmount)
+        .shiftedBy(fromToken.decimals)
+        .toFixed(),
       minOutAmount: this.swapService.getMinAmountOut(
         receiveAmount,
         BRIDGE_SLIPVALUE
@@ -991,9 +1001,7 @@ export class O3EthWalletApiService {
   ): Promise<string> {
     this.commonService.log('\u001b[32m  ✓ start get allowance \u001b[0m');
     let tokenhash = fromToken.assetID;
-    if (
-      fromToken.symbol === WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
-    ) {
+    if (fromToken.assetID === ETH_SOURCE_ASSET_HASH) {
       tokenhash = WETH_ASSET_HASH[fromToken.chain].assetID;
     }
     const json = await this.getEthErc20Json();
@@ -1031,9 +1039,7 @@ export class O3EthWalletApiService {
     aggregator?: string
   ): Promise<any> {
     let tokenhash = fromToken.assetID;
-    if (
-      fromToken.symbol === WETH_ASSET_HASH[fromToken.chain].standardTokenSymbol
-    ) {
+    if (fromToken.assetID === ETH_SOURCE_ASSET_HASH) {
       tokenhash = WETH_ASSET_HASH[fromToken.chain].assetID;
     }
     let contract = ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain];

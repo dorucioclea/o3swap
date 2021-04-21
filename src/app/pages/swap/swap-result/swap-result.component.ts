@@ -19,6 +19,8 @@ import {
   WETH_ASSET_HASH,
   ConnectChainType,
   ETH_SOURCE_ASSET_HASH,
+  NEO_TOKEN,
+  NNEO_TOKEN,
 } from '@lib';
 import {
   ApiService,
@@ -260,11 +262,17 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     }
     // neo 同链
     if (this.fromToken.chain === 'NEO' && this.toToken.chain === 'NEO') {
-      if (this.fromToken.symbol === 'NEO' && this.toToken.symbol === 'nNEO') {
+      if (
+        this.fromToken.assetID === NEO_TOKEN.assetID &&
+        this.toToken.assetID === NNEO_TOKEN.assetID
+      ) {
         this.mintNNeo();
         return;
       }
-      if (this.fromToken.symbol === 'nNEO' && this.toToken.symbol === 'NEO') {
+      if (
+        this.fromToken.assetID === NNEO_TOKEN.assetID &&
+        this.toToken.assetID === NEO_TOKEN.assetID
+      ) {
         this.releaseNeo();
         return;
       }
@@ -278,31 +286,23 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     // eth 同链
     if (this.fromToken.chain === this.toToken.chain) {
       if (
-        this.fromToken.symbol ===
-          WETH_ASSET_HASH[this.fromToken.chain].standardTokenSymbol &&
-        this.toToken.symbol === WETH_ASSET_HASH[this.toToken.chain].symbol
+        this.fromToken.assetID === ETH_SOURCE_ASSET_HASH &&
+        this.toToken.assetID === WETH_ASSET_HASH[this.toToken.chain].assetID
       ) {
         return this.depositWEth();
       }
       if (
-        this.fromToken.symbol ===
-          WETH_ASSET_HASH[this.fromToken.chain].symbol &&
-        this.toToken.symbol ===
-          WETH_ASSET_HASH[this.toToken.chain].standardTokenSymbol
+        this.fromToken.assetID ===
+          WETH_ASSET_HASH[this.fromToken.chain].assetID &&
+        this.toToken.assetID === ETH_SOURCE_ASSET_HASH
       ) {
         return this.withdrawalWeth();
       }
-      if (
-        this.toToken.symbol ===
-        WETH_ASSET_HASH[this.toToken.chain].standardTokenSymbol
-      ) {
+      if (this.toToken.assetID === ETH_SOURCE_ASSET_HASH) {
         this.swapExactTokensForETH();
         return;
       }
-      if (
-        this.fromToken.symbol ===
-        WETH_ASSET_HASH[this.fromToken.chain].standardTokenSymbol
-      ) {
+      if (this.fromToken.assetID === ETH_SOURCE_ASSET_HASH) {
         this.swapExactETHForTokens();
         return;
       }
@@ -313,12 +313,12 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     if (this.fromToken.chain !== this.toToken.chain) {
       const fromUsd = USD_TOKENS.find(
         (item) =>
-          item.symbol === this.fromToken.symbol &&
+          item.assetID === this.fromToken.assetID &&
           item.chain === this.fromToken.chain
       );
       const toUsd = USD_TOKENS.find(
         (item) =>
-          item.symbol === this.toToken.symbol &&
+          item.assetID === this.toToken.assetID &&
           item.chain === this.toToken.chain
       );
       if (fromUsd && toUsd) {
@@ -328,10 +328,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       if (!toUsd) {
         return;
       }
-      if (
-        this.fromToken.symbol ===
-        WETH_ASSET_HASH[this.fromToken.chain].standardTokenSymbol
-      ) {
+      if (this.fromToken.assetID === ETH_SOURCE_ASSET_HASH) {
         this.swapExactETHForTokensCrossChain();
         return;
       } else {
@@ -633,12 +630,10 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     }
     if (
       WETH_ASSET_HASH[this.fromToken.chain] &&
-      ((this.fromToken.symbol ===
-        WETH_ASSET_HASH[this.fromToken.chain].symbol &&
-        this.toToken.symbol ===
-          WETH_ASSET_HASH[this.toToken.chain].standardTokenSymbol) ||
-        this.fromToken.symbol ===
-          WETH_ASSET_HASH[this.fromToken.chain].standardTokenSymbol)
+      ((this.fromToken.assetID ===
+        WETH_ASSET_HASH[this.fromToken.chain].assetID &&
+        this.toToken.assetID === ETH_SOURCE_ASSET_HASH) ||
+        this.fromToken.assetID === ETH_SOURCE_ASSET_HASH)
     ) {
       this.commonService.log('check show approve return');
       return false;
@@ -703,14 +698,36 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   checkO3SwapFee(): void {
     if (this.fromToken.chain === this.toToken.chain) {
       if (
-        (this.fromToken.chain === 'NEO' && this.fromToken.symbol === 'NEO' && this.toToken.symbol === 'nNEO') ||
-        (this.fromToken.chain === 'NEO' && this.fromToken.symbol === 'nNEO' && this.toToken.symbol === 'NEO') ||
-        (this.fromToken.chain === 'ETH' && this.fromToken.symbol === 'ETH' && this.toToken.symbol === 'WETH') ||
-        (this.fromToken.chain === 'ETH' && this.fromToken.symbol === 'WETH' && this.toToken.symbol === 'ETH') ||
-        (this.fromToken.chain === 'BSC' && this.fromToken.symbol === 'WBNB' && this.toToken.symbol === 'BNB') ||
-        (this.fromToken.chain === 'BSC' && this.fromToken.symbol === 'BNB' && this.toToken.symbol === 'WBNB') ||
-        (this.fromToken.chain === 'HECO' && this.fromToken.symbol === 'HT' && this.toToken.symbol === 'WHT') ||
-        (this.fromToken.chain === 'HECO' && this.fromToken.symbol === 'WHT' && this.toToken.symbol === 'HT')
+        (this.fromToken.chain === 'NEO' &&
+          this.fromToken.assetID === NEO_TOKEN.assetID &&
+          this.toToken.assetID === NNEO_TOKEN.assetID) ||
+        (this.fromToken.chain === 'NEO' &&
+          this.fromToken.assetID === NNEO_TOKEN.assetID &&
+          this.toToken.assetID === NEO_TOKEN.assetID) ||
+        (this.fromToken.chain === 'ETH' &&
+          this.fromToken.assetID === ETH_SOURCE_ASSET_HASH &&
+          this.toToken.assetID ===
+            WETH_ASSET_HASH[this.toToken.chain].assetID) ||
+        (this.fromToken.chain === 'ETH' &&
+          this.fromToken.assetID ===
+            WETH_ASSET_HASH[this.fromToken.chain].assetID &&
+          this.toToken.assetID === ETH_SOURCE_ASSET_HASH) ||
+        (this.fromToken.chain === 'BSC' &&
+          this.fromToken.assetID ===
+            WETH_ASSET_HASH[this.fromToken.chain].assetID &&
+          this.toToken.assetID === ETH_SOURCE_ASSET_HASH) ||
+        (this.fromToken.chain === 'BSC' &&
+          this.fromToken.assetID === ETH_SOURCE_ASSET_HASH &&
+          this.toToken.assetID ===
+            WETH_ASSET_HASH[this.toToken.chain].assetID) ||
+        (this.fromToken.chain === 'HECO' &&
+          this.fromToken.assetID === ETH_SOURCE_ASSET_HASH &&
+          this.toToken.assetID ===
+            WETH_ASSET_HASH[this.toToken.chain].assetID) ||
+        (this.fromToken.chain === 'HECO' &&
+          this.fromToken.assetID ===
+            WETH_ASSET_HASH[this.fromToken.chain].assetID &&
+          this.toToken.assetID === ETH_SOURCE_ASSET_HASH)
       ) {
         this.showO3SwapFee = false;
         return;
@@ -722,10 +739,14 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.showO3SwapFee = true;
     }
     const fromUsd = USD_TOKENS.find(
-      (item) => item.symbol === this.fromToken.symbol && item.chain === this.fromToken.chain
+      (item) =>
+        item.assetID === this.fromToken.assetID &&
+        item.chain === this.fromToken.chain
     );
     const toUsd = USD_TOKENS.find(
-      (item) => item.symbol === this.toToken.symbol && item.chain === this.toToken.chain
+      (item) =>
+        item.assetID === this.toToken.assetID &&
+        item.chain === this.toToken.chain
     );
     if (fromUsd && toUsd) {
       this.showO3SwapFee = false;
@@ -830,7 +851,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     if (
       this.showPolyFee &&
       this.polyFee &&
-      this.fromToken.symbol !== SOURCE_TOKEN_SYMBOL[this.fromToken.chain]
+      this.fromToken.assetID !== ETH_SOURCE_ASSET_HASH
     ) {
       if (
         !chainBalances[ETH_SOURCE_ASSET_HASH] ||
@@ -850,7 +871,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     if (
       this.showPolyFee &&
       this.polyFee &&
-      this.fromToken.symbol === SOURCE_TOKEN_SYMBOL[this.fromToken.chain]
+      this.fromToken.assetID === ETH_SOURCE_ASSET_HASH
     ) {
       const allNeedBalance = new BigNumber(this.inputAmount).plus(
         new BigNumber(this.polyFee)
