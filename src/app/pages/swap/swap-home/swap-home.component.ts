@@ -298,11 +298,11 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
     }
     // neo nneo 互换只能整单位
     if (
-      this.fromToken.chain === 'NEO' &&
-      this.toToken.chain === 'NEO' &&
       this.fromToken &&
+      this.fromToken.chain === 'NEO' &&
       this.fromToken.symbol === 'nNEO' &&
       this.toToken &&
+      this.toToken.chain === 'NEO' &&
       this.toToken.symbol === 'NEO' &&
       decimalPart &&
       decimalPart.length > 0
