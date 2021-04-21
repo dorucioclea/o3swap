@@ -143,7 +143,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
             res.assetID !== this.fromToken.assetID ||
             res.chain !== this.fromToken.chain)
         ) {
-          if (this.fromToken.chain !== res.chain) {
+          if (this.fromToken && this.fromToken.chain !== res.chain) {
             this.toToken = null;
           }
           this.inputAmount = '';
