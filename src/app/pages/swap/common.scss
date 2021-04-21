@@ -1,6 +1,7 @@
 section.wrapper {
   width: 460px;
-  height: 631px;
+  min-height: 631px;
+  height: max-content;
   margin: 0 auto;
   margin-top: 89px;
   background-image: url("/assets/images/swap/bg.png");

@@ -1,10 +1,10 @@
 <section class="wrapper inquiry-wrapper" *ngIf="showInquiry">
   <p class="title">Swap</p>
   <ng-lottie class="inquiry-json" [options]="inquiryOptions"></ng-lottie>
-  <p class="inquirying">Inquerying...</p>
+  <p class="inquirying">Requesting quote...</p>
 </section>
 
-<section class="wrapper result-wrapper" *ngIf="!showInquiry" [ngClass]="{route: chooseSwapPath?.swapPath.length > 4}">
+<section class="wrapper result-wrapper" *ngIf="!showInquiry">
   <p class="title">Swap</p>
   <div class="exchange-amount">
     <p class="left">
