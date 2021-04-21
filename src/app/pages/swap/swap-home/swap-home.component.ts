@@ -96,11 +96,9 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
       currentFromToken &&
       this.tokenBalance[this.fromToken.chain][this.fromToken.assetID]
     ) {
-      this.fromToken = this.commonService.changeObjectValue<Token>(
-        this.fromToken,
-        'amount',
-        this.tokenBalance[this.fromToken.chain][this.fromToken.assetID].amount
-      );
+      this.fromToken.amount = this.tokenBalance[this.fromToken.chain][
+        this.fromToken.assetID
+      ].amount;
     }
   }
 
@@ -213,11 +211,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
     this.tokenBalance.BSC = state.bscBalances;
     this.tokenBalance.HECO = state.hecoBalances;
     if (this.fromToken) {
-      this.fromToken = this.commonService.changeObjectValue<Token>(
-        this.fromToken,
-        'amount',
-        '0'
-      );
+      this.fromToken.amount = '0';
     }
     if (
       this.fromToken &&
@@ -226,11 +220,9 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
       this.fromToken.amount = this.tokenBalance[this.fromToken.chain][
         this.fromToken.assetID
       ].amount;
-      this.fromToken = this.commonService.changeObjectValue<Token>(
-        this.fromToken,
-        'amount',
-        this.tokenBalance[this.fromToken.chain][this.fromToken.assetID].amount
-      );
+      this.fromToken.amount = this.tokenBalance[this.fromToken.chain][
+        this.fromToken.assetID
+      ].amount;
     }
   }
   checkCanInquiry(): boolean {

@@ -44,7 +44,7 @@ export class SwapComponent implements OnInit, OnDestroy {
     const chain = this.metaMaskWalletApiService.getChain();
     if (chain) {
       await this.apiService.getTokens();
-      this.fromToken = this.chainTokens[chain][0];
+      this.fromToken = Object.assign({}, this.chainTokens[chain][0]);
     } else {
       this.fromToken = USD_TOKENS[0];
     }
