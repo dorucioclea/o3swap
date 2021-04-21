@@ -418,6 +418,9 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     const swapApi = this.getEthDapiService();
     swapApi.getBalancByHash(this.LPToken).then((res) => {
       // this.LPToken['amount'] = res || '0';
+      if (this.LPToken.amount !== res) {
+        this.getPusdtBalance();
+      }
       this.LPToken = this.commonService.changeObjectValue<Token>(
         this.LPToken,
         'amount',
