@@ -116,10 +116,8 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  getRates(): void {
-    this.apiService.getRates().subscribe((res) => {
-      this.rates = res;
-    });
+  async getRates(): Promise<void> {
+    this.rates = await this.apiService.getRates();
   }
 
   showTokens(type: 'from' | 'to'): void {
@@ -332,12 +330,15 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
     this.changeData = true;
     this.chooseSwapPath = {};
   }
-  calcutionInputAmountFiat(): void {
+  async calcutionInputAmountFiat(): Promise<void> {
     if (!this.fromToken) {
       this.inputAmountFiat = '';
       return;
     }
     this.commonService.log(this.rates);
+    if (!this.rates['eth']) {
+      await this.getRates();
+    }
     const price = this.commonService.getAssetRate(this.rates, this.fromToken);
     if (this.inputAmount && price) {
       this.inputAmountFiat = new BigNumber(this.inputAmount)

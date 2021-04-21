@@ -186,10 +186,8 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       .toFixed();
   }
 
-  getRates(): void {
-    this.apiService.getRates().subscribe((res) => {
-      this.rates = res;
-    });
+  async getRates(): Promise<void>  {
+    this.rates = await this.apiService.getRates();
   }
 
   changeLiquidityType(params: LiquidityType): void {

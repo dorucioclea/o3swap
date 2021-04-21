@@ -174,10 +174,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     }
   }
 
-  getRates(): void {
-    this.apiService.getRates().subscribe((res) => {
-      this.rates = res;
-    });
+  async getRates(): Promise<void> {
+    this.rates = await this.apiService.getRates();
   }
 
   setInquiryInterval(): void {
@@ -669,11 +667,18 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         }
       });
   }
-  handleReceiveSwapPathFiat(): void {
+  async handleReceiveSwapPathFiat(): Promise<void> {
     this.receiveSwapPathArray.forEach((item) => {
       item.receiveAmount = new BigNumber(item.receiveAmount)
         .shiftedBy(-this.toToken.decimals)
         .toFixed();
+    });
+    this.chooseSwapPathIndex = 0;
+    this.chooseSwapPath = this.receiveSwapPathArray[0];
+    if (!this.rates['eth']) {
+      await this.getRates();
+    }
+    this.receiveSwapPathArray.forEach((item) => {
       // 计算法币价格
       const price = this.commonService.getAssetRate(this.rates, this.toToken);
       if (price) {
@@ -683,8 +688,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
           .toFixed();
       }
     });
-    this.chooseSwapPathIndex = 0;
-    this.chooseSwapPath = this.receiveSwapPathArray[0];
   }
   async getNetworkFee(): Promise<void> {
     this.polyFee = '';

@@ -101,14 +101,17 @@ export class ApiService {
     this.store.dispatch({ type: UPDATE_CHAIN_TOKENS, data: apiTokens });
   }
 
-  getRates(): Observable<any> {
-    return this.http.get(`${this.RATE_HOST}/crypto/rates`).pipe(
-      map((res: CommonHttpResponse) => {
-        if (res.status === 'success') {
-          return res.data;
-        }
-      })
-    );
+  getRates(): Promise<any> {
+    return this.http
+      .get(`${this.RATE_HOST}/crypto/rates`)
+      .pipe(
+        map((res: CommonHttpResponse) => {
+          if (res.status === 'success') {
+            return res.data;
+          }
+        })
+      )
+      .toPromise();
   }
 
   async getSwapPath(
@@ -512,7 +515,9 @@ export class ApiService {
                 amount: item.amounts,
                 swapPath,
                 assetHashPath: item.path,
-                swapPathLogo: item.path.map(hash => this.getAssetLogoByHash(hash, fromToken.chain)),
+                swapPathLogo: item.path.map((hash) =>
+                  this.getAssetLogoByHash(hash, fromToken.chain)
+                ),
                 aggregator: item.aggregator,
               };
               target.push(temp);

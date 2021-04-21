@@ -444,10 +444,13 @@ export class BridgeComponent implements OnInit, OnDestroy {
     }
   }
 
-  calcutionInputAmountFiat(): void {
+  async calcutionInputAmountFiat(): Promise<void> {
     if (!this.fromToken) {
       this.inputAmountFiat = '';
       return;
+    }
+    if (!this.rates['eth']) {
+      await this.getRates();
     }
     const price = this.commonService.getAssetRate(this.rates, this.fromToken);
     if (this.inputAmount && price) {
@@ -460,10 +463,13 @@ export class BridgeComponent implements OnInit, OnDestroy {
     }
   }
 
-  calcutionReceiveAmountFiat(): void {
+  async calcutionReceiveAmountFiat(): Promise<void> {
     if (!this.toToken) {
       this.receiveAmountFiat = '';
       return;
+    }
+    if (!this.rates['eth']) {
+      await this.getRates();
     }
     const price = this.commonService.getAssetRate(this.rates, this.fromToken);
     if (this.receiveAmount && price) {
@@ -494,10 +500,8 @@ export class BridgeComponent implements OnInit, OnDestroy {
     this.calcutionReceiveAmountFiat();
     this.getBridgeRate();
   }
-  getRates(): void {
-    this.apiService.getRates().subscribe((res) => {
-      this.rates = res;
-    });
+  async getRates(): Promise<void> {
+    this.rates = await this.apiService.getRates();
   }
   getBridgeRate(): void {
     if (this.inputAmount && this.receiveAmount) {
