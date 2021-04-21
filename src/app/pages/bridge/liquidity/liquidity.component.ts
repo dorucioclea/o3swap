@@ -32,6 +32,8 @@ import {
 import BigNumber from 'bignumber.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { ApproveComponent } from '@shared/compontent/approve/approve.component';
 
 type LiquidityType = 'add' | 'remove';
 interface State {
@@ -46,9 +48,15 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   BRIDGE_SLIPVALUE = BRIDGE_SLIPVALUE;
   swapProgress = 20;
   addLiquidityTokens: Token[] = JSON.parse(JSON.stringify(USD_TOKENS));
-  USDTToken: Token = this.addLiquidityTokens.find((item) => item.symbol.indexOf('USDT') >= 0);
-  BUSDToken: Token = this.addLiquidityTokens.find((item) => item.symbol.indexOf('BUSD') >= 0);
-  HUSDToken: Token = this.addLiquidityTokens.find((item) => item.symbol.indexOf('HUSD') >= 0);
+  USDTToken: Token = this.addLiquidityTokens.find(
+    (item) => item.symbol.indexOf('USDT') >= 0
+  );
+  BUSDToken: Token = this.addLiquidityTokens.find(
+    (item) => item.symbol.indexOf('BUSD') >= 0
+  );
+  HUSDToken: Token = this.addLiquidityTokens.find(
+    (item) => item.symbol.indexOf('HUSD') >= 0
+  );
   liquidityType: LiquidityType = 'add';
   rates = {};
 
@@ -90,7 +98,8 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     private nzMessage: NzMessageService,
     private router: Router,
     private swapService: SwapService,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private modal: NzModalService
   ) {
     this.swap$ = store.select('swap');
     this.addLiquidityTokens.forEach((item, index) => {
@@ -233,7 +242,10 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   }
 
   async maxRemoveLiquidityInput(index: number): Promise<void> {
-    if (!new BigNumber(this.LPToken.amount).isNaN() && !new BigNumber(this.LPToken.amount).isZero()) {
+    if (
+      !new BigNumber(this.LPToken.amount).isNaN() &&
+      !new BigNumber(this.LPToken.amount).isZero()
+    ) {
       this.payAmount[index] = this.LPToken.amount;
       this.removeLiquidityInputAmount[
         index
@@ -265,7 +277,9 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     }
     const allowance = await swapApi.getAllowance(token, this.currentAddress);
     if (new BigNumber(allowance).comparedTo(tokenAmount) < 0) {
-      await swapApi.approve(token, this.currentAddress);
+      // await swapApi.approve(token, this.currentAddress);
+      this.showApproveModal(token);
+      return;
     }
     const amountOut = new BigNumber(this.receiveAmount[index])
       .shiftedBy(this.LPToken.decimals)
@@ -313,7 +327,9 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       this.currentAddress
     );
     if (new BigNumber(allowance).comparedTo(lpPayAmount) < 0) {
-      await swapApi.approve(this.LPToken, this.currentAddress);
+      // await swapApi.approve(this.LPToken, this.currentAddress);
+      this.showApproveModal(token);
+      return;
     }
     const amountOut = new BigNumber(this.removeLiquidityInputAmount[index])
       .shiftedBy(token.decimals)
@@ -338,6 +354,33 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   }
 
   //#region
+  showApproveModal(token: Token): void {
+    let walletName: string;
+    switch (token.chain) {
+      case 'ETH':
+        walletName = this.ethWalletName;
+        break;
+      case 'BSC':
+        walletName = this.bscWalletName;
+        break;
+      case 'HECO':
+        walletName = this.hecoWalletName;
+        break;
+    }
+    this.modal.create({
+      nzContent: ApproveComponent,
+      nzFooter: null,
+      nzTitle: null,
+      nzClosable: false,
+      nzMaskClosable: false,
+      nzClassName: 'custom-modal',
+      nzComponentParams: {
+        fromToken: token,
+        fromAddress: this.currentAddress,
+        walletName,
+      },
+    });
+  }
   checkWalletConnect(token: Token): boolean {
     if (token.chain === 'ETH' && !this.ethAccountAddress) {
       this.nzMessage.error('Please connect the ETH wallet first');
@@ -374,21 +417,36 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     }
     const swapApi = this.getEthDapiService();
     swapApi.getBalancByHash(this.LPToken).then((res) => {
-      this.LPToken.amount = res || '0';
+      // this.LPToken['amount'] = res || '0';
+      this.LPToken = this.commonService.changeObjectValue<Token>(
+        this.LPToken,
+        'amount',
+        res || '0'
+      );
     });
   }
   private handleAccountBalance(state): void {
     this.tokenBalance.ETH = state.ethBalances;
     this.tokenBalance.BSC = state.bscBalances;
     this.tokenBalance.HECO = state.hecoBalances;
-    this.addLiquidityTokens.forEach((item) => {
+    this.addLiquidityTokens.forEach((item, index) => {
       if (this.tokenBalance[item.chain][item.assetID]) {
-        item.amount = this.tokenBalance[item.chain][item.assetID].amount;
+        this.addLiquidityTokens[
+          index
+        ] = this.commonService.changeObjectValue<Token>(
+          item,
+          'amount',
+          this.tokenBalance[item.chain][item.assetID].amount
+        );
       } else {
-        item.amount = '--';
+        this.addLiquidityTokens[
+          index
+        ] = this.commonService.changeObjectValue<Token>(item, 'amount', '--');
       }
       if (item.chain === this.currentChain && item.amount === '--') {
-        item.amount = '0';
+        this.addLiquidityTokens[
+          index
+        ] = this.commonService.changeObjectValue<Token>(item, 'amount', '0');
       }
     });
   }
