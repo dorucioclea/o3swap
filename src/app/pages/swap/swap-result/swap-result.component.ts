@@ -319,7 +319,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       const toUsd = USD_TOKENS.find(
         (item) =>
           item.symbol === this.toToken.symbol &&
-          item.chain === this.fromToken.chain
+          item.chain === this.toToken.chain
       );
       if (fromUsd && toUsd) {
         this.swapCrossChainEth();
