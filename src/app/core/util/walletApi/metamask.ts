@@ -152,6 +152,7 @@ export class MetaMaskWalletApiService {
       .request({ method: 'eth_requestAccounts' })
       .then((result) => {
         if (result.length <= 0) {
+          this.nzMessage.error('Please update your MetaMask extension');
           return;
         }
         this.commonService.log(result);
