@@ -22,7 +22,7 @@
         <div class="desc">
           <span *ngIf="txAtPage!=='liquidity'">Swap</span>
           <span
-            *ngIf="txAtPage==='liquidity'">{{ transaction?.fromToken.symbol==='LP' ? 'Withdrawal' : 'Deposit' }}</span>
+            *ngIf="txAtPage==='liquidity'">{{ transaction?.fromToken.symbol==='LP' ? 'Withdraw' : 'Deposit' }}</span>
           {{ transaction?.amount }} {{ transaction?.fromToken?.symbol }}
           for {{ transaction?.receiveAmount | transNumber }}
           {{ transaction?.toToken?.symbol }}
