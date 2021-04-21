@@ -70,7 +70,7 @@
       <div class="value">{{ polyFee | transNumber }} {{ SOURCE_TOKEN_SYMBOL[fromToken.chain] }}</div>
     </div>
     <div class="fee-item" *ngIf="showO3SwapFee">
-      <p class="label">Quote includes {{ O3_AGGREGATOR_FEE }}% O3Swap fee</p>
+      <p class="label">Quote includes a {{ O3_AGGREGATOR_FEE }}% O3Swap fee</p>
     </div>
   </div>
   <button class="confirm" (click)="swap()">Confirm</button>
