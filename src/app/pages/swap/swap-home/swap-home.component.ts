@@ -9,12 +9,7 @@ import {
   ChangeDetectorRef,
   SimpleChanges,
 } from '@angular/core';
-import {
-  NEO_TOKEN,
-  NNEO_TOKEN,
-  SwapStateType,
-  Token,
-} from '@lib';
+import { NEO_TOKEN, NNEO_TOKEN, SwapStateType, Token } from '@lib';
 import BigNumber from 'bignumber.js';
 import { SwapSettingComponent, SwapTokenComponent } from '@shared';
 import { NzModalService } from 'ng-zorro-antd/modal';
@@ -38,6 +33,10 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
   @Input() toToken: Token;
   @Input() chooseSwapPath;
   @Input() inputAmount: string; // 支付的 token 数量
+  @Input() set setRates(value: object) {
+    this.rates = value;
+    this.calcutionInputAmountFiat();
+  }
   @Output() toInquiryPage = new EventEmitter<{
     inputAmount: string;
     fromToken: Token;
@@ -77,7 +76,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
-    this.getRates();
+    // this.getRates();
     this.settingUnScribe = this.setting$.subscribe((state) => {
       this.slipValue = state.slipValue;
       this.deadline = state.deadline;
@@ -96,14 +95,16 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const currentFromToken: Token = changes.fromToken.currentValue;
-    if (
-      currentFromToken &&
-      this.tokenBalance[this.fromToken.chain][this.fromToken.assetID]
-    ) {
-      this.fromToken.amount = this.tokenBalance[this.fromToken.chain][
-        this.fromToken.assetID
-      ].amount;
+    if (changes.fromToken) {
+      const currentFromToken: Token = changes.fromToken.currentValue;
+      if (
+        currentFromToken &&
+        this.tokenBalance[this.fromToken.chain][this.fromToken.assetID]
+      ) {
+        this.fromToken.amount = this.tokenBalance[this.fromToken.chain][
+          this.fromToken.assetID
+        ].amount;
+      }
     }
   }
 
@@ -336,9 +337,9 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
       return;
     }
     this.commonService.log(this.rates);
-    if (!this.rates['eth']) {
-      await this.getRates();
-    }
+    // if (!this.rates['eth']) {
+    //   await this.getRates();
+    // }
     const price = this.commonService.getAssetRate(this.rates, this.fromToken);
     if (this.inputAmount && price) {
       this.inputAmountFiat = new BigNumber(this.inputAmount)

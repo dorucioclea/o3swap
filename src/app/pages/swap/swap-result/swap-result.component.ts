@@ -55,9 +55,13 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   @Input() toToken: Token;
   @Input() inputAmount: string; // 支付的 token 数量
   @Input() initData: any;
+  @Input() set setRates(value: object) {
+    this.rates = value;
+    this.calculationPrice();
+    this.handleReceiveSwapPathFiat();
+  }
   @Output() closePage = new EventEmitter<any>();
   @Output() swapFail = new EventEmitter();
-
   rates = {};
 
   inquiryOptions = {
@@ -120,7 +124,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.getRates();
+    // this.getRates();
     this.init();
     this.checkO3SwapFee();
     this.getSwapPathFun();
@@ -668,6 +672,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       });
   }
   async handleReceiveSwapPathFiat(): Promise<void> {
+    if (!this.receiveSwapPathArray) {
+      return;
+    }
     this.receiveSwapPathArray.forEach((item) => {
       item.receiveAmount = new BigNumber(item.receiveAmount)
         .shiftedBy(-this.toToken.decimals)
@@ -675,9 +682,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     });
     this.chooseSwapPathIndex = 0;
     this.chooseSwapPath = this.receiveSwapPathArray[0];
-    if (!this.rates['eth']) {
-      await this.getRates();
-    }
+    // if (!this.rates['eth']) {
+    //   await this.getRates();
+    // }
     this.receiveSwapPathArray.forEach((item) => {
       // 计算法币价格
       const price = this.commonService.getAssetRate(this.rates, this.toToken);
@@ -758,14 +765,16 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     }
   }
   calculationPrice(): void {
-    this.price = new BigNumber(this.chooseSwapPath.receiveAmount)
-      .dividedBy(new BigNumber(this.inputAmount))
-      .dp(7)
-      .toFixed();
-    this.lnversePrice = new BigNumber(this.inputAmount)
-      .dividedBy(new BigNumber(this.chooseSwapPath.receiveAmount))
-      .dp(7)
-      .toFixed();
+    if (this.chooseSwapPath && this.chooseSwapPath.receiveAmount) {
+      this.price = new BigNumber(this.chooseSwapPath.receiveAmount)
+        .dividedBy(new BigNumber(this.inputAmount))
+        .dp(7)
+        .toFixed();
+      this.lnversePrice = new BigNumber(this.inputAmount)
+        .dividedBy(new BigNumber(this.chooseSwapPath.receiveAmount))
+        .dp(7)
+        .toFixed();
+    }
   }
   getFromAndToAddress(): void {
     switch (this.fromToken.chain) {

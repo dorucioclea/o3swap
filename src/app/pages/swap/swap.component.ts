@@ -27,7 +27,8 @@ export class SwapComponent implements OnInit, OnDestroy {
   tokensUnScribe: Unsubscribable;
   tokens$: Observable<any>;
   chainTokens = new ChainTokens();
-
+  rates = {};
+  ratesTimer = null;
   constructor(
     private store: Store<State>,
     private apiService: ApiService,
@@ -41,6 +42,7 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
+    this.rates = await this.apiService.getRates();
     const chain = this.metaMaskWalletApiService.getChain();
     if (chain) {
       await this.apiService.getTokens();
@@ -48,9 +50,17 @@ export class SwapComponent implements OnInit, OnDestroy {
     } else {
       this.fromToken = USD_TOKENS[0];
     }
+    this.ratesTimer = setInterval(async () => {
+      this.apiService.getRates().then((res) => {
+        this.rates = res;
+      });
+    }, 60000);
   }
 
   ngOnDestroy(): void {
+    if (this.ratesTimer) {
+      clearInterval(this.ratesTimer);
+    }
     if (this.tokensUnScribe) {
       this.tokensUnScribe.unsubscribe();
     }
