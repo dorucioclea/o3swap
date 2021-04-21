@@ -139,6 +139,9 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
             res.assetID !== this.fromToken.assetID ||
             res.chain !== this.fromToken.chain)
         ) {
+          if (this.fromToken.chain !== res.chain) {
+            this.toToken = null;
+          }
           this.inputAmount = '';
           this.fromToken = res;
           this.checkInputAmountDecimal();
@@ -153,6 +156,13 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   exchangeToken(): void {
+    if (
+      this.toToken &&
+      this.fromToken &&
+      this.toToken.chain !== this.fromToken.chain
+    ) {
+      return;
+    }
     if (this.toToken || this.fromToken) {
       const temp = this.fromToken;
       this.fromToken = this.toToken;
