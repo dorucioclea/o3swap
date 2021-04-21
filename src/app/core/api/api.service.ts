@@ -129,12 +129,12 @@ export class ApiService {
     this.commonService.log(1);
     if (fromToken.chain === toToken.chain) {
       if (
-        (fromToken.symbol === 'ETH' && toToken.symbol === 'WETH') ||
-        (fromToken.symbol === 'WETH' && toToken.symbol === 'ETH') ||
-        (fromToken.symbol === 'BNB' && toToken.symbol === 'WBNB') ||
-        (fromToken.symbol === 'WBNB' && toToken.symbol === 'BNB') ||
-        (fromToken.symbol === 'WHT' && toToken.symbol === 'HT') ||
-        (fromToken.symbol === 'HT' && toToken.symbol === 'WHT')
+        (fromToken.chain === 'ETH' && fromToken.symbol === 'ETH' && toToken.symbol === 'WETH') ||
+        (fromToken.chain === 'ETH' && fromToken.symbol === 'WETH' && toToken.symbol === 'ETH') ||
+        (fromToken.chain === 'BSC' && fromToken.symbol === 'BNB' && toToken.symbol === 'WBNB') ||
+        (fromToken.chain === 'BSC' && fromToken.symbol === 'WBNB' && toToken.symbol === 'BNB') ||
+        (fromToken.chain === 'HECO' && fromToken.symbol === 'WHT' && toToken.symbol === 'HT') ||
+        (fromToken.chain === 'HECO' && fromToken.symbol === 'HT' && toToken.symbol === 'WHT')
       ) {
         return this.getEthWEthSwapPath(fromToken, toToken, inputAmount);
       }
@@ -677,12 +677,12 @@ export class ApiService {
       .toPromise();
   }
 
-  private getAssetLogoByName(name: string): string {
+  private getAssetLogoByName(hash: string): string {
     let token;
     for (const key in this.chainTokens) {
       if (this.chainTokens.hasOwnProperty(key)) {
         const tokenList = this.chainTokens[key];
-        token = tokenList.find((item) => item.symbol === name);
+        token = tokenList.find((item) => item.assetID === hash);
         if (token) {
           break;
         }
@@ -702,8 +702,8 @@ export class ApiService {
         item.swapPath.push(toToken.symbol);
       }
       item.swapPathLogo = [];
-      item.swapPath.forEach((name) => {
-        item.swapPathLogo.push(this.getAssetLogoByName(name));
+      item.assetHashPath.forEach((hash) => {
+        item.swapPathLogo.push(this.getAssetLogoByName(hash));
       });
     });
     return this.shellSortSwapPath(swapPathArr);

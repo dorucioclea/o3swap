@@ -113,12 +113,15 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     const tokens = this.showOnlyNNeo
       ? this.MYNNEO_TOKEN
       : this.MYCHAIN_TOKENS[this.chain];
-    this.allTokens = this.hideToken
-      ? tokens.filter((item) => item.symbol !== this.hideToken.symbol)
-      : tokens;
-    this.allTokens = this.hideNeoToken
-      ? this.allTokens.filter((item) => item.symbol !== 'NEO')
-      : this.allTokens;
+    this.allTokens = tokens;
+    if (this.hideToken && this.hideToken.chain === this.chain) {
+      this.allTokens = this.allTokens.filter(
+        (item) => item.symbol !== this.hideToken.symbol
+      );
+    }
+    if (this.hideNeoToken && this.chain === 'NEO') {
+      this.allTokens = this.allTokens.filter((item) => item.symbol !== 'NEO');
+    }
     this.displayTokens = this.allTokens;
   }
 
@@ -178,21 +181,28 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     const tokens = this.showOnlyNNeo
       ? this.MYNNEO_TOKEN
       : this.MYCHAIN_TOKENS[this.chain];
-    this.allTokens = this.hideToken
-      ? tokens.filter((item) => item.symbol !== this.hideToken.symbol)
-      : tokens;
-    this.allTokens = this.hideNeoToken
-      ? this.allTokens.filter((item) => item.symbol !== 'NEO')
-      : this.allTokens;
+    this.allTokens = tokens;
+    if (this.hideToken && this.hideToken.chain === this.chain) {
+      this.allTokens = this.allTokens.filter(
+        (item) => item.symbol !== this.hideToken.symbol
+      );
+    }
+    if (this.hideNeoToken && this.chain === 'NEO') {
+      this.allTokens = this.allTokens.filter((item) => item.symbol !== 'NEO');
+    }
     this.displayTokens = this.allTokens;
   }
   checkShowOnlyNNeo(): void {
     const showOnlyNNeoTo =
       this.isFrom === false &&
       this.fromToken &&
+      this.fromToken.chain === 'NEO' &&
       this.fromToken.symbol === 'NEO';
     const showOnlyNNeoFrom =
-      this.isFrom && this.toToken && this.toToken.symbol === 'NEO';
+      this.isFrom &&
+      this.toToken &&
+      this.toToken.chain === 'NEO' &&
+      this.toToken.symbol === 'NEO';
     if (showOnlyNNeoFrom || showOnlyNNeoTo) {
       this.showOnlyNNeo = true;
     } else {
@@ -205,10 +215,20 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     }
   }
   checkHideNeo(): void {
-    if (this.isFrom && this.toToken && this.toToken.symbol !== 'nNEO') {
+    if (
+      this.isFrom &&
+      this.toToken &&
+      this.toToken.chain === 'NEO' &&
+      this.toToken.symbol !== 'nNEO'
+    ) {
       this.hideNeoToken = true;
     }
-    if (!this.isFrom && this.fromToken && this.fromToken.symbol !== 'nNEO') {
+    if (
+      !this.isFrom &&
+      this.fromToken &&
+      this.fromToken.chain === 'NEO' &&
+      this.fromToken.symbol !== 'nNEO'
+    ) {
       this.hideNeoToken = true;
     }
   }

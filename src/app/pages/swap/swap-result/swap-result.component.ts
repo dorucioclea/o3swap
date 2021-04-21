@@ -312,10 +312,14 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     // eth 跨链
     if (this.fromToken.chain !== this.toToken.chain) {
       const fromUsd = USD_TOKENS.find(
-        (item) => item.symbol === this.fromToken.symbol
+        (item) =>
+          item.symbol === this.fromToken.symbol &&
+          item.chain === this.fromToken.chain
       );
       const toUsd = USD_TOKENS.find(
-        (item) => item.symbol === this.toToken.symbol
+        (item) =>
+          item.symbol === this.toToken.symbol &&
+          item.chain === this.fromToken.chain
       );
       if (fromUsd && toUsd) {
         this.swapCrossChainEth();
@@ -633,7 +637,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         WETH_ASSET_HASH[this.fromToken.chain].symbol &&
         this.toToken.symbol ===
           WETH_ASSET_HASH[this.toToken.chain].standardTokenSymbol) ||
-        this.fromToken.symbol === WETH_ASSET_HASH[this.fromToken.chain].standardTokenSymbol)
+        this.fromToken.symbol ===
+          WETH_ASSET_HASH[this.fromToken.chain].standardTokenSymbol)
     ) {
       this.commonService.log('check show approve return');
       return false;
@@ -698,14 +703,14 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   checkO3SwapFee(): void {
     if (this.fromToken.chain === this.toToken.chain) {
       if (
-        (this.fromToken.symbol === 'NEO' && this.toToken.symbol === 'nNEO') ||
-        (this.fromToken.symbol === 'nNEO' && this.toToken.symbol === 'NEO') ||
-        (this.fromToken.symbol === 'ETH' && this.toToken.symbol === 'WETH') ||
-        (this.fromToken.symbol === 'WETH' && this.toToken.symbol === 'ETH') ||
-        (this.fromToken.symbol === 'WBNB' && this.toToken.symbol === 'BNB') ||
-        (this.fromToken.symbol === 'BNB' && this.toToken.symbol === 'WBNB') ||
-        (this.fromToken.symbol === 'HT' && this.toToken.symbol === 'WHT') ||
-        (this.fromToken.symbol === 'WHT' && this.toToken.symbol === 'HT')
+        (this.fromToken.chain === 'NEO' && this.fromToken.symbol === 'NEO' && this.toToken.symbol === 'nNEO') ||
+        (this.fromToken.chain === 'NEO' && this.fromToken.symbol === 'nNEO' && this.toToken.symbol === 'NEO') ||
+        (this.fromToken.chain === 'ETH' && this.fromToken.symbol === 'ETH' && this.toToken.symbol === 'WETH') ||
+        (this.fromToken.chain === 'ETH' && this.fromToken.symbol === 'WETH' && this.toToken.symbol === 'ETH') ||
+        (this.fromToken.chain === 'BSC' && this.fromToken.symbol === 'WBNB' && this.toToken.symbol === 'BNB') ||
+        (this.fromToken.chain === 'BSC' && this.fromToken.symbol === 'BNB' && this.toToken.symbol === 'WBNB') ||
+        (this.fromToken.chain === 'HECO' && this.fromToken.symbol === 'HT' && this.toToken.symbol === 'WHT') ||
+        (this.fromToken.chain === 'HECO' && this.fromToken.symbol === 'WHT' && this.toToken.symbol === 'HT')
       ) {
         this.showO3SwapFee = false;
         return;
@@ -717,10 +722,10 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.showO3SwapFee = true;
     }
     const fromUsd = USD_TOKENS.find(
-      (item) => item.symbol === this.fromToken.symbol
+      (item) => item.symbol === this.fromToken.symbol && item.chain === this.fromToken.chain
     );
     const toUsd = USD_TOKENS.find(
-      (item) => item.symbol === this.toToken.symbol
+      (item) => item.symbol === this.toToken.symbol && item.chain === this.toToken.chain
     );
     if (fromUsd && toUsd) {
       this.showO3SwapFee = false;
