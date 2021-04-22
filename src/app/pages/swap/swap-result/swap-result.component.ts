@@ -668,29 +668,37 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         if (res && res.length > 0) {
           this.commonService.log(res);
           this.receiveSwapPathArray = res;
+          this.handleReceiveAmount();
           this.handleReceiveSwapPathFiat();
-          this.chooseSwapPathIndex = 0;
-          this.chooseSwapPath = this.receiveSwapPathArray[0];
           this.calculationPrice();
         }
       });
+  }
+  handleReceiveAmount(): void {
+    this.receiveSwapPathArray.forEach((item, index) => {
+      this.receiveSwapPathArray[index].receiveAmount = new BigNumber(
+        item.receiveAmount
+      )
+        .shiftedBy(-this.toToken.decimals)
+        .toFixed();
+    });
+    this.chooseSwapPathIndex = 0;
+    this.chooseSwapPath = this.receiveSwapPathArray[0];
   }
   handleReceiveSwapPathFiat(): void {
     if (!this.receiveSwapPathArray) {
       return;
     }
     const price = this.commonService.getAssetRate(this.rates, this.toToken);
+    if (!price) {
+      return;
+    }
     this.receiveSwapPathArray.forEach((item, index) => {
-      item.receiveAmount = new BigNumber(item.receiveAmount)
-        .shiftedBy(-this.toToken.decimals)
-        .toFixed();
       // 计算法币价格
-      if (price) {
-        item.fiat = new BigNumber(item.receiveAmount)
-          .multipliedBy(new BigNumber(price))
-          .dp(2)
-          .toFixed();
-      }
+      this.receiveSwapPathArray[index].fiat = new BigNumber(item.receiveAmount)
+        .multipliedBy(new BigNumber(price))
+        .dp(2)
+        .toFixed();
     });
   }
   async getNetworkFee(): Promise<void> {
