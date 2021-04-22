@@ -178,6 +178,7 @@ export const LP_TOKENS: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'ETH',
+    logo: '/assets/images/tokens/lp-eth.png',
   },
   {
     assetID:
@@ -188,6 +189,7 @@ export const LP_TOKENS: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'BSC',
+    logo: '/assets/images/tokens/lp-bsc.png',
   },
   {
     assetID:
@@ -198,6 +200,7 @@ export const LP_TOKENS: Token[] = [
     decimals: 18,
     amount: '0',
     chain: 'HECO',
+    logo: '/assets/images/tokens/lp-heco.png',
   },
 ];
 //#endregion
