@@ -2,23 +2,24 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
-import { LoadingComponent } from './compontent/loading/loading.component';
-import { SwapSettingComponent } from './compontent/swap-setting/swap-setting.component';
-import { SwapExchangeComponent } from './compontent/swap-exchange/swap-exchange.component';
-import { SwapTokenComponent } from './compontent/swap-token/swap-token.component';
-import { VaultStakeComponent } from './compontent/vault-stake/vault-stake.component';
-import { TxProgressComponent } from './compontent/tx-progress/tx-progress.component';
-import { ApproveComponent } from './compontent/approve/approve.component';
+import { LoadingComponent } from './component/loading/loading.component';
+import { TxProgressComponent } from './component/tx-progress/tx-progress.component';
+import { LongBalanceComponent } from './component/long-balance/long-balance.component';
+import { ExchartLiquidfillComponent } from './component/echarts-liquidfill/echarts-liquidfill.component';
 import {
   HeaderConnectComponent,
   HeaderConnectItemComponent,
   WalletConnectComponent,
   VaultWalletConnectComponent,
   VaultHeaderConnectComponent,
-} from './compontent/header';
-import { LongBalanceComponent } from './compontent/long-balance/long-balance.component';
-import { ExchartLiquidfillComponent } from './compontent/echarts-liquidfill/echarts-liquidfill.component';
-import { RiskWarningComponent } from './compontent/risk-warning/risk-warning.component';
+} from './component/header';
+
+import { SwapSettingComponent } from './modal/swap-setting/swap-setting.component';
+import { SwapExchangeComponent } from './modal/swap-exchange/swap-exchange.component';
+import { SwapTokenComponent } from './modal/swap-token/swap-token.component';
+import { VaultStakeComponent } from './modal/vault-stake/vault-stake.component';
+import { ApproveComponent } from './modal/approve/approve.component';
+import { RiskWarningComponent } from './modal/risk-warning/risk-warning.component';
 
 import { ShortAddressPipe } from './pipes/short-address.pipe';
 import { TransNumberPipe } from './pipes/trans-number.pipe';

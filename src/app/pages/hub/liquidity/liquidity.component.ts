@@ -33,7 +33,7 @@ import BigNumber from 'bignumber.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NavigationEnd, Router, RouterEvent } from '@angular/router';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { ApproveComponent } from '@shared/compontent/approve/approve.component';
+import { ApproveComponent } from '@shared';
 
 type LiquidityType = 'add' | 'remove';
 interface State {

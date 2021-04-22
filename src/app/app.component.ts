@@ -6,7 +6,7 @@ import {
   VaultdMetaMaskWalletApiService,
   ApiService,
 } from '@core';
-import { RiskWarningComponent } from '@shared/compontent/risk-warning/risk-warning.component';
+import { RiskWarningComponent } from '@shared';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { interval, Unsubscribable } from 'rxjs';
 
