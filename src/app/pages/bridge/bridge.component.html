@@ -1,5 +1,5 @@
 <section class="page-container">
-  <div class="group-container row1 swap">
+  <div class="group-container swap">
     <div *ngIf="inputAmountError" class="input-token-error">{{ inputAmountError }}</div>
     <div class="token-select-container">
       <div class="left-container">
@@ -95,57 +95,7 @@
         (click)="swap()">Swap</button>
     </div>
   </div>
-  <div class="group-container row2 pool">
-    <div class="header">Cross-chain Pool</div>
-    <div class="group-item">
-      <div class="pool-detail">
-        <div class="list">
-          <div class="item">
-            <div class="value">$--</div>
-            <div class="name">TVL</div>
-          </div>
-          <div class="item">
-            <div class="value">$--</div>
-            <div class="name">VOL</div>
-          </div>
-          <div class="item">
-            <div class="value">--</div>
-            <div class="name">APR</div>
-          </div>
-          <div class="item">
-            <div class="value">
-              <img [src]="USD_TOKENS[0].logo" alt="" class="token-logo">
-              <img [src]="USD_TOKENS[1].logo" alt="" class="token-logo">
-              <img [src]="USD_TOKENS[2].logo" alt="" class="token-logo">
-              <img src="/assets/images/logo-O3.png" alt="" class="token-logo">
-            </div>
-            <div class="name">REWARDS</div>
-          </div>
-        </div>
-        <div class="right">
-          <div class="btn-primary deposit-btn" [routerLink]="['/hub/liquidity', 'add']">
-            Deposit
-          </div>
-          <div class="btn-primary withdrawal-btn" [routerLink]="['/hub/liquidity', 'remove']">
-            Withdraw
-          </div>
-        </div>
-      </div>
-      <div class="token-detail">
-        <img src="/assets/images/logo-O3.png" alt="" class="token-logo">
-        <div class="token-name">
-          O3Pool <span>(USDT+BUSD+HUSD)</span>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="group-container row2 statistical-data">
-    <div class="header">Total Pool Deposits & Daily Volume</div>
-    <div class="desc">
-      <p>Total pool deposit: $--</p>
-      <p>Daily volume: $--</p>
-    </div>
-  </div>
+  <app-bridge-pool></app-bridge-pool>
 </section>
 
 <app-tx-progress [txAtPage]="'bridge'"></app-tx-progress>

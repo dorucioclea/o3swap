@@ -19,6 +19,7 @@ import {
   SwapResultComponent,
   DashboardComponent,
   BridgeComponent,
+  BridgePoolComponent,
   LiquidityComponent,
 } from './pages';
 
@@ -29,6 +30,7 @@ const PAGECOMPONENTS = [
   SwapResultComponent,
   DashboardComponent,
   BridgeComponent,
+  BridgePoolComponent,
   LiquidityComponent,
 ];
 
@@ -82,7 +84,7 @@ function playerFactory(): any {
     StoreModule.forRoot(rootReducer, {
       runtimeChecks: {
         strictActionImmutability: false,
-        strictStateImmutability: false
+        strictStateImmutability: false,
       },
     }),
     NgxEchartsModule.forRoot({ echarts }),

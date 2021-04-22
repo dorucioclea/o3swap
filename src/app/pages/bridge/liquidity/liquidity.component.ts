@@ -332,7 +332,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     );
     if (new BigNumber(allowance).comparedTo(lpPayAmount) < 0) {
       // await swapApi.approve(this.LPToken, this.currentAddress);
-      this.showApproveModal(token);
+      this.showApproveModal(this.LPToken);
       return;
     }
     const amountOut = new BigNumber(this.removeLiquidityInputAmount[index])
