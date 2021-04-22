@@ -37,7 +37,7 @@ interface State {
 @Component({
   selector: 'app-wallet-connect',
   templateUrl: './wallet-connect.component.html',
-  styleUrls: ['./wallet-connect.component.scss'],
+  styleUrls: ['../wallet-connect.scss'],
 })
 export class WalletConnectComponent implements OnInit, OnDestroy {
   NEO_WALLETS = NEO_WALLETS;

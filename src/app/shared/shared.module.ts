@@ -10,6 +10,7 @@ import {
   HeaderConnectComponent,
   HeaderConnectItemComponent,
   WalletConnectComponent,
+  WalletConnectItemComponent,
   VaultWalletConnectComponent,
   VaultHeaderConnectComponent,
 } from './component/header';
@@ -49,6 +50,7 @@ const COMPONENTS = [
   HeaderConnectComponent,
   HeaderConnectItemComponent,
   WalletConnectComponent,
+  WalletConnectItemComponent,
   VaultWalletConnectComponent,
   VaultHeaderConnectComponent,
   LongBalanceComponent,
