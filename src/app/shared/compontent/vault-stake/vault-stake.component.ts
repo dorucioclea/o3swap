@@ -15,15 +15,11 @@ interface State {
 }
 
 @Component({
-  templateUrl: './dashboard-stake.component.html',
-  styleUrls: ['./dashboard-stake.component.scss'],
+  templateUrl: './vault-stake.component.html',
+  styleUrls: ['./vault-stake.component.scss'],
 })
-export class DashboardStakeComponent implements OnInit, OnDestroy {
-  @Input() isFrom: boolean;
+export class VaultStakeComponent implements OnInit, OnDestroy {
   @Input() inputAmount: number = 0;
-
-  hideNeoToken = false;
-  showOnlyNNeo = false;
 
   constructor(
     private store: Store<State>,

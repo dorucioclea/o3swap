@@ -26,10 +26,6 @@ export const ETH_CROSS_SWAP_CONTRACT_HASH = {
       : '0x0488ADd7e3D4C58acb8DF7c487dAfC48e3224833',
 };
 
-// 已废弃
-export const UNI_SWAP_CONTRACT_HASH =
-  NETWORK === 'MainNet' ? '' : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D';
-
 export const SWAP_CONTRACT_CHAIN_ID = {
   BSC: NETWORK === 'MainNet' ? 6 : 79,
   HECO: NETWORK === 'MainNet' ? 7 : 7,

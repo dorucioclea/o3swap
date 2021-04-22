@@ -2,15 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { ApiService } from '@core';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { DashboardStakeComponent } from '@shared';
+import { VaultStakeComponent } from '@shared';
 
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss'],
+  selector: 'app-vault',
+  templateUrl: './vault.component.html',
+  styleUrls: ['./vault.component.scss'],
 })
-export class DashboardComponent implements OnInit {
+export class VaultComponent implements OnInit {
   constructor(
     private modal: NzModalService,
     private nzMessage: NzMessageService
@@ -18,22 +18,16 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  showStake(type: 'from' | 'to'): void {
+  showStake(): void {
     const modal = this.modal.create({
-      nzContent: DashboardStakeComponent,
+      nzContent: VaultStakeComponent,
       nzFooter: null,
       nzTitle: null,
       nzClosable: false,
       nzClassName: 'custom-modal custom-stake-modal',
-      nzComponentParams: {
-        isFrom: type === 'from' ? true : false,
-      },
     });
     modal.afterClose.subscribe((res) => {
       if (res) {
-        if (type === 'from') {
-        } else {
-        }
       }
     });
   }

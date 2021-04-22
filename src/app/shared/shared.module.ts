@@ -6,7 +6,7 @@ import { LoadingComponent } from './compontent/loading/loading.component';
 import { SwapSettingComponent } from './compontent/swap-setting/swap-setting.component';
 import { SwapExchangeComponent } from './compontent/swap-exchange/swap-exchange.component';
 import { SwapTokenComponent } from './compontent/swap-token/swap-token.component';
-import { DashboardStakeComponent } from './compontent/dashboard-stake/dashboard-stake.component';
+import { VaultStakeComponent } from './compontent/vault-stake/vault-stake.component';
 import { TxProgressComponent } from './compontent/tx-progress/tx-progress.component';
 import { ApproveComponent } from './compontent/approve/approve.component';
 import {
@@ -41,7 +41,7 @@ const COMPONENTS = [
   SwapSettingComponent,
   SwapExchangeComponent,
   SwapTokenComponent,
-  DashboardStakeComponent,
+  VaultStakeComponent,
   TxProgressComponent,
   ApproveComponent,
   ExchartLiquidfillComponent,

@@ -17,9 +17,9 @@ import {
   SwapComponent,
   SwapHomeComponent,
   SwapResultComponent,
-  DashboardComponent,
-  BridgeComponent,
-  BridgePoolComponent,
+  VaultComponent,
+  HubComponent,
+  HubPoolComponent,
   LiquidityComponent,
 } from './pages';
 
@@ -28,9 +28,9 @@ const PAGECOMPONENTS = [
   SwapComponent,
   SwapHomeComponent,
   SwapResultComponent,
-  DashboardComponent,
-  BridgeComponent,
-  BridgePoolComponent,
+  VaultComponent,
+  HubComponent,
+  HubPoolComponent,
   LiquidityComponent,
 ];
 

@@ -1,14 +1,20 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { HomeComponent, SwapComponent, DashboardComponent, BridgeComponent, LiquidityComponent } from './pages';
+import {
+  HomeComponent,
+  SwapComponent,
+  VaultComponent,
+  HubComponent,
+  LiquidityComponent,
+} from './pages';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'home', component: HomeComponent },
   { path: 'swap', component: SwapComponent },
-  // { path: 'vault', component: DashboardComponent },
-  { path: 'hub', component: BridgeComponent },
+  // { path: 'vault', component: VaultComponent },
+  { path: 'hub', component: HubComponent },
   { path: 'hub/liquidity/:type', component: LiquidityComponent },
   { path: '**', redirectTo: '/home' },
 ];

@@ -1,6 +1,5 @@
 import { NETWORK } from './network';
 
-// 主网后续要改!!!!
 export const CROSS_CHAIN_SWAP_DETAIL_HOST =
   NETWORK === 'MainNet'
     ? 'https://bridge.poly.network/v1'

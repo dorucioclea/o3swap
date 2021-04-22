@@ -30,11 +30,11 @@ interface State {
   rates: any;
 }
 @Component({
-  selector: 'app-bridge',
-  templateUrl: './bridge.component.html',
-  styleUrls: ['./bridge.component.scss'],
+  selector: 'app-hub',
+  templateUrl: './hub.component.html',
+  styleUrls: ['./hub.component.scss'],
 })
-export class BridgeComponent implements OnInit, OnDestroy {
+export class HubComponent implements OnInit, OnDestroy {
   CONST_BRIDGE_TOKENS = CONST_BRIDGE_TOKENS;
   SOURCE_TOKEN_SYMBOL = SOURCE_TOKEN_SYMBOL;
   BRIDGE_SLIPVALUE = BRIDGE_SLIPVALUE;
