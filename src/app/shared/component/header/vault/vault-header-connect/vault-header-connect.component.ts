@@ -12,7 +12,7 @@ interface State {
 @Component({
   selector: 'app-vault-header-connect',
   templateUrl: './vault-header-connect.component.html',
-  styleUrls: ['./vault-header-connect.component.scss'],
+  styleUrls: ['../../header-connect.scss'],
 })
 export class VaultHeaderConnectComponent implements OnInit, OnDestroy {
   connectChainType: ConnectChainType = 'ETH';

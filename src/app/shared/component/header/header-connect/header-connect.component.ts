@@ -27,7 +27,7 @@ interface State {
 @Component({
   selector: 'app-header-connect',
   templateUrl: './header-connect.component.html',
-  styleUrls: ['./header-connect.component.scss'],
+  styleUrls: ['../header-connect.scss', './header-connect.component.scss'],
 })
 export class HeaderConnectComponent implements OnInit, OnDestroy {
   connectChainType: ConnectChainType = 'ETH';
