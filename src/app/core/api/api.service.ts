@@ -29,6 +29,7 @@ import {
   ChainTokens,
   NEO_TOKEN,
   CHAINS,
+  UPDATE_RATES,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { CommonService } from '../util/common.service';
@@ -37,6 +38,7 @@ import { Store } from '@ngrx/store';
 
 interface State {
   tokens: any;
+  rates: any;
 }
 
 @Injectable()
@@ -101,8 +103,8 @@ export class ApiService {
     this.store.dispatch({ type: UPDATE_CHAIN_TOKENS, data: apiTokens });
   }
 
-  getRates(): Promise<any> {
-    return this.http
+  async getRates(): Promise<void> {
+    const rates = await this.http
       .get(`${this.RATE_HOST}/crypto/rates`)
       .pipe(
         map((res: CommonHttpResponse) => {
@@ -112,6 +114,9 @@ export class ApiService {
         })
       )
       .toPromise();
+    if (rates) {
+      this.store.dispatch({ type: UPDATE_RATES, data: rates });
+    }
   }
 
   async getSwapPath(

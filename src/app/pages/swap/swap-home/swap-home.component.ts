@@ -21,6 +21,7 @@ import { CommonService, ApiService } from '@core';
 interface State {
   setting: any;
   swap: SwapStateType;
+  rates: any;
 }
 
 @Component({
@@ -33,10 +34,6 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
   @Input() toToken: Token;
   @Input() chooseSwapPath;
   @Input() inputAmount: string; // 支付的 token 数量
-  @Input() set setRates(value: object) {
-    this.rates = value;
-    this.calcutionInputAmountFiat();
-  }
   @Output() toInquiryPage = new EventEmitter<{
     inputAmount: string;
     fromToken: Token;
@@ -44,7 +41,6 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
   }>();
   @Output() toResultPage = new EventEmitter();
 
-  rates = {};
   swap$: Observable<any>;
   neoAccountAddress: string;
   ethAccountAddress: string;
@@ -58,6 +54,10 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
   settingUnScribe: Unsubscribable;
   slipValue: number;
   deadline: number;
+
+  ratesUnScribe: Unsubscribable;
+  rates$: Observable<any>;
+  rates = {};
 
   changeData = false;
   inputAmountFiat: string; // 支付的 token 美元价值
@@ -73,10 +73,10 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
   ) {
     this.setting$ = store.select('setting');
     this.swap$ = store.select('swap');
+    this.rates$ = store.select('rates');
   }
 
   ngOnInit(): void {
-    // this.getRates();
     this.settingUnScribe = this.setting$.subscribe((state) => {
       this.slipValue = state.slipValue;
       this.deadline = state.deadline;
@@ -91,6 +91,10 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
       this.hecoAccountAddress = state.hecoAccountAddress;
       this.handleTokenAmountBalance(state);
       this.changeDetectorRef.detectChanges();
+    });
+    this.ratesUnScribe = this.rates$.subscribe((state) => {
+      this.rates = state.rates;
+      this.calcutionInputAmountFiat();
     });
   }
 
@@ -115,10 +119,9 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
     if (this.settingUnScribe) {
       this.settingUnScribe.unsubscribe();
     }
-  }
-
-  async getRates(): Promise<void> {
-    this.rates = await this.apiService.getRates();
+    if (this.ratesUnScribe) {
+      this.ratesUnScribe.unsubscribe();
+    }
   }
 
   showTokens(type: 'from' | 'to'): void {
@@ -331,15 +334,11 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
     this.changeData = true;
     this.chooseSwapPath = {};
   }
-  async calcutionInputAmountFiat(): Promise<void> {
+  calcutionInputAmountFiat(): void {
     if (!this.fromToken) {
       this.inputAmountFiat = '';
       return;
     }
-    this.commonService.log(this.rates);
-    // if (!this.rates['eth']) {
-    //   await this.getRates();
-    // }
     const price = this.commonService.getAssetRate(this.rates, this.fromToken);
     if (this.inputAmount && price) {
       this.inputAmountFiat = new BigNumber(this.inputAmount)

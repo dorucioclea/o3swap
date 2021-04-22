@@ -27,6 +27,7 @@ import { ApproveComponent } from '@shared';
 interface State {
   swap: SwapStateType;
   tokens: any;
+  rates: any;
 }
 @Component({
   selector: 'app-bridge',
@@ -47,7 +48,6 @@ export class BridgeComponent implements OnInit, OnDestroy {
 
   receiveAmount: string;
   receiveAmountFiat: string; // 支付的 token 美元价值
-  rates = {};
 
   swapUnScribe: Unsubscribable;
   swap$: Observable<any>;
@@ -62,6 +62,10 @@ export class BridgeComponent implements OnInit, OnDestroy {
   tokensUnScribe: Unsubscribable;
   tokens$: Observable<any>;
   chainTokens = new ChainTokens();
+
+  ratesUnScribe: Unsubscribable;
+  rates$: Observable<any>;
+  rates = {};
 
   fromAddress: string;
   toAddress: string;
@@ -87,6 +91,7 @@ export class BridgeComponent implements OnInit, OnDestroy {
   ) {
     this.swap$ = store.select('swap');
     this.tokens$ = store.select('tokens');
+    this.rates$ = store.select('rates');
   }
   ngOnDestroy(): void {
     if (this.swapUnScribe) {
@@ -95,11 +100,13 @@ export class BridgeComponent implements OnInit, OnDestroy {
     if (this.tokensUnScribe) {
       this.tokensUnScribe.unsubscribe();
     }
+    if (this.ratesUnScribe) {
+      this.ratesUnScribe.unsubscribe();
+    }
   }
 
   ngOnInit(): void {
     this.fromToken = JSON.parse(JSON.stringify(USD_TOKENS[0]));
-    this.getRates();
     this.swapUnScribe = this.swap$.subscribe((state) => {
       this.ethAccountAddress = state.ethAccountAddress;
       this.bscAccountAddress = state.bscAccountAddress;
@@ -112,6 +119,11 @@ export class BridgeComponent implements OnInit, OnDestroy {
     });
     this.tokensUnScribe = this.tokens$.subscribe((state) => {
       this.chainTokens = state.chainTokens;
+    });
+    this.ratesUnScribe = this.rates$.subscribe((state) => {
+      this.rates = state.rates;
+      this.calcutionInputAmountFiat();
+      this.calcutionReceiveAmountFiat();
     });
   }
 
@@ -444,13 +456,10 @@ export class BridgeComponent implements OnInit, OnDestroy {
     }
   }
 
-  async calcutionInputAmountFiat(): Promise<void> {
+  calcutionInputAmountFiat(): void {
     if (!this.fromToken) {
       this.inputAmountFiat = '';
       return;
-    }
-    if (!this.rates['eth']) {
-      await this.getRates();
     }
     const price = this.commonService.getAssetRate(this.rates, this.fromToken);
     if (this.inputAmount && price) {
@@ -463,13 +472,10 @@ export class BridgeComponent implements OnInit, OnDestroy {
     }
   }
 
-  async calcutionReceiveAmountFiat(): Promise<void> {
+  calcutionReceiveAmountFiat(): void {
     if (!this.toToken) {
       this.receiveAmountFiat = '';
       return;
-    }
-    if (!this.rates['eth']) {
-      await this.getRates();
     }
     const price = this.commonService.getAssetRate(this.rates, this.fromToken);
     if (this.receiveAmount && price) {
@@ -499,9 +505,6 @@ export class BridgeComponent implements OnInit, OnDestroy {
     );
     this.calcutionReceiveAmountFiat();
     this.getBridgeRate();
-  }
-  async getRates(): Promise<void> {
-    this.rates = await this.apiService.getRates();
   }
   getBridgeRate(): void {
     if (this.inputAmount && this.receiveAmount) {

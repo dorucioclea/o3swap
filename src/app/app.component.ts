@@ -4,9 +4,11 @@ import {
   NeolineWalletApiService,
   MetaMaskWalletApiService,
   VaultdMetaMaskWalletApiService,
+  ApiService,
 } from '@core';
 import { RiskWarningComponent } from '@shared/compontent/risk-warning/risk-warning.component';
 import { NzModalService } from 'ng-zorro-antd/modal';
+import { interval, Unsubscribable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -18,12 +20,15 @@ export class AppComponent implements OnInit {
   isHome = true;
   showRisk = true;
 
+  updateRatesInterval: Unsubscribable;
+
   constructor(
     private router: Router,
     private metaMaskWalletApiService: MetaMaskWalletApiService,
     private neolineWalletApiService: NeolineWalletApiService,
     private vaultdMetaMaskWalletApiService: VaultdMetaMaskWalletApiService,
-    private modal: NzModalService
+    private modal: NzModalService,
+    private apiService: ApiService
   ) {
     this.router.events.subscribe((res: RouterEvent) => {
       if (res instanceof NavigationEnd) {
@@ -37,6 +42,7 @@ export class AppComponent implements OnInit {
         ) {
           this.riskWarning();
         }
+        this.updateRates();
       }
     });
   }
@@ -50,6 +56,22 @@ export class AppComponent implements OnInit {
       this.neolineWalletApiService.init();
       this.metaMaskWalletApiService.init();
       this.vaultdMetaMaskWalletApiService.init();
+    }
+  }
+
+  updateRates(): void {
+    if (!this.isHome) {
+      this.apiService.getRates();
+      if (this.updateRatesInterval) {
+        this.updateRatesInterval.unsubscribe();
+      }
+      this.updateRatesInterval = interval(60000).subscribe(() => {
+        this.apiService.getRates();
+      });
+    } else {
+      if (this.updateRatesInterval) {
+        this.updateRatesInterval.unsubscribe();
+      }
     }
   }
 

@@ -38,6 +38,7 @@ import { ApproveComponent } from '@shared/compontent/approve/approve.component';
 type LiquidityType = 'add' | 'remove';
 interface State {
   swap: SwapStateType;
+  rates: any;
 }
 @Component({
   selector: 'app-liquidity',
@@ -58,7 +59,6 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     (item) => item.symbol.indexOf('HUSD') >= 0
   );
   liquidityType: LiquidityType = 'add';
-  rates = {};
 
   LPToken: Token;
   LPTokens: Token[];
@@ -82,6 +82,10 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   metamaskNetworkId: number;
   tokenBalance = { ETH: {}, NEO: {}, BSC: {}, HECO: {} }; // 账户的 tokens
 
+  ratesUnScribe: Unsubscribable;
+  rates$: Observable<any>;
+  rates = {};
+
   pusdtBalance = {
     ALL: '',
     ETH: { value: '', percentage: '0' },
@@ -102,6 +106,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     private modal: NzModalService
   ) {
     this.swap$ = store.select('swap');
+    this.rates$ = store.select('rates');
     this.addLiquidityTokens.forEach((item, index) => {
       this.addLiquidityInputAmount.push('');
       this.removeLiquidityInputAmount.push('');
@@ -116,7 +121,9 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.getRates();
+    this.ratesUnScribe = this.rates$.subscribe((state) => {
+      this.rates = state.rates;
+    });
     this.getPusdtBalance();
     this.LPTokens = JSON.parse(JSON.stringify(LP_TOKENS));
     this.addLiquidityTokens.forEach((item) => {
@@ -143,6 +150,9 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.swapUnScribe) {
       this.swapUnScribe.unsubscribe();
+    }
+    if (this.ratesUnScribe) {
+      this.ratesUnScribe.unsubscribe();
     }
   }
 
@@ -184,10 +194,6 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       .times(100)
       .dp(3)
       .toFixed();
-  }
-
-  async getRates(): Promise<void>  {
-    this.rates = await this.apiService.getRates();
   }
 
   changeLiquidityType(params: LiquidityType): void {

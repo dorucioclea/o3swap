@@ -42,6 +42,7 @@ import { take } from 'rxjs/operators';
 interface State {
   swap: SwapStateType;
   setting: any;
+  rates: any;
 }
 
 @Component({
@@ -55,14 +56,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   @Input() toToken: Token;
   @Input() inputAmount: string; // 支付的 token 数量
   @Input() initData: any;
-  @Input() set setRates(value: object) {
-    this.rates = value;
-    this.calculationPrice();
-    this.handleReceiveSwapPathFiat();
-  }
   @Output() closePage = new EventEmitter<any>();
   @Output() swapFail = new EventEmitter();
-  rates = {};
 
   inquiryOptions = {
     path: '/assets/json/Inquerying.json',
@@ -73,6 +68,10 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   settingUnScribe: Unsubscribable;
   slipValue: number;
   deadline: number;
+
+  ratesUnScribe: Unsubscribable;
+  rates$: Observable<any>;
+  rates = {};
 
   swap$: Observable<any>;
   swapUnScribe: Unsubscribable;
@@ -121,10 +120,10 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   ) {
     this.swap$ = store.select('swap');
     this.setting$ = store.select('setting');
+    this.rates$ = store.select('rates');
   }
 
   ngOnInit(): void {
-    // this.getRates();
     this.init();
     this.checkO3SwapFee();
     this.getSwapPathFun();
@@ -149,6 +148,10 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.slipValue = state.slipValue;
       this.deadline = state.deadline;
     });
+    this.ratesUnScribe = this.rates$.subscribe((state) => {
+      this.rates = state.rates;
+      this.handleReceiveSwapPathFiat();
+    });
   }
 
   ngOnDestroy(): void {
@@ -160,6 +163,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     }
     if (this.settingUnScribe) {
       this.settingUnScribe.unsubscribe();
+    }
+    if (this.ratesUnScribe) {
+      this.ratesUnScribe.unsubscribe();
     }
   }
 
@@ -176,10 +182,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     } else {
       this.showInquiry = true;
     }
-  }
-
-  async getRates(): Promise<void> {
-    this.rates = await this.apiService.getRates();
   }
 
   setInquiryInterval(): void {
@@ -667,27 +669,22 @@ export class SwapResultComponent implements OnInit, OnDestroy {
           this.commonService.log(res);
           this.receiveSwapPathArray = res;
           this.handleReceiveSwapPathFiat();
+          this.chooseSwapPathIndex = 0;
+          this.chooseSwapPath = this.receiveSwapPathArray[0];
           this.calculationPrice();
         }
       });
   }
-  async handleReceiveSwapPathFiat(): Promise<void> {
+  handleReceiveSwapPathFiat(): void {
     if (!this.receiveSwapPathArray) {
       return;
     }
-    this.receiveSwapPathArray.forEach((item) => {
+    const price = this.commonService.getAssetRate(this.rates, this.toToken);
+    this.receiveSwapPathArray.forEach((item, index) => {
       item.receiveAmount = new BigNumber(item.receiveAmount)
         .shiftedBy(-this.toToken.decimals)
         .toFixed();
-    });
-    this.chooseSwapPathIndex = 0;
-    this.chooseSwapPath = this.receiveSwapPathArray[0];
-    // if (!this.rates['eth']) {
-    //   await this.getRates();
-    // }
-    this.receiveSwapPathArray.forEach((item) => {
       // 计算法币价格
-      const price = this.commonService.getAssetRate(this.rates, this.toToken);
       if (price) {
         item.fiat = new BigNumber(item.receiveAmount)
           .multipliedBy(new BigNumber(price))
