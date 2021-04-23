@@ -167,7 +167,7 @@ export class ApiService {
         toToken,
         inputAmount
       );
-      return this.handleReceiveSwapPathFiat(res, toToken);
+      return this.handleReceiveSwapPathFiat(res, true);
     }
     this.commonService.log(2);
     const fromUsd = USD_TOKENS.find((item) => item.chain === fromToken.chain);
@@ -181,7 +181,7 @@ export class ApiService {
         toToken,
         inputAmount
       );
-      return this.handleReceiveSwapPathFiat(res, toToken);
+      return this.handleReceiveSwapPathFiat(res);
     }
     this.commonService.log(toUsd.assetID);
     this.commonService.log(toToken.assetID);
@@ -196,7 +196,7 @@ export class ApiService {
         inputAmount,
         fromUsd
       );
-      return this.handleReceiveSwapPathFiat(res, toToken);
+      return this.handleReceiveSwapPathFiat(res);
     }
     this.commonService.log(4);
     return of([]).toPromise();
@@ -491,7 +491,7 @@ export class ApiService {
     }
     this.commonService.log(result);
     if (result) {
-      return of(this.handleReceiveSwapPathFiat(result, toToken)).toPromise();
+      return of(this.handleReceiveSwapPathFiat(result)).toPromise();
     }
   }
 
@@ -527,7 +527,7 @@ export class ApiService {
               };
               target.push(temp);
             });
-            return this.handleReceiveSwapPathFiat(target, toToken);
+            return this.handleReceiveSwapPathFiat(target);
           }
         })
       )
@@ -554,7 +554,7 @@ export class ApiService {
       },
     ];
     this.commonService.log(result);
-    return of(this.handleReceiveSwapPathFiat(result, toToken)).toPromise();
+    return of(this.handleReceiveSwapPathFiat(result)).toPromise();
   }
 
   private getFromEthSwapPath(
@@ -736,10 +736,16 @@ export class ApiService {
 
   private handleReceiveSwapPathFiat(
     swapPathArr: AssetQueryResponse,
-    toToken: Token
+    hasAggregator = false
   ): AssetQueryResponse {
     swapPathArr.forEach((item) => {
-      item.receiveAmount = item.amount[item.amount.length - 1];
+      item.receiveAmount = String(item.amount[item.amount.length - 1]);
+      if (hasAggregator) {
+        item.receiveAmount = this.swapService.getMinAmountOut(
+          item.receiveAmount,
+          O3_AGGREGATOR_FEE
+        );
+      }
     });
     return this.shellSortSwapPath(swapPathArr);
   }

@@ -527,7 +527,8 @@ export class MetaMaskWalletApiService {
     inputAmount: string,
     fromAddress: string,
     toAddress: string,
-    deadline: number
+    deadline: number,
+    slipValue: number
   ): Promise<any> {
     this.commonService.log(
       `\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`
@@ -549,7 +550,7 @@ export class MetaMaskWalletApiService {
         .toFixed(),
       swapAmountOutMin: this.swapService.getMinAmountOut(
         receiveAmount,
-        O3_AGGREGATOR_SLIPVALUE
+        slipValue
       ),
       path: chooseSwapPath.assetHashPath,
       to: toAddress,
@@ -602,7 +603,8 @@ export class MetaMaskWalletApiService {
     inputAmount: string,
     fromAddress: string,
     toAddress: string,
-    deadline: number
+    deadline: number,
+    slipValue: number
   ): Promise<any> {
     this.commonService.log(
       `\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`
@@ -621,7 +623,7 @@ export class MetaMaskWalletApiService {
     const params = {
       swapAmountOutMin: this.swapService.getMinAmountOut(
         receiveAmount,
-        O3_AGGREGATOR_SLIPVALUE
+        slipValue
       ),
       path: chooseSwapPath.assetHashPath,
       to: toAddress,
@@ -678,7 +680,8 @@ export class MetaMaskWalletApiService {
     inputAmount: string,
     fromAddress: string,
     toAddress: string,
-    deadline: number
+    deadline: number,
+    slipValue: number
   ): Promise<any> {
     this.commonService.log(
       `\u001b[32m  ✓ ${chooseSwapPath.aggregator} \u001b[0m`
@@ -701,7 +704,7 @@ export class MetaMaskWalletApiService {
         .toFixed(),
       swapAmountOutMin: this.swapService.getMinAmountOut(
         receiveAmount,
-        O3_AGGREGATOR_SLIPVALUE
+        slipValue
       ),
       path: chooseSwapPath.assetHashPath,
       to: toAddress,

@@ -73,7 +73,7 @@
       <p class="label">Quote includes a {{ O3_AGGREGATOR_FEE }}% O3Swap fee</p>
     </div>
   </div>
-  <button class="confirm" (click)="swap()">Confirm</button>
+  <button class="confirm" (click)="swap()" [ngClass]="{active: chooseSwapPath}">Confirm</button>
   <div class="setting-group">
     <div class="refresh">
       After<span>{{ inquiryTime }}</span>s

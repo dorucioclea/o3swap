@@ -469,7 +469,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.inputAmount,
         this.fromAddress,
         this.toAddress,
-        this.deadline
+        this.deadline,
+        this.slipValue
       )
       .then((res) => {
         if (res) {
@@ -488,7 +489,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.inputAmount,
         this.fromAddress,
         this.toAddress,
-        this.deadline
+        this.deadline,
+        this.slipValue
       )
       .then((res) => {
         if (res) {
@@ -507,7 +509,8 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.inputAmount,
         this.fromAddress,
         this.toAddress,
-        this.deadline
+        this.deadline,
+        this.slipValue
       )
       .then((res) => {
         if (res) {

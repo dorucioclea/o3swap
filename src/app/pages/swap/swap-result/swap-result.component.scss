@@ -139,6 +139,14 @@ section.result-wrapper {
     width: 100%;
     margin-top: 20px;
     border-radius: 30px;
+    opacity: 0.5;
+    cursor: default;
+    pointer-events: none;
+    &.active {
+      cursor: pointer;
+      opacity: 1;
+      pointer-events: auto;
+    }
   }
   .setting-group {
     .refresh {
