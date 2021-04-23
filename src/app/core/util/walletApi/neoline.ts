@@ -24,6 +24,7 @@ import {
 import { interval, Observable, Unsubscribable } from 'rxjs';
 import { wallet } from '@cityofzion/neon-js';
 import BigNumber from 'bignumber.js';
+import { take } from 'rxjs/operators';
 
 interface State {
   swap: SwapStateType;
@@ -40,7 +41,6 @@ export class NeolineWalletApiService {
   neolineNetwork: Network;
 
   neolineDapi;
-  autoConnectInterval: Unsubscribable;
 
   constructor(
     private store: Store<State>,
@@ -62,26 +62,32 @@ export class NeolineWalletApiService {
 
   //#region connect
   init(): void {
+    // local transaction
+    const localTxString = localStorage.getItem('transaction');
+    if (localTxString) {
+      this.handleLocalTx(localTxString);
+    }
+    // auto connect
     const sessionNeoWalletName = sessionStorage.getItem(
       'neoWalletName'
     ) as NeoWalletName;
-    if (sessionNeoWalletName === 'NeoLine') {
-      this.autoConnectInterval = interval(1000).subscribe(() => {
+    if (sessionNeoWalletName !== 'NeoLine') {
+      return;
+    }
+    const autoConnectInterval = interval(1000)
+      .pipe(take(5))
+      .subscribe(() => {
         if (this.neolineDapi) {
+          autoConnectInterval.unsubscribe();
           this.connect(false);
-          this.autoConnectInterval.unsubscribe();
         }
       });
-    }
   }
 
   connect(showMessage = true): Promise<string> {
     if (this.neolineDapi === undefined) {
       this.swapService.toDownloadWallet(this.myWalletName);
       return;
-    }
-    if (this.autoConnectInterval) {
-      this.autoConnectInterval.unsubscribe();
     }
     return this.neolineDapi
       .getAccount()
@@ -134,7 +140,13 @@ export class NeolineWalletApiService {
       })
       .then(({ txid }) => {
         const txHash = this.commonService.add0xHash(txid);
-        this.handleTx(fromToken, toToken, inputAmount, inputAmount, txHash);
+        this.handleTx(
+          fromToken,
+          toToken,
+          inputAmount,
+          new BigNumber(inputAmount).shiftedBy(toToken.decimals).toFixed(),
+          txHash
+        );
         return txHash;
       })
       .catch((error) => {
@@ -390,6 +402,58 @@ export class NeolineWalletApiService {
   }
 
   //#region private function
+  handleLocalTx(localTxString: string): void {
+    if (localTxString === null || localTxString === undefined) {
+      return;
+    }
+    const localTx: SwapTransaction = JSON.parse(localTxString);
+    if (localTx.fromToken.chain !== 'NEO' || localTx.walletName !== 'NeoLine') {
+      return;
+    }
+    this.transaction = localTx;
+    this.store.dispatch({ type: UPDATE_PENDING_TX, data: localTx });
+    if (localTx.isPending === false) {
+      return;
+    }
+    const neolineDapiIsReadyInterval = interval(1000)
+      .pipe(take(5))
+      .subscribe(() => {
+        if (this.neolineDapi) {
+          neolineDapiIsReadyInterval.unsubscribe();
+          const getTx = () => {
+            this.neolineDapi
+              .getTransaction({
+                txid: this.commonService.add0xHash(localTx.txid),
+                network: NETWORK,
+              })
+              .then((result) => {
+                if (intervalTx) {
+                  intervalTx.unsubscribe();
+                }
+                if (
+                  this.commonService.add0xHash(result.txid) ===
+                  this.commonService.add0xHash(localTx.txid)
+                ) {
+                  this.getBalances();
+                  this.transaction.isPending = false;
+                  this.store.dispatch({
+                    type: UPDATE_PENDING_TX,
+                    data: this.transaction,
+                  });
+                }
+              })
+              .catch((error) => {
+                this.commonService.log(error);
+              });
+          };
+          getTx();
+          const intervalTx = interval(5000).subscribe(() => {
+            getTx();
+          });
+        }
+      });
+  }
+
   private getBalances(
     fromTokenAssetId?: string,
     inputAmount?: string
@@ -421,7 +485,7 @@ export class NeolineWalletApiService {
         }
       })
       .catch((error) => {
-        this.swapService.handleNeoDapiError(error, 'NeoLine');
+        this.commonService.log(error);
       });
   }
 
@@ -453,6 +517,7 @@ export class NeolineWalletApiService {
       receiveAmount: new BigNumber(receiveAmount)
         .shiftedBy(-toToken.decimals)
         .toFixed(),
+      walletName: 'NeoLine',
     };
     if (addLister === false) {
       pendingTx.progress = {

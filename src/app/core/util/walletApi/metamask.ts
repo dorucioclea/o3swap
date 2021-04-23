@@ -43,7 +43,7 @@ import { CommonService } from '../common.service';
 import { SwapService } from '../swap.service';
 import Web3 from 'web3';
 import { HttpClient } from '@angular/common/http';
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { ApiService } from '../../api/api.service';
 interface State {
   swap: SwapStateType;
@@ -54,6 +54,8 @@ export class MetaMaskWalletApiService {
   myWalletName: EthWalletName = 'MetaMask';
   accountAddress: string;
   requestTxStatusInterval: Unsubscribable;
+  requestBridgeTxStatusInterval: Unsubscribable;
+  requestLiquidityTxStatusInterval: Unsubscribable;
 
   swap$: Observable<any>;
   ethWalletName: EthWalletName;
@@ -110,11 +112,19 @@ export class MetaMaskWalletApiService {
 
   //#region connect
   init(): void {
-    setTimeout(() => {
-      if ((window as any).ethereum && (window as any).ethereum.isConnected()) {
-        (window as any).ethereum
-          .request({ method: 'eth_accounts' })
-          .then((result) => {
+    this.initTxs();
+    const intervalReq = interval(1000)
+      .pipe(take(5))
+      .subscribe(() => {
+        if (!(window as any).ethereum) {
+          return;
+        } else {
+          intervalReq.unsubscribe();
+        }
+        this.ethereum = (window as any).ethereum;
+        this.web3 = new Web3((window as any).ethereum);
+        if (this.ethereum.isConnected()) {
+          this.ethereum.request({ method: 'eth_accounts' }).then((result) => {
             if (result.length === 0) {
               return;
             }
@@ -137,8 +147,8 @@ export class MetaMaskWalletApiService {
               this.connect('HECO', false);
             }
           });
-      }
-    }, 1000);
+        }
+      });
   }
 
   connect(chain: string, showMessage = true): Promise<string> {
@@ -1174,12 +1184,79 @@ export class MetaMaskWalletApiService {
         return null;
       })
       .catch((error) => {
-        this.handleDapiError(error);
+        this.commonService.log(error);
       });
   }
   //#endregion
 
   //#region private function
+  private initTxs(): void {
+    const localTxString = localStorage.getItem('transaction');
+    const localBridgeTxString = localStorage.getItem('bridgeeTransaction');
+    const localLiquidityTxString = localStorage.getItem('liquidityTransaction');
+    this.handleLocalTx(localTxString, UPDATE_PENDING_TX, 'swap');
+    this.handleLocalTx(localBridgeTxString, UPDATE_BRIDGE_PENDING_TX, 'bridge');
+    this.handleLocalTx(
+      localLiquidityTxString,
+      UPDATE_LIQUIDITY_PENDING_TX,
+      'liquidity'
+    );
+  }
+  private handleLocalTx(
+    localTxString: string,
+    dispatchType: string,
+    txAtPage: TxAtPage
+  ): void {
+    if (localTxString === null || localTxString === undefined) {
+      return;
+    }
+    const localTx: SwapTransaction = JSON.parse(localTxString);
+    if (
+      localTx.fromToken.chain === 'NEO' ||
+      localTx.walletName !== 'MetaMask'
+    ) {
+      return;
+    }
+    switch (txAtPage) {
+      case 'swap':
+        this.transaction = localTx;
+        break;
+      case 'swap':
+        this.bridgeeTransaction = localTx;
+        break;
+      case 'swap':
+        this.liquidityTransaction = localTx;
+        break;
+    }
+    this.store.dispatch({ type: dispatchType, data: localTx });
+    if (localTx.isPending === false) {
+      return;
+    }
+    if (!this.ethereum) {
+      const ethereumiInterval = interval(1000)
+        .pipe(take(5))
+        .subscribe(() => {
+          if (!this.ethereum) {
+            return;
+          } else {
+            ethereumiInterval.unsubscribe();
+            this.listerTxReceipt(
+              localTx.txid,
+              dispatchType,
+              localTx.progress ? true : false,
+              txAtPage
+            );
+          }
+        });
+    } else {
+      this.listerTxReceipt(
+        localTx.txid,
+        dispatchType,
+        localTx.progress ? true : false,
+        txAtPage
+      );
+    }
+  }
   private handleTx(
     fromToken: Token,
     toToken: Token,
@@ -1200,6 +1277,7 @@ export class MetaMaskWalletApiService {
       receiveAmount: new BigNumber(receiveAmount)
         .shiftedBy(-toToken.decimals)
         .toFixed(),
+      walletName: 'MetaMask',
     };
     if (hasCrossChain) {
       pendingTx.progress = {
@@ -1233,10 +1311,25 @@ export class MetaMaskWalletApiService {
     hasCrossChain = true,
     txAtPage: TxAtPage
   ): void {
-    if (this.requestTxStatusInterval) {
-      this.requestTxStatusInterval.unsubscribe();
+    if (!this.ethereum) {
+      return;
     }
-    this.requestTxStatusInterval = interval(5000).subscribe(() => {
+    let myInterval;
+    switch (txAtPage) {
+      case 'swap':
+        myInterval = this.requestTxStatusInterval;
+        break;
+      case 'bridge':
+        myInterval = this.requestBridgeTxStatusInterval;
+        break;
+      case 'liquidity':
+        myInterval = this.requestLiquidityTxStatusInterval;
+        break;
+    }
+    if (myInterval) {
+      myInterval.unsubscribe();
+    }
+    myInterval = interval(5000).subscribe(() => {
       let currentTx: SwapTransaction;
       switch (txAtPage) {
         case 'swap':
@@ -1252,12 +1345,12 @@ export class MetaMaskWalletApiService {
       this.ethereum
         .request({
           method: 'eth_getTransactionReceipt',
-          params: [txHash],
+          params: [this.commonService.add0xHash(txHash)],
         })
         .then((receipt) => {
           this.commonService.log(receipt);
           if (receipt) {
-            this.requestTxStatusInterval.unsubscribe();
+            myInterval.unsubscribe();
             if (new BigNumber(receipt.status, 16).isZero()) {
               currentTx.isPending = false;
               currentTx.isFailed = true;
@@ -1272,8 +1365,8 @@ export class MetaMaskWalletApiService {
           }
         })
         .catch((error) => {
-          this.requestTxStatusInterval.unsubscribe();
-          this.handleDapiError(error);
+          myInterval.unsubscribe();
+          this.commonService.log(error);
         });
     });
   }
@@ -1330,7 +1423,7 @@ export class MetaMaskWalletApiService {
         }
       })
       .catch((error) => {
-        this.handleDapiError(error);
+        this.commonService.log(error);
       });
     this.ethereum.on('accountsChanged', (accounts) => {
       this.accountAddress = accounts.length > 0 ? accounts[0] : null;

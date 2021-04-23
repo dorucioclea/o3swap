@@ -21,9 +21,10 @@ import {
   NETWORK,
   SWAP_CONTRACT_CHAIN_ID,
 } from '@lib';
-import { Observable } from 'rxjs';
+import { interval, Observable } from 'rxjs';
 import { wallet } from '@cityofzion/neon-js';
 import BigNumber from 'bignumber.js';
+import { take } from 'rxjs/operators';
 
 interface State {
   swap: SwapStateType;
@@ -51,10 +52,61 @@ export class O3NeoWalletApiService {
     });
   }
 
+  init(): void {
+    const localTxString = localStorage.getItem('transaction');
+    if (localTxString === null || localTxString === undefined) {
+      return;
+    }
+    const localTx: SwapTransaction = JSON.parse(localTxString);
+    if (localTx.fromToken.chain !== 'NEO' || localTx.walletName !== 'O3') {
+      return;
+    }
+    this.transaction = localTx;
+    this.store.dispatch({ type: UPDATE_PENDING_TX, data: localTx });
+    if (localTx.isPending === false) {
+      return;
+    }
+    o3dapi.NEO.addEventListener(o3dapi.NEO.Constants.EventName.READY, () => {
+      const getTx = () => {
+        o3dapi.NEO.getTransaction({
+          txid: this.commonService.add0xHash(localTx.txid),
+          network: NETWORK,
+        })
+          .then((result) => {
+            if (intervalTx) {
+              intervalTx.unsubscribe();
+            }
+            if (
+              this.commonService.add0xHash(result.txid) ===
+              this.commonService.add0xHash(localTx.txid)
+            ) {
+              this.getBalances();
+              this.transaction.isPending = false;
+              this.store.dispatch({
+                type: UPDATE_PENDING_TX,
+                data: this.transaction,
+              });
+            }
+          })
+          .catch((error) => {
+            this.commonService.log(error);
+          });
+      };
+      getTx();
+      const intervalTx = interval(5000).subscribe(() => {
+        getTx();
+      });
+    });
+  }
+
   connect(): Promise<string> {
     return o3dapi.NEO.getAccount()
       .then((result) => {
         this.commonService.log(result);
+        if (!result.address) {
+          return;
+        }
+        this.nzMessage.success('Connection succeeded!');
         this.accountAddress = result.address;
         this.store.dispatch({
           type: UPDATE_NEO_ACCOUNT,
@@ -93,7 +145,13 @@ export class O3NeoWalletApiService {
     })
       .then(({ txid }) => {
         const txHash = this.commonService.add0xHash(txid);
-        this.handleTx(fromToken, toToken, inputAmount, inputAmount, txHash);
+        this.handleTx(
+          fromToken,
+          toToken,
+          inputAmount,
+          new BigNumber(inputAmount).shiftedBy(toToken.decimals).toFixed(),
+          txHash
+        );
         return txHash;
       })
       .catch((error) => {
@@ -354,7 +412,7 @@ export class O3NeoWalletApiService {
       network: NETWORK,
     })
       .then((addressTokens: any[]) => {
-        const tokens = addressTokens[this.accountAddress];
+        const tokens = addressTokens[this.accountAddress] || [];
         const tempTokenBalance = {};
         tokens.forEach((tokenItem: any) => {
           tempTokenBalance[tokenItem.asset_id || tokenItem.assetID] = tokenItem;
@@ -375,7 +433,7 @@ export class O3NeoWalletApiService {
         }
       })
       .catch((error) => {
-        this.swapService.handleNeoDapiError(error, 'O3');
+        this.commonService.log(error);
       });
   }
 
@@ -397,6 +455,7 @@ export class O3NeoWalletApiService {
       receiveAmount: new BigNumber(receiveAmount)
         .shiftedBy(-toToken.decimals)
         .toFixed(),
+      walletName: 'O3',
     };
     if (addLister === false) {
       pendingTx.progress = {

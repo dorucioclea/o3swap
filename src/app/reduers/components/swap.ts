@@ -128,10 +128,13 @@ export default function swap(state = initialState, action): any {
       return { ...state, metamaskNetworkId: action.data };
 
     case UPDATE_PENDING_TX:
+      setlocalStorage('transaction', action.data);
       return { ...state, transaction: action.data };
     case UPDATE_BRIDGE_PENDING_TX:
+      setlocalStorage('bridgeeTransaction', action.data);
       return { ...state, bridgeeTransaction: action.data };
     case UPDATE_LIQUIDITY_PENDING_TX:
+      setlocalStorage('liquidityTransaction', action.data);
       return { ...state, liquidityTransaction: action.data };
     default:
       return state;
@@ -140,4 +143,8 @@ export default function swap(state = initialState, action): any {
 
 function setSessionStorage(key: string, value: string): void {
   sessionStorage.setItem(key, value);
+}
+
+function setlocalStorage(key: string, value: string): void {
+  localStorage.setItem(key, JSON.stringify(value));
 }

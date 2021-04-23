@@ -1,6 +1,6 @@
 import { Network } from './network';
 import { Token } from './token';
-import { NeoWalletName, EthWalletName } from './wallet';
+import { NeoWalletName, EthWalletName, WalletName } from './wallet';
 
 export type TxProgress = {
   step1: { hash: string; status: 0 | 1 | 2 }; // 0 = 未开始, 1 = 进行中, 2 = 已完成
@@ -18,6 +18,7 @@ export interface SwapTransaction {
   receiveAmount: string;
   progress?: TxProgress;
   isFailed?: boolean;
+  walletName: WalletName;
 }
 
 export interface SwapStateType {

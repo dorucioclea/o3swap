@@ -4,6 +4,7 @@ import {
   NeolineWalletApiService,
   MetaMaskWalletApiService,
   VaultdMetaMaskWalletApiService,
+  O3NeoWalletApiService,
   ApiService,
 } from '@core';
 import { RiskWarningComponent } from '@shared';
@@ -26,6 +27,7 @@ export class AppComponent implements OnInit {
     private router: Router,
     private metaMaskWalletApiService: MetaMaskWalletApiService,
     private neolineWalletApiService: NeolineWalletApiService,
+    private o3NeoWalletApiService: O3NeoWalletApiService,
     private vaultdMetaMaskWalletApiService: VaultdMetaMaskWalletApiService,
     private modal: NzModalService,
     private apiService: ApiService
@@ -57,6 +59,7 @@ export class AppComponent implements OnInit {
       this.neolineWalletApiService.init();
       this.metaMaskWalletApiService.init();
       this.vaultdMetaMaskWalletApiService.init();
+      this.o3NeoWalletApiService.init();
     }
   }
 

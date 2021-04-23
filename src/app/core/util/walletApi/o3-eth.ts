@@ -1083,7 +1083,7 @@ export class O3EthWalletApiService {
         return null;
       })
       .catch((error) => {
-        this.handleDapiError(error);
+        this.commonService.log(error);
       });
   }
   //#endregion
@@ -1109,6 +1109,7 @@ export class O3EthWalletApiService {
       receiveAmount: new BigNumber(receiveAmount)
         .shiftedBy(-toToken.decimals)
         .toFixed(),
+      walletName: 'O3',
     };
     if (hasCrossChain) {
       pendingTx.progress = {
