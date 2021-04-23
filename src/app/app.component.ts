@@ -48,6 +48,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.apiService.getRates();
     const sessionShowRisk = sessionStorage.getItem('showRisk');
     if (sessionShowRisk !== undefined) {
       this.showRisk = sessionShowRisk === 'false' ? false : true;
@@ -61,9 +62,8 @@ export class AppComponent implements OnInit {
 
   updateRates(): void {
     if (!this.isHome) {
-      this.apiService.getRates();
       if (this.updateRatesInterval) {
-        this.updateRatesInterval.unsubscribe();
+        return;
       }
       this.updateRatesInterval = interval(60000).subscribe(() => {
         this.apiService.getRates();
