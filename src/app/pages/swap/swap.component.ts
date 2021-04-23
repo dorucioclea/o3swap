@@ -1,59 +1,22 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ApiService, CommonService } from '@core';
-import {
-  SwapStateType,
-  SwapTransaction,
-  Token,
-  UPDATE_PENDING_TX,
-  ETH_TX_PAGES_PREFIX,
-  POLY_TX_PAGES_PREFIX,
-  NEO_TX_PAGES_PREFIX,
-  TxProgress,
-  DefaultTxProgress,
-} from '@lib';
+import { ApiService, MetaMaskWalletApiService } from '@core';
+import { ChainTokens, CHAIN_TOKENS, NNEO_TOKEN, Token, USD_TOKENS } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { AnimationOptions } from 'ngx-lottie';
-import { interval, Observable, Unsubscribable } from 'rxjs';
+import { Unsubscribable, Observable } from 'rxjs';
+
+interface State {
+  tokens: any;
+}
 
 type PageStatus = 'home' | 'result';
-interface State {
-  swap: SwapStateType;
-}
 @Component({
   selector: 'app-swap',
   templateUrl: './swap.component.html',
   styleUrls: ['./swap.component.scss'],
 })
 export class SwapComponent implements OnInit, OnDestroy {
-  ETH_TX_PAGES_PREFIX = ETH_TX_PAGES_PREFIX;
-  NEO_TX_PAGES_PREFIX = NEO_TX_PAGES_PREFIX;
-  POLY_TX_PAGES_PREFIX = POLY_TX_PAGES_PREFIX;
-  successOptions: AnimationOptions = {
-    path: '/assets/json/success.json',
-    loop: false,
-  };
-  pendingOptions = {
-    path: '/assets/json/pending.json',
-  };
-  pendingMinOptions = {
-    path: '/assets/json/pending-min.json',
-  };
-  txCompleteOptions = {
-    path: '/assets/json/tx-complete.json',
-    loop: false,
-  };
-  txPendingOptions = {
-    path: '/assets/json/tx-waiting.json',
-  };
-  showTxModal = false;
-  showTxDetail = false;
-
-  swap$: Observable<any>;
-  transaction: SwapTransaction;
-
   pageStatus: PageStatus = 'home';
-  rates = {};
 
   fromToken: Token;
   toToken: Token;
@@ -61,103 +24,35 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   initResultData;
 
-  requestCrossInterval: Unsubscribable;
-  swapProgress = 20;
-
+  tokensUnScribe: Unsubscribable;
+  tokens$: Observable<any>;
+  chainTokens = new ChainTokens();
   constructor(
-    public store: Store<State>,
+    private store: Store<State>,
     private apiService: ApiService,
-    private nzMessage: NzMessageService,
-    private commonService: CommonService
+    private metaMaskWalletApiService: MetaMaskWalletApiService,
+    private nzMessage: NzMessageService
   ) {
-    this.swap$ = store.select('swap');
-  }
-
-  ngOnInit(): void {
-    this.swap$.subscribe((state) => {
-      if (
-        state.transaction &&
-        state.transaction.txid !== this.transaction.txid &&
-        state.transaction.toToken &&
-        state.transaction.toToken.chain !== 'NEO' &&
-        state.transaction.isPending
-      ) {
-        this.transaction = Object.assign({}, state.transaction);
-        this.setRequestCrossInterval();
-      }
-      this.transaction = Object.assign({}, state.transaction);
-      this.showTxModal = this.transaction.min === false ? true : false;
-      if (this.transaction.isPending === false) {
-        this.swapProgress = 100;
-      } else {
-        if (this.transaction.progress) {
-          if (this.transaction.progress.step3.status === 2) {
-            this.swapProgress = 100;
-          } else if (this.transaction.progress.step2.status === 2) {
-            this.swapProgress = 66;
-          } else if (this.transaction.progress.step1.status === 2) {
-            this.swapProgress = 33;
-          } else {
-            this.swapProgress = 20;
-          }
-        } else {
-          this.swapProgress = 20;
-        }
-      }
+    this.tokens$ = store.select('tokens');
+    this.tokensUnScribe = this.tokens$.subscribe((state) => {
+      this.chainTokens = state.chainTokens;
     });
-    this.getRates();
   }
 
-  ngOnDestroy(): void {
-    if (
-      this.requestCrossInterval !== null &&
-      this.requestCrossInterval !== undefined
-    ) {
-      this.requestCrossInterval.unsubscribe();
+  async ngOnInit(): Promise<void> {
+    const chain = this.metaMaskWalletApiService.getChain();
+    if (chain) {
+      await this.apiService.getTokens();
+      this.fromToken = Object.assign({}, this.chainTokens[chain][0]);
+    } else {
+      this.fromToken = USD_TOKENS[0];
     }
   }
 
-  setRequestCrossInterval(): void {
-    this.requestCrossInterval = interval(5000).subscribe(() => {
-      this.apiService
-        .getCrossChainSwapDetail(this.transaction.txid)
-        .subscribe((res: TxProgress) => {
-          this.commonService.log(res);
-          this.transaction.progress = res;
-          if (
-            res.step1.status === 2 &&
-            res.step2.status === 2 &&
-            res.step3.status === 2
-          ) {
-            this.transaction.isPending = false;
-            this.requestCrossInterval.unsubscribe();
-          }
-          this.store.dispatch({
-            type: UPDATE_PENDING_TX,
-            data: this.transaction,
-          });
-        });
-    });
-  }
-
-  getRates(): void {
-    this.apiService.getRates().subscribe((res) => {
-      this.rates = res;
-    });
-  }
-
-  minTxHashModal(): void {
-    this.transaction.min = true;
-    this.store.dispatch({ type: UPDATE_PENDING_TX, data: this.transaction });
-  }
-
-  maxTxHashModal(): void {
-    this.transaction.min = false;
-    this.store.dispatch({ type: UPDATE_PENDING_TX, data: this.transaction });
-  }
-
-  copy(hash: string): void {
-    this.commonService.copy(hash);
+  ngOnDestroy(): void {
+    if (this.tokensUnScribe) {
+      this.tokensUnScribe.unsubscribe();
+    }
   }
 
   //#region home

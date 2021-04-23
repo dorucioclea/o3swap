@@ -44,7 +44,7 @@
     "zh": "发布 Litepaper"
   },
   "roadmapQ2Q3Detail1": {
-    "en": "Launch the bridge module. Provide cross-chain service.",
+    "en": "Release O3 Hub, providing cross-chain service.",
     "zh": "上线 bridge 模块，提供跨链服务"
   },
   "roadmapQ2Q3Detail2": {
@@ -52,20 +52,20 @@
     "zh": "Swap 支持 ETH，BSC 网络"
   },
   "roadmapQ2Q3Detail3": {
-    "en": "Release O3 Swap token and economic model.",
+    "en": "O3 Version 1 online.",
     "zh": "发行 O3 Swap 治理 token 与经济模型"
   },
-  "roadmapQ2Q3Detail4": {
-    "en": "Launch trade mining and other community incentives.",
-    "zh": "开启交易挖矿与其他社区激励"
-  },
   "roadmapQ4Detail1": {
-    "en": "Launch DAO.",
+    "en": "Launch DAO Version 1.",
     "zh": "上线DAO"
   },
   "roadmapQ4Detail2": {
-    "en": "Complete Layer 2 development and deployment.",
+    "en": "Deploy aggregation protocol on Layer 2 networks.",
     "zh": "完成 Layer2 版本开发与部署 "
+  },
+  "roadmapQ4Detail3": {
+    "en": "Complete O3 Hub development across Layer 2 networks. ",
+    "zh": "上线DAO"
   },
   "roadmap2022Detail1": {
     "en": "Release V2. Support instant quote and pending order.",

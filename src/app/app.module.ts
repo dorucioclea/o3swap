@@ -17,7 +17,10 @@ import {
   SwapComponent,
   SwapHomeComponent,
   SwapResultComponent,
-  DashboardComponent,
+  VaultComponent,
+  HubComponent,
+  HubPoolComponent,
+  LiquidityComponent,
 } from './pages';
 
 const PAGECOMPONENTS = [
@@ -25,7 +28,10 @@ const PAGECOMPONENTS = [
   SwapComponent,
   SwapHomeComponent,
   SwapResultComponent,
-  DashboardComponent,
+  VaultComponent,
+  HubComponent,
+  HubPoolComponent,
+  LiquidityComponent,
 ];
 
 //#region ng-zorro-antd
@@ -53,6 +59,10 @@ const INTERCEPTOR_PROVIDES = [
 //#region lottie
 import { LottieModule } from 'ngx-lottie';
 import player from 'lottie-web';
+
+//#region echarts
+import { NgxEchartsModule } from 'ngx-echarts';
+import * as echarts from 'echarts';
 // Note we need a separate function as it's required
 // by the AOT compiler.
 function playerFactory(): any {
@@ -71,7 +81,13 @@ function playerFactory(): any {
     CoreModule,
     SharedModule,
     LottieModule.forRoot({ player: playerFactory }),
-    StoreModule.forRoot(rootReducer, {}),
+    StoreModule.forRoot(rootReducer, {
+      runtimeChecks: {
+        strictActionImmutability: false,
+        strictStateImmutability: false,
+      },
+    }),
+    NgxEchartsModule.forRoot({ echarts }),
   ],
   providers: [{ provide: NZ_I18N, useValue: en_US }, ...INTERCEPTOR_PROVIDES],
   bootstrap: [AppComponent],

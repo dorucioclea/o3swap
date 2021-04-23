@@ -20,6 +20,7 @@
   .modal-content {
     & > .title {
       font-size: 20px;
+      font-family: "fontDemiBold";
     }
     .close-group {
       position: absolute;
@@ -38,4 +39,10 @@
       }
     }
   }
+}
+.custom-stake-modal {
+  width: 420px !important;
+}
+.progress-container .ant-progress-inner {
+  background-color: #2A2A2A!important;
 }

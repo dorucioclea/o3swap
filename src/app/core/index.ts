@@ -7,3 +7,4 @@ export * from './util/walletApi/neoline';
 export * from './util/walletApi/metamask';
 export * from './util/walletApi/o3-neo';
 export * from './util/walletApi/o3-eth';
+export * from './util/walletApi/vault-metamask';

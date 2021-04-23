@@ -49,6 +49,7 @@ section.select-token-wrapper {
           .all {
             color: #6162ef;
             margin-left: 10px;
+            cursor: pointer;
           }
         }
       }
@@ -160,9 +161,11 @@ section.select-token-wrapper {
       margin-top: 20px;
       opacity: 0.5;
       cursor: default;
+      pointer-events: none;
       &.active {
         cursor: pointer;
         opacity: 1;
+        pointer-events: auto;
       }
     }
     img.next {

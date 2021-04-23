@@ -1,16 +1,32 @@
+import { NETWORK } from './network';
+
+export type ConnectChainType = 'ETH' | 'NEO' | 'BSC' | 'HECO';
 export type WalletName = 'O3' | 'NeoLine' | 'MetaMask';
 export type NeoWalletName = 'O3' | 'NeoLine';
 export type EthWalletName = 'O3' | 'MetaMask';
 
-export const CHAIN_ID_ETHEREUM = 2;
-export const CHAIN_ID_ONTOLOGY = 3;
-export const CHAIN_ID_NEO = 4;
+export const METAMASK_CHAIN_ID = {
+  BSC: NETWORK === 'MainNet' ? 56 : 97,
+  HECO: NETWORK === 'MainNet' ? 128 : 256,
+  ETH: NETWORK === 'MainNet' ? 1 : 3,
+};
+
+export const METAMASK_CHAIN =
+  NETWORK === 'MainNet'
+    ? {
+        56: 'BSC',
+        128: 'HECO',
+        1: 'ETH',
+      }
+    : {
+        97: 'BSC',
+        256: 'HECO',
+        3: 'ETH',
+      };
 
 export interface Wallet {
   name: WalletName;
-  chainId: number;
   logo: string;
-  downloadUrl: string;
 }
 
 export interface NeoWallet extends Wallet {
@@ -22,31 +38,25 @@ export interface EthWallet extends Wallet {
 export const NEO_WALLETS: NeoWallet[] = [
   {
     name: 'O3',
-    chainId: CHAIN_ID_NEO,
     logo: '/assets/images/logo-O3.png',
-    downloadUrl: 'https://o3.network/#download',
   },
   {
     name: 'NeoLine',
-    chainId: CHAIN_ID_NEO,
     logo: '/assets/images/logo-NeoLine.png',
-    downloadUrl:
-      'https://chrome.google.com/webstore/detail/neoline/cphhlgmgameodnhkjdmkpanlelnlohao',
   },
 ];
 
 export const ETH_WALLETS: EthWallet[] = [
   {
-    name: 'O3',
-    chainId: CHAIN_ID_NEO,
-    logo: '/assets/images/logo-O3.png',
-    downloadUrl: 'https://o3.network/#download',
+    name: 'MetaMask',
+    logo: '/assets/images/logo-MetaMask.png',
   },
   {
-    name: 'MetaMask',
-    chainId: CHAIN_ID_ETHEREUM,
-    logo: '/assets/images/logo-MetaMask.png',
-    downloadUrl:
-      'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
+    name: 'O3',
+    logo: '/assets/images/logo-O3.png',
   },
 ];
+
+export const BSC_WALLETS: EthWallet[] = ETH_WALLETS;
+
+export const HECO_WALLETS: EthWallet[] = ETH_WALLETS;

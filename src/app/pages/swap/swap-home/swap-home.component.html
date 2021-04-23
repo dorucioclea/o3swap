@@ -7,7 +7,7 @@
         <span class="left">From</span>
         <p class="right">
           Balance:&nbsp;
-          <span class="from-amount">{{ fromToken?.amount || '0' }}</span>
+          <app-long-balance class="from-amount" [balance]="fromToken?.amount"></app-long-balance>
           &nbsp;{{ fromToken?.symbol }}
           <span class="all" (click)="allInputAmount()">Max</span>
         </p>
@@ -18,8 +18,8 @@
           <span class="name">{{ fromToken?.symbol || 'SELECT' }}</span>
           <img class="arrow" src="/assets/images/swap/arrow-down.png" alt="">
         </div>
-        <input class="choose-amount" (input)="changeInputAmount($event)" [ngModel]="inputAmount" type="number"
-          placeholder="0.0">
+        <input class="choose-amount" title="Token Amount" (input)="changeInputAmount($event)" [ngModel]="inputAmount"
+          type="number" placeholder="0.0">
       </div>
       <p class="from-fiat">≈＄{{ inputAmountFiat || '0.00' }}</p>
     </div>
@@ -43,7 +43,7 @@
     <p class="sub-title receive-title">You will receive</p>
     <p class="receive-amount">{{ chooseSwapPath?.receiveAmount || '--' }} {{ toToken?.symbol }}</p>
     <p class="receive-fiat">≈＄{{ chooseSwapPath?.fiat || '--.--' }}</p>
-    <button class="confirm" (click)="inquiry()" [ngClass]="{active: checkCanInquiry()}">Inquiry</button>
+    <button class="confirm" (click)="inquiry()" [ngClass]="{active: checkCanInquiry()}">RFQ</button>
     <img class="next" (click)="backToResultPage()" src="/assets/images/swap/next.png" alt="">
   </div>
   <div class="setting-group">

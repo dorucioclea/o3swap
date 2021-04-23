@@ -1,130 +1,46 @@
 import { Injectable } from '@angular/core';
 import BigNumber from 'bignumber.js';
-import { from, of } from 'rxjs';
-import { map } from 'rxjs/operators';
-import {
-  AssetQueryResponse,
-  ALL_PERCENTAGE,
-  AssetQueryResponseItem,
-  ALL_NEO_TOKENS,
-  Token,
-  WalletName,
-  NeoWalletName,
-  NEOLINE_NETWORK,
-} from '@lib';
-import { ApiService } from '../api/api.service';
+import { ALL_PERCENTAGE, Token, WalletName, NeoWalletName, CHAINS } from '@lib';
 import { CommonService } from './common.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import * as crypto from 'crypto-js';
-import { ethers } from 'ethers';
 
 @Injectable()
 export class SwapService {
   constructor(
-    private apiService: ApiService,
     private commonService: CommonService,
     private nzMessage: NzMessageService
   ) {}
 
-  getToStandardSwapPath(fromToken: Token, inputAmount: string): Promise<string[]> {
-    if (NEOLINE_NETWORK === 'MainNet') {
-      return this.getToFusdtSwapPath(fromToken, inputAmount);
-    } else {
-      return this.getToNeoSwapPath(fromToken, inputAmount);
-    }
-  }
-
-  private getToFusdtSwapPath(
-    fromToken: Token,
-    inputAmount: string
-  ): Promise<string[]> {
-    if (fromToken.symbol === 'fUSDT') {
-      return of(['fUSDT']).toPromise();
-    }
-    return this.apiService
-      .getSwapPath(
-        fromToken.symbol,
-        'fUSDT',
-        this.getAmountIn(fromToken, inputAmount)
-      )
-      .pipe(
-        map((res: AssetQueryResponse) => {
-          if (res.length > 0) {
-            return res[0].swapPath;
-          } else {
-            return [];
-          }
-        })
-      )
-      .toPromise();
-  }
-
-  private getToNeoSwapPath(
-    fromToken: Token,
-    inputAmount: string
-  ): Promise<string[]> {
-    if (fromToken.symbol === 'nNEO') {
-      return of(['nNEO']).toPromise();
-    }
-    return this.apiService
-      .getSwapPath(
-        fromToken.symbol,
-        'nNEO',
-        this.getAmountIn(fromToken, inputAmount)
-      )
-      .pipe(
-        map((res: AssetQueryResponse) => {
-          if (res.length > 0) {
-            return res[0].swapPath;
-          } else {
-            return [];
-          }
-        })
-      )
-      .toPromise();
-  }
   getAmountIn(fromToken: Token, inputAmount: string): string {
     const factAmount = new BigNumber(inputAmount)
       .dividedBy(ALL_PERCENTAGE)
       .toFixed();
     return this.commonService.decimalToInteger(factAmount, fromToken.decimals);
   }
-  getAmountOutMin(
-    chooseSwapPath: AssetQueryResponseItem,
-    slipValue: number
-  ): string {
-    const amount = chooseSwapPath.amount[chooseSwapPath.amount.length - 1];
+  getMinAmountOut(amountOut: string, slipValue: number): string {
     const factPercentage = new BigNumber(1).minus(
       new BigNumber(slipValue).shiftedBy(-2)
     );
-    const factAmount = new BigNumber(amount)
+    const factAmount = new BigNumber(amountOut)
       .times(factPercentage)
       .dp(0)
       .toFixed();
     return factAmount;
   }
-  getAssetHashPath(swapPath: string[]): any[] {
+  getAssetNamePath(swapPath: string[], tokens: Token[]): any[] {
     const target = [];
-    swapPath.forEach((name) => {
-      const assetHash = this.getNeoAssetHashByName(name);
-      if (assetHash) {
-        target.push({ type: 'Hash160', value: assetHash });
-      }
+    swapPath.forEach((hash) => {
+      const token = tokens.find(
+        (item) =>
+          this.commonService.remove0xHash(item.assetID).toLowerCase() ===
+          this.commonService.remove0xHash(hash).toLowerCase()
+      );
+      target.push(token.symbol);
     });
     return target;
   }
-  getNeoAssetHashByName(name: string): string {
-    const token = ALL_NEO_TOKENS.find((item) => item.symbol === name);
-    return (token && token.assetID) || '';
-  }
-  getNeoAssetLogoByName(name: string): string {
-    const token = ALL_NEO_TOKENS.find((item) => item.symbol === name);
-    return (token && token.logo) || '';
-  }
   getHash160FromAddress(text: string): any {
-    if (text.startsWith('0x')) {
-      text = text.slice(2);
-    }
+    text = this.commonService.remove0xHash(text);
     return this.reverseHex(text);
   }
   private reverseHex(hex): string {
@@ -135,24 +51,42 @@ export class SwapService {
     return out;
   }
   handleNeoDapiError(error, walletName: NeoWalletName): void {
+    let message: string;
     switch (error.type) {
       case 'NO_PROVIDER':
         this.toDownloadWallet(walletName);
         break;
       case 'CONNECTION_DENIED':
-        this.nzMessage.error(
-          'The user rejected the request to connect with your dApp'
-        );
+        message = 'The user rejected the request to connect with your dApp';
+        break;
+      case 'RPC_ERROR':
+        message = 'RPC connection to a network node fails';
+        break;
+      case 'MALFORMED_INPUT':
+        message = 'The address is not a valid NEO address';
+        break;
+      case 'CANCELED':
+        message = 'User cancels, or refuses the dapps request';
+        break;
+      case 'FAIL':
+        message = 'The request failed';
+        break;
+      case 'INSUFFICIENT_FUNDS':
+        message = 'Insufficient balance';
         break;
       default:
         if (typeof error === 'string') {
-          this.nzMessage.error(error);
+          message = error;
         } else {
-          this.nzMessage.error(error.type || 'Unknown error');
+          message = error.type || 'Unknown error';
         }
         break;
     }
+    if (message) {
+      this.nzMessage.error(message);
+    }
   }
+
   toDownloadWallet(type: WalletName): void {
     switch (type) {
       case 'O3':

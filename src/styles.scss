@@ -1,5 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @import './styles/modal.scss';
+@import './styles/btn.scss';
+@import './styles/page.scss';
 
 * {
   margin: 0;
@@ -93,6 +95,7 @@ input[type="number"] {
 // 滚动条样式
 .scroll::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 /*正常时候的主干部分*/
 .scroll::-webkit-scrollbar-track {
@@ -102,4 +105,8 @@ input[type="number"] {
 .scroll::-webkit-scrollbar-thumb {
   background-color: #121212;
   border-radius: 5px;
+}
+/*当同时有垂直滚动条和水平滚动条时交汇的部分.*/
+.scroll::-webkit-scrollbar-corner {
+  background: transparent;
 }

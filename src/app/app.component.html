@@ -4,129 +4,79 @@
       <a routerLink="/">
         <img class="logo" src="/assets/images/logo.png" alt="">
       </a>
-      <ul class="menu flex-1">
+      <ul *ngIf="isHome !== false" [ngClass]="{ 'menu flex-1': isHome !== false }">
         <li [ngClass]="{active: isHome}">
           <a routerLink="/">Home</a>
         </li>
         <li [ngClass]="{active: currentPage==='/swap'}">
           <a routerLink="/swap">Swap</a>
         </li>
-        <!-- <li>
-          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Swap</a>
-        </li> -->
-        <li class="add-width">
-          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Buy Crypto</a>
+        <li [ngClass]="{active: currentPage.startsWith('/hub')}">
+          <a routerLink="/hub">Hub</a>
         </li>
-        <!-- <li class="add-width" [ngClass]="{active: currentPage==='/dashboard'}">
-          <a routerLink="/dashboard">Dashboard</a>
-        </li> -->
-        <!-- <li class="add-width">
+        <li [ngClass]="{active: currentPage==='/vault'}">
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Vault</a>
+        </li>
+        <li class="add-width">
           <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Dashboard</a>
-        </li> -->
+        </li>
         <li>
           <a href="https://medium.com/o3-labs-o3-wallet" target="_blank">Blog</a>
+        </li>
+        <!-- <li class="add-width" [ngClass]="{active: currentPage.startsWith('/governance')}">
+          <a>Governance</a>
+        </li> -->
+        <li class="add-width">
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Governance</a>
         </li>
         <li>
           <a href="https://docs.o3swap.com/" target="_blank">Doc</a>
         </li>
       </ul>
-      <div *ngIf="isHome===false" class="connect">
-        <div class="wallet" *ngIf="ethWalletName">
-          <img (mouseenter)="showAccountModal('ETH')" (mouseleave)="hideAccountModal('ETH')"
-            src="/assets/images/chains/eth.png" alt="">
-          <div class="dropdown" *ngIf="showEthAccountModal" (mouseenter)="showAccountModal('ETH')"
-            (mouseleave)="hideAccountModal('ETH')">
-            <div class="title">
-              <span>Account</span>
-              <button class="change-btn" (click)="changeWallet('ETH')">
-                <img class="change" src="/assets/images/swap/account-change.png" alt="">Change
-              </button>
-            </div>
-            <div class="account">
-              <p class="name">{{ ethWalletName }} Wallet</p>
-              <p class="address">
-                {{ ethAccountAddress | shortAddress: 6 }}
-                <img class="copy" (click)="copy(ethAccountAddress)" src="/assets/images/swap/copy.png" alt="">
-              </p>
-            </div>
-            <button class="disconnect" (click)="disConnect('ETH')">Disconnect</button>
-          </div>
-        </div>
-        <div class="wallet" *ngIf="neoWalletName">
-          <img (mouseenter)="showAccountModal('NEO')" (mouseleave)="hideAccountModal('NEO')"
-            src="/assets/images/chains/neo.png" alt="">
-          <div class="dropdown" *ngIf="showNeoAccountModal" (mouseenter)="showAccountModal('NEO')"
-            (mouseleave)="hideAccountModal('NEO')">
-            <div class="title">
-              <span>Account</span>
-              <button class="change-btn" (click)="changeWallet('NEO')">
-                <img class="change" src="/assets/images/swap/account-change.png" alt="">Change
-              </button>
-            </div>
-            <div class="account">
-              <p class="name">{{ neoWalletName }} Wallet</p>
-              <p class="address">
-                {{ neoAccountAddress | shortAddress: 6 }}
-                <img class="copy" (click)="copy(neoAccountAddress)" src="/assets/images/swap/copy.png" alt="">
-              </p>
-            </div>
-            <button class="disconnect" (click)="disConnect('NEO')">Disconnect</button>
-          </div>
-        </div>
-        <div class="connect-btn" *ngIf="!neoWalletName" (click)="showConnect()">
-          <img src="/assets/images/swap/link.png" alt="">
-          <span>Connect Wallet</span>
-        </div>
-      </div>
+      <ul *ngIf="isHome === false" [ngClass]="{ 'left-menu': isHome === false, showRisk: showRisk }">
+        <li [ngClass]="{active: isHome}">
+          <a routerLink="/">Home</a>
+        </li>
+        <li [ngClass]="{active: currentPage==='/swap'}">
+          <a routerLink="/swap">Swap</a>
+        </li>
+        <li [ngClass]="{active: currentPage.startsWith('/hub')}">
+          <a routerLink="/hub">Hub</a>
+        </li>
+        <li [ngClass]="{active: currentPage==='/vault'}">
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="right"
+            [nzTooltipOrigin]="button1.elementRef">
+            <span nz-element #button1="nzElement">Vault</span>
+          </a>
+        </li>
+        <li>
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="right"
+            [nzTooltipOrigin]="button2.elementRef">
+            <span nz-element #button2="nzElement">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://medium.com/o3-labs-o3-wallet" target="_blank">Blog</a>
+        </li>
+        <li>
+          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="right"
+            [nzTooltipOrigin]="button3.elementRef">
+            <span nz-element #button3="nzElement">Governance</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://docs.o3swap.com/" target="_blank">Doc</a>
+        </li>
+      </ul>
+      <app-header-connect *ngIf="isHome===false && currentPage!=='/vault'"></app-header-connect>
+      <app-vault-header-connect *ngIf="isHome===false && currentPage==='/vault'"></app-vault-header-connect>
     </div>
   </header>
+  <div class="risk-tip" *ngIf="showRisk && !isHome">
+    <img src="/assets/images/risk-icon.png" alt="">
+    O3 Swap is currently in the testing phase. The testing amount is limited to below $20 in USD. Back up your private
+    keys securely and trade at your own risk.
+    <img (click)="closeRisk()" class="close" src="/assets/images/close-risk.png" alt="">
+  </div>
   <router-outlet></router-outlet>
 </div>
-
-<nz-modal [(nzVisible)]="showConnectModal" (nzOnCancel)="showConnectModal=false" [nzFooter]="null" [nzClosable]="false"
-  [nzTitle]="null" nzClassName="custom-modal connect-wallet-modal">
-  <div class="connect-modal-content modal-content">
-    <div class="close-group">
-      <img (click)="closeConnectModal()" class="close" src="/assets/images/swap/close.png" alt="">
-    </div>
-    <p class="title">Connect wallet</p>
-    <div class="chains">
-      <img [ngClass]="{active: connectWalletType==='ETH'}" src="/assets/images/chains/eth.png" alt="">
-      <img [ngClass]="{active: connectWalletType==='NEO'}" (click)="connectWalletType='NEO'"
-        src="/assets/images/chains/neo.png" alt="">
-    </div>
-    <p class="wallet-type">{{ connectWalletType }} Wallet</p>
-    <ul class="wallets" *ngIf="connectWalletType==='ETH'">
-      <li class="wallet" *ngFor="let wallet of ETH_WALLETS" (click)="connectEthWallet(wallet)">
-        <div *ngIf="ethWalletName!==wallet.name">
-          <img class="logo" [src]="wallet.logo" alt="">
-          <span class="name">Connect {{ wallet.name }}</span>
-          <img class="option" src="/assets/images/swap/add.png" alt="">
-        </div>
-        <div *ngIf="ethWalletName===wallet.name" class="active">
-          <span class="name">{{ wallet.name }}</span>
-          <p class="address">
-            {{ ethAccountAddress | shortAddress: 10 }}
-            <img class="copy" (click)="copy(ethAccountAddress)" src="/assets/images/swap/copy.png" alt="">
-          </p>
-        </div>
-      </li>
-    </ul>
-    <ul class="wallets" *ngIf="connectWalletType==='NEO'">
-      <li class="wallet" *ngFor="let wallet of NEO_WALLETS" (click)="connectNeoWallet(wallet)">
-        <div *ngIf="neoWalletName!==wallet.name">
-          <img class="logo" [src]="wallet.logo" alt="">
-          <span class="name">Connect {{ wallet.name }}</span>
-          <img class="option" src="/assets/images/swap/add.png" alt="">
-        </div>
-        <div *ngIf="neoWalletName===wallet.name" class="active">
-          <span class="name">{{ wallet.name }}</span>
-          <p class="address">
-            {{ neoAccountAddress | shortAddress: 10 }}
-            <img class="copy" (click)="copy(neoAccountAddress)" src="/assets/images/swap/copy.png" alt="">
-          </p>
-        </div>
-      </li>
-    </ul>
-  </div>
-</nz-modal>

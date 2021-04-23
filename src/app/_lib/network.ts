@@ -1,3 +1,5 @@
-import { NeolineNetwork } from './swap';
+import { environment } from '@env/environment';
 
-export const NEOLINE_NETWORK: NeolineNetwork = 'MainNet';
+export type Network = 'MainNet' | 'TestNet';
+
+export const NETWORK: Network = environment.network as Network;
