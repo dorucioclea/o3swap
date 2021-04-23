@@ -624,10 +624,6 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
   async checkShowApprove(): Promise<boolean> {
     this.commonService.log('check show approve');
-    if (!this.chooseSwapPath || !this.chooseSwapPath.aggregator) {
-      this.commonService.log('check show approve return');
-      return false;
-    }
     if (this.fromToken.chain === 'NEO' || this.toToken.chain === 'NEO') {
       this.commonService.log('check show approve return');
       return false;
