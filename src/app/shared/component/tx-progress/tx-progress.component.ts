@@ -137,12 +137,18 @@ export class TxProgressComponent implements OnInit, OnDestroy {
     if (this.requestCrossInterval) {
       this.requestCrossInterval.unsubscribe();
     }
+    let hasGetBalance1 = false;
     this.requestCrossInterval = interval(5000).subscribe(() => {
       this.apiService
         .getCrossChainSwapDetail(this.transaction.txid)
         .subscribe((res: TxProgress) => {
           this.commonService.log(res);
           this.transaction.progress = res;
+          const swapApi = this.getEthDapiService();
+          if (res.step1.status === 2 && hasGetBalance1 === false) {
+            swapApi.getBalance(this.transaction.fromToken.chain);
+            hasGetBalance1 = true;
+          }
           if (
             res.step1.status === 2 &&
             res.step2.status === 2 &&
@@ -150,8 +156,8 @@ export class TxProgressComponent implements OnInit, OnDestroy {
           ) {
             this.transaction.isPending = false;
             this.requestCrossInterval.unsubscribe();
-            const swapApi = this.getEthDapiService();
-            swapApi.getBalance();
+            swapApi.getBalance(this.transaction.fromToken.chain);
+            swapApi.getBalance(this.transaction.toToken.chain);
           }
           this.store.dispatch({
             type: this.dispatchType,

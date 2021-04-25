@@ -15,6 +15,7 @@ import {
   RESET_BSC_BALANCES,
   RESET_HECO_BALANCES,
   ConnectChainType,
+  RESET_ETH_BALANCES,
 } from '@lib';
 import { CommonService } from '@core';
 import { Store } from '@ngrx/store';
@@ -88,6 +89,7 @@ export class HeaderConnectComponent implements OnInit, OnDestroy {
         this.ethAccountAddress = null;
         this.store.dispatch({ type: UPDATE_ETH_ACCOUNT, data: null });
         this.store.dispatch({ type: UPDATE_ETH_WALLET_NAME, data: null });
+        this.store.dispatch({ type: RESET_ETH_BALANCES });
         break;
       case 'NEO':
         this.neoWalletName = null;
