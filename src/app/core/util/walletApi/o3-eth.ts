@@ -186,13 +186,13 @@ export class O3EthWalletApiService {
         if (tempAmount) {
           result[item.assetID] = JSON.parse(JSON.stringify(item));
           result[item.assetID].amount = tempAmount;
+          this.store.dispatch({
+            type: dispatchBalanceType,
+            data: result,
+          });
         }
       }
       this.commonService.log(result);
-      this.store.dispatch({
-        type: dispatchBalanceType,
-        data: result,
-      });
       resolve(true);
     });
   }
