@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import o3dapi from 'o3-dapi-core';
-import o3dapiEth from 'o3-dapi-eth';
+import { ETH, BSC, HECO } from 'o3-dapi-eth';
 import { CommonService } from '../common.service';
 import { SwapService } from '../swap.service';
 import {
@@ -51,7 +51,7 @@ interface State {
 @Injectable()
 export class O3EthWalletApiService {
   myWalletName: NeoWalletName = 'O3';
-  accountAddress: string;
+  accountAddress = { ETH: '', BSC: '', HECO: '' };
   requestTxStatusInterval: Unsubscribable;
 
   swap$: Observable<any>;
@@ -90,7 +90,9 @@ export class O3EthWalletApiService {
     private commonService: CommonService,
     private apiService: ApiService
   ) {
-    o3dapi.initPlugins([o3dapiEth]);
+    o3dapi.initPlugins([ETH]);
+    o3dapi.initPlugins([BSC]);
+    o3dapi.initPlugins([HECO]);
     this.swap$ = store.select('swap');
     this.tokens$ = store.select('tokens');
     this.swap$.subscribe((state) => {
@@ -106,14 +108,22 @@ export class O3EthWalletApiService {
     });
   }
 
-  connect(chain: string): void {
-    o3dapi.ETH.request({ method: 'eth_requestAccounts' })
-      .then(async (response) => {
-        const addressArr = response.result;
-        if (addressArr.length <= 0) {
-          return;
+  connect(chain: string): Promise<string> {
+    return o3dapi[chain]
+      .request({ method: 'eth_requestAccounts' })
+      .then((response) => {
+        if (response.result) {
+          const addressArr = response.result;
+          if (addressArr.length <= 0) {
+            return;
+          }
+          this.accountAddress[chain] = addressArr[0];
+        } else {
+          if (response.length <= 0) {
+            return;
+          }
+          this.accountAddress[chain] = response[0].address;
         }
-        this.accountAddress = addressArr[0];
         this.getBalance(chain as CHAINS);
         let dispatchAccountType;
         let dispatchWalletNameType;
@@ -133,13 +143,13 @@ export class O3EthWalletApiService {
         }
         this.store.dispatch({
           type: dispatchAccountType,
-          data: this.accountAddress,
+          data: this.accountAddress[chain],
         });
         this.store.dispatch({
           type: dispatchWalletNameType,
           data: this.myWalletName,
         });
-        return this.accountAddress;
+        return this.accountAddress[chain];
       })
       .catch((error) => {
         this.handleDapiError(error);
@@ -176,13 +186,13 @@ export class O3EthWalletApiService {
         if (tempAmount) {
           result[item.assetID] = JSON.parse(JSON.stringify(item));
           result[item.assetID].amount = tempAmount;
+          this.store.dispatch({
+            type: dispatchBalanceType,
+            data: result,
+          });
         }
       }
       this.commonService.log(result);
-      this.store.dispatch({
-        type: dispatchBalanceType,
-        data: result,
-      });
       resolve(true);
     });
   }
@@ -192,19 +202,20 @@ export class O3EthWalletApiService {
       const json = await this.getEthErc20Json();
       const ethErc20Contract = new this.web3.eth.Contract(json, token.assetID);
       const data = await ethErc20Contract.methods
-        .balanceOf(this.accountAddress)
+        .balanceOf(this.accountAddress[token.chain])
         .encodeABI();
-      return o3dapi.ETH.request({
-        method: 'eth_call',
-        params: [
-          this.getSendTransactionParams(
-            this.accountAddress,
-            token.assetID,
-            data
-          ),
-          'latest',
-        ],
-      })
+      return o3dapi[token.chain]
+        .request({
+          method: 'eth_call',
+          params: [
+            this.getSendTransactionParams(
+              this.accountAddress[token.chain],
+              token.assetID,
+              data
+            ),
+            'latest',
+          ],
+        })
         .then((response) => {
           const balance = response.result;
           if (
@@ -219,10 +230,11 @@ export class O3EthWalletApiService {
           this.commonService.log(error);
         });
     } else {
-      return o3dapi.ETH.request({
-        method: 'eth_getBalance',
-        params: [this.accountAddress, 'latest'],
-      })
+      return o3dapi[token.chain]
+        .request({
+          method: 'eth_getBalance',
+          params: [this.accountAddress[token.chain], 'latest'],
+        })
         .then((response) => {
           const balance = response.result;
           if (
@@ -259,7 +271,7 @@ export class O3EthWalletApiService {
     const value = new BigNumber(inputAmount)
       .shiftedBy(fromToken.decimals)
       .toFixed();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -307,7 +319,7 @@ export class O3EthWalletApiService {
         new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed()
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -388,7 +400,7 @@ export class O3EthWalletApiService {
         params.id
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -465,7 +477,7 @@ export class O3EthWalletApiService {
         params.deadline
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -541,7 +553,7 @@ export class O3EthWalletApiService {
         params.deadline
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -619,7 +631,7 @@ export class O3EthWalletApiService {
         params.deadline
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -716,7 +728,7 @@ export class O3EthWalletApiService {
         params.fee
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -813,7 +825,7 @@ export class O3EthWalletApiService {
         params.fee
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -890,7 +902,7 @@ export class O3EthWalletApiService {
         params.id
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -966,7 +978,7 @@ export class O3EthWalletApiService {
         params.id
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -1016,7 +1028,7 @@ export class O3EthWalletApiService {
     const data = ethErc20Contract.methods
       .allowance(fromAddress, contract)
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_call',
       params: [this.getSendTransactionParams(fromAddress, tokenhash, data)],
     })
@@ -1058,7 +1070,7 @@ export class O3EthWalletApiService {
       )
       .encodeABI();
     try {
-      const response = await o3dapi.ETH.request({
+      const response = await o3dapi[fromToken.chain].request({
         method: 'eth_sendTransaction',
         params: [this.getSendTransactionParams(fromAddress, tokenhash, data)],
       });
@@ -1069,8 +1081,8 @@ export class O3EthWalletApiService {
     }
   }
 
-  getReceipt(hash: string): Promise<any> {
-    return o3dapi.ETH.request({
+  getReceipt(hash: string, chain: CHAINS): Promise<any> {
+    return o3dapi[chain].request({
       method: 'eth_getTransactionReceipt',
       params: [hash],
     })
@@ -1171,7 +1183,7 @@ export class O3EthWalletApiService {
           currentTx = this.liquidityTransaction;
           break;
       }
-      o3dapi.ETH.request({
+      o3dapi[fromChain].request({
         method: 'eth_getTransactionReceipt',
         params: [txHash],
       })
@@ -1187,7 +1199,6 @@ export class O3EthWalletApiService {
             } else {
               if (hasCrossChain === false) {
                 this.getBalance(fromChain);
-                this.getBalance(toChain);
                 currentTx.isPending = false;
                 this.store.dispatch({ type: dispatchType, data: currentTx });
               }

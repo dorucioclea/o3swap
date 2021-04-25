@@ -354,13 +354,13 @@ export class MetaMaskWalletApiService {
         if (tempAmount) {
           result[item.assetID] = JSON.parse(JSON.stringify(item));
           result[item.assetID].amount = tempAmount;
+          this.store.dispatch({
+            type: dispatchBalanceType,
+            data: result,
+          });
         }
       }
       this.commonService.log(result);
-      this.store.dispatch({
-        type: dispatchBalanceType,
-        data: result,
-      });
       if (this.ethWalletName === 'MetaMask' && chain !== 'ETH') {
         this.store.dispatch({
           type: RESET_ETH_BALANCES,
@@ -1170,7 +1170,7 @@ export class MetaMaskWalletApiService {
     }
   }
 
-  getReceipt(hash: string): Promise<any> {
+  getReceipt(hash: string, chain?: CHAINS): Promise<any> {
     return this.ethereum
       .request({
         method: 'eth_getTransactionReceipt',
