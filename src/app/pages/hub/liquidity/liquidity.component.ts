@@ -139,7 +139,6 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       this.bscWalletName = state.bscWalletName;
       this.hecoWalletName = state.hecoWalletName;
       this.getCurrentChain(state.metamaskNetworkId);
-      this.getLPBalance();
       this.handleAccountBalance(state);
       this.handleCurrentAddress();
       this.getLPBalance();
