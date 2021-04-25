@@ -245,10 +245,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     if (!this.fromAddress || !this.toAddress) {
       this.getFromAndToAddress();
     }
-    const swapApi = this.getEthDapiService();
     if (
       this.fromToken.chain !== 'NEO' &&
-      swapApi.checkNetwork(this.fromToken) === false
+      this.getEthDapiService().checkNetwork(this.fromToken) === false
     ) {
       return;
     }
@@ -350,7 +349,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
   //#region 合约调用
   depositWEth(): void {
-    this.metaMaskWalletApiService
+    this.getEthDapiService()
       .depositWEth(
         this.fromToken,
         this.toToken,
@@ -365,7 +364,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   withdrawalWeth(): void {
-    this.metaMaskWalletApiService
+    this.getEthDapiService()
       .withdrawalWeth(
         this.fromToken,
         this.toToken,
@@ -460,8 +459,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   swapExactTokensForETH(): void {
-    const swapApi = this.getEthDapiService();
-    this.metaMaskWalletApiService
+    this.getEthDapiService()
       .swapExactTokensForETH(
         this.fromToken,
         this.toToken,
@@ -480,8 +478,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   swapExactETHForTokens(): void {
-    const swapApi = this.getEthDapiService();
-    this.metaMaskWalletApiService
+    this.getEthDapiService()
       .swapExactETHForTokens(
         this.fromToken,
         this.toToken,
@@ -500,8 +497,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   swapExactTokensForTokens(): void {
-    const swapApi = this.getEthDapiService();
-    this.metaMaskWalletApiService
+    this.getEthDapiService()
       .swapExactTokensForTokens(
         this.fromToken,
         this.toToken,
@@ -520,7 +516,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   swapExactETHForTokensCrossChain(): void {
-    this.metaMaskWalletApiService
+    this.getEthDapiService()
       .swapExactETHForTokensCrossChain(
         this.fromToken,
         this.toToken,
@@ -539,7 +535,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       });
   }
   swapExactTokensForTokensCrossChain(): void {
-    this.metaMaskWalletApiService
+    this.getEthDapiService()
       .swapExactTokensForTokensCrossChain(
         this.fromToken,
         this.toToken,
@@ -559,8 +555,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   }
 
   swapCrossChainEth(): void {
-    const swapApi = this.getEthDapiService();
-    this.metaMaskWalletApiService
+    this.getEthDapiService()
       .swapCrossChain(
         this.fromToken,
         this.toToken,
@@ -641,8 +636,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.commonService.log('check show approve return');
       return false;
     }
-    const swapApi = this.getEthDapiService();
-    const balance = await swapApi.getAllowance(
+    const balance = await this.getEthDapiService().getAllowance(
       this.fromToken,
       this.fromAddress,
       this.chooseSwapPath.aggregator
