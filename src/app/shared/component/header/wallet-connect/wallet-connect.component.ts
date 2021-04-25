@@ -28,6 +28,7 @@ import {
 } from '@core';
 import { Store } from '@ngrx/store';
 import { Observable, Unsubscribable } from 'rxjs';
+import { environment } from '@env/environment';
 
 export type ConnectChainType = 'ETH' | 'NEO' | 'BSC' | 'HECO';
 interface State {
@@ -121,9 +122,9 @@ export class WalletConnectComponent implements OnInit, OnDestroy {
 
   async connectEthWallet(wallet: EthWallet): Promise<void> {
     let connectRes;
-    // if (wallet.name === 'O3') {
-    //   return;
-    // }
+    if (environment.testSite === false && wallet.name === 'O3') {
+      return;
+    }
     switch (this.connectChainType) {
       case 'ETH':
         if (this.ethWalletName === wallet.name) {
