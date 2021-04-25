@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import o3dapi from 'o3-dapi-core';
-import o3dapiEth from 'o3-dapi-eth';
+import { ETH, BSC, HECO } from 'o3-dapi-eth';
 import { CommonService } from '../common.service';
 import { SwapService } from '../swap.service';
 import {
@@ -90,7 +90,9 @@ export class O3EthWalletApiService {
     private commonService: CommonService,
     private apiService: ApiService
   ) {
-    o3dapi.initPlugins([o3dapiEth]);
+    o3dapi.initPlugins([ETH]);
+    o3dapi.initPlugins([BSC]);
+    o3dapi.initPlugins([HECO]);
     this.swap$ = store.select('swap');
     this.tokens$ = store.select('tokens');
     this.swap$.subscribe((state) => {
@@ -107,13 +109,19 @@ export class O3EthWalletApiService {
   }
 
   connect(chain: string): void {
-    o3dapi.ETH.request({ method: 'eth_requestAccounts' })
+    o3dapi[chain].request({ method: 'eth_requestAccounts' })
       .then(async (response) => {
-        const addressArr = response.result;
-        if (addressArr.length <= 0) {
+        if ((response.result && response.result.length <= 0)|| (response && response.length <= 0)) {
           return;
         }
-        this.accountAddress = addressArr[0];
+        let addressArr;
+        if (response.result) {
+          addressArr = response.result;
+          this.accountAddress = addressArr[0];
+        } else if (response) {
+          addressArr = response;
+          this.accountAddress = addressArr[0].address;
+        }
         this.getBalance(chain as CHAINS);
         let dispatchAccountType;
         let dispatchWalletNameType;
