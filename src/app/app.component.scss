@@ -119,6 +119,9 @@ header {
     background-color: #202020;
     border-radius: 20px;
     z-index: 1000;
+    @media screen and (max-height: 800px) {
+      height: 500px;
+    }
     &.showRisk {
       top: 170px;
     }
