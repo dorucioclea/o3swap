@@ -1170,7 +1170,7 @@ export class MetaMaskWalletApiService {
     }
   }
 
-  getReceipt(hash: string): Promise<any> {
+  getReceipt(hash: string, chain?: CHAINS): Promise<any> {
     return this.ethereum
       .request({
         method: 'eth_getTransactionReceipt',

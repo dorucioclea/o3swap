@@ -271,7 +271,7 @@ export class O3EthWalletApiService {
     const value = new BigNumber(inputAmount)
       .shiftedBy(fromToken.decimals)
       .toFixed();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -319,7 +319,7 @@ export class O3EthWalletApiService {
         new BigNumber(inputAmount).shiftedBy(fromToken.decimals).toFixed()
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -400,7 +400,7 @@ export class O3EthWalletApiService {
         params.id
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -477,7 +477,7 @@ export class O3EthWalletApiService {
         params.deadline
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -553,7 +553,7 @@ export class O3EthWalletApiService {
         params.deadline
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -631,7 +631,7 @@ export class O3EthWalletApiService {
         params.deadline
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -728,7 +728,7 @@ export class O3EthWalletApiService {
         params.fee
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -825,7 +825,7 @@ export class O3EthWalletApiService {
         params.fee
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -902,7 +902,7 @@ export class O3EthWalletApiService {
         params.id
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -978,7 +978,7 @@ export class O3EthWalletApiService {
         params.id
       )
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_sendTransaction',
       params: [
         this.getSendTransactionParams(
@@ -1028,7 +1028,7 @@ export class O3EthWalletApiService {
     const data = ethErc20Contract.methods
       .allowance(fromAddress, contract)
       .encodeABI();
-    return o3dapi.ETH.request({
+    return o3dapi[fromToken.chain].request({
       method: 'eth_call',
       params: [this.getSendTransactionParams(fromAddress, tokenhash, data)],
     })
@@ -1070,7 +1070,7 @@ export class O3EthWalletApiService {
       )
       .encodeABI();
     try {
-      const response = await o3dapi.ETH.request({
+      const response = await o3dapi[fromToken.chain].request({
         method: 'eth_sendTransaction',
         params: [this.getSendTransactionParams(fromAddress, tokenhash, data)],
       });
@@ -1081,8 +1081,8 @@ export class O3EthWalletApiService {
     }
   }
 
-  getReceipt(hash: string): Promise<any> {
-    return o3dapi.ETH.request({
+  getReceipt(hash: string, chain: CHAINS): Promise<any> {
+    return o3dapi[chain].request({
       method: 'eth_getTransactionReceipt',
       params: [hash],
     })
@@ -1183,7 +1183,7 @@ export class O3EthWalletApiService {
           currentTx = this.liquidityTransaction;
           break;
       }
-      o3dapi.ETH.request({
+      o3dapi[fromChain].request({
         method: 'eth_getTransactionReceipt',
         params: [txHash],
       })

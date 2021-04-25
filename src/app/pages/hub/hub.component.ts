@@ -250,7 +250,7 @@ export class HubComponent implements OnInit, OnDestroy {
       .shiftedBy(this.toToken.decimals)
       .dp(0)
       .toFixed();
-    this.metaMaskWalletApiService
+    swapApi
       .swapCrossChain(
         this.fromToken,
         this.toToken,
