@@ -6684,10 +6684,10 @@ o3-dapi-core@^0.3.13:
     randomfill "~1.0.4"
     socket.io-client "~2.2.0"
 
-o3-dapi-eth@^1.0.5:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/o3-dapi-eth/-/o3-dapi-eth-1.0.7.tgz#ea18fec0db20c8591dc3a9c30e6e698158ddc6c3"
-  integrity sha512-nFoC8SVIeazoy9ft0QFiqM5L1Uv1s7kldO2sBqPILLfVoSJ5tMXJzEivimVgPh7ixt9JFvdYbBDBmjzGREPsJQ==
+o3-dapi-eth@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.nlark.com/o3-dapi-eth/download/o3-dapi-eth-1.0.8.tgz#abf101bfbf1b86e41d8313513690a67c3c1faf71"
+  integrity sha1-q/EBv78bhuQdgxNRNpCmfDwfr3E=
 
 o3-dapi-neo@^0.6.1:
   version "0.6.1"
