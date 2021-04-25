@@ -113,6 +113,7 @@ export class MetaMaskWalletApiService {
   //#region connect
   init(): void {
     this.initTxs();
+    this.listenBlockNumber();
     const intervalReq = interval(1000)
       .pipe(take(5))
       .subscribe(() => {
@@ -228,6 +229,15 @@ export class MetaMaskWalletApiService {
   //#endregion
 
   //#region ETH<=>WETH HT<=>WHT BNB<=>WBNB swap
+
+  listenBlockNumber(): void {
+    interval(15000).subscribe(() => {
+      if (this.ethereum && this.ethereum.isConnected()) {
+        this.getBalance();
+      }
+    });
+  }
+
   async depositWEth(
     fromToken: Token, // eth
     toToken: Token, // weth
