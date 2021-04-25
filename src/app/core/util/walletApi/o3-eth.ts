@@ -1199,7 +1199,6 @@ export class O3EthWalletApiService {
             } else {
               if (hasCrossChain === false) {
                 this.getBalance(fromChain);
-                this.getBalance(toChain);
                 currentTx.isPending = false;
                 this.store.dispatch({ type: dispatchType, data: currentTx });
               }
