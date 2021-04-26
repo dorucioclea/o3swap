@@ -390,20 +390,21 @@ export class HubComponent implements OnInit, OnDestroy {
     }
   }
   getEthDapiService(): any {
+    let walletName;
     switch (this.fromToken?.chain) {
       case 'ETH':
-        return this.ethWalletName === 'MetaMask'
-          ? this.metaMaskWalletApiService
-          : this.o3EthWalletApiService;
+        walletName = this.ethWalletName;
+        break;
       case 'BSC':
-        return this.bscWalletName === 'MetaMask'
-          ? this.metaMaskWalletApiService
-          : this.o3EthWalletApiService;
+        walletName = this.bscWalletName;
+        break;
       case 'HECO':
-        return this.hecoWalletName === 'MetaMask'
-          ? this.metaMaskWalletApiService
-          : this.o3EthWalletApiService;
+        walletName = this.hecoWalletName;
+        break;
     }
+    return walletName === 'MetaMask' || !walletName
+      ? this.metaMaskWalletApiService
+      : this.o3EthWalletApiService;
   }
   async checkShowApprove(): Promise<boolean> {
     const swapApi = this.getEthDapiService();

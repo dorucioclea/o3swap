@@ -478,10 +478,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
         walletName = this.hecoWalletName;
         break;
     }
-    return walletName === 'MetaMask' ||
-      (this.o3EthWalletApiService.accountAddress.BSC === '' &&
-        this.o3EthWalletApiService.accountAddress.ETH === '' &&
-        this.o3EthWalletApiService.accountAddress.HECO === '')
+    return walletName === 'MetaMask' || !walletName
       ? this.metaMaskWalletApiService
       : this.o3EthWalletApiService;
   }
