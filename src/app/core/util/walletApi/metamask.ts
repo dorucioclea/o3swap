@@ -340,33 +340,38 @@ export class MetaMaskWalletApiService {
     if (!chain) {
       return;
     }
-    let dispatchBalanceType;
-    let tempTokenBalance: Token[];
+    const tempTokenBalance: Token[] = JSON.parse(
+      JSON.stringify(this.chainTokens[chain])
+    );
     return new Promise(async (resolve, reject) => {
-      switch (chain) {
-        case 'ETH':
-          dispatchBalanceType = UPDATE_ETH_BALANCES;
-          tempTokenBalance = JSON.parse(JSON.stringify(this.chainTokens.ETH));
-          break;
-        case 'BSC':
-          dispatchBalanceType = UPDATE_BSC_BALANCES;
-          tempTokenBalance = JSON.parse(JSON.stringify(this.chainTokens.BSC));
-          break;
-        case 'HECO':
-          dispatchBalanceType = UPDATE_HECO_BALANCES;
-          tempTokenBalance = JSON.parse(JSON.stringify(this.chainTokens.HECO));
-          break;
-      }
       const result = {};
       for (const item of tempTokenBalance) {
         const tempAmount = await this.getBalancByHash(item);
         if (tempAmount) {
           result[item.assetID] = JSON.parse(JSON.stringify(item));
           result[item.assetID].amount = tempAmount;
-          this.store.dispatch({
-            type: dispatchBalanceType,
-            data: result,
-          });
+          let dispatchBalanceType;
+          let tempWalletName;
+          switch (chain) {
+            case 'ETH':
+              dispatchBalanceType = UPDATE_ETH_BALANCES;
+              tempWalletName = this.ethWalletName;
+              break;
+            case 'BSC':
+              dispatchBalanceType = UPDATE_BSC_BALANCES;
+              tempWalletName = this.bscWalletName;
+              break;
+            case 'HECO':
+              dispatchBalanceType = UPDATE_HECO_BALANCES;
+              tempWalletName = this.hecoWalletName;
+              break;
+          }
+          if (tempWalletName && tempWalletName === this.myWalletName) {
+            this.store.dispatch({
+              type: dispatchBalanceType,
+              data: result,
+            });
+          }
         }
       }
       this.commonService.log(result);
