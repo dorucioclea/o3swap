@@ -38,6 +38,7 @@ import {
 import { Store } from '@ngrx/store';
 import BigNumber from 'bignumber.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { interval, Observable, of, Unsubscribable } from 'rxjs';
 import { CommonService } from '../common.service';
 import { SwapService } from '../swap.service';
@@ -45,6 +46,8 @@ import Web3 from 'web3';
 import { HttpClient } from '@angular/common/http';
 import { map, take } from 'rxjs/operators';
 import { ApiService } from '../../api/api.service';
+import { getMessageFromCode } from 'eth-rpc-errors';
+
 interface State {
   swap: SwapStateType;
   tokens: any;
@@ -91,6 +94,7 @@ export class MetaMaskWalletApiService {
     private http: HttpClient,
     private store: Store<State>,
     private nzMessage: NzMessageService,
+    private nzNotification: NzNotificationService,
     private swapService: SwapService,
     private commonService: CommonService,
     private apiService: ApiService
@@ -1419,17 +1423,11 @@ export class MetaMaskWalletApiService {
   }
 
   private handleDapiError(error): void {
-    this.commonService.log(error);
-    switch (error.code) {
-      case 4001:
-        this.nzMessage.error('The request was rejected by the user');
-        break;
-      case -32602:
-        this.nzMessage.error('The parameters were invalid');
-        break;
-      case -32603:
-        this.nzMessage.error('Internal error'); // transaction underpriced
-        break;
+    const title = getMessageFromCode(error.code);
+    if (error.message && error.code !== 4001) {
+      this.nzNotification.error(title, error.message);
+    } else {
+      this.nzMessage.error(title);
     }
   }
 
