@@ -52,7 +52,7 @@ export class ApproveComponent implements OnInit {
   }
 
   getEthDapiService(): any {
-    return this.walletName === 'MetaMask'
+    return this.walletName === 'MetaMask' || !this.walletName
       ? this.metaMaskWalletApiService
       : this.o3EthWalletApiService;
   }

@@ -442,6 +442,9 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       if (item.chain === this.currentChain && item.amount === '--') {
         this.addLiquidityTokens[index].amount = '0';
       }
+      if (item.chain !== this.currentChain) {
+        this.addLiquidityTokens[index].amount = '--';
+      }
     });
   }
   private handleCurrentAddress(): void {
@@ -475,7 +478,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
         walletName = this.hecoWalletName;
         break;
     }
-    return walletName === 'MetaMask'
+    return walletName === 'MetaMask' || !walletName
       ? this.metaMaskWalletApiService
       : this.o3EthWalletApiService;
   }

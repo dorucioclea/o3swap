@@ -56,6 +56,7 @@ export class MetaMaskWalletApiService {
   requestTxStatusInterval: Unsubscribable;
   requestBridgeTxStatusInterval: Unsubscribable;
   requestLiquidityTxStatusInterval: Unsubscribable;
+  blockNumberInterval: Unsubscribable;
 
   swap$: Observable<any>;
   ethWalletName: EthWalletName;
@@ -170,6 +171,7 @@ export class MetaMaskWalletApiService {
         if (showMessage) {
           this.nzMessage.success('Connection succeeded!');
         }
+        this.listenBlockNumber();
         this.getBalance();
         let dispatchAccountType;
         let dispatchWalletNameType;
@@ -177,14 +179,17 @@ export class MetaMaskWalletApiService {
           case 'ETH':
             dispatchAccountType = UPDATE_ETH_ACCOUNT;
             dispatchWalletNameType = UPDATE_ETH_WALLET_NAME;
+            this.ethWalletName = this.myWalletName;
             break;
           case 'BSC':
             dispatchAccountType = UPDATE_BSC_ACCOUNT;
             dispatchWalletNameType = UPDATE_BSC_WALLET_NAME;
+            this.bscWalletName = this.myWalletName;
             break;
           case 'HECO':
             dispatchAccountType = UPDATE_HECO_ACCOUNT;
             dispatchWalletNameType = UPDATE_HECO_WALLET_NAME;
+            this.hecoWalletName = this.myWalletName;
             break;
         }
         this.store.dispatch({
@@ -1193,6 +1198,23 @@ export class MetaMaskWalletApiService {
   //#endregion
 
   //#region private function
+  private listenBlockNumber(): void {
+    if (this.blockNumberInterval) {
+      return;
+    }
+    this.blockNumberInterval = interval(15000).subscribe(() => {
+      // 没有连接时不获取 balances
+      if (
+        (this.ethWalletName && this.ethWalletName === 'MetaMask') ||
+        (this.bscWalletName && this.bscWalletName === 'MetaMask') ||
+        (this.hecoWalletName && this.hecoWalletName === 'MetaMask')
+      ) {
+        this.getBalance();
+      } else {
+        this.blockNumberInterval.unsubscribe();
+      }
+    });
+  }
   private initTxs(): void {
     const localTxString = localStorage.getItem('transaction');
     const localBridgeTxString = localStorage.getItem('bridgeeTransaction');
@@ -1540,18 +1562,21 @@ export class MetaMaskWalletApiService {
 
   private updateWalletName(data: string): void {
     if (this.ethWalletName === 'MetaMask') {
+      this.ethWalletName = null;
       this.store.dispatch({
         type: UPDATE_ETH_WALLET_NAME,
         data,
       });
     }
     if (this.bscWalletName === 'MetaMask') {
+      this.bscWalletName = null;
       this.store.dispatch({
         type: UPDATE_BSC_WALLET_NAME,
         data,
       });
     }
     if (this.hecoWalletName === 'MetaMask') {
+      this.hecoWalletName = null;
       this.store.dispatch({
         type: UPDATE_HECO_WALLET_NAME,
         data,
