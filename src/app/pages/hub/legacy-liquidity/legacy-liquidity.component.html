@@ -43,55 +43,16 @@
   <div class="group-container tab-container row2">
     <div class="tab-wrap">
       <div class="tab-nav-scroll">
-        <div class="tabs tabs-add" [ngClass]="{addActive: liquidityType === 'add'}"
-          [routerLink]="['/hub/liquidity', 'add']">
+        <div class="tabs tabs-add">
           Add Liquidity
         </div>
-        <div class="tabs tabs-remove" [ngClass]="{removeActive: liquidityType === 'remove'}"
-          [routerLink]="['/hub/liquidity', 'remove']">
+        <div class="tabs tabs-remove removeActive">
           Remove Liquidity
         </div>
       </div>
       <div class="tab-content">
         <ul class="list-wrap">
-          <ng-container *ngIf="liquidityType === 'add'">
-            <li *ngFor="let tokenItem  of addLiquidityTokens; let i = index ">
-              <div class="detail">
-                <div class="left">
-                  <div class="item-logo-box">
-                    <img [src]="tokenItem.logo" alt="" class="token-logo">
-                    <img class="token-type" *ngIf="tokenItem.type==='ERC-20'"
-                      src="/assets/images/bridge-liquidity/erc20.png" alt="">
-                    <img class="token-type" *ngIf="tokenItem.type==='BEP-20'"
-                      src="/assets/images/bridge-liquidity/bep20.png" alt="">
-                    <img class="token-type" *ngIf="tokenItem.type==='HRC-20'"
-                      src="/assets/images/bridge-liquidity/hrc20.png" alt="">
-                  </div>
-                  <div class="token-name">{{ tokenItem.symbol }}</div>
-                </div>
-                <div class="right">
-                  <div class="input-container">
-                    <input type="number" title="Pay amount" (input)="changeInAmount(tokenItem, i)"
-                      [(ngModel)]="addLiquidityInputAmount[i]" placeholder="0.0">
-                  </div>
-                  <div class="max-status" (click)="maxAddLiquidityInput(i)"
-                    [ngClass]="{active: tokenItem.amount != '--'}">MAX</div>
-                  <div class="balance">
-                    <span>Balance</span>
-                    <app-long-balance [balance]="tokenItem?.amount"></app-long-balance>
-                  </div>
-                </div>
-              </div>
-              <div class="receive">
-                <span>Receive</span>
-                <app-long-balance [balance]="receiveAmount[i]"></app-long-balance>
-              </div>
-              <div class="btn-primary btn-liquidity" (click)="depost(tokenItem, i)">
-                Deposit
-              </div>
-            </li>
-          </ng-container>
-          <ng-container *ngIf="liquidityType !== 'add'">
+          <ng-container>
             <li *ngFor="let tokenItem  of addLiquidityTokens; let i = index ">
               <div class="detail">
                 <div class="left">
@@ -196,17 +157,6 @@
           </div>
         </li>
       </ul>
-    </div>
-    <div class="right">
-      <a routerLink="/hub/legacy-liquidity/remove">Legacy LP</a>
-      <!-- <div class="item-list">
-        <span class="name">{{ liquidityType == 'add' ? 'Receive' : 'PayAmount' }}</span>
-        <span class="value">{{ (liquidityType == 'add' ? receiveAmount : payAmount) | transNumber }}</span>
-      </div> -->
-      <!-- <div class="item-list">
-        <span class="name">Max slippage</span>
-        <span class="value">{{BRIDGE_SLIPVALUE}}%</span>
-      </div> -->
     </div>
   </div>
 </section>

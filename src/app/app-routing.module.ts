@@ -7,6 +7,7 @@ import {
   VaultComponent,
   HubComponent,
   LiquidityComponent,
+  LegacyLiquidityComponent,
 } from './pages';
 
 const routes: Routes = [
@@ -16,6 +17,7 @@ const routes: Routes = [
   // { path: 'vault', component: VaultComponent },
   { path: 'hub', component: HubComponent },
   { path: 'hub/liquidity/:type', component: LiquidityComponent },
+  { path: 'hub/legacy-liquidity/remove', component: LegacyLiquidityComponent },
   { path: '**', redirectTo: '/home' },
 ];
 

@@ -21,6 +21,7 @@ import {
   HubComponent,
   HubPoolComponent,
   LiquidityComponent,
+  LegacyLiquidityComponent,
 } from './pages';
 
 const PAGECOMPONENTS = [
@@ -32,6 +33,7 @@ const PAGECOMPONENTS = [
   HubComponent,
   HubPoolComponent,
   LiquidityComponent,
+  LegacyLiquidityComponent,
 ];
 
 //#region ng-zorro-antd
