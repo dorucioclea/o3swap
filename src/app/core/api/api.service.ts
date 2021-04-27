@@ -167,7 +167,7 @@ export class ApiService {
         toToken,
         inputAmount
       );
-      return this.handleReceiveSwapPathFiat(res, true);
+      return this.handleSwapPathReceiveAmount(res, true);
     }
     this.commonService.log(2);
     const fromUsd = USD_TOKENS.find((item) => item.chain === fromToken.chain);
@@ -181,7 +181,7 @@ export class ApiService {
         toToken,
         inputAmount
       );
-      return this.handleReceiveSwapPathFiat(res);
+      return this.handleSwapPathReceiveAmount(res);
     }
     this.commonService.log(toUsd.assetID);
     this.commonService.log(toToken.assetID);
@@ -196,7 +196,7 @@ export class ApiService {
         inputAmount,
         fromUsd
       );
-      return this.handleReceiveSwapPathFiat(res);
+      return this.handleSwapPathReceiveAmount(res);
     }
     this.commonService.log(4);
     return of([]).toPromise();
@@ -228,7 +228,7 @@ export class ApiService {
   }
   //#endregion
 
-  //#region neo nneo swap
+  //#region neo nneo swap utxo
   getUtxo(address: string, amount: string): Promise<any> {
     return this.http
       .post(`${UTXO_HOST}/utxo`, {
@@ -282,19 +282,6 @@ export class ApiService {
       )
       .toPromise();
   }
-
-  // getFromEthPoolFeeRate(): Promise<string> {
-  //   return this.http
-  //     .get(`${POLY_HOST}/swapFee/${POLY_HOST_ADDRESS}`)
-  //     .pipe(
-  //       map((res: any) => {
-  //         if (res.code === 200) {
-  //           return new BigNumber(res.fee).shiftedBy(-10).toFixed();
-  //         }
-  //       })
-  //     )
-  //     .toPromise();
-  // }
 
   getCrossChainSwapDetail(hash: string): Observable<TxProgress> {
     hash = this.commonService.remove0xHash(hash);
@@ -491,7 +478,7 @@ export class ApiService {
     }
     this.commonService.log(result);
     if (result) {
-      return of(this.handleReceiveSwapPathFiat(result)).toPromise();
+      return of(this.handleSwapPathReceiveAmount(result)).toPromise();
     }
   }
 
@@ -527,7 +514,7 @@ export class ApiService {
               };
               target.push(temp);
             });
-            return this.handleReceiveSwapPathFiat(target);
+            return this.handleSwapPathReceiveAmount(target);
           }
         })
       )
@@ -554,7 +541,7 @@ export class ApiService {
       },
     ];
     this.commonService.log(result);
-    return of(this.handleReceiveSwapPathFiat(result)).toPromise();
+    return of(this.handleSwapPathReceiveAmount(result)).toPromise();
   }
 
   private getFromEthSwapPath(
@@ -734,7 +721,7 @@ export class ApiService {
     return token && token.logo;
   }
 
-  private handleReceiveSwapPathFiat(
+  private handleSwapPathReceiveAmount(
     swapPathArr: AssetQueryResponse,
     hasAggregator = false
   ): AssetQueryResponse {
