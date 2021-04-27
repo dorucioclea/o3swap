@@ -137,12 +137,18 @@ export class TxProgressComponent implements OnInit, OnDestroy {
     if (this.requestCrossInterval) {
       this.requestCrossInterval.unsubscribe();
     }
+    let hasGetBalance1 = false;
     this.requestCrossInterval = interval(5000).subscribe(() => {
       this.apiService
         .getCrossChainSwapDetail(this.transaction.txid)
         .subscribe((res: TxProgress) => {
           this.commonService.log(res);
           this.transaction.progress = res;
+          const swapApi = this.getEthDapiService();
+          if (res.step1.status === 2 && hasGetBalance1 === false) {
+            swapApi.getBalance(this.transaction.fromToken.chain);
+            hasGetBalance1 = true;
+          }
           if (
             res.step1.status === 2 &&
             res.step2.status === 2 &&
@@ -150,8 +156,8 @@ export class TxProgressComponent implements OnInit, OnDestroy {
           ) {
             this.transaction.isPending = false;
             this.requestCrossInterval.unsubscribe();
-            const swapApi = this.getEthDapiService();
-            swapApi.getBalance();
+            swapApi.getBalance(this.transaction.fromToken.chain);
+            swapApi.getBalance(this.transaction.toToken.chain);
           }
           this.store.dispatch({
             type: this.dispatchType,
@@ -223,20 +229,21 @@ export class TxProgressComponent implements OnInit, OnDestroy {
     }
   }
   getEthDapiService(): any {
-    switch (this.transaction?.fromToken.chain) {
+    let walletName;
+    switch (this.transaction.fromToken.chain) {
       case 'ETH':
-        return this.ethWalletName === 'MetaMask'
-          ? this.metaMaskWalletApiService
-          : this.o3EthWalletApiService;
+        walletName = this.ethWalletName;
+        break;
       case 'BSC':
-        return this.bscWalletName === 'MetaMask'
-          ? this.metaMaskWalletApiService
-          : this.o3EthWalletApiService;
+        walletName = this.bscWalletName;
+        break;
       case 'HECO':
-        return this.hecoWalletName === 'MetaMask'
-          ? this.metaMaskWalletApiService
-          : this.o3EthWalletApiService;
+        walletName = this.hecoWalletName;
+        break;
     }
+    return walletName === 'MetaMask' || !walletName
+      ? this.metaMaskWalletApiService
+      : this.o3EthWalletApiService;
   }
   //#endregion
 }

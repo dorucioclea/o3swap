@@ -6,7 +6,7 @@ export const environment = {
   production: false,
   apiDomain: '',
   network: 'TestNet',
-  testSite: false,
+  testSite: true,
 };
 
 /*

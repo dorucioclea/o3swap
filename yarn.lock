@@ -4026,6 +4026,13 @@ eth-lib@^0.1.26:
     ws "^3.0.0"
     xhr-request-promise "^0.1.2"
 
+eth-rpc-errors@^4.0.3:
+  version "4.0.3"
+  resolved "https://registry.npm.taobao.org/eth-rpc-errors/download/eth-rpc-errors-4.0.3.tgz#6ddb6190a4bf360afda82790bb7d9d5e724f423a"
+  integrity sha1-bdthkKS/Ngr9qCeQu32dXnJPQjo=
+  dependencies:
+    fast-safe-stringify "^2.0.6"
+
 ethereum-bloom-filters@^1.0.6:
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/ethereum-bloom-filters/-/ethereum-bloom-filters-1.0.9.tgz#4a59dead803af0c9e33834170bd7695df67061ec"
@@ -4279,6 +4286,11 @@ fast-json-stable-stringify@2.1.0, fast-json-stable-stringify@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/fast-json-stable-stringify/-/fast-json-stable-stringify-2.1.0.tgz#874bf69c6f404c2b5d99c481341399fd55892633"
   integrity sha512-lhd/wF+Lk98HZoTCtlVraHtfh5XYijIjalXck7saUtuanSDyLMxnHhSXEDJqHxD7msR8D0uCmqlkwjCV8xvwHw==
+
+fast-safe-stringify@^2.0.6:
+  version "2.0.7"
+  resolved "https://registry.npm.taobao.org/fast-safe-stringify/download/fast-safe-stringify-2.0.7.tgz#124aa885899261f68aedb42a7c080de9da608743"
+  integrity sha1-EkqohYmSYfaK7bQqfAgN6dpgh0M=
 
 fastparse@^1.1.2:
   version "1.1.2"
@@ -6684,10 +6696,10 @@ o3-dapi-core@^0.3.13:
     randomfill "~1.0.4"
     socket.io-client "~2.2.0"
 
-o3-dapi-eth@^1.0.5:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/o3-dapi-eth/-/o3-dapi-eth-1.0.7.tgz#ea18fec0db20c8591dc3a9c30e6e698158ddc6c3"
-  integrity sha512-nFoC8SVIeazoy9ft0QFiqM5L1Uv1s7kldO2sBqPILLfVoSJ5tMXJzEivimVgPh7ixt9JFvdYbBDBmjzGREPsJQ==
+o3-dapi-eth@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.nlark.com/o3-dapi-eth/download/o3-dapi-eth-1.0.8.tgz#abf101bfbf1b86e41d8313513690a67c3c1faf71"
+  integrity sha1-q/EBv78bhuQdgxNRNpCmfDwfr3E=
 
 o3-dapi-neo@^0.6.1:
   version "0.6.1"

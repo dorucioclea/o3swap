@@ -34,6 +34,7 @@ interface State {
 export class O3NeoWalletApiService {
   walletName: NeoWalletName = 'O3';
   accountAddress: string;
+  o3DapiIsReady = false;
 
   swap$: Observable<any>;
   transaction: SwapTransaction;
@@ -46,6 +47,9 @@ export class O3NeoWalletApiService {
     private apiService: ApiService
   ) {
     o3dapi.initPlugins([o3dapiNeo]);
+    o3dapi.NEO.addEventListener(o3dapi.NEO.Constants.EventName.READY, () => {
+      this.o3DapiIsReady = true;
+    });
     this.swap$ = store.select('swap');
     this.swap$.subscribe((state) => {
       this.transaction = Object.assign({}, state.transaction);
@@ -66,40 +70,44 @@ export class O3NeoWalletApiService {
     if (localTx.isPending === false) {
       return;
     }
-    o3dapi.NEO.addEventListener(o3dapi.NEO.Constants.EventName.READY, () => {
-      const getTx = () => {
-        o3dapi.NEO.getTransaction({
-          txid: this.commonService.add0xHash(localTx.txid),
-          network: NETWORK,
+    const getTx = () => {
+      if (this.o3DapiIsReady === false) {
+        return;
+      }
+      o3dapi.NEO.getTransaction({
+        txid: this.commonService.add0xHash(localTx.txid),
+        network: NETWORK,
+      })
+        .then((result) => {
+          if (intervalTx) {
+            intervalTx.unsubscribe();
+          }
+          if (
+            this.commonService.add0xHash(result.txid) ===
+            this.commonService.add0xHash(localTx.txid)
+          ) {
+            this.getBalances();
+            this.transaction.isPending = false;
+            this.store.dispatch({
+              type: UPDATE_PENDING_TX,
+              data: this.transaction,
+            });
+          }
         })
-          .then((result) => {
-            if (intervalTx) {
-              intervalTx.unsubscribe();
-            }
-            if (
-              this.commonService.add0xHash(result.txid) ===
-              this.commonService.add0xHash(localTx.txid)
-            ) {
-              this.getBalances();
-              this.transaction.isPending = false;
-              this.store.dispatch({
-                type: UPDATE_PENDING_TX,
-                data: this.transaction,
-              });
-            }
-          })
-          .catch((error) => {
-            this.commonService.log(error);
-          });
-      };
+        .catch((error) => {
+          this.commonService.log(error);
+        });
+    };
+    getTx();
+    const intervalTx = interval(5000).subscribe(() => {
       getTx();
-      const intervalTx = interval(5000).subscribe(() => {
-        getTx();
-      });
     });
   }
 
   connect(): Promise<string> {
+    if (this.o3DapiIsReady === false) {
+      this.nzMessage.info('O3 dAPI is not ready, please open O3 wallet before use.');
+    }
     return o3dapi.NEO.getAccount()
       .then((result) => {
         this.commonService.log(result);

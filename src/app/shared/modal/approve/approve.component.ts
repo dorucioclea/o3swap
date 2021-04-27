@@ -36,7 +36,8 @@ export class ApproveComponent implements OnInit {
         if (hash) {
           this.approveInterval = interval(5000).subscribe(async () => {
             const receipt = await swapApi.getReceipt(
-              hash
+              hash,
+              this.fromToken.chain
             );
             if (receipt !== null) {
               this.approveInterval.unsubscribe();
@@ -51,7 +52,7 @@ export class ApproveComponent implements OnInit {
   }
 
   getEthDapiService(): any {
-    return this.walletName === 'MetaMask'
+    return this.walletName === 'MetaMask' || !this.walletName
       ? this.metaMaskWalletApiService
       : this.o3EthWalletApiService;
   }
