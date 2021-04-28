@@ -50,14 +50,13 @@ interface State {
 
 @Injectable()
 export class O3EthWalletApiService {
-  myWalletName: NeoWalletName = 'O3';
-  accountAddress = { ETH: '', BSC: '', HECO: '' };
+  myWalletName: EthWalletName = 'O3';
   requestTxStatusInterval: Unsubscribable;
+  blockNumberInterval: Unsubscribable;
 
   swap$: Observable<any>;
-  ethWalletName: EthWalletName;
-  bscWalletName: EthWalletName;
-  hecoWalletName: EthWalletName;
+  walletName = { ETH: '', BSC: '', HECO: '' };
+  accountAddress = { ETH: '', BSC: '', HECO: '' };
   transaction: SwapTransaction;
   bridgeeTransaction: SwapTransaction;
   liquidityTransaction: SwapTransaction;
@@ -96,9 +95,12 @@ export class O3EthWalletApiService {
     this.swap$ = store.select('swap');
     this.tokens$ = store.select('tokens');
     this.swap$.subscribe((state) => {
-      this.ethWalletName = state.ethWalletName;
-      this.bscWalletName = state.bscWalletName;
-      this.hecoWalletName = state.hecoWalletName;
+      this.walletName.ETH = state.ethWalletName;
+      this.walletName.BSC = state.bscWalletName;
+      this.walletName.HECO = state.hecoWalletName;
+      this.accountAddress.ETH = state.ethAccountAddress;
+      this.accountAddress.BSC = state.bscAccountAddress;
+      this.accountAddress.HECO = state.hecoAccountAddress;
       this.transaction = Object.assign({}, state.transaction);
       this.bridgeeTransaction = Object.assign({}, state.bridgeeTransaction);
       this.liquidityTransaction = Object.assign({}, state.liquidityTransaction);
@@ -124,6 +126,7 @@ export class O3EthWalletApiService {
           }
           this.accountAddress[chain] = response[0].address;
         }
+        this.walletName[chain] = this.myWalletName;
         this.getBalance(chain as CHAINS);
         let dispatchAccountType;
         let dispatchWalletNameType;
@@ -161,36 +164,27 @@ export class O3EthWalletApiService {
   }
 
   //#region balance
-  async getBalance(chain: CHAINS): Promise<boolean> {
-    this.commonService.log('getBalance-----------');
-    let dispatchBalanceType;
-    let tempTokenBalance: Token[];
-    return new Promise(async (resolve) => {
-      switch (chain) {
-        case 'ETH':
-          dispatchBalanceType = UPDATE_ETH_BALANCES;
-          tempTokenBalance = JSON.parse(JSON.stringify(this.chainTokens.ETH));
-          break;
-        case 'BSC':
-          dispatchBalanceType = UPDATE_BSC_BALANCES;
-          tempTokenBalance = JSON.parse(JSON.stringify(this.chainTokens.BSC));
-          break;
-        case 'HECO':
-          dispatchBalanceType = UPDATE_HECO_BALANCES;
-          tempTokenBalance = JSON.parse(JSON.stringify(this.chainTokens.HECO));
-          break;
-      }
+  async getBalance(chain: CHAINS, isUpdate = true): Promise<boolean> {
+    if (this.walletName[chain] !== 'O3' || !this.accountAddress[chain]) {
+      return;
+    }
+    const tempTokenBalance: Token[] = JSON.parse(
+      JSON.stringify(this.chainTokens[chain])
+    );
+    return new Promise(async (resolve, reject) => {
       const result = {};
       for (const item of tempTokenBalance) {
         const tempAmount = await this.getBalancByHash(item);
         if (tempAmount) {
           result[item.assetID] = JSON.parse(JSON.stringify(item));
           result[item.assetID].amount = tempAmount;
-          this.store.dispatch({
-            type: dispatchBalanceType,
-            data: result,
-          });
+          if (isUpdate === false) {
+            this.dispatchUpdateBalance(chain, result);
+          }
         }
+      }
+      if (isUpdate === true) {
+        this.dispatchUpdateBalance(chain, result);
       }
       this.commonService.log(result);
       resolve(true);
@@ -198,59 +192,32 @@ export class O3EthWalletApiService {
   }
 
   async getBalancByHash(token: Token): Promise<string> {
+    if (!this.accountAddress[token.chain]) {
+      return;
+    }
+    let params;
     if (token.assetID !== ETH_SOURCE_ASSET_HASH) {
       const json = await this.getEthErc20Json();
       const ethErc20Contract = new this.web3.eth.Contract(json, token.assetID);
       const data = await ethErc20Contract.methods
         .balanceOf(this.accountAddress[token.chain])
         .encodeABI();
-      return o3dapi[token.chain]
-        .request({
-          method: 'eth_call',
-          params: [
-            this.getSendTransactionParams(
-              this.accountAddress[token.chain],
-              token.assetID,
-              data
-            ),
-            'latest',
-          ],
-        })
-        .then((response) => {
-          const balance = response.result;
-          if (
-            balance &&
-            !new BigNumber(balance).isNaN() &&
-            new BigNumber(balance).comparedTo(0) > 0
-          ) {
-            return new BigNumber(balance).shiftedBy(-token.decimals).toFixed();
-          }
-        })
-        .catch((error) => {
-          this.commonService.log(error);
-        });
+      params = [
+        this.getSendTransactionParams(
+          this.accountAddress[token.chain],
+          token.assetID,
+          data
+        ),
+        'latest',
+      ];
     } else {
-      return o3dapi[token.chain]
-        .request({
-          method: 'eth_getBalance',
-          params: [this.accountAddress[token.chain], 'latest'],
-        })
-        .then((response) => {
-          const balance = response.result;
-          if (
-            balance &&
-            !new BigNumber(balance).isNaN() &&
-            new BigNumber(balance).comparedTo(0) > 0
-          ) {
-            return new BigNumber(balance, 16)
-              .shiftedBy(-token.decimals)
-              .toFixed();
-          }
-        })
-        .catch((error) => {
-          this.commonService.log(error);
-        });
+      params = [this.accountAddress[token.chain], 'latest'];
     }
+    return this.rpcApiService.getEthTokenBalance(params, token).then((res) => {
+      if (res) {
+        return res;
+      }
+    });
   }
   //#endregion
 
@@ -1115,6 +1082,44 @@ export class O3EthWalletApiService {
   //#endregion
 
   //#region private function
+  private dispatchUpdateBalance(chain: CHAINS, balances): void {
+    let dispatchBalanceType;
+    switch (chain) {
+      case 'ETH':
+        dispatchBalanceType = UPDATE_ETH_BALANCES;
+        break;
+      case 'BSC':
+        dispatchBalanceType = UPDATE_BSC_BALANCES;
+        break;
+      case 'HECO':
+        dispatchBalanceType = UPDATE_HECO_BALANCES;
+        break;
+    }
+    if (this.walletName[chain] === this.myWalletName) {
+      this.store.dispatch({
+        type: dispatchBalanceType,
+        data: balances,
+      });
+    }
+  }
+  private listenBlockNumber(): void {
+    if (this.blockNumberInterval) {
+      return;
+    }
+    this.blockNumberInterval = interval(15000).subscribe(() => {
+      this.getBalance('ETH');
+      this.getBalance('BSC');
+      this.getBalance('HECO');
+      // 没有连接时不获取 balances
+      if (
+        this.walletName.ETH !== 'O3' &&
+        this.walletName.BSC !== 'O3' &&
+        this.walletName.HECO !== 'O3'
+      ) {
+        this.blockNumberInterval.unsubscribe();
+      }
+    });
+  }
   private handleTx(
     fromToken: Token,
     toToken: Token,

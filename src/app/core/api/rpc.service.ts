@@ -11,10 +11,13 @@ import {
   CHAINS,
   NETWORK,
   CommonHttpResponse,
+  Token,
+  ETH_SOURCE_ASSET_HASH,
 } from '@lib';
 import { CommonService } from '../util/common.service';
 import { map } from 'rxjs/operators';
 import { rpc } from '@cityofzion/neon-js';
+import { BigNumber } from 'bignumber.js';
 
 @Injectable()
 export class RpcApiService {
@@ -49,21 +52,36 @@ export class RpcApiService {
       .toPromise();
   }
 
-  getEthTxReceipt(txHash: string, chain: CHAINS): Observable<any> {
-    let host;
-    switch (chain) {
-      case 'ETH':
-        host = ETH_RPC_HOST;
-        break;
-      case 'BSC':
-        host = BSC_RPC_HOST;
-        break;
-      case 'HECO':
-        host = HECO_RPC_HOST;
-        break;
+  getEthTokenBalance(params, token: Token): Promise<any> {
+    let method = 'eth_call';
+    if (token.assetID === ETH_SOURCE_ASSET_HASH) {
+      method = 'eth_getBalance';
     }
     return this.http
-      .post(host, {
+      .post(this.getEthRpcHost(token.chain), {
+        jsonrpc: '2.0',
+        id: METAMASK_CHAIN_ID[token.chain],
+        method,
+        params,
+      })
+      .pipe(
+        map((response: any) => {
+          const balance = response.result;
+          if (
+            balance &&
+            !new BigNumber(balance).isNaN() &&
+            new BigNumber(balance).comparedTo(0) > 0
+          ) {
+            return new BigNumber(balance).shiftedBy(-token.decimals).toFixed();
+          }
+        })
+      )
+      .toPromise();
+  }
+
+  getEthTxReceipt(txHash: string, chain: CHAINS): Observable<any> {
+    return this.http
+      .post(this.getEthRpcHost(chain), {
         jsonrpc: '2.0',
         id: METAMASK_CHAIN_ID[chain],
         method: 'eth_getTransactionReceipt',
@@ -76,5 +94,16 @@ export class RpcApiService {
           }
         })
       );
+  }
+
+  private getEthRpcHost(chain: CHAINS): string {
+    switch (chain) {
+      case 'ETH':
+        return ETH_RPC_HOST;
+      case 'BSC':
+        return BSC_RPC_HOST;
+      case 'HECO':
+        return HECO_RPC_HOST;
+    }
   }
 }
