@@ -45,8 +45,8 @@ import { SwapService } from '../swap.service';
 import Web3 from 'web3';
 import { HttpClient } from '@angular/common/http';
 import { map, take } from 'rxjs/operators';
-import { ApiService } from '../../api/api.service';
 import { getMessageFromCode } from 'eth-rpc-errors';
+import { RpcApiService } from '../../api/rpc.service';
 
 interface State {
   swap: SwapStateType;
@@ -97,7 +97,7 @@ export class MetaMaskWalletApiService {
     private nzNotification: NzNotificationService,
     private swapService: SwapService,
     private commonService: CommonService,
-    private apiService: ApiService
+    private rpcApiService: RpcApiService
   ) {
     this.swap$ = store.select('swap');
     this.tokens$ = store.select('tokens');
@@ -176,7 +176,7 @@ export class MetaMaskWalletApiService {
           this.nzMessage.success('Connection succeeded!');
         }
         this.listenBlockNumber();
-        this.getBalance();
+        this.getBalance(chain, false);
         let dispatchAccountType;
         let dispatchWalletNameType;
         switch (chain) {
@@ -333,7 +333,7 @@ export class MetaMaskWalletApiService {
   //#endregion
 
   //#region balance
-  async getBalance(targetChain?: CHAINS): Promise<boolean> {
+  async getBalance(targetChain?, isUpdate = true): Promise<boolean> {
     this.commonService.log('getBalance-----------');
     const chainId = new BigNumber(this.ethereum.chainId, 16).toNumber();
     const chain = METAMASK_CHAIN[chainId];
@@ -350,29 +350,13 @@ export class MetaMaskWalletApiService {
         if (tempAmount) {
           result[item.assetID] = JSON.parse(JSON.stringify(item));
           result[item.assetID].amount = tempAmount;
-          let dispatchBalanceType;
-          let tempWalletName;
-          switch (chain) {
-            case 'ETH':
-              dispatchBalanceType = UPDATE_ETH_BALANCES;
-              tempWalletName = this.ethWalletName;
-              break;
-            case 'BSC':
-              dispatchBalanceType = UPDATE_BSC_BALANCES;
-              tempWalletName = this.bscWalletName;
-              break;
-            case 'HECO':
-              dispatchBalanceType = UPDATE_HECO_BALANCES;
-              tempWalletName = this.hecoWalletName;
-              break;
-          }
-          if (tempWalletName && tempWalletName === this.myWalletName) {
-            this.store.dispatch({
-              type: dispatchBalanceType,
-              data: result,
-            });
+          if (isUpdate === false) {
+            this.dispatchUpdateBalance(chain, result);
           }
         }
+      }
+      if (isUpdate === true) {
+        this.dispatchUpdateBalance(chain, result);
       }
       this.commonService.log(result);
       if (this.ethWalletName === 'MetaMask' && chain !== 'ETH') {
@@ -1036,6 +1020,7 @@ export class MetaMaskWalletApiService {
 
   async removeLiquidity(
     fromToken: Token, // LP token
+    toToken: Token,
     inputAmount: string,
     address: string,
     toChainId: number,
@@ -1048,13 +1033,12 @@ export class MetaMaskWalletApiService {
       json,
       ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain]
     );
-    const usdtToken = USD_TOKENS.find((item) => item.chain === fromToken.chain);
     const bigNumberPolyFee = new BigNumber(fee).shiftedBy(18).dp(0).toFixed();
     const params = {
       fromAssetHash: this.commonService.add0xHash(fromToken.assetID),
       toPoolId: 1,
       toChainId,
-      toAssetHash: this.commonService.add0xHash(usdtToken.assetID),
+      toAssetHash: this.commonService.add0xHash(toToken.assetID),
       toAddress: address,
       amount: new BigNumber(inputAmount)
         .shiftedBy(fromToken.decimals)
@@ -1097,7 +1081,7 @@ export class MetaMaskWalletApiService {
         this.commonService.log(hash);
         this.handleTx(
           fromToken,
-          usdtToken,
+          toToken,
           inputAmount,
           receiveAmount,
           hash,
@@ -1185,28 +1169,49 @@ export class MetaMaskWalletApiService {
   }
 
   getReceipt(hash: string, chain?: CHAINS): Promise<any> {
-    return this.ethereum
-      .request({
-        method: 'eth_getTransactionReceipt',
-        params: [hash],
-      })
-      .then((receipt) => {
-        if (receipt) {
-          if (new BigNumber(receipt.status, 16).isZero()) {
-            return false;
-          } else {
-            return true;
+    return this.rpcApiService
+      .getEthTxReceipt(hash, chain)
+      .pipe(
+        map((receipt) => {
+          if (receipt) {
+            if (new BigNumber(receipt.status, 16).isZero()) {
+              return false;
+            } else {
+              return true;
+            }
           }
-        }
-        return null;
-      })
-      .catch((error) => {
-        this.commonService.log(error);
-      });
+          return null;
+        })
+      )
+      .toPromise();
   }
   //#endregion
 
   //#region private function
+  private dispatchUpdateBalance(chain: CHAINS, balances): void {
+    let dispatchBalanceType;
+    let tempWalletName;
+    switch (chain) {
+      case 'ETH':
+        dispatchBalanceType = UPDATE_ETH_BALANCES;
+        tempWalletName = this.ethWalletName;
+        break;
+      case 'BSC':
+        dispatchBalanceType = UPDATE_BSC_BALANCES;
+        tempWalletName = this.bscWalletName;
+        break;
+      case 'HECO':
+        dispatchBalanceType = UPDATE_HECO_BALANCES;
+        tempWalletName = this.hecoWalletName;
+        break;
+    }
+    if (tempWalletName && tempWalletName === this.myWalletName) {
+      this.store.dispatch({
+        type: dispatchBalanceType,
+        data: balances,
+      });
+    }
+  }
   private listenBlockNumber(): void {
     if (this.blockNumberInterval) {
       return;
@@ -1376,32 +1381,30 @@ export class MetaMaskWalletApiService {
           currentTx = this.liquidityTransaction;
           break;
       }
-      this.ethereum
-        .request({
-          method: 'eth_getTransactionReceipt',
-          params: [this.commonService.add0xHash(txHash)],
-        })
-        .then((receipt) => {
-          this.commonService.log(receipt);
-          if (receipt) {
-            myInterval.unsubscribe();
-            if (new BigNumber(receipt.status, 16).isZero()) {
-              currentTx.isPending = false;
-              currentTx.isFailed = true;
-              this.store.dispatch({ type: dispatchType, data: currentTx });
-            } else {
-              if (hasCrossChain === false) {
+      this.rpcApiService
+        .getEthTxReceipt(txHash, currentTx.fromToken.chain)
+        .subscribe(
+          (receipt) => {
+            if (receipt) {
+              myInterval.unsubscribe();
+              if (new BigNumber(receipt.status, 16).isZero()) {
                 currentTx.isPending = false;
-                this.getBalance();
+                currentTx.isFailed = true;
                 this.store.dispatch({ type: dispatchType, data: currentTx });
+              } else {
+                if (hasCrossChain === false) {
+                  currentTx.isPending = false;
+                  this.getBalance();
+                  this.store.dispatch({ type: dispatchType, data: currentTx });
+                }
               }
             }
+          },
+          (error) => {
+            myInterval.unsubscribe();
+            this.commonService.log(error);
           }
-        })
-        .catch((error) => {
-          myInterval.unsubscribe();
-          this.commonService.log(error);
-        });
+        );
     });
   }
 

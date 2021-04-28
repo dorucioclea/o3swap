@@ -21,10 +21,11 @@ import {
   NETWORK,
   SWAP_CONTRACT_CHAIN_ID,
 } from '@lib';
-import { interval, Observable } from 'rxjs';
+import { interval, Observable, Unsubscribable } from 'rxjs';
 import { wallet } from '@cityofzion/neon-js';
 import BigNumber from 'bignumber.js';
 import { take } from 'rxjs/operators';
+import { RpcApiService } from '../../api/rpc.service';
 
 interface State {
   swap: SwapStateType;
@@ -39,12 +40,15 @@ export class O3NeoWalletApiService {
   swap$: Observable<any>;
   transaction: SwapTransaction;
 
+  listerTxinterval: Unsubscribable;
+
   constructor(
     private store: Store<State>,
     private nzMessage: NzMessageService,
     private swapService: SwapService,
     private commonService: CommonService,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private rpcApiService: RpcApiService
   ) {
     o3dapi.initPlugins([o3dapiNeo]);
     o3dapi.NEO.addEventListener(o3dapi.NEO.Constants.EventName.READY, () => {
@@ -70,43 +74,14 @@ export class O3NeoWalletApiService {
     if (localTx.isPending === false) {
       return;
     }
-    const getTx = () => {
-      if (this.o3DapiIsReady === false) {
-        return;
-      }
-      o3dapi.NEO.getTransaction({
-        txid: this.commonService.add0xHash(localTx.txid),
-        network: NETWORK,
-      })
-        .then((result) => {
-          if (intervalTx) {
-            intervalTx.unsubscribe();
-          }
-          if (
-            this.commonService.add0xHash(result.txid) ===
-            this.commonService.add0xHash(localTx.txid)
-          ) {
-            this.getBalances();
-            this.transaction.isPending = false;
-            this.store.dispatch({
-              type: UPDATE_PENDING_TX,
-              data: this.transaction,
-            });
-          }
-        })
-        .catch((error) => {
-          this.commonService.log(error);
-        });
-    };
-    getTx();
-    const intervalTx = interval(5000).subscribe(() => {
-      getTx();
-    });
+    this.listerTxReceipt(localTx);
   }
 
   connect(): Promise<string> {
     if (this.o3DapiIsReady === false) {
-      this.nzMessage.info('O3 dAPI is not ready, please open O3 wallet before use.');
+      this.nzMessage.info(
+        'O3 dAPI is not ready, please open O3 wallet before use.'
+      );
     }
     return o3dapi.NEO.getAccount()
       .then((result) => {
@@ -404,6 +379,39 @@ export class O3NeoWalletApiService {
   }
 
   //#region private function
+  private listerTxReceipt(tx: SwapTransaction): void {
+    const getTx = () => {
+      this.rpcApiService
+        .getNeoTxByHash(tx.txid)
+        .then((result) => {
+          if (
+            this.commonService.add0xHash(result.txid) ===
+            this.commonService.add0xHash(this.transaction.txid)
+          ) {
+            if (this.listerTxinterval) {
+              this.listerTxinterval.unsubscribe();
+            }
+            this.transaction.isPending = false;
+            this.store.dispatch({
+              type: UPDATE_PENDING_TX,
+              data: this.transaction,
+            });
+            this.getBalances();
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
+    getTx();
+    if (this.listerTxinterval) {
+      this.listerTxinterval.unsubscribe();
+    }
+    this.listerTxinterval = interval(5000).subscribe(() => {
+      getTx();
+    });
+  }
+
   private getBalances(
     fromTokenAssetId?: string,
     inputAmount?: string
@@ -474,20 +482,7 @@ export class O3NeoWalletApiService {
     }
     this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
     if (addLister) {
-      o3dapi.NEO.addEventListener(
-        o3dapi.NEO.Constants.EventName.TRANSACTION_CONFIRMED,
-        (result) => {
-          this.commonService.log(result);
-          if ((txHash as string).includes(result.txid)) {
-            this.getBalances();
-            this.transaction.isPending = false;
-            this.store.dispatch({
-              type: UPDATE_PENDING_TX,
-              data: this.transaction,
-            });
-          }
-        }
-      );
+      this.listerTxReceipt(this.transaction);
     }
   }
   //#endregion

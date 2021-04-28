@@ -1,4 +1,9 @@
-import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  ChangeDetectorRef,
+} from '@angular/core';
 import {
   ApiService,
   CommonService,
@@ -10,6 +15,8 @@ import { Store } from '@ngrx/store';
 import { SwapStateType } from 'src/app/_lib/swap';
 import {
   SWAP_CONTRACT_CHAIN_ID,
+  METAMASK_CHAIN,
+  METAMASK_CHAIN_ID,
   BRIDGE_SLIPVALUE,
   Token,
   USD_TOKENS,
@@ -17,27 +24,22 @@ import {
   ETH_PUSDT_ASSET,
   ConnectChainType,
   EthWalletName,
-  METAMASK_CHAIN,
-  SOURCE_TOKEN_SYMBOL,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { NavigationEnd, Router, RouterEvent } from '@angular/router';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { ApproveComponent } from '@shared';
 
-type LiquidityType = 'add' | 'remove';
 interface State {
   swap: SwapStateType;
   rates: any;
 }
 @Component({
-  selector: 'app-liquidity',
-  templateUrl: './liquidity.component.html',
-  styleUrls: ['./liquidity.component.scss'],
+  selector: 'app-legacy-liquidity',
+  templateUrl: './legacy-liquidity.component.html',
+  styleUrls: ['../liquidity/liquidity.component.scss', './legacy-liquidity.component.scss'],
 })
-export class LiquidityComponent implements OnInit, OnDestroy {
-  SOURCE_TOKEN_SYMBOL = SOURCE_TOKEN_SYMBOL;
+export class LegacyLiquidityComponent implements OnInit, OnDestroy {
   BRIDGE_SLIPVALUE = BRIDGE_SLIPVALUE;
   swapProgress = 20;
   addLiquidityTokens: Token[] = JSON.parse(JSON.stringify(USD_TOKENS));
@@ -50,22 +52,18 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   HUSDToken: Token = this.addLiquidityTokens.find(
     (item) => item.symbol.indexOf('HUSD') >= 0
   );
-  liquidityType: LiquidityType = 'add';
 
-  LPToken: Token = LP_TOKENS.find((item) => item.chain === 'ETH');
-  addLiquidityInputAmount = [];
+  LPToken: Token;
+  LPTokens: Token[];
   removeLiquidityInputAmount = [];
-  receiveAmount: string[] = [];
   payAmount: string[] = [];
+  currentAddress: string;
+  currentChain: string;
   showConnectWallet = false;
   connectChainType: ConnectChainType;
-  addPolyFee: string[] = [];
-  removePolyFee: string[] = [];
-  showAddPolyFee: boolean[] = [false, false, false];
-  showRemovePolyFee: boolean[] = [false, false, false];
 
-  swapUnScribe: Unsubscribable;
   swap$: Observable<any>;
+  swapUnScribe: Unsubscribable;
   ethAccountAddress: string;
   bscAccountAddress: string;
   hecoAccountAddress: string;
@@ -93,23 +91,14 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     private metaMaskWalletApiService: MetaMaskWalletApiService,
     private o3EthWalletApiService: O3EthWalletApiService,
     private nzMessage: NzMessageService,
-    private router: Router,
     private changeDetectorRef: ChangeDetectorRef,
     private modal: NzModalService
   ) {
     this.swap$ = store.select('swap');
     this.rates$ = store.select('rates');
-    this.addLiquidityTokens.forEach((item) => {
-      this.addLiquidityInputAmount.push('');
+    this.addLiquidityTokens.forEach(() => {
       this.removeLiquidityInputAmount.push('');
-      this.receiveAmount.push('--');
       this.payAmount.push('--');
-      item.amount = '--';
-    });
-    this.router.events.subscribe((res: RouterEvent) => {
-      if (res instanceof NavigationEnd) {
-        this.liquidityType = res.url.indexOf('/remove') > 0 ? 'remove' : 'add';
-      }
     });
   }
 
@@ -118,6 +107,12 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       this.rates = state.rates;
     });
     this.getPusdtBalance();
+    this.LPTokens = JSON.parse(JSON.stringify(LP_TOKENS));
+    this.addLiquidityTokens.forEach((item) => {
+      if (this.metaMaskWalletApiService !== METAMASK_CHAIN_ID[item.chain]) {
+        item.amount = '--';
+      }
+    });
     this.swapUnScribe = this.swap$.subscribe((state: SwapStateType) => {
       this.ethAccountAddress = state.ethAccountAddress;
       this.bscAccountAddress = state.bscAccountAddress;
@@ -125,8 +120,9 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       this.ethWalletName = state.ethWalletName;
       this.bscWalletName = state.bscWalletName;
       this.hecoWalletName = state.hecoWalletName;
-      this.metamaskNetworkId = state.metamaskNetworkId;
+      this.getCurrentChain(state.metamaskNetworkId);
       this.handleAccountBalance(state);
+      this.handleCurrentAddress();
       this.getLPBalance();
       this.changeDetectorRef.detectChanges();
     });
@@ -181,30 +177,6 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       .toFixed();
   }
 
-  changeLiquidityType(params: LiquidityType): void {
-    this.liquidityType = params;
-  }
-
-  async changeInAmount(token: Token, index: number): Promise<void> {
-    const inputAmount = new BigNumber(this.addLiquidityInputAmount[index]);
-    if (!inputAmount.isNaN() && inputAmount.comparedTo(0) > 0) {
-      if (inputAmount.comparedTo(50) === 1) {
-        this.nzMessage.error(`You've exceeded the maximum limit`);
-        return;
-      }
-      this.receiveAmount[index] = await this.apiService.getPoolOutGivenSingleIn(
-        token,
-        this.addLiquidityInputAmount[index]
-      );
-      this.addPolyFee[index] = await this.apiService.getFromEthPolyFee(
-        token,
-        this.LPToken
-      );
-    } else {
-      this.receiveAmount[index] = '--';
-    }
-  }
-
   async changeOutAmount(token: Token, index: number): Promise<void> {
     const inputAmount = new BigNumber(this.removeLiquidityInputAmount[index]);
     if (!inputAmount.isNaN() && inputAmount.comparedTo(0) > 0) {
@@ -216,30 +188,9 @@ export class LiquidityComponent implements OnInit, OnDestroy {
         token,
         this.removeLiquidityInputAmount[index]
       );
-      this.removePolyFee[index] = await this.apiService.getFromEthPolyFee(
-        this.LPToken,
-        token
-      );
     } else {
       this.payAmount[index] = '--';
     }
-  }
-
-  async maxAddLiquidityInput(index: number): Promise<void> {
-    if (!new BigNumber(this.addLiquidityTokens[index].amount).isNaN()) {
-      this.addLiquidityInputAmount[index] = this.addLiquidityTokens[
-        index
-      ].amount;
-      this.receiveAmount[index] = await this.apiService.getPoolOutGivenSingleIn(
-        this.addLiquidityTokens[index],
-        this.addLiquidityInputAmount[index]
-      );
-      this.addPolyFee[index] = await this.apiService.getFromEthPolyFee(
-        this.addLiquidityTokens[index],
-        this.LPToken
-      );
-    }
-    this.changeInAmount(this.addLiquidityTokens[index], index);
   }
 
   async maxRemoveLiquidityInput(index: number): Promise<void> {
@@ -252,70 +203,18 @@ export class LiquidityComponent implements OnInit, OnDestroy {
         index
       ] = await this.apiService.getSingleOutGivenPoolIn(
         this.addLiquidityTokens[index],
-        this.payAmount[index]
-      );
-      this.removePolyFee[index] = await this.apiService.getFromEthPolyFee(
-        this.LPToken,
-        this.addLiquidityTokens[index]
+        this.payAmount[index],
+        false
       );
     }
-    this.changeInAmount(this.addLiquidityTokens[index], index);
-  }
-
-  async depost(token: Token, index: number): Promise<void> {
-    if (this.checkWalletConnect(token) === false) {
-      return;
-    }
-    const swapApi = this.getEthDapiService(token);
-    if (swapApi.checkNetwork(token) === false) {
-      return;
-    }
-    const tokenBalance = new BigNumber(token.amount);
-    const tokenAmount = new BigNumber(this.addLiquidityInputAmount[index]);
-    if (tokenAmount.isNaN() || tokenAmount.comparedTo(0) <= 0) {
-      this.nzMessage.error('Wrong input');
-      return;
-    }
-    if (tokenBalance.comparedTo(tokenAmount) < 0) {
-      this.nzMessage.error('Insufficient balance');
-      return;
-    }
-    const allowance = await swapApi.getAllowance(
-      token,
-      this.getFromTokenAddress(token)
-    );
-    if (new BigNumber(allowance).comparedTo(tokenAmount) < 0) {
-      this.showApproveModal(token);
-      return;
-    }
-    const amountOut = new BigNumber(this.receiveAmount[index])
-      .shiftedBy(this.LPToken.decimals)
-      .dp(0)
-      .toFixed();
-    swapApi
-      .addLiquidity(
-        token,
-        this.LPToken,
-        this.addLiquidityInputAmount[index],
-        this.getFromTokenAddress(token),
-        SWAP_CONTRACT_CHAIN_ID[this.LPToken.chain],
-        amountOut,
-        this.addPolyFee[index]
-      )
-      .then((res) => {
-        this.commonService.log(res);
-      })
-      .catch((error) => {
-        this.nzMessage.error(error);
-      });
   }
 
   async withdrawal(token: Token, index: number): Promise<void> {
     if (this.checkWalletConnect(token) === false) {
       return;
     }
-    const swapApi = this.getEthDapiService(this.LPToken);
-    if (swapApi.checkNetwork(this.LPToken) === false) {
+    const swapApi = this.getEthDapiService();
+    if (swapApi.checkNetwork(token) === false) {
       return;
     }
     const lpBalance = new BigNumber(this.LPToken.amount);
@@ -330,9 +229,10 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     }
     const allowance = await swapApi.getAllowance(
       this.LPToken,
-      this.getFromTokenAddress(token)
+      this.currentAddress
     );
     if (new BigNumber(allowance).comparedTo(lpPayAmount) < 0) {
+      // await swapApi.approve(this.LPToken, this.currentAddress);
       this.showApproveModal(this.LPToken);
       return;
     }
@@ -340,15 +240,16 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       .shiftedBy(token.decimals)
       .dp(0)
       .toFixed();
+    const fee = await this.apiService.getFromEthPolyFee(token, token);
     swapApi
       .removeLiquidity(
         this.LPToken,
         token,
         lpPayAmount.toFixed(),
-        this.getFromTokenAddress(this.LPToken),
+        this.currentAddress,
         SWAP_CONTRACT_CHAIN_ID[token.chain],
         amountOut,
-        this.removePolyFee[index]
+        fee
       )
       .then((res) => {
         this.commonService.log(res);
@@ -359,16 +260,6 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   }
 
   //#region
-  getFromTokenAddress(token: Token): string {
-    switch (token.chain) {
-      case 'ETH':
-        return this.ethAccountAddress;
-      case 'BSC':
-        return this.bscAccountAddress;
-      case 'HECO':
-        return this.hecoAccountAddress;
-    }
-  }
   showApproveModal(token: Token): void {
     let walletName: string;
     switch (token.chain) {
@@ -391,7 +282,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       nzClassName: 'custom-modal',
       nzComponentParams: {
         fromToken: token,
-        fromAddress: this.getFromTokenAddress(token),
+        fromAddress: this.currentAddress,
         walletName,
       },
     });
@@ -415,31 +306,24 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       this.connectChainType = 'HECO';
       return false;
     }
-    if (!this.ethAccountAddress) {
-      this.nzMessage.error('Please connect the ETH wallet first');
-      this.showConnectWallet = true;
-      this.connectChainType = 'ETH';
-      return false;
-    }
     return true;
+  }
+  getCurrentChain(metamaskNetworkId): void {
+    if (this.currentChain !== METAMASK_CHAIN[metamaskNetworkId]) {
+      this.currentChain = METAMASK_CHAIN[metamaskNetworkId];
+      const token = this.LPTokens.find(
+        (item) => item.chain === this.currentChain
+      );
+      this.LPToken = JSON.parse(JSON.stringify(token));
+    }
   }
   private getLPBalance(): void {
     if (!this.LPToken) {
       return;
     }
-    if (!this.ethWalletName) {
-      this.LPToken.amount = '--';
-      return;
-    }
-    if (
-      this.ethWalletName === 'MetaMask' &&
-      METAMASK_CHAIN[this.metamaskNetworkId] !== 'ETH'
-    ) {
-      this.LPToken.amount = '--';
-      return;
-    }
-    const swapApi = this.getEthDapiService(this.LPToken);
+    const swapApi = this.getEthDapiService();
     swapApi.getBalancByHash(this.LPToken).then((res) => {
+      // this.LPToken['amount'] = res || '0';
       if (this.LPToken.amount !== res) {
         this.getPusdtBalance();
       }
@@ -456,42 +340,37 @@ export class LiquidityComponent implements OnInit, OnDestroy {
           item.assetID
         ].amount;
       } else {
-        if (
-          (item.chain === 'ETH' && this.ethAccountAddress) ||
-          (item.chain === 'BSC' && this.bscAccountAddress) ||
-          (item.chain === 'HECO' && this.hecoAccountAddress)
-        ) {
-          this.addLiquidityTokens[index].amount = '0';
-        } else {
-          this.addLiquidityTokens[index].amount = '--';
-        }
-      }
-      if (
-        item.chain === 'ETH' &&
-        this.ethWalletName === 'MetaMask' &&
-        METAMASK_CHAIN[this.metamaskNetworkId] !== 'ETH'
-      ) {
         this.addLiquidityTokens[index].amount = '--';
       }
-      if (
-        item.chain === 'BSC' &&
-        this.bscWalletName === 'MetaMask' &&
-        METAMASK_CHAIN[this.metamaskNetworkId] !== 'BSC'
-      ) {
-        this.addLiquidityTokens[index].amount = '--';
+      if (item.chain === this.currentChain && item.amount === '--') {
+        this.addLiquidityTokens[index].amount = '0';
       }
-      if (
-        item.chain === 'HECO' &&
-        this.hecoWalletName === 'MetaMask' &&
-        METAMASK_CHAIN[this.metamaskNetworkId] !== 'HECO'
-      ) {
+      if (item.chain !== this.currentChain) {
         this.addLiquidityTokens[index].amount = '--';
       }
     });
   }
-  getEthDapiService(token: Token): any {
+  private handleCurrentAddress(): void {
+    switch (this.currentChain) {
+      case 'ETH': {
+        this.currentAddress = this.ethAccountAddress;
+        break;
+      }
+      case 'BSC': {
+        this.currentAddress = this.bscAccountAddress;
+        break;
+      }
+      case 'HECO': {
+        this.currentAddress = this.hecoAccountAddress;
+        break;
+      }
+      default:
+        return;
+    }
+  }
+  getEthDapiService(): any {
     let walletName;
-    switch (this.getFromTokenAddress(token)) {
+    switch (this.currentChain) {
       case 'ETH':
         walletName = this.ethWalletName;
         break;

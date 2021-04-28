@@ -25,6 +25,7 @@ import { interval, Observable, Unsubscribable } from 'rxjs';
 import { wallet } from '@cityofzion/neon-js';
 import BigNumber from 'bignumber.js';
 import { take } from 'rxjs/operators';
+import { RpcApiService } from '../../api/rpc.service';
 
 interface State {
   swap: SwapStateType;
@@ -41,13 +42,15 @@ export class NeolineWalletApiService {
   neolineNetwork: Network;
 
   neolineDapi;
+  listerTxinterval: Unsubscribable;
 
   constructor(
     private store: Store<State>,
     private nzMessage: NzMessageService,
     private commonService: CommonService,
     private swapService: SwapService,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private rpcApiService: RpcApiService
   ) {
     this.swap$ = store.select('swap');
     this.swap$.subscribe((state) => {
@@ -415,43 +418,7 @@ export class NeolineWalletApiService {
     if (localTx.isPending === false) {
       return;
     }
-    const neolineDapiIsReadyInterval = interval(1000)
-      .pipe(take(5))
-      .subscribe(() => {
-        if (this.neolineDapi) {
-          neolineDapiIsReadyInterval.unsubscribe();
-          const getTx = () => {
-            this.neolineDapi
-              .getTransaction({
-                txid: this.commonService.add0xHash(localTx.txid),
-                network: NETWORK,
-              })
-              .then((result) => {
-                if (intervalTx) {
-                  intervalTx.unsubscribe();
-                }
-                if (
-                  this.commonService.add0xHash(result.txid) ===
-                  this.commonService.add0xHash(localTx.txid)
-                ) {
-                  this.getBalances();
-                  this.transaction.isPending = false;
-                  this.store.dispatch({
-                    type: UPDATE_PENDING_TX,
-                    data: this.transaction,
-                  });
-                }
-              })
-              .catch((error) => {
-                this.commonService.log(error);
-              });
-          };
-          getTx();
-          const intervalTx = interval(5000).subscribe(() => {
-            getTx();
-          });
-        }
-      });
+    this.listerTxReceipt(localTx);
   }
 
   private getBalances(
@@ -528,21 +495,41 @@ export class NeolineWalletApiService {
     }
     this.store.dispatch({ type: UPDATE_PENDING_TX, data: pendingTx });
     if (addLister) {
-      window.addEventListener(
-        'NEOLine.NEO.EVENT.TRANSACTION_CONFIRMED',
-        (result: any) => {
-          this.commonService.log(result.detail.txid);
-          if (result.detail.txid === txHash) {
-            this.getBalances();
+      this.listerTxReceipt(this.transaction);
+    }
+  }
+
+  private listerTxReceipt(tx: SwapTransaction): void {
+    const getTx = () => {
+      this.rpcApiService
+        .getNeoTxByHash(tx.txid)
+        .then((result) => {
+          if (
+            this.commonService.add0xHash(result.txid) ===
+            this.commonService.add0xHash(this.transaction.txid)
+          ) {
+            if (this.listerTxinterval) {
+              this.listerTxinterval.unsubscribe();
+            }
             this.transaction.isPending = false;
             this.store.dispatch({
               type: UPDATE_PENDING_TX,
               data: this.transaction,
             });
+            this.getBalances();
           }
-        }
-      );
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
+    getTx();
+    if (this.listerTxinterval) {
+      this.listerTxinterval.unsubscribe();
     }
+    this.listerTxinterval = interval(5000).subscribe(() => {
+      getTx();
+    });
   }
 
   private addListener(): void {
