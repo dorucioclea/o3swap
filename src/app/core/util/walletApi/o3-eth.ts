@@ -41,7 +41,7 @@ import { Unsubscribable, Observable, of, interval } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import Web3 from 'web3';
-import { ApiService } from '../../api/api.service';
+import { RpcApiService } from '../../api/rpc.service';
 
 interface State {
   swap: SwapStateType;
@@ -88,7 +88,7 @@ export class O3EthWalletApiService {
     private nzMessage: NzMessageService,
     private swapService: SwapService,
     private commonService: CommonService,
-    private apiService: ApiService
+    private rpcApiService: RpcApiService
   ) {
     o3dapi.initPlugins([ETH]);
     o3dapi.initPlugins([BSC]);
@@ -1095,26 +1095,22 @@ export class O3EthWalletApiService {
     }
   }
 
-  getReceipt(hash: string, chain: CHAINS): Promise<any> {
-    return o3dapi[chain]
-      .request({
-        method: 'eth_getTransactionReceipt',
-        params: [hash],
-      })
-      .then((response) => {
-        const receipt = response.result;
-        if (receipt) {
-          if (new BigNumber(receipt.status, 16).isZero()) {
-            return false;
-          } else {
-            return true;
+  getReceipt(hash: string, chain?: CHAINS): Promise<any> {
+    return this.rpcApiService
+      .getEthTxReceipt(hash, chain)
+      .pipe(
+        map((receipt: any) => {
+          if (receipt) {
+            if (new BigNumber(receipt.status, 16).isZero()) {
+              return false;
+            } else {
+              return true;
+            }
           }
-        }
-        return null;
-      })
-      .catch((error) => {
-        this.commonService.log(error);
-      });
+          return null;
+        })
+      )
+      .toPromise();
   }
   //#endregion
 
@@ -1198,33 +1194,30 @@ export class O3EthWalletApiService {
           currentTx = this.liquidityTransaction;
           break;
       }
-      o3dapi[fromChain]
-        .request({
-          method: 'eth_getTransactionReceipt',
-          params: [txHash],
-        })
-        .then((response) => {
-          const receipt = response.result;
-          this.commonService.log(receipt);
-          if (receipt) {
-            this.requestTxStatusInterval.unsubscribe();
-            if (new BigNumber(receipt.status, 16).isZero()) {
-              currentTx.isPending = false;
-              currentTx.isFailed = true;
-              this.store.dispatch({ type: dispatchType, data: currentTx });
-            } else {
-              if (hasCrossChain === false) {
-                this.getBalance(fromChain);
+      this.rpcApiService
+        .getEthTxReceipt(txHash, currentTx.fromToken.chain)
+        .subscribe(
+          (receipt: any) => {
+            if (receipt) {
+              this.requestTxStatusInterval.unsubscribe();
+              if (new BigNumber(receipt.status, 16).isZero()) {
                 currentTx.isPending = false;
+                currentTx.isFailed = true;
                 this.store.dispatch({ type: dispatchType, data: currentTx });
+              } else {
+                if (hasCrossChain === false) {
+                  this.getBalance(fromChain);
+                  currentTx.isPending = false;
+                  this.store.dispatch({ type: dispatchType, data: currentTx });
+                }
               }
             }
+          },
+          (error) => {
+            this.requestTxStatusInterval.unsubscribe();
+            this.handleDapiError(error);
           }
-        })
-        .catch((error) => {
-          this.requestTxStatusInterval.unsubscribe();
-          this.handleDapiError(error);
-        });
+        );
     });
   }
 

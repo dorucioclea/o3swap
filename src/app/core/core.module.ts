@@ -16,6 +16,7 @@ const APPINIT_PROVIDES = [
 
 //#region services
 import { ApiService } from './api/api.service';
+import { RpcApiService } from './api/rpc.service';
 import { CommonService } from './util/common.service';
 import { SwapService } from './util/swap.service';
 import { MetaMaskWalletApiService } from './util/walletApi/metamask';
@@ -26,6 +27,7 @@ import { VaultdMetaMaskWalletApiService } from './util/walletApi/vault-metamask'
 
 const SERVICES = [
   ApiService,
+  RpcApiService,
   CommonService,
   SwapService,
   MetaMaskWalletApiService,
