@@ -347,7 +347,7 @@ export class ApiService {
    */
   getPoolOutGivenSingleIn(fromToken: Token, amount: string): Promise<string> {
     const poolPUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
-    const lpToken = LP_TOKENS.find((item) => item.chain === fromToken.chain);
+    const usdtLpToken = LP_TOKENS.find((item) => item.chain === 'ETH');
     amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
     return this.http
       .get(
@@ -357,7 +357,7 @@ export class ApiService {
         map((res: any) => {
           if (res.code === 200) {
             return new BigNumber(res.pool_amount_out)
-              .shiftedBy(-lpToken.decimals)
+              .shiftedBy(-usdtLpToken.decimals)
               .toFixed();
           }
         })
@@ -373,7 +373,7 @@ export class ApiService {
    */
   getPoolInGivenSingleOut(fromToken: Token, amount: string): Promise<string> {
     const poolPUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
-    const lpToken = LP_TOKENS.find((item) => item.chain === fromToken.chain);
+    const usdtLpToken = LP_TOKENS.find((item) => item.chain === 'ETH');
     amount = new BigNumber(amount).shiftedBy(fromToken.decimals).toFixed();
     return this.http
       .get(
@@ -383,7 +383,7 @@ export class ApiService {
         map((res: any) => {
           if (res.code === 200) {
             return new BigNumber(res.pool_amount_out)
-              .shiftedBy(-lpToken.decimals)
+              .shiftedBy(-usdtLpToken.decimals)
               .toFixed();
           }
         })
@@ -397,8 +397,11 @@ export class ApiService {
    * @param amount LP amount
    * @return promise
    */
-  getSingleOutGivenPoolIn(fromToken: Token, amount: string): Promise<string> {
-    const poolPUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+  getSingleOutGivenPoolIn(fromToken: Token, amount: string, isUsdtLp = true): Promise<string> {
+    let poolPUsdtHash = ETH_PUSDT_ASSET.ETH.assetID;
+    if (isUsdtLp === false) {
+      poolPUsdtHash = ETH_PUSDT_ASSET[fromToken.chain].assetID;
+    }
     const usdtToken = USD_TOKENS.find((item) => item.chain === fromToken.chain);
     amount = new BigNumber(amount).shiftedBy(18).toFixed();
     return this.http
