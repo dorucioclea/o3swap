@@ -18,6 +18,7 @@ import {
   ConnectChainType,
   EthWalletName,
   METAMASK_CHAIN,
+  SOURCE_TOKEN_SYMBOL,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -36,6 +37,7 @@ interface State {
   styleUrls: ['./liquidity.component.scss'],
 })
 export class LiquidityComponent implements OnInit, OnDestroy {
+  SOURCE_TOKEN_SYMBOL = SOURCE_TOKEN_SYMBOL;
   BRIDGE_SLIPVALUE = BRIDGE_SLIPVALUE;
   swapProgress = 20;
   addLiquidityTokens: Token[] = JSON.parse(JSON.stringify(USD_TOKENS));
@@ -57,6 +59,8 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   payAmount: string[] = [];
   showConnectWallet = false;
   connectChainType: ConnectChainType;
+  addPolyFee: string[] = [];
+  removePolyFee: string[] = [];
 
   swapUnScribe: Unsubscribable;
   swap$: Observable<any>;
@@ -190,6 +194,10 @@ export class LiquidityComponent implements OnInit, OnDestroy {
         token,
         this.addLiquidityInputAmount[index]
       );
+      this.addPolyFee[index] = await this.apiService.getFromEthPolyFee(
+        token,
+        this.LPToken
+      );
     } else {
       this.receiveAmount[index] = '--';
     }
@@ -206,6 +214,10 @@ export class LiquidityComponent implements OnInit, OnDestroy {
         token,
         this.removeLiquidityInputAmount[index]
       );
+      this.removePolyFee[index] = await this.apiService.getFromEthPolyFee(
+        this.LPToken,
+        token
+      );
     } else {
       this.payAmount[index] = '--';
     }
@@ -219,6 +231,10 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       this.receiveAmount[index] = await this.apiService.getPoolOutGivenSingleIn(
         this.addLiquidityTokens[index],
         this.addLiquidityInputAmount[index]
+      );
+      this.addPolyFee[index] = await this.apiService.getFromEthPolyFee(
+        this.addLiquidityTokens[index],
+        this.LPToken
       );
     }
     this.changeInAmount(this.addLiquidityTokens[index], index);
@@ -235,6 +251,10 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       ] = await this.apiService.getSingleOutGivenPoolIn(
         this.addLiquidityTokens[index],
         this.payAmount[index]
+      );
+      this.removePolyFee[index] = await this.apiService.getFromEthPolyFee(
+        this.LPToken,
+        this.addLiquidityTokens[index]
       );
     }
     this.changeInAmount(this.addLiquidityTokens[index], index);
@@ -270,7 +290,6 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       .shiftedBy(this.LPToken.decimals)
       .dp(0)
       .toFixed();
-    const fee = await this.apiService.getFromEthPolyFee(token, this.LPToken);
     swapApi
       .addLiquidity(
         token,
@@ -279,7 +298,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
         this.getFromTokenAddress(token),
         SWAP_CONTRACT_CHAIN_ID[this.LPToken.chain],
         amountOut,
-        fee
+        this.addPolyFee[index]
       )
       .then((res) => {
         this.commonService.log(res);
@@ -319,7 +338,6 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       .shiftedBy(token.decimals)
       .dp(0)
       .toFixed();
-    const fee = await this.apiService.getFromEthPolyFee(this.LPToken, token);
     swapApi
       .removeLiquidity(
         this.LPToken,
@@ -327,7 +345,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
         this.getFromTokenAddress(this.LPToken),
         SWAP_CONTRACT_CHAIN_ID[token.chain],
         amountOut,
-        fee
+        this.removePolyFee[index]
       )
       .then((res) => {
         this.commonService.log(res);

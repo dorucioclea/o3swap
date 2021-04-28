@@ -129,16 +129,43 @@
         .list-wrap {
           li {
             margin-top: 10px;
-            height: 60px;
             display: flex;
             justify-content: space-between;
-            .detail {
+            .detail-wrapper {
+              flex: 1;
               margin-right: 10px;
+              height: 120px;
+              border: 1px solid #353535;
+              border-radius: 10px;
+              .poly-fee {
+                padding-left: 35px;
+                padding-top: 10px;
+                font-family: "fontRegular";
+                color: #546a6a;
+                line-height: 20px;
+                span {
+                  color: #479561;
+                  display: inline-flex;
+                  align-items: center;
+                  margin-left: 5px;
+                }
+                img {
+                  height: 14px;
+                  margin-right: 4px;
+                }
+                .address p {
+                  display: inline-flex;
+                  width: 260px;
+                }
+              }
+            }
+            .detail {
+              height: 60px;
               padding-left: 30px;
+              padding-right: 5px;
               display: flex;
               align-items: center;
               justify-content: space-between;
-              flex: 1;
               background-color: hsl(0, 0%, 16%);
               border-radius: 10px;
               .left {
@@ -224,15 +251,18 @@
                     height: 20px;
                     background: #353535;
                   }
-                  // span {
-                  //   width: 100%;
-                  //   overflow: hidden;
-                  //   text-overflow: ellipsis;
-                  // }
                 }
+              }
+              .btn-liquidity {
+                font-family: "fontMedium";
+                width: 90px;
+                height: 50px;
+                background: #2f2f3b;
+                border-radius: 6px;
               }
             }
             .receive {
+              height: 60px;
               justify-content: space-between;
               width: 150px;
               position: relative;
@@ -249,17 +279,6 @@
                 color: #546a6a;
               }
             }
-          }
-        }
-        .btn-liquidity {
-          font-family: "fontMedium";
-        }
-        .big-btn {
-          display: none;
-          margin: 40px auto 0;
-          font-size: 18px;
-          &.active {
-            display: inline-flex;
           }
         }
         .slipvalue {
