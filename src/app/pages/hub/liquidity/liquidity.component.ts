@@ -343,6 +343,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     swapApi
       .removeLiquidity(
         this.LPToken,
+        token,
         lpPayAmount.toFixed(),
         this.getFromTokenAddress(this.LPToken),
         SWAP_CONTRACT_CHAIN_ID[token.chain],

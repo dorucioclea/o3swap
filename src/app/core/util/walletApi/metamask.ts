@@ -1020,6 +1020,7 @@ export class MetaMaskWalletApiService {
 
   async removeLiquidity(
     fromToken: Token, // LP token
+    toToken: Token,
     inputAmount: string,
     address: string,
     toChainId: number,
@@ -1032,13 +1033,12 @@ export class MetaMaskWalletApiService {
       json,
       ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain]
     );
-    const usdtToken = USD_TOKENS.find((item) => item.chain === fromToken.chain);
     const bigNumberPolyFee = new BigNumber(fee).shiftedBy(18).dp(0).toFixed();
     const params = {
       fromAssetHash: this.commonService.add0xHash(fromToken.assetID),
       toPoolId: 1,
       toChainId,
-      toAssetHash: this.commonService.add0xHash(usdtToken.assetID),
+      toAssetHash: this.commonService.add0xHash(toToken.assetID),
       toAddress: address,
       amount: new BigNumber(inputAmount)
         .shiftedBy(fromToken.decimals)
@@ -1081,7 +1081,7 @@ export class MetaMaskWalletApiService {
         this.commonService.log(hash);
         this.handleTx(
           fromToken,
-          usdtToken,
+          toToken,
           inputAmount,
           receiveAmount,
           hash,
