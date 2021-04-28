@@ -176,7 +176,7 @@ export class MetaMaskWalletApiService {
           this.nzMessage.success('Connection succeeded!');
         }
         this.listenBlockNumber();
-        this.getBalance();
+        this.getBalance(chain, false);
         let dispatchAccountType;
         let dispatchWalletNameType;
         switch (chain) {
@@ -333,7 +333,7 @@ export class MetaMaskWalletApiService {
   //#endregion
 
   //#region balance
-  async getBalance(targetChain?: CHAINS): Promise<boolean> {
+  async getBalance(targetChain?, isUpdate = true): Promise<boolean> {
     this.commonService.log('getBalance-----------');
     const chainId = new BigNumber(this.ethereum.chainId, 16).toNumber();
     const chain = METAMASK_CHAIN[chainId];
@@ -350,29 +350,13 @@ export class MetaMaskWalletApiService {
         if (tempAmount) {
           result[item.assetID] = JSON.parse(JSON.stringify(item));
           result[item.assetID].amount = tempAmount;
-          let dispatchBalanceType;
-          let tempWalletName;
-          switch (chain) {
-            case 'ETH':
-              dispatchBalanceType = UPDATE_ETH_BALANCES;
-              tempWalletName = this.ethWalletName;
-              break;
-            case 'BSC':
-              dispatchBalanceType = UPDATE_BSC_BALANCES;
-              tempWalletName = this.bscWalletName;
-              break;
-            case 'HECO':
-              dispatchBalanceType = UPDATE_HECO_BALANCES;
-              tempWalletName = this.hecoWalletName;
-              break;
-          }
-          if (tempWalletName && tempWalletName === this.myWalletName) {
-            this.store.dispatch({
-              type: dispatchBalanceType,
-              data: result,
-            });
+          if (isUpdate === false) {
+            this.dispatchUpdateBalance(chain, result);
           }
         }
+      }
+      if (isUpdate === true) {
+        this.dispatchUpdateBalance(chain, result);
       }
       this.commonService.log(result);
       if (this.ethWalletName === 'MetaMask' && chain !== 'ETH') {
@@ -1207,6 +1191,30 @@ export class MetaMaskWalletApiService {
   //#endregion
 
   //#region private function
+  private dispatchUpdateBalance(chain: CHAINS, balances): void {
+    let dispatchBalanceType;
+    let tempWalletName;
+    switch (chain) {
+      case 'ETH':
+        dispatchBalanceType = UPDATE_ETH_BALANCES;
+        tempWalletName = this.ethWalletName;
+        break;
+      case 'BSC':
+        dispatchBalanceType = UPDATE_BSC_BALANCES;
+        tempWalletName = this.bscWalletName;
+        break;
+      case 'HECO':
+        dispatchBalanceType = UPDATE_HECO_BALANCES;
+        tempWalletName = this.hecoWalletName;
+        break;
+    }
+    if (tempWalletName && tempWalletName === this.myWalletName) {
+      this.store.dispatch({
+        type: dispatchBalanceType,
+        data: balances,
+      });
+    }
+  }
   private listenBlockNumber(): void {
     if (this.blockNumberInterval) {
       return;
