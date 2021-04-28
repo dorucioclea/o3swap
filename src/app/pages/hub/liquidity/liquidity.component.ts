@@ -61,6 +61,8 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   connectChainType: ConnectChainType;
   addPolyFee: string[] = [];
   removePolyFee: string[] = [];
+  showAddPolyFee: boolean[] = [false, false, false];
+  showRemovePolyFee: boolean[] = [false, false, false];
 
   swapUnScribe: Unsubscribable;
   swap$: Observable<any>;
@@ -312,8 +314,8 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     if (this.checkWalletConnect(token) === false) {
       return;
     }
-    const swapApi = this.getEthDapiService(token);
-    if (swapApi.checkNetwork(token) === false) {
+    const swapApi = this.getEthDapiService(this.LPToken);
+    if (swapApi.checkNetwork(this.LPToken) === false) {
       return;
     }
     const lpBalance = new BigNumber(this.LPToken.amount);

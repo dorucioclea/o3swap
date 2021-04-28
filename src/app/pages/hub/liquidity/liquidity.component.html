@@ -56,7 +56,7 @@
         <ul class="list-wrap">
           <ng-container *ngIf="liquidityType === 'add'">
             <li *ngFor="let tokenItem  of addLiquidityTokens; let i = index ">
-              <div class="detail-wrapper">
+              <div class="detail-wrapper" [ngClass]="{showPolyFee: showAddPolyFee[i]}">
                 <div class="detail">
                   <div class="left">
                     <div class="item-logo-box">
@@ -81,12 +81,15 @@
                       <span>Balance</span>
                       <app-long-balance [balance]="tokenItem?.amount"></app-long-balance>
                     </div>
-                  </div>
-                  <div class="btn-primary btn-liquidity" (click)="depost(tokenItem, i)">
-                    Deposit
+                    <div class="btn-primary btn-liquidity" (click)="depost(tokenItem, i)">
+                      Deposit
+                    </div>
+                    <div class="showPolyFeeArrow" (click)="showAddPolyFee[i]=!showAddPolyFee[i]">
+                      <img src="/assets/images/swap/arrow-down.png" alt="">
+                    </div>
                   </div>
                 </div>
-                <div class="poly-fee">
+                <div class="poly-fee" *ngIf="showAddPolyFee[i]">
                   <p>Poly Fee:<span *ngIf="addPolyFee[i]">{{ addPolyFee[i] }}
                       {{ SOURCE_TOKEN_SYMBOL[tokenItem?.chain] }}</span></p>
                   <div class="address">
@@ -117,7 +120,7 @@
           </ng-container>
           <ng-container *ngIf="liquidityType !== 'add'">
             <li *ngFor="let tokenItem  of addLiquidityTokens; let i = index ">
-              <div class="detail-wrapper">
+              <div class="detail-wrapper" [ngClass]="{showPolyFee: showRemovePolyFee[i]}">
                 <div class="detail">
                   <div class="left">
                     <div class="item-logo-box">
@@ -142,12 +145,15 @@
                       <span>Balance</span>
                       <app-long-balance [balance]="tokenItem?.amount"></app-long-balance>
                     </div>
-                  </div>
-                  <div class="btn-primary btn-liquidity" (click)=" withdrawal(tokenItem, i)">
-                    Withdraw
+                    <div class="btn-primary btn-liquidity" (click)=" withdrawal(tokenItem, i)">
+                      Withdraw
+                    </div>
+                    <div class="showPolyFeeArrow" (click)="showRemovePolyFee[i]=!showRemovePolyFee[i]">
+                      <img src="/assets/images/swap/arrow-down.png" alt="">
+                    </div>
                   </div>
                 </div>
-                <div class="poly-fee">
+                <div class="poly-fee" *ngIf="showRemovePolyFee[i]">
                   <p>Poly Fee:<span *ngIf="removePolyFee[i]">{{ removePolyFee[i] }} ETH</span></p>
                   <div class="address">
                     <p>From:

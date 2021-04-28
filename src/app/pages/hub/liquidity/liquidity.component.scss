@@ -132,11 +132,19 @@
             display: flex;
             justify-content: space-between;
             .detail-wrapper {
-              flex: 1;
+              width: calc(100% - 190px);
               margin-right: 10px;
-              height: 120px;
-              border: 1px solid #353535;
               border-radius: 10px;
+              height: 60px;
+              transition: all 0.3s;
+              border: 1px solid transparent;
+              &.showPolyFee {
+                border: 1px solid #353535;
+                height: 120px;
+                .detail .showPolyFeeArrow img {
+                  transform: rotate(180deg);
+                }
+              }
               .poly-fee {
                 padding-left: 35px;
                 padding-top: 10px;
@@ -191,11 +199,11 @@
                 }
               }
               .right {
+                align-items: center;
                 display: flex;
                 font-size: 14px;
                 color: #8aa1a1;
                 .input-container {
-                  width: 300px;
                   height: 36px;
                   border-radius: 10px;
                   font-size: 20px;
@@ -238,7 +246,7 @@
                   position: relative;
                   display: flex;
                   flex-direction: column;
-                  align-items: center;
+                  padding-left: 20px;
                   color: #8aa1a1;
                   line-height: 18px;
                   &:before {
@@ -252,25 +260,42 @@
                     background: #353535;
                   }
                 }
-              }
-              .btn-liquidity {
-                font-family: "fontMedium";
-                width: 90px;
-                height: 50px;
-                background: #2f2f3b;
-                border-radius: 6px;
+                .btn-liquidity {
+                  font-family: "fontMedium";
+                  width: 90px;
+                  height: 50px;
+                  background: #2f2f3b;
+                  border-radius: 6px;
+                }
+                .showPolyFeeArrow {
+                  width: 25px;
+                  height: 50px;
+                  background: #303030;
+                  border-radius: 6px;
+                  margin-left: 5px;
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  cursor: pointer;
+                  &:hover {
+                    background: #353535;
+                  }
+                  img {
+                    width: 11px;
+                    transition: transform 0.3s;
+                  }
+                }
               }
             }
             .receive {
               height: 60px;
               justify-content: space-between;
-              width: 150px;
+              width: 180px;
               position: relative;
               display: flex;
               flex-direction: column;
-              align-items: center;
+              padding-left: 20px;
               color: #546a6a;
-              margin-right: 10px;
               padding-top: 15px;
               padding-bottom: 15px;
               background: #252525;
