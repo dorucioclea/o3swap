@@ -127,7 +127,8 @@ export class O3EthWalletApiService {
           this.accountAddress[chain] = response[0].address;
         }
         this.walletName[chain] = this.myWalletName;
-        this.getBalance(chain as CHAINS);
+        this.listenBlockNumber();
+        this.getBalance(chain as CHAINS, false);
         let dispatchAccountType;
         let dispatchWalletNameType;
         switch (chain) {
@@ -186,7 +187,6 @@ export class O3EthWalletApiService {
       if (isUpdate === true) {
         this.dispatchUpdateBalance(chain, result);
       }
-      this.commonService.log(result);
       resolve(true);
     });
   }

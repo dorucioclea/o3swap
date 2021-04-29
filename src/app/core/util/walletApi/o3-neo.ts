@@ -39,8 +39,10 @@ export class O3NeoWalletApiService {
   swap$: Observable<any>;
   transaction: SwapTransaction;
   neoAccountAddress: string;
+  neoWalletName: string;
 
   listerTxinterval: Unsubscribable;
+  blockNumberInterval: Unsubscribable;
 
   constructor(
     private store: Store<State>,
@@ -58,9 +60,11 @@ export class O3NeoWalletApiService {
     this.swap$.subscribe((state) => {
       this.transaction = Object.assign({}, state.transaction);
       this.neoAccountAddress = state.neoAccountAddress;
+      this.neoWalletName = state.neoWalletName;
     });
   }
 
+  //#region connect
   init(): void {
     const localTxString = localStorage.getItem('transaction');
     if (localTxString === null || localTxString === undefined) {
@@ -101,12 +105,14 @@ export class O3NeoWalletApiService {
           data: this.walletName,
         });
         this.getBalances();
+        this.listenBlockNumber();
         return this.neoAccountAddress;
       })
       .catch((error) => {
         this.swapService.handleNeoDapiError(error, 'O3');
       });
   }
+  //#endregion
 
   //#region NEO nNEO swap
   async mintNNeo(
@@ -209,6 +215,7 @@ export class O3NeoWalletApiService {
   }
   //#endregion
 
+  //#region swap
   async swap(
     fromToken: Token,
     toToken: Token,
@@ -378,6 +385,7 @@ export class O3NeoWalletApiService {
         this.swapService.handleNeoDapiError(error, 'O3');
       });
   }
+  //#endregion
 
   //#region private function
   private listerTxReceipt(tx: SwapTransaction): void {
@@ -410,6 +418,19 @@ export class O3NeoWalletApiService {
     }
     this.listerTxinterval = interval(5000).subscribe(() => {
       getTx();
+    });
+  }
+
+  private listenBlockNumber(): void {
+    if (this.blockNumberInterval) {
+      return;
+    }
+    this.blockNumberInterval = interval(15000).subscribe(() => {
+      this.getBalances();
+      // 没有连接时不获取 balances
+      if (this.neoWalletName !== 'NeoLine') {
+        this.blockNumberInterval.unsubscribe();
+      }
     });
   }
 

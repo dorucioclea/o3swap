@@ -43,6 +43,7 @@ export class NeolineWalletApiService {
 
   neolineDapi;
   listerTxinterval: Unsubscribable;
+  blockNumberInterval: Unsubscribable;
 
   constructor(
     private store: Store<State>,
@@ -111,6 +112,7 @@ export class NeolineWalletApiService {
         });
         this.addListener();
         this.getBalances();
+        this.listenBlockNumber();
         return this.neoAccountAddress;
       })
       .catch((error) => {
@@ -228,6 +230,7 @@ export class NeolineWalletApiService {
   }
   //#endregion
 
+  //#region swap
   async swap(
     fromToken: Token,
     toToken: Token,
@@ -404,6 +407,7 @@ export class NeolineWalletApiService {
         this.swapService.handleNeoDapiError(error, 'NeoLine');
       });
   }
+  //#endregion
 
   //#region private function
   handleLocalTx(localTxString: string): void {
@@ -422,6 +426,19 @@ export class NeolineWalletApiService {
     this.listerTxReceipt(localTx);
   }
 
+  private listenBlockNumber(): void {
+    if (this.blockNumberInterval) {
+      return;
+    }
+    this.blockNumberInterval = interval(15000).subscribe(() => {
+      this.getBalances();
+      // 没有连接时不获取 balances
+      if (this.neoWalletName !== 'NeoLine') {
+        this.blockNumberInterval.unsubscribe();
+      }
+    });
+  }
+
   private getBalances(
     fromTokenAssetId?: string,
     inputAmount?: string
@@ -432,7 +449,6 @@ export class NeolineWalletApiService {
     return this.rpcApiService
       .getNeoLineTokenBalance(this.neoAccountAddress)
       .then((addressTokens) => {
-        console.log(addressTokens);
         this.store.dispatch({
           type: UPDATE_NEO_BALANCES,
           data: addressTokens,

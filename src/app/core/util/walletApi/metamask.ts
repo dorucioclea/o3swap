@@ -350,7 +350,6 @@ export class MetaMaskWalletApiService {
       if (isUpdate === true) {
         this.dispatchUpdateBalance(chain, result);
       }
-      this.commonService.log(result);
       resolve(true);
     });
   }
