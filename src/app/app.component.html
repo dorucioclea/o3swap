@@ -15,7 +15,7 @@
           <a routerLink="/hub">Hub</a>
         </li>
         <li [ngClass]="{active: currentPage==='/vault'}">
-          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Vault</a>
+          <a routerLink="/vault">Vault</a>
         </li>
         <li class="add-width">
           <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Dashboard</a>
@@ -44,10 +44,7 @@
           <a routerLink="/hub">Hub</a>
         </li>
         <li [ngClass]="{active: currentPage==='/vault'}">
-          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="right"
-            [nzTooltipOrigin]="button1.elementRef">
-            <span nz-element #button1="nzElement">Vault</span>
-          </a>
+          <a routerLink="/vault">Vault</a>
         </li>
         <li>
           <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="right"

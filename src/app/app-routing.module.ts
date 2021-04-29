@@ -14,7 +14,7 @@ const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'home', component: HomeComponent },
   { path: 'swap', component: SwapComponent },
-  // { path: 'vault', component: VaultComponent },
+  { path: 'vault', component: VaultComponent },
   { path: 'hub', component: HubComponent },
   { path: 'hub/liquidity/:type', component: LiquidityComponent },
   { path: 'hub/legacy-liquidity/remove', component: LegacyLiquidityComponent },
