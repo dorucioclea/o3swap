@@ -8,7 +8,7 @@ import { VaultStakeComponent } from '@shared';
 @Component({
   selector: 'app-vault',
   templateUrl: './vault.component.html',
-  styleUrls: ['./vault.component.scss'],
+  styleUrls: ['./vault.component.scss', './mobile.scss'],
 })
 export class VaultComponent implements OnInit {
   constructor(
