@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ApiService } from '@core';
-import { ChainTokens, Token, USD_TOKENS } from '@lib';
+import { INIT_CHAIN_TOKENS, Token, USD_TOKENS } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Unsubscribable, Observable } from 'rxjs';
@@ -27,7 +27,7 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   tokensUnScribe: Unsubscribable;
   tokens$: Observable<any>;
-  chainTokens: any = new ChainTokens();
+  chainTokens = INIT_CHAIN_TOKENS;
 
   swapUnScribe: Unsubscribable;
   swap$: Observable<any>;
@@ -40,26 +40,58 @@ export class SwapComponent implements OnInit, OnDestroy {
   ) {
     this.tokens$ = store.select('tokens');
     this.swap$ = store.select('swap');
+  }
+
+  async ngOnInit(): Promise<void> {
     this.tokensUnScribe = this.tokens$.subscribe((state) => {
       this.chainTokens = state.chainTokens;
+      if (this.chainTokens.ETH.length > 0) {
+        this.handleFromToken();
+      }
     });
     this.swapUnScribe = this.swap$.subscribe((state) => {
       this.walletName.ETH = state.ethWalletName;
       this.walletName.BSC = state.bscWalletName;
       this.walletName.HECO = state.hecoWalletName;
       this.walletName.NEO = state.neoWalletName;
+      this.handleFromToken();
     });
   }
 
-  async ngOnInit(): Promise<void> {
-    await this.apiService.getTokens();
-    if (this.walletName.ETH && this.chainTokens.ETH.length > 0) {
+  handleFromToken(): void {
+    const fromTokenStr = JSON.stringify(this.fromToken);
+    let ethTokenStr: string;
+    let bscTokenStr: string;
+    let hecoTokenStr: string;
+    let neoTokenStr: string;
+    if (this.walletName.ETH) {
+      ethTokenStr = JSON.stringify(this.chainTokens.ETH[0]);
+      if (fromTokenStr === ethTokenStr) {
+        return;
+      }
+    } else if (this.walletName.BSC) {
+      bscTokenStr = JSON.stringify(this.chainTokens.BSC[0]);
+      if (fromTokenStr === bscTokenStr) {
+        return;
+      }
+    } else if (this.walletName.HECO) {
+      hecoTokenStr = JSON.stringify(this.chainTokens.HECO[0]);
+      if (fromTokenStr === hecoTokenStr) {
+        return;
+      }
+    } else if (this.walletName.NEO) {
+      neoTokenStr = JSON.stringify(this.chainTokens.NEO[0]);
+      if (fromTokenStr === neoTokenStr) {
+        return;
+      }
+    }
+    if (this.walletName.ETH) {
       this.fromToken = Object.assign({}, this.chainTokens.ETH[0]);
-    } else if (this.walletName.BSC && this.chainTokens.BSC.length > 0) {
+    } else if (this.walletName.BSC) {
       this.fromToken = Object.assign({}, this.chainTokens.BSC[0]);
-    } else if (this.walletName.HECO && this.chainTokens.HECO.length > 0) {
+    } else if (this.walletName.HECO) {
       this.fromToken = Object.assign({}, this.chainTokens.HECO[0]);
-    } else if (this.walletName.NEO && this.chainTokens.NEO.length > 0) {
+    } else if (this.walletName.NEO) {
       this.fromToken = Object.assign({}, this.chainTokens.NEO[0]);
     } else {
       this.fromToken = USD_TOKENS[0];

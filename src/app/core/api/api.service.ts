@@ -26,7 +26,7 @@ import {
   WETH_ASSET_HASH,
   LP_TOKENS,
   UPDATE_CHAIN_TOKENS,
-  ChainTokens,
+  INIT_CHAIN_TOKENS,
   NEO_TOKEN,
   CHAINS,
   UPDATE_RATES,
@@ -47,7 +47,7 @@ export class ApiService {
   RATE_HOST = 'https://hub.o3.network/v1';
 
   tokens$: Observable<any>;
-  chainTokens = new ChainTokens();
+  chainTokens = INIT_CHAIN_TOKENS;
 
   constructor(
     private http: HttpClient,

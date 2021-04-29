@@ -10,7 +10,7 @@ import {
   CHAINS,
   NNEO_TOKEN,
   USD_TOKENS,
-  ChainTokens,
+  INIT_CHAIN_TOKENS,
   NEO_TOKEN,
 } from '@lib';
 import { Token } from '@lib';
@@ -45,7 +45,7 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
 
   tokensUnScribe: Unsubscribable;
   tokens$: Observable<any>;
-  chainTokens = new ChainTokens();
+  chainTokens = INIT_CHAIN_TOKENS;
 
   chain: CHAINS = 'ETH';
   allTokens: Token[] = []; // 所有的 tokens, 排除了 fromToken 或 toToken

@@ -15,7 +15,7 @@ import {
   ConnectChainType,
   ETH_SOURCE_ASSET_HASH,
   CONST_BRIDGE_TOKENS,
-  ChainTokens,
+  INIT_CHAIN_TOKENS,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -61,7 +61,7 @@ export class HubComponent implements OnInit, OnDestroy {
 
   tokensUnScribe: Unsubscribable;
   tokens$: Observable<any>;
-  chainTokens = new ChainTokens();
+  chainTokens = INIT_CHAIN_TOKENS;
 
   ratesUnScribe: Unsubscribable;
   rates$: Observable<any>;

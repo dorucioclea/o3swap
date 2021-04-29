@@ -6,7 +6,6 @@ import { ETH, BSC, HECO } from 'o3-dapi-eth';
 import { CommonService } from '../common.service';
 import { SwapService } from '../swap.service';
 import {
-  NeoWalletName,
   UPDATE_ETH_ACCOUNT,
   UPDATE_ETH_WALLET_NAME,
   SwapStateType,
@@ -34,7 +33,7 @@ import {
   AssetQueryResponseItem,
   BRIDGE_SLIPVALUE,
   O3_AGGREGATOR_SLIPVALUE,
-  ChainTokens,
+  INIT_CHAIN_TOKENS,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { Unsubscribable, Observable, of, interval } from 'rxjs';
@@ -62,7 +61,7 @@ export class O3EthWalletApiService {
   liquidityTransaction: SwapTransaction;
 
   tokens$: Observable<any>;
-  chainTokens = new ChainTokens();
+  chainTokens = INIT_CHAIN_TOKENS;
 
   isConnected: boolean;
   web3 = new Web3();

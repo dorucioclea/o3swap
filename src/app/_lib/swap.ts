@@ -43,10 +43,10 @@ export interface SwapStateType {
 
 export type TxAtPage = 'swap' | 'bridge' | 'liquidity';
 
-export class ChainTokens {
-  ETH: [];
-  NEO: [];
-  BSC: [];
-  HECO: [];
-  ALL: [];
-}
+export const INIT_CHAIN_TOKENS = {
+  ETH: [],
+  NEO: [],
+  BSC: [],
+  HECO: [],
+  ALL: [],
+};

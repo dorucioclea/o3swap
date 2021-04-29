@@ -1,7 +1,7 @@
-import { ChainTokens, UPDATE_CHAIN_TOKENS } from '@lib';
+import { INIT_CHAIN_TOKENS, UPDATE_CHAIN_TOKENS } from '@lib';
 
 const initialState = {
-  chainTokens: new ChainTokens(),
+  chainTokens: INIT_CHAIN_TOKENS,
 };
 
 export default function tokens(state = initialState, action): any {

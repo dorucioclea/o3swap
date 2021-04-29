@@ -29,7 +29,7 @@ import {
   WETH_ASSET_HASH,
   AGGREGATOR_CONTRACT,
   CHAINS,
-  ChainTokens,
+  INIT_CHAIN_TOKENS,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import BigNumber from 'bignumber.js';
@@ -65,7 +65,7 @@ export class MetaMaskWalletApiService {
   liquidityTransaction: SwapTransaction;
 
   tokens$: Observable<any>;
-  chainTokens = new ChainTokens();
+  chainTokens = INIT_CHAIN_TOKENS;
 
   ethereum;
   web3: Web3;
