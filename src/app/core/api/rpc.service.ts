@@ -23,7 +23,7 @@ import { BigNumber } from 'bignumber.js';
 @Injectable()
 export class RpcApiService {
   apiDo = environment.apiDomain;
-  headers = { Network: NETWORK.toLowerCase(), Connection: 'keep-alive' };
+  headers = { Network: NETWORK.toLowerCase() };
 
   constructor(private http: HttpClient, private commonService: CommonService) {}
 
@@ -70,9 +70,7 @@ export class RpcApiService {
       .post(
         `${NEOLINE_TX_HOST}/v1/neo2/address/balances`,
         { params: [{ address }] },
-        {
-          headers: this.headers,
-        }
+        { headers: this.headers }
       )
       .pipe(
         map((res: CommonHttpResponse) => {
