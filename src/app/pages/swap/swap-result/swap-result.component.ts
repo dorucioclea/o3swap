@@ -37,7 +37,7 @@ import { interval, Observable, timer, Unsubscribable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { ApproveComponent, SwapExchangeComponent } from '@shared';
-import { take } from 'rxjs/operators';
+import { take, timeout } from 'rxjs/operators';
 
 interface State {
   swap: SwapStateType;
@@ -105,6 +105,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   toAddress: string;
   showConnectWallet = false;
   connectChainType: ConnectChainType;
+  isSwapCanClick = true;
 
   constructor(
     public store: Store<State>,
@@ -262,6 +263,14 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     }
     if (this.inquiryInterval) {
       this.inquiryInterval.unsubscribe();
+    }
+    if (this.isSwapCanClick) {
+      this.isSwapCanClick = false;
+      setTimeout(() => {
+        this.isSwapCanClick = true;
+      }, 1000);
+    } else {
+      return;
     }
     // neo 同链
     if (this.fromToken.chain === 'NEO' && this.toToken.chain === 'NEO') {
