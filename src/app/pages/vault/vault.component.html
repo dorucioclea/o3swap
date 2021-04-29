@@ -15,7 +15,8 @@
         <div class="group-title">To be unlocked</div>
         <div class="group-content">9.31673761 O3</div>
         <div class="group-icon">
-          <img nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="right" src="/assets/images/dashboard/doubt.png" alt="">
+          <img nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="right"
+            src="/assets/images/dashboard/doubt.png" alt="">
         </div>
       </div>
     </div>
@@ -24,47 +25,55 @@
         <div class="list-head">
           <div class="list-head-title">Unlock zone</div>
           <div class="list-head-right">
-            <div class="name">Unlocked amount: </div>
-            9.31673761 O3
-            <div class="name">Speed value: </div>
-            8.60
+            <p>
+              <span class="name">Unlocked amount:</span>
+              &nbsp;
+              <span class="value">9.31673761 O3</span>
+            </p>
+            <p>
+              <span class="name">Speed value: </span>
+              &nbsp;
+              <span class="value">8.60</span>
+            </p>
           </div>
         </div>
         <div class="tran-list">
-          <div class="row-head">
-            <div class="col"></div>
-            <div class="col">Name</div>
-            <div class="col">Staked</div>
-            <div class="col">Remaining</div>
-            <div class="col">Release value</div>
-            <div class="col">APY%</div>
-            <div class="col"></div>
-            <div class="col"></div>
-          </div>
-          <div class="warpper">
-            <div class="row">
-              <div class="col"><img class="token-img" src="" alt=""></div>
-              <div class="col">Name</div>
-              <div class="col">Staked</div>
-              <div class="col">Remaining</div>
-              <div class="col">Release value</div>
-              <div class="col">APY%</div>
-              <div class="col">
-                <div class="btn-primary">
-                  Stake
-                </div>
-              </div>
-              <div class="col">
-                <div class="btn-primary unstake-btn">
-                  Unstake
-                </div>
-              </div>
-            </div>
-          </div>
+          <nz-table class="unlock-zone" nzAlign="center" nzTemplateMode [nzScroll]="{ x: '1200px', y: '500px' }">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Staked</th>
+                <th>Remaining</th>
+                <th>Release value</th>
+                <th>APY%</th>
+                <th nzRight></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><img class="token-img" src="" alt=""></td>
+                <td>Name</td>
+                <td>Staked</td>
+                <td>Remaining</td>
+                <td>Release value</td>
+                <td>APY%</td>
+                <td nzRight >
+                  <button class="btn-primary">
+                    Stake
+                  </button>
+                  <button class="btn-primary unstake-btn">
+                    Unstake
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </nz-table>
         </div>
       </div>
     </div>
-    <div class="item-container row-2">
+
+    <div class="item-container row-3">
       <div class="left">
         <div class="title">
           <div class="name">
@@ -76,8 +85,8 @@
             <div class="item-group-title">
               <div class="token"><img src="" alt="">pnUNI_V2_ETH_WBTC</div>
               <div class="right">
-                <div class="btn-primary" (click)="showStake()">Stake</div>
-                <div class="btn-primary unstake-btn">Unstake</div>
+                <button class="btn-primary" (click)="showStake()">Stake</button>
+                <button class="btn-primary unstake-btn">Unstake</button>
               </div>
             </div>
             <div class="detail-item">

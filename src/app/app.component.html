@@ -71,8 +71,10 @@
   </header>
   <div class="risk-tip" *ngIf="showRisk && !isHome">
     <img src="/assets/images/risk-icon.png" alt="">
-    O3 Swap is currently in the testing phase. The testing amount is limited to below $20 in USD. Back up your private
-    keys securely and trade at your own risk.
+    <div class="risk-tip-text-box">
+      <span class="risk-tip-text">O3 Swap is currently in the testing phase. The testing amount is limited to below $20 in USD. Back up your private
+        keys securely and trade at your own risk.</span>
+    </div>
     <img (click)="closeRisk()" class="close" src="/assets/images/close-risk.png" alt="">
   </div>
   <router-outlet></router-outlet>

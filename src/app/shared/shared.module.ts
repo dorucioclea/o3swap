@@ -37,6 +37,7 @@ import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzElementPatchModule } from 'ng-zorro-antd/core/element-patch';
 import { LottieModule } from 'ngx-lottie';
 import { NgxEchartsModule } from 'ngx-echarts';
+import { NzTableModule } from 'ng-zorro-antd/table';
 
 const COMPONENTS = [
   LoadingComponent,
@@ -68,6 +69,7 @@ const THIRD_MODULES = [
   LottieModule,
   NgxEchartsModule,
   NzElementPatchModule,
+  NzTableModule,
 ];
 
 @NgModule({

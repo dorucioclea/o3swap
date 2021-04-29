@@ -114,3 +114,11 @@ input[type="number"] {
 .scroll::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+@media screen and (max-width: 800px) {
+  html, body {
+    height: 100%;
+    width: 100%;
+    min-width: 100%;
+  }
+}
