@@ -54,48 +54,26 @@ export class SwapComponent implements OnInit, OnDestroy {
       this.walletName.BSC = state.bscWalletName;
       this.walletName.HECO = state.hecoWalletName;
       this.walletName.NEO = state.neoWalletName;
-      this.handleFromToken();
     });
   }
 
   handleFromToken(): void {
-    const fromTokenStr = JSON.stringify(this.fromToken);
-    let ethTokenStr: string;
-    let bscTokenStr: string;
-    let hecoTokenStr: string;
-    let neoTokenStr: string;
-    if (this.walletName.ETH) {
-      ethTokenStr = JSON.stringify(this.chainTokens.ETH[0]);
-      if (fromTokenStr === ethTokenStr) {
+    setTimeout(() => {
+      if (this.fromToken) {
         return;
       }
-    } else if (this.walletName.BSC) {
-      bscTokenStr = JSON.stringify(this.chainTokens.BSC[0]);
-      if (fromTokenStr === bscTokenStr) {
-        return;
+      if (this.walletName.ETH) {
+        this.fromToken = Object.assign({}, this.chainTokens.ETH[0]);
+      } else if (this.walletName.BSC) {
+        this.fromToken = Object.assign({}, this.chainTokens.BSC[0]);
+      } else if (this.walletName.HECO) {
+        this.fromToken = Object.assign({}, this.chainTokens.HECO[0]);
+      } else if (this.walletName.NEO) {
+        this.fromToken = Object.assign({}, this.chainTokens.NEO[0]);
+      } else {
+        this.fromToken = USD_TOKENS[0];
       }
-    } else if (this.walletName.HECO) {
-      hecoTokenStr = JSON.stringify(this.chainTokens.HECO[0]);
-      if (fromTokenStr === hecoTokenStr) {
-        return;
-      }
-    } else if (this.walletName.NEO) {
-      neoTokenStr = JSON.stringify(this.chainTokens.NEO[0]);
-      if (fromTokenStr === neoTokenStr) {
-        return;
-      }
-    }
-    if (this.walletName.ETH) {
-      this.fromToken = Object.assign({}, this.chainTokens.ETH[0]);
-    } else if (this.walletName.BSC) {
-      this.fromToken = Object.assign({}, this.chainTokens.BSC[0]);
-    } else if (this.walletName.HECO) {
-      this.fromToken = Object.assign({}, this.chainTokens.HECO[0]);
-    } else if (this.walletName.NEO) {
-      this.fromToken = Object.assign({}, this.chainTokens.NEO[0]);
-    } else {
-      this.fromToken = USD_TOKENS[0];
-    }
+    }, 1000);
   }
 
   ngOnDestroy(): void {

@@ -292,14 +292,16 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         this.fromToken.assetID === ETH_SOURCE_ASSET_HASH &&
         this.toToken.assetID === WETH_ASSET_HASH[this.toToken.chain].assetID
       ) {
-        return this.depositWEth();
+        this.depositWEth();
+        return;
       }
       if (
         this.fromToken.assetID ===
           WETH_ASSET_HASH[this.fromToken.chain].assetID &&
         this.toToken.assetID === ETH_SOURCE_ASSET_HASH
       ) {
-        return this.withdrawalWeth();
+        this.withdrawalWeth();
+        return;
       }
       if (this.toToken.assetID === ETH_SOURCE_ASSET_HASH) {
         this.swapExactTokensForETH();
