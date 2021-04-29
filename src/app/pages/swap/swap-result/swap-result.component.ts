@@ -268,7 +268,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       this.isSwapCanClick = false;
       setTimeout(() => {
         this.isSwapCanClick = true;
-      }, 1000);
+      }, 2000);
     } else {
       return;
     }
