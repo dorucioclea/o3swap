@@ -3,7 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { Observable } from 'rxjs';
 import {
-  NEO_TX_HOST,
+  NEOLINE_TX_HOST,
+  O3_TX_HOST,
   ETH_RPC_HOST,
   BSC_RPC_HOST,
   HECO_RPC_HOST,
@@ -22,30 +23,73 @@ import { BigNumber } from 'bignumber.js';
 @Injectable()
 export class RpcApiService {
   apiDo = environment.apiDomain;
+  headers = { Network: NETWORK.toLowerCase(), Connection: 'keep-alive' };
 
   constructor(private http: HttpClient, private commonService: CommonService) {}
 
-  getNeoTxByHash(txHash: string): Promise<any> {
-    if (NETWORK === 'TestNet') {
-      return this.getNeoTxByHashTestnet(txHash);
-    }
-    return rpc.Query.getRawTransaction(this.commonService.add0xHash(txHash))
-      .execute(NEO_TX_HOST)
-      .then((res) => res.result);
-  }
-
-  getNeoTxByHashTestnet(txHash: string): Promise<any> {
-    txHash = this.commonService.add0xHash(txHash);
+  //#region balances
+  getO3TokenBalance(address: string): Promise<any> {
     return this.http
-      .get(`${NEO_TX_HOST}/v1/neo2/transaction/${txHash}`, {
-        headers: { Network: NETWORK.toLowerCase() },
+      .get(`${O3_TX_HOST}/v1/neo2/address/assets?address=${address}`, {
+        headers: this.headers,
       })
       .pipe(
         map((res: CommonHttpResponse) => {
           if (res.status === 'success') {
-            return res.data;
+            const { nep5, asset } = res.data;
+            const targetRes = {};
+            if (nep5) {
+              nep5.forEach(({ asset_id, symbol, balance }) => {
+                targetRes[asset_id] = {
+                  assetID: asset_id,
+                  symbol,
+                  amount: new BigNumber(balance).toFixed(),
+                };
+              });
+            }
+            if (asset) {
+              asset.forEach(({ asset_id, symbol, balance }) => {
+                targetRes[asset_id] = {
+                  assetID: asset_id,
+                  symbol,
+                  amount: balance,
+                };
+              });
+            }
+            return targetRes;
           } else {
-            return null;
+            return {};
+          }
+        })
+      )
+      .toPromise();
+  }
+
+  getNeoLineTokenBalance(address: string): Promise<any> {
+    return this.http
+      .post(
+        `${NEOLINE_TX_HOST}/v1/neo2/address/balances`,
+        { params: [{ address }] },
+        {
+          headers: this.headers,
+        }
+      )
+      .pipe(
+        map((res: CommonHttpResponse) => {
+          if (res.status === 'success' && res.data) {
+            const targetRes = {};
+            if (res.data[address]) {
+              res.data[address].forEach(({ asset_id, symbol, amount }) => {
+                targetRes[asset_id] = {
+                  assetID: asset_id,
+                  symbol,
+                  amount,
+                };
+              });
+            }
+            return targetRes;
+          } else {
+            return {};
           }
         })
       )
@@ -78,6 +122,46 @@ export class RpcApiService {
       )
       .toPromise();
   }
+  //#endregion
+
+  //#region transaction
+  getNeoLineTxByHash(txHash: string): Promise<any> {
+    txHash = this.commonService.add0xHash(txHash);
+    return this.http
+      .get(`${NEOLINE_TX_HOST}/v1/neo2/transaction/${txHash}`, {
+        headers: this.headers,
+      })
+      .pipe(
+        map((res: CommonHttpResponse) => {
+          if (res.status === 'success') {
+            return res.data;
+          } else {
+            return null;
+          }
+        })
+      )
+      .toPromise();
+  }
+
+  getO3TxByHash(txHash: string): Promise<any> {
+    txHash = this.commonService.add0xHash(txHash);
+    return this.http
+      .post(
+        `${O3_TX_HOST}/v1/neo2/txids_valid`,
+        { txids: [txHash] },
+        { headers: this.headers }
+      )
+      .pipe(
+        map((res: CommonHttpResponse) => {
+          if (res.status === 'success' && res.data) {
+            return res.data[0];
+          } else {
+            return null;
+          }
+        })
+      )
+      .toPromise();
+  }
 
   getEthTxReceipt(txHash: string, chain: CHAINS): Observable<any> {
     return this.http
@@ -95,6 +179,7 @@ export class RpcApiService {
         })
       );
   }
+  //#endregion
 
   private getEthRpcHost(chain: CHAINS): string {
     switch (chain) {

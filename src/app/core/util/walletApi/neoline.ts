@@ -34,10 +34,10 @@ interface State {
 @Injectable()
 export class NeolineWalletApiService {
   myWalletName: NeoWalletName = 'NeoLine';
-  accountAddress: string;
 
   swap$: Observable<any>;
   neoWalletName: NeoWalletName;
+  neoAccountAddress: string;
   transaction: SwapTransaction;
   neolineNetwork: Network;
 
@@ -55,6 +55,7 @@ export class NeolineWalletApiService {
     this.swap$ = store.select('swap');
     this.swap$.subscribe((state) => {
       this.neoWalletName = state.neoWalletName;
+      this.neoAccountAddress = state.neoAccountAddress;
       this.transaction = Object.assign({}, state.transaction);
       this.neolineNetwork = state.neolineNetwork;
     });
@@ -99,10 +100,10 @@ export class NeolineWalletApiService {
           this.nzMessage.success('Connection succeeded!');
         }
         this.commonService.log(result);
-        this.accountAddress = result.address;
+        this.neoAccountAddress = result.address;
         this.store.dispatch({
           type: UPDATE_NEO_ACCOUNT,
-          data: this.accountAddress,
+          data: this.neoAccountAddress,
         });
         this.store.dispatch({
           type: UPDATE_NEO_WALLET_NAME,
@@ -110,7 +111,7 @@ export class NeolineWalletApiService {
         });
         this.addListener();
         this.getBalances();
-        return this.accountAddress;
+        return this.neoAccountAddress;
       })
       .catch((error) => {
         this.swapService.handleNeoDapiError(error, 'NeoLine');
@@ -252,7 +253,7 @@ export class NeolineWalletApiService {
     const args = [
       {
         type: 'Address',
-        value: this.accountAddress,
+        value: this.neoAccountAddress,
       },
       {
         type: 'Integer',
@@ -330,7 +331,7 @@ export class NeolineWalletApiService {
     const args = [
       {
         type: 'Address',
-        value: this.accountAddress,
+        value: this.neoAccountAddress,
       },
       {
         type: 'Integer',
@@ -425,24 +426,20 @@ export class NeolineWalletApiService {
     fromTokenAssetId?: string,
     inputAmount?: string
   ): Promise<boolean> {
-    return this.neolineDapi
-      .getBalance({
-        params: [{ address: this.accountAddress }],
-        network: NETWORK,
-      })
-      .then((addressTokens: any[]) => {
-        const tokens = addressTokens[this.accountAddress];
-        const tempTokenBalance = {};
-        tokens.forEach((tokenItem: any) => {
-          tempTokenBalance[tokenItem.asset_id || tokenItem.assetID] = tokenItem;
-        });
+    if (!this.neolineDapi) {
+      return;
+    }
+    return this.rpcApiService
+      .getNeoLineTokenBalance(this.neoAccountAddress)
+      .then((addressTokens) => {
+        console.log(addressTokens);
         this.store.dispatch({
           type: UPDATE_NEO_BALANCES,
-          data: tempTokenBalance,
+          data: addressTokens,
         });
         if (
-          tempTokenBalance[fromTokenAssetId] &&
-          new BigNumber(tempTokenBalance[fromTokenAssetId].amount).comparedTo(
+          addressTokens[fromTokenAssetId] &&
+          new BigNumber(addressTokens[fromTokenAssetId].amount).comparedTo(
             new BigNumber(inputAmount)
           ) >= 0
         ) {
@@ -450,9 +447,6 @@ export class NeolineWalletApiService {
         } else {
           return false;
         }
-      })
-      .catch((error) => {
-        this.commonService.log(error);
       });
   }
 
@@ -502,7 +496,7 @@ export class NeolineWalletApiService {
   private listerTxReceipt(tx: SwapTransaction): void {
     const getTx = () => {
       this.rpcApiService
-        .getNeoTxByHash(tx.txid)
+        .getNeoLineTxByHash(tx.txid)
         .then((result) => {
           if (
             this.commonService.add0xHash(result.txid) ===
@@ -536,10 +530,10 @@ export class NeolineWalletApiService {
     window.addEventListener(
       'NEOLine.NEO.EVENT.ACCOUNT_CHANGED',
       (result: any) => {
-        this.accountAddress = result.detail.address;
+        this.neoAccountAddress = result.detail.address;
         this.store.dispatch({
           type: UPDATE_NEO_ACCOUNT,
-          data: this.accountAddress,
+          data: this.neoAccountAddress,
         });
         if (this.neoWalletName === this.myWalletName) {
           this.getBalances();

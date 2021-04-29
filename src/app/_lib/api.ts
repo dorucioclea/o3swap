@@ -31,10 +31,8 @@ if (environment.testSite) {
 
 export const INQUIRY_HOST = inquiryHost;
 
-export const NEO_TX_HOST =
-  NETWORK === 'MainNet'
-    ? 'https://neo2-mainnet.o3node.org'
-    : 'https://api.neoline.io';
+export const NEOLINE_TX_HOST = 'https://api.neoline.io';
+export const O3_TX_HOST = 'https://hub.o3.network';
 
 export const ETH_RPC_HOST =
   NETWORK === 'MainNet'

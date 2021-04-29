@@ -173,7 +173,7 @@ export class MetaMaskWalletApiService {
         if (showMessage) {
           this.nzMessage.success('Connection succeeded!');
         }
-        // this.listenBlockNumber();
+        this.listenBlockNumber();
         this.getBalance(chain as CHAINS, false);
         let dispatchAccountType;
         let dispatchWalletNameType;

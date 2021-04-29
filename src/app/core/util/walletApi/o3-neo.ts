@@ -34,11 +34,11 @@ interface State {
 @Injectable()
 export class O3NeoWalletApiService {
   walletName: NeoWalletName = 'O3';
-  accountAddress: string;
   o3DapiIsReady = false;
 
   swap$: Observable<any>;
   transaction: SwapTransaction;
+  neoAccountAddress: string;
 
   listerTxinterval: Unsubscribable;
 
@@ -57,6 +57,7 @@ export class O3NeoWalletApiService {
     this.swap$ = store.select('swap');
     this.swap$.subscribe((state) => {
       this.transaction = Object.assign({}, state.transaction);
+      this.neoAccountAddress = state.neoAccountAddress;
     });
   }
 
@@ -90,17 +91,17 @@ export class O3NeoWalletApiService {
           return;
         }
         this.nzMessage.success('Connection succeeded!');
-        this.accountAddress = result.address;
+        this.neoAccountAddress = result.address;
         this.store.dispatch({
           type: UPDATE_NEO_ACCOUNT,
-          data: this.accountAddress,
+          data: this.neoAccountAddress,
         });
         this.store.dispatch({
           type: UPDATE_NEO_WALLET_NAME,
           data: this.walletName,
         });
         this.getBalances();
-        return this.accountAddress;
+        return this.neoAccountAddress;
       })
       .catch((error) => {
         this.swapService.handleNeoDapiError(error, 'O3');
@@ -230,7 +231,7 @@ export class O3NeoWalletApiService {
     const args = [
       {
         type: 'Address',
-        value: this.accountAddress,
+        value: this.neoAccountAddress,
       },
       {
         type: 'Integer',
@@ -303,7 +304,7 @@ export class O3NeoWalletApiService {
     const args = [
       {
         type: 'Address', // sender (用户小端序Hash)
-        value: this.accountAddress,
+        value: this.neoAccountAddress,
       },
       {
         type: 'Integer', // amountIn (用户的输入额度， 不包含聚合swap的手续费)
@@ -382,10 +383,10 @@ export class O3NeoWalletApiService {
   private listerTxReceipt(tx: SwapTransaction): void {
     const getTx = () => {
       this.rpcApiService
-        .getNeoTxByHash(tx.txid)
-        .then((result) => {
+        .getO3TxByHash(tx.txid)
+        .then((txid) => {
           if (
-            this.commonService.add0xHash(result.txid) ===
+            this.commonService.add0xHash(txid) ===
             this.commonService.add0xHash(this.transaction.txid)
           ) {
             if (this.listerTxinterval) {
@@ -416,6 +417,9 @@ export class O3NeoWalletApiService {
     fromTokenAssetId?: string,
     inputAmount?: string
   ): Promise<boolean> {
+    if (this.o3DapiIsReady === false) {
+      return;
+    }
     if (NETWORK === 'TestNet') {
       this.store.dispatch({
         type: UPDATE_NEO_BALANCES,
@@ -423,23 +427,16 @@ export class O3NeoWalletApiService {
       });
       return;
     }
-    return o3dapi.NEO.getBalance({
-      params: [{ address: this.accountAddress }],
-      network: NETWORK,
-    })
-      .then((addressTokens: any[]) => {
-        const tokens = addressTokens[this.accountAddress] || [];
-        const tempTokenBalance = {};
-        tokens.forEach((tokenItem: any) => {
-          tempTokenBalance[tokenItem.asset_id || tokenItem.assetID] = tokenItem;
-        });
+    return this.rpcApiService
+      .getO3TokenBalance(this.neoAccountAddress)
+      .then((addressTokens) => {
         this.store.dispatch({
           type: UPDATE_NEO_BALANCES,
-          data: tempTokenBalance,
+          data: addressTokens,
         });
         if (
-          tempTokenBalance[fromTokenAssetId] &&
-          new BigNumber(tempTokenBalance[fromTokenAssetId].amount).comparedTo(
+          addressTokens[fromTokenAssetId] &&
+          new BigNumber(addressTokens[fromTokenAssetId].amount).comparedTo(
             new BigNumber(inputAmount)
           ) >= 0
         ) {
@@ -447,9 +444,6 @@ export class O3NeoWalletApiService {
         } else {
           return false;
         }
-      })
-      .catch((error) => {
-        this.commonService.log(error);
       });
   }
 
