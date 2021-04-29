@@ -21,7 +21,7 @@
   height: 40px;
   line-height: 40px;
   background: #46b0691a;
-  font-family: 'fontRegular';
+  font-family: "fontRegular";
   padding-left: 72px;
   padding-right: 40px;
   position: relative;
@@ -53,7 +53,6 @@ header {
   }
   .logo {
     height: 30px;
-    line-height: 30px;
   }
   ul.menu {
     display: flex;
@@ -163,9 +162,19 @@ header {
   }
 }
 
-footer {
-  width: 1920px;
-  height: 400px;
-  margin-top: -93px;
-  background: #202020;
+@media screen and (max-width: 420px) {
+  .main.home {
+    background: #121212;
+    height: 100%;
+  }
+  header {
+    background: #181818;
+    .logo {
+      height: 28px;
+    }
+    ul.menu,
+    ul.left-menu {
+      display: none;
+    }
+  }
 }

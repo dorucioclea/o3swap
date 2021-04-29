@@ -35,7 +35,6 @@ section.home {
   }
   .desc1 {
     font-size: 60px;
-    line-height: 72px;
     line-height: 80px;
   }
   .desc2 {
@@ -189,8 +188,12 @@ section.exchange-click {
     align-items: center;
   }
   .exchange-json {
+    display: block;
     height: 307px;
     padding-left: 78px;
+  }
+  .exchange-json-mobile {
+    display: none;
   }
   .dot {
     width: 24px;
@@ -415,6 +418,12 @@ section.partners {
   padding-top: 160px;
   padding-bottom: 90px;
   background: #151c18;
+  .wrapper {
+    display: block;
+  }
+  .mobile-wrapper {
+    display: none;
+  }
   .sub-title {
     margin-bottom: 18px;
   }
@@ -445,8 +454,6 @@ section.partners {
 }
 
 footer {
-  width: 100%;
-  height: 440px;
   background: #202020;
   padding: 70px 0;
   .subscript {

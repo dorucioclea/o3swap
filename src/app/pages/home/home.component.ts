@@ -8,7 +8,7 @@ import { interval, Unsubscribable } from 'rxjs';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
+  styleUrls: ['./home.component.scss', './mobile.scss'],
 })
 export class HomeComponent implements OnInit, OnDestroy {
   liquiditySource = LiquiditySource;

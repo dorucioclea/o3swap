@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
-@import './styles/modal.scss';
-@import './styles/btn.scss';
-@import './styles/page.scss';
+@import "./styles/modal.scss";
+@import "./styles/btn.scss";
+@import "./styles/page.scss";
 
 * {
   margin: 0;
@@ -49,6 +49,10 @@ body {
   line-height: 1;
   color: #fff;
   min-width: 1440px;
+  @media screen and (max-width: 420px) {
+    min-width: 100%;
+    font-size: 13px;
+  }
 }
 
 button {
