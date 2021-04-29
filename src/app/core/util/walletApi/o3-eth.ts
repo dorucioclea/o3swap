@@ -41,6 +41,8 @@ import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import Web3 from 'web3';
 import { RpcApiService } from '../../api/rpc.service';
+import { getMessageFromCode } from 'eth-rpc-errors';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 interface State {
   swap: SwapStateType;
@@ -86,6 +88,7 @@ export class O3EthWalletApiService {
     private nzMessage: NzMessageService,
     private swapService: SwapService,
     private commonService: CommonService,
+    private nzNotification: NzNotificationService,
     private rpcApiService: RpcApiService
   ) {
     o3dapi.initPlugins([ETH]);
@@ -1248,20 +1251,15 @@ export class O3EthWalletApiService {
   }
 
   private handleDapiError(error): void {
-    this.commonService.log(error);
-    switch (error.type) {
-      case 'NO_PROVIDER':
-        this.swapService.toDownloadWallet(this.myWalletName);
-        break;
-      case 4001:
-        this.nzMessage.error('The request was rejected by the user');
-        break;
-      case -32602:
-        this.nzMessage.error('The parameters were invalid');
-        break;
-      case -32603:
-        this.nzMessage.error('Internal error'); // transaction underpriced
-        break;
+    if (error.type && error.type === 'NO_PROVIDER') {
+      this.swapService.toDownloadWallet(this.myWalletName);
+      return;
+    }
+    const title = getMessageFromCode(error.code);
+    if (error.message && error.code !== 4001) {
+      this.nzNotification.error(title, error.message);
+    } else {
+      this.nzMessage.error(title);
     }
   }
 
