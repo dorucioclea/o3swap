@@ -1,12 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ApiService, MetaMaskWalletApiService } from '@core';
-import { ChainTokens, CHAIN_TOKENS, NNEO_TOKEN, Token, USD_TOKENS } from '@lib';
+import { ApiService } from '@core';
+import { ChainTokens, Token, USD_TOKENS } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Unsubscribable, Observable } from 'rxjs';
 
 interface State {
   tokens: any;
+  swap: any;
 }
 
 type PageStatus = 'home' | 'result';
@@ -26,24 +27,40 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   tokensUnScribe: Unsubscribable;
   tokens$: Observable<any>;
-  chainTokens = new ChainTokens();
+  chainTokens: any = new ChainTokens();
+
+  swapUnScribe: Unsubscribable;
+  swap$: Observable<any>;
+  walletName = { ETH: '', BSC: '', HECO: '', NEO: '' };
+
   constructor(
     private store: Store<State>,
     private apiService: ApiService,
-    private metaMaskWalletApiService: MetaMaskWalletApiService,
     private nzMessage: NzMessageService
   ) {
     this.tokens$ = store.select('tokens');
+    this.swap$ = store.select('swap');
     this.tokensUnScribe = this.tokens$.subscribe((state) => {
       this.chainTokens = state.chainTokens;
+    });
+    this.swapUnScribe = this.swap$.subscribe((state) => {
+      this.walletName.ETH = state.ethWalletName;
+      this.walletName.BSC = state.bscWalletName;
+      this.walletName.HECO = state.hecoWalletName;
+      this.walletName.NEO = state.neoWalletName;
     });
   }
 
   async ngOnInit(): Promise<void> {
-    const chain = this.metaMaskWalletApiService.getChain();
-    if (chain) {
-      await this.apiService.getTokens();
-      this.fromToken = Object.assign({}, this.chainTokens[chain][0]);
+    await this.apiService.getTokens();
+    if (this.walletName.ETH && this.chainTokens.ETH.length > 0) {
+      this.fromToken = Object.assign({}, this.chainTokens.ETH[0]);
+    } else if (this.walletName.BSC && this.chainTokens.BSC.length > 0) {
+      this.fromToken = Object.assign({}, this.chainTokens.BSC[0]);
+    } else if (this.walletName.HECO && this.chainTokens.HECO.length > 0) {
+      this.fromToken = Object.assign({}, this.chainTokens.HECO[0]);
+    } else if (this.walletName.NEO && this.chainTokens.NEO.length > 0) {
+      this.fromToken = Object.assign({}, this.chainTokens.NEO[0]);
     } else {
       this.fromToken = USD_TOKENS[0];
     }
@@ -52,6 +69,9 @@ export class SwapComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.tokensUnScribe) {
       this.tokensUnScribe.unsubscribe();
+    }
+    if (this.swapUnScribe) {
+      this.swapUnScribe.unsubscribe();
     }
   }
 

@@ -33,7 +33,7 @@ interface State {
 
 @Injectable()
 export class O3NeoWalletApiService {
-  walletName: NeoWalletName = 'O3';
+  myWalletName: NeoWalletName = 'O3';
   o3DapiIsReady = false;
 
   swap$: Observable<any>;
@@ -102,7 +102,7 @@ export class O3NeoWalletApiService {
         });
         this.store.dispatch({
           type: UPDATE_NEO_WALLET_NAME,
-          data: this.walletName,
+          data: this.myWalletName,
         });
         this.getBalances();
         this.listenBlockNumber();
@@ -428,7 +428,7 @@ export class O3NeoWalletApiService {
     this.blockNumberInterval = interval(15000).subscribe(() => {
       this.getBalances();
       // 没有连接时不获取 balances
-      if (this.neoWalletName !== 'NeoLine') {
+      if (this.neoWalletName !== 'O3') {
         this.blockNumberInterval.unsubscribe();
       }
     });
@@ -451,6 +451,9 @@ export class O3NeoWalletApiService {
     return this.rpcApiService
       .getO3TokenBalance(this.neoAccountAddress)
       .then((addressTokens) => {
+        if (this.neoWalletName !== this.myWalletName) {
+          return;
+        }
         this.store.dispatch({
           type: UPDATE_NEO_BALANCES,
           data: addressTokens,

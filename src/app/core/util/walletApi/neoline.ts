@@ -449,6 +449,9 @@ export class NeolineWalletApiService {
     return this.rpcApiService
       .getNeoLineTokenBalance(this.neoAccountAddress)
       .then((addressTokens) => {
+        if (this.neoWalletName !== this.myWalletName) {
+          return;
+        }
         this.store.dispatch({
           type: UPDATE_NEO_BALANCES,
           data: addressTokens,
