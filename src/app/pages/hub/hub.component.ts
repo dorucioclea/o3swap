@@ -22,7 +22,8 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import BigNumber from 'bignumber.js';
 import { interval, Observable, Unsubscribable } from 'rxjs';
-import { ApproveComponent } from '@shared';
+import { ApproveComponent, HubTokenComponent } from '@shared';
+import { NzDrawerService } from 'ng-zorro-antd/drawer';
 
 interface State {
   swap: SwapStateType;
@@ -87,7 +88,8 @@ export class HubComponent implements OnInit, OnDestroy {
     private metaMaskWalletApiService: MetaMaskWalletApiService,
     private changeDetectorRef: ChangeDetectorRef,
     private o3EthWalletApiService: O3EthWalletApiService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private drawerService: NzDrawerService
   ) {
     this.swap$ = store.select('swap');
     this.tokens$ = store.select('tokens');
@@ -127,7 +129,28 @@ export class HubComponent implements OnInit, OnDestroy {
     });
   }
 
+  clickShowTokenListModal(type: 'from' | 'to'): void {
+    if (window.document.getElementsByTagName('body')[0].clientWidth > 420) {
+      return;
+    }
+    const drawerRef = this.drawerService.create({
+      nzContent: HubTokenComponent,
+      nzTitle: null,
+      nzClosable: false,
+      nzPlacement: 'bottom',
+      nzWrapClassName: 'custom-drawer',
+    });
+    drawerRef.afterClose.subscribe((token) => {
+      if (token) {
+        this.selectToken(type, token);
+      }
+    });
+  }
+
   showTokenListModal(type: 'from' | 'to'): void {
+    if (window.document.getElementsByTagName('body')[0].clientWidth <= 420) {
+      return;
+    }
     if (type === 'from') {
       clearTimeout(this.showFromTokenListModalTimeout);
       this.showFromTokenList = true;
@@ -148,6 +171,7 @@ export class HubComponent implements OnInit, OnDestroy {
       }, 200);
     }
   }
+
   selectToken(type: 'from' | 'to', token: Token): void {
     this.showFromTokenList = false;
     this.showToTokenList = false;

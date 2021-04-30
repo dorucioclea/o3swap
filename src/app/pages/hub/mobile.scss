@@ -25,6 +25,10 @@
         .right-container {
           width: 100%;
           padding: 25px 5%;
+          .content div.token-name {
+            transform: translateX(-10px);
+            padding-left: 10px;
+          }
         }
       }
       .detail {

@@ -1,0 +1,24 @@
+<section class="container">
+  <div class="header">
+    <span class="title">SELECT</span>
+    <span class="close" (click)="close()">Cancel</span>
+  </div>
+  <ul class="tokens scroll">
+    <li *ngFor="let token of USD_TOKENS" (click)="close(token)">
+      <img class="logo" [src]="token.logo" alt="">
+      <div class="name">
+        <span>{{ token.symbol }}</span>
+        <span class="token-type" [ngClass]="token.chain">{{ token.type }}</span>
+      </div>
+      <img class="arrow" src="/assets/images/swap/arrow-down.png" alt="">
+    </li>
+    <li *ngFor="let token of CONST_BRIDGE_TOKENS" class="disabled">
+      <img class="logo" [src]="token.logo" alt="">
+      <div class="name">
+        <span>{{ token.symbol }}</span>
+        <span class="token-type" *ngIf="token.type" [ngClass]="token.chain">{{ token.type }}</span>
+      </div>
+      <img class="arrow" src="/assets/images/swap/arrow-down.png" alt="">
+    </li>
+  </ul>
+</section>

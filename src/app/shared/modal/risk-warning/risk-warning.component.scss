@@ -14,13 +14,32 @@ section.wrapper {
     width: calc(100% - 80px);
     text-align: center;
     margin-top: 50px;
-    border: 1px solid #46B069;
+    border: 1px solid #46b069;
     border-radius: 30px;
     margin-left: 40px;
     font-size: 16px;
     cursor: pointer;
     &:hover {
-      background: #46B069;
+      background: #46b069;
+    }
+  }
+}
+
+@media screen and (max-width: 420px) {
+  section.wrapper {
+    padding: 22px 34px;
+    .content {
+      padding: 16px 6px;
+      text-align: center;
+      margin-top: 0;
+    }
+    .understand-btn {
+      height: 50px;
+      line-height: 50px;
+      width: 100%;
+      margin: 0;
+      margin-top: 5px;
+      border-radius: 25px;
     }
   }
 }

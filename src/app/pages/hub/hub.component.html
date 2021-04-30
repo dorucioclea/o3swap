@@ -14,7 +14,7 @@
         </div>
         <div class="content">
           <div class="token-name" [ngClass]="{active: fromToken?.symbol}" (mouseenter)="showTokenListModal('from')"
-            (mouseleave)="hideTokenListModal('from')">
+            (mouseleave)="hideTokenListModal('from')" (click)="clickShowTokenListModal('from')">
             <img *ngIf="fromToken?.logo" [src]="fromToken?.logo" alt="" class="token-logo">
             {{ fromToken?.symbol || 'SELECT' }}
             <img src="/assets/images/swap/arrow-down.png" alt="" class="arrow">
@@ -49,7 +49,7 @@
         </div>
         <div class="content">
           <div class="token-name" [ngClass]="{active: toToken?.symbol}" (mouseenter)="showTokenListModal('to')"
-            (mouseleave)="hideTokenListModal('to')">
+            (mouseleave)="hideTokenListModal('to')" (click)="clickShowTokenListModal('to')">
             <img *ngIf="toToken?.logo" [src]="toToken?.logo" alt="" class="token-logo">
             {{ toToken?.symbol || 'SELECT' }}
             <img src="/assets/images/swap/arrow-down.png" alt="" class="arrow">

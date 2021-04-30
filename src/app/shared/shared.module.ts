@@ -15,6 +15,8 @@ import {
   VaultHeaderConnectComponent,
 } from './component/header';
 
+import { HubTokenComponent } from './drawers/hub-token/hub-token.component';
+
 import { SwapSettingComponent } from './modal/swap-setting/swap-setting.component';
 import { SwapExchangeComponent } from './modal/swap-exchange/swap-exchange.component';
 import { SwapTokenComponent } from './modal/swap-token/swap-token.component';
@@ -36,6 +38,7 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzElementPatchModule } from 'ng-zorro-antd/core/element-patch';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { LottieModule } from 'ngx-lottie';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { NzTableModule } from 'ng-zorro-antd/table';
@@ -57,6 +60,7 @@ const COMPONENTS = [
   VaultHeaderConnectComponent,
   LongBalanceComponent,
   RiskWarningComponent,
+  HubTokenComponent,
 ];
 const PIPES = [ShortAddressPipe, TransNumberPipe, TranslatePipe];
 const DIRECTIVES = [ErrSrcDirective];
@@ -68,6 +72,7 @@ const THIRD_MODULES = [
   NzModalModule,
   NzProgressModule,
   NzDropDownModule,
+  NzDrawerModule,
   LottieModule,
   NgxEchartsModule,
   NzElementPatchModule,

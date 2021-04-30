@@ -1,0 +1,11 @@
+.custom-drawer {
+  min-height: 70%;
+  .ant-drawer-content {
+    background: #2a2a2a;
+    border-radius: 22px 22px 0px 0px;
+    .ant-drawer-body {
+      padding: 0;
+      line-height: 1;
+    }
+  }
+}

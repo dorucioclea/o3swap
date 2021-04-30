@@ -46,3 +46,14 @@
 .progress-container .ant-progress-inner {
   background-color: #2A2A2A!important;
 }
+
+@media screen and (max-width: 420px) {
+  .custom-modal {
+    width: 80% !important;
+    top: 98px;
+    .ant-modal-content,
+    .ant-modal-body {
+      border-radius: 22px;
+    }
+  }
+}

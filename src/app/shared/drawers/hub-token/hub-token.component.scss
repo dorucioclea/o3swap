@@ -1,0 +1,93 @@
+section.container {
+  padding: 18px 0 0;
+  height: 100%;
+  .header {
+    padding: 0 8%;
+    height: 60px;
+    line-height: 60px;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    &::before {
+      content: "";
+      position: absolute;
+      top: 60px;
+      left: 5%;
+      right: 5%;
+      height: 1px;
+      background: #353535;
+    }
+    .title {
+      font-size: 17px;
+    }
+    .close {
+      font-size: 16px;
+      color: #46b069;
+    }
+  }
+  ul.tokens {
+    padding: 0 5%;
+    cursor: default;
+    height: calc(100% - 60px);
+    overflow: scroll;
+    li {
+      cursor: pointer;
+      height: 78px;
+      line-height: 78px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      position: relative;
+      &::before {
+        content: "";
+        position: absolute;
+        top: 78px;
+        left: 57px;
+        right: 0;
+        height: 1px;
+        background: #353535;
+      }
+      &.disabled {
+        opacity: 0.5;
+        cursor: default;
+        pointer-events: none;
+      }
+      img.logo {
+        width: 39px;
+        height: 39px;
+        margin-right: 5%;
+      }
+      .name {
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        span.token-type {
+          margin-left: 10px;
+          height: 20px;
+          line-height: 20px;
+          padding: 0 4px;
+          border-radius: 6px;
+          font-size: 12px;
+          &.ETH {
+            background: #459ffb1a;
+            color: #459ffb;
+          }
+          &.BSC {
+            background: #f0b90b1a;
+            color: #f0b90b;
+          }
+          &.HECO {
+            color: #008cd6;
+            background: #008cd61a;
+          }
+        }
+      }
+      img.arrow {
+        height: 10px;
+        transform: rotate(-90deg);
+      }
+    }
+  }
+}
