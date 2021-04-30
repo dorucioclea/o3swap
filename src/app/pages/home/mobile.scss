@@ -15,7 +15,9 @@
     background-size: 100% 100%;
     background-repeat: no-repeat;
     .wrapper {
-      padding: 45px 20px 50px;
+      padding: 0 5%;
+      padding-top: 45px;
+      padding-bottom: 50px;
     }
     .title,
     .desc1 {
@@ -48,7 +50,7 @@
     margin-top: -30px;
     overflow: hidden;
     .wrapper {
-      padding: 0 30px;
+      padding: 0 5%;
       padding-top: 90px;
     }
     img.bg {
@@ -62,9 +64,9 @@
       flex-wrap: wrap;
       margin-top: 0;
       ul.col {
-        width: 47%;
+        width: 48%;
         height: 360px;
-        padding: 0 20px;
+        padding: 0 4%;
         border-radius: 11px;
         font-size: 13px;
         &::before {
@@ -76,7 +78,7 @@
         }
         img {
           width: 20px;
-          margin-right: 13px;
+          margin-right: 5%;
         }
         li {
           margin-top: 28px;
@@ -84,7 +86,7 @@
       }
       ul.col1,
       ul.col3 {
-        margin-right: 6% !important;
+        margin-right: 4% !important;
       }
       ul.col1 {
         margin-top: 38px;
@@ -104,7 +106,9 @@
     }
   }
   section.price {
-    padding: 78px 30px 30px;
+    padding: 0 5%;
+    padding-top: 78px;
+    padding-bottom: 30px;
     .wrapper {
       flex-direction: column;
     }
@@ -129,7 +133,9 @@
     }
   }
   section.exchange-click {
-    padding: 67px 30px 30px;
+    padding: 0 5%;
+    padding-top: 67px;
+    padding-bottom: 30px;
     .wrapper {
       flex-direction: column;
     }
@@ -255,10 +261,10 @@
   }
   section.o3wallet {
     .wrapper {
-      width: 90%;
+      width: 92%;
       height: 336px;
       border-radius: 22px;
-      padding: 0 30px;
+      padding: 0 23px;
       position: relative;
       flex-direction: column;
       text-align: center;
@@ -306,7 +312,7 @@
       display: block;
     }
     .wrapper {
-      padding: 0 23px;
+      padding: 0 5%;
     }
     img.title {
       height: 29px;
@@ -318,14 +324,14 @@
       a {
         background: none;
         border-radius: 0;
-        width: 47%;
+        width: 48%;
         margin-top: 6px;
         &:nth-child(1),
         &:nth-child(2) {
           margin-top: 0;
         }
         &:nth-child(2n-1) {
-          margin-right: 6%;
+          margin-right: 4%;
         }
         img {
           width: 100%;
@@ -344,8 +350,8 @@
         border-radius: 6px;
         margin-top: 22px;
         input {
-          width: 240px;
-          padding: 0 17px;
+          width: calc(100% - 90px);
+          padding: 0 0 0 17px;
           font-size: 13px;
         }
         button {
