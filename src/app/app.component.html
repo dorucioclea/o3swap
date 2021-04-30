@@ -67,15 +67,50 @@
       </ul>
       <app-header-connect *ngIf="isHome===false && currentPage!=='/vault'"></app-header-connect>
       <app-vault-header-connect *ngIf="isHome===false && currentPage==='/vault'"></app-vault-header-connect>
+      <img class="mobile-menu-icon" nz-dropdown nzTrigger="click" [nzDropdownMenu]="mobileMenu"
+        [nzOverlayClassName]="'custom-mobile-menu'" src="/assets/mobile-images/menu.png" alt="">
     </div>
   </header>
   <div class="risk-tip" *ngIf="showRisk && !isHome">
     <img src="/assets/images/risk-icon.png" alt="">
     <div class="risk-tip-text-box">
-      <span class="risk-tip-text">O3 Swap is currently in the testing phase. The testing amount is limited to below $20 in USD. Back up your private
+      <span class="risk-tip-text">O3 Swap is currently in the testing phase. The testing amount is limited to below $20
+        in USD. Back up your private
         keys securely and trade at your own risk.</span>
     </div>
     <img (click)="closeRisk()" class="close" src="/assets/images/close-risk.png" alt="">
   </div>
   <router-outlet></router-outlet>
 </div>
+
+<nz-dropdown-menu #mobileMenu="nzDropdownMenu">
+  <ul class="mobile-menu" nz-menu>
+    <li nz-menu-item [ngClass]="{active: isHome}">
+      <a routerLink="/">Home</a>
+    </li>
+    <li nz-menu-item [ngClass]="{active: currentPage==='/swap'}">
+      <a routerLink="/swap">Swap</a>
+    </li>
+    <li nz-menu-item [ngClass]="{active: currentPage.startsWith('/hub')}">
+      <a routerLink="/hub">Hub</a>
+    </li>
+    <li nz-menu-item [ngClass]="{active: currentPage==='/vault'}">
+      <a routerLink="/vault">Vault</a>
+    </li>
+    <li nz-menu-item>
+      <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Dashboard</a>
+    </li>
+    <li nz-menu-item>
+      <a href="https://medium.com/o3-labs-o3-wallet" target="_blank">Blog</a>
+    </li>
+    <!-- <li [ngClass]="{active: currentPage.startsWith('/governance')}">
+        <a>Governance</a>
+      </li> -->
+    <li nz-menu-item>
+      <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Governance</a>
+    </li>
+    <li nz-menu-item>
+      <a href="https://docs.o3swap.com/" target="_blank">Doc</a>
+    </li>
+  </ul>
+</nz-dropdown-menu>

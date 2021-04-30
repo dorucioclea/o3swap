@@ -17,3 +17,18 @@
     }
   }
 }
+
+@media screen and (max-width: 420px) {
+  .connect {
+    min-width: auto;
+    .connect-btn {
+      width: 134px;
+      height: 39px;
+      font-size: 13px;
+      img {
+        width: 15px;
+        margin-right: 3px;
+      }
+    }
+  }
+}

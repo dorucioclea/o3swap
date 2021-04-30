@@ -1,3 +1,9 @@
 .connect {
   min-width: 310px;
 }
+
+@media screen and (max-width: 420px) {
+  .connect {
+    min-width: auto;
+  }
+}

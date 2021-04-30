@@ -35,6 +35,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzElementPatchModule } from 'ng-zorro-antd/core/element-patch';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { LottieModule } from 'ngx-lottie';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { NzTableModule } from 'ng-zorro-antd/table';
@@ -66,6 +67,7 @@ const THIRD_MODULES = [
   NzButtonModule,
   NzModalModule,
   NzProgressModule,
+  NzDropDownModule,
   LottieModule,
   NgxEchartsModule,
   NzElementPatchModule,
