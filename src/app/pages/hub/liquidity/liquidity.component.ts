@@ -34,7 +34,7 @@ interface State {
 @Component({
   selector: 'app-liquidity',
   templateUrl: './liquidity.component.html',
-  styleUrls: ['./liquidity.component.scss'],
+  styleUrls: ['./liquidity.component.scss', './mobile.scss'],
 })
 export class LiquidityComponent implements OnInit, OnDestroy {
   SOURCE_TOKEN_SYMBOL = SOURCE_TOKEN_SYMBOL;
