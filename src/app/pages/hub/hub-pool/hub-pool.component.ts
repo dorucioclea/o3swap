@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 @Component({
   selector: 'app-hub-pool',
   templateUrl: './hub-pool.component.html',
-  styleUrls: ['./hub-pool.component.scss'],
+  styleUrls: ['./hub-pool.component.scss', './mobile.scss'],
 })
 export class HubPoolComponent implements OnInit, OnDestroy {
   constructor() {}

@@ -1,4 +1,5 @@
 <section class="page-container">
+  <p class="mobile-title">Hub</p>
   <div class="group-container swap">
     <div *ngIf="inputAmountError" class="input-token-error">{{ inputAmountError }}</div>
     <div class="token-select-container">
@@ -71,25 +72,25 @@
         <div class="asset">≈ $ {{ receiveAmountFiat || '0.00' }}</div>
       </div>
     </div>
-    <p class="detail">Exchange Rate {{ toToken?.symbol || '--' }}/{{ fromToken?.symbol || '--' }} (including fees):
+    <p class="detail">Exchange Rate {{ toToken?.symbol || '--' }}/{{ fromToken?.symbol || '--' }}(including fees):
       <span *ngIf="bridgeRate">1 : {{ bridgeRate }}</span></p>
     <p class="detail">Poly Fee: <span *ngIf="polyFee">{{ polyFee }} {{ SOURCE_TOKEN_SYMBOL[fromToken.chain] }}</span>
     </p>
     <p class="detail">Max slippage: <span>{{ BRIDGE_SLIPVALUE }}%</span></p>
-    <p class="detail">
-      From:<span class="address">
-        <img *ngIf="fromAddress && fromToken?.chain==='ETH'" src="/assets/images/swap-chains/ETH.png" alt="">
-        <img *ngIf="fromAddress && fromToken?.chain==='BSC'" src="/assets/images/swap-chains/BSC.png" alt="">
-        <img *ngIf="fromAddress && fromToken?.chain==='HECO'" src="/assets/images/swap-chains/HECO.png" alt="">
-        {{ fromAddress | shortAddress: 10 }}
-      </span>
-      To:<span class="address">
-        <img *ngIf="toAddress&&toToken?.chain==='ETH'" src="/assets/images/swap-chains/ETH.png" alt="">
-        <img *ngIf="toAddress&&toToken?.chain==='BSC'" src="/assets/images/swap-chains/BSC.png" alt="">
-        <img *ngIf="toAddress&&toToken?.chain==='HECO'" src="/assets/images/swap-chains/HECO.png" alt="">
-        {{ toAddress | shortAddress: 10 }}
-      </span>
-    </p>
+    <div class="detail mobile-detail">
+      <p>From:<span class="address">
+          <img *ngIf="fromAddress && fromToken?.chain==='ETH'" src="/assets/images/swap-chains/ETH.png" alt="">
+          <img *ngIf="fromAddress && fromToken?.chain==='BSC'" src="/assets/images/swap-chains/BSC.png" alt="">
+          <img *ngIf="fromAddress && fromToken?.chain==='HECO'" src="/assets/images/swap-chains/HECO.png" alt="">
+          {{ fromAddress | shortAddress: 10 }}
+        </span></p>
+      <p>To:<span class="address">
+          <img *ngIf="toAddress&&toToken?.chain==='ETH'" src="/assets/images/swap-chains/ETH.png" alt="">
+          <img *ngIf="toAddress&&toToken?.chain==='BSC'" src="/assets/images/swap-chains/BSC.png" alt="">
+          <img *ngIf="toAddress&&toToken?.chain==='HECO'" src="/assets/images/swap-chains/HECO.png" alt="">
+          {{ toAddress | shortAddress: 10 }}
+        </span></p>
+    </div>
     <div class="swap-confirm">
       <button class="btn-primary big-btn swap-btn" [ngClass]="{active: checkCanInquiry()}"
         (click)="swap()">Swap</button>

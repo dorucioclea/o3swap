@@ -32,7 +32,7 @@ interface State {
 @Component({
   selector: 'app-hub',
   templateUrl: './hub.component.html',
-  styleUrls: ['./hub.component.scss'],
+  styleUrls: ['./hub.component.scss', './mobile.scss'],
 })
 export class HubComponent implements OnInit, OnDestroy {
   CONST_BRIDGE_TOKENS = CONST_BRIDGE_TOKENS;

@@ -1,14 +1,12 @@
 .page-container {
   padding-bottom: 40px;
-  .group-container {
+  .group-container.swap {
     position: relative;
-    margin: auto;
+    margin: 0 auto;
+    margin-top: 40px;
     width: 1000px;
     background: #1e1e1e;
     border-radius: 20px;
-  }
-  .group-container.swap {
-    margin-top: 40px !important;
     font-family: "fontRegular";
     padding: 50px 40px 20px;
     .input-token-error {
@@ -227,4 +225,8 @@
       }
     }
   }
+}
+
+.mobile-title {
+  display: none;
 }
