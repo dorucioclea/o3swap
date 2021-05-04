@@ -7,6 +7,7 @@ import { VaultWallet } from 'src/app/_lib/vault';
 
 interface State {
   vault: any;
+  language: any;
 }
 
 @Component({
@@ -22,11 +23,20 @@ export class VaultHeaderConnectComponent implements OnInit, OnDestroy {
   vaultUnScribe: Unsubscribable;
   vaultWallet: VaultWallet;
 
+  langPageName = 'header';
+  langUnScribe: Unsubscribable;
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
     private store: Store<State>,
     private commonService: CommonService,
     private changeDetectorRef: ChangeDetectorRef
   ) {
+    this.language$ = store.select('language');
+    this.langUnScribe = this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
     this.vault$ = store.select('vault');
   }
 
@@ -40,6 +50,9 @@ export class VaultHeaderConnectComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.vaultUnScribe) {
       this.vaultUnScribe.unsubscribe();
+    }
+    if (this.langUnScribe) {
+      this.langUnScribe.unsubscribe();
     }
   }
 

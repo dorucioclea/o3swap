@@ -6,6 +6,7 @@ import { Observable, Unsubscribable } from 'rxjs';
 import { Store } from '@ngrx/store';
 interface State {
   setting: any;
+  language: any;
 }
 
 @Component({
@@ -25,11 +26,20 @@ export class SwapSettingComponent implements OnInit, OnDestroy {
   slipValueGroup = [0.1, 0.5, 1, 2];
   slipValueError: string;
 
+  langPageName = 'swap-setting';
+  langUnScribe: Unsubscribable;
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
     private modal: NzModalRef,
     private commonService: CommonService,
     public store: Store<State>
   ) {
+    this.language$ = store.select('language');
+    this.langUnScribe = this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
     this.setting$ = store.select('setting');
   }
 
@@ -45,6 +55,9 @@ export class SwapSettingComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.settingUnScribe) {
       this.settingUnScribe.unsubscribe();
+    }
+    if (this.langUnScribe) {
+      this.langUnScribe.unsubscribe();
     }
   }
 

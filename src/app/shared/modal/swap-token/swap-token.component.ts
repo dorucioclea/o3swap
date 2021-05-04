@@ -21,6 +21,7 @@ import { ApiService } from '@core';
 interface State {
   swap: SwapStateType;
   tokens: any;
+  language: any;
 }
 @Component({
   templateUrl: './swap-token.component.html',
@@ -52,12 +53,21 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
   displayTokens: any[] = []; // 最终展示的 tokens, search 结果
   isfocusSearchInput = false;
 
+  langPageName = 'swap-token';
+  langUnScribe: Unsubscribable;
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
     private store: Store<State>,
     private changeDetectorRef: ChangeDetectorRef,
     private modal: NzModalRef,
     private apiService: ApiService
   ) {
+    this.language$ = store.select('language');
+    this.langUnScribe = this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
     this.swap$ = store.select('swap');
     this.tokens$ = store.select('tokens');
     this.tokensUnScribe = this.tokens$.subscribe((state) => {
@@ -70,6 +80,9 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
     }
     if (this.tokensUnScribe) {
       this.tokensUnScribe.unsubscribe();
+    }
+    if (this.langUnScribe) {
+      this.langUnScribe.unsubscribe();
     }
   }
 

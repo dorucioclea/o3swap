@@ -38,3 +38,6 @@ export const RESET_VAULT_WALLET = 'RESET_VAULT_WALLET';
 
 // chain tokens
 export const UPDATE_CHAIN_TOKENS = 'UPDATE_CHAIN_TOKENS';
+
+// language
+export const UPDATE_LANGUAGE = 'UPDATE_LANGUAGE';

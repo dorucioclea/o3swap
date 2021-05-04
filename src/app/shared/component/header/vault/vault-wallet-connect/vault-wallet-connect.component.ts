@@ -29,6 +29,7 @@ import { VaultWallet } from 'src/app/_lib/vault';
 export type ConnectChainType = 'ETH' | 'NEO' | 'BSC' | 'HECO';
 interface State {
   vault: any;
+  language: any;
 }
 
 @Component({
@@ -49,6 +50,11 @@ export class VaultWalletConnectComponent implements OnInit, OnDestroy {
   vaultUnScribe: Unsubscribable;
   vaultWallet: VaultWallet;
 
+  langPageName = 'header';
+  langUnScribe: Unsubscribable;
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
     store: Store<State>,
     private commonService: CommonService,
@@ -58,11 +64,18 @@ export class VaultWalletConnectComponent implements OnInit, OnDestroy {
     private vaultdMetaMaskWalletApiService: VaultdMetaMaskWalletApiService,
     private changeDetectorRef: ChangeDetectorRef
   ) {
+    this.language$ = store.select('language');
+    this.langUnScribe = this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
     this.vault$ = store.select('vault');
   }
   ngOnDestroy(): void {
     if (this.vaultUnScribe) {
       this.vaultUnScribe.unsubscribe();
+    }
+    if (this.langUnScribe) {
+      this.langUnScribe.unsubscribe();
     }
   }
 

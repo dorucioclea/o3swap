@@ -23,6 +23,7 @@ import { Observable, Unsubscribable } from 'rxjs';
 
 interface State {
   swap: SwapStateType;
+  language: any;
 }
 
 @Component({
@@ -34,8 +35,8 @@ export class HeaderConnectComponent implements OnInit, OnDestroy {
   connectChainType: ConnectChainType = 'ETH';
   showConnectModal = false; // connect wallet modal
 
-  swap$: Observable<any>;
   swapUnScribe: Unsubscribable;
+  swap$: Observable<any>;
   neoAccountAddress: string;
   ethAccountAddress: string;
   bscAccountAddress: string;
@@ -45,11 +46,20 @@ export class HeaderConnectComponent implements OnInit, OnDestroy {
   bscWalletName: EthWalletName;
   hecoWalletName: EthWalletName;
 
+  langPageName = 'header';
+  langUnScribe: Unsubscribable;
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
     private store: Store<State>,
     private commonService: CommonService,
     private changeDetectorRef: ChangeDetectorRef
   ) {
+    this.language$ = store.select('language');
+    this.langUnScribe = this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
     this.swap$ = store.select('swap');
   }
 
@@ -70,6 +80,9 @@ export class HeaderConnectComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.swapUnScribe) {
       this.swapUnScribe.unsubscribe();
+    }
+    if (this.langUnScribe) {
+      this.langUnScribe.unsubscribe();
     }
   }
 

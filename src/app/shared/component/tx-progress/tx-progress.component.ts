@@ -24,6 +24,7 @@ import { interval, Observable, Unsubscribable } from 'rxjs';
 
 interface State {
   swap: SwapStateType;
+  language: any;
 }
 @Component({
   selector: 'app-tx-progress',
@@ -68,6 +69,11 @@ export class TxProgressComponent implements OnInit, OnDestroy {
   swapProgress = 20;
   minMessage: string;
 
+  langPageName = 'tx-progress';
+  langUnScribe: Unsubscribable;
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
     public store: Store<State>,
     private apiService: ApiService,
@@ -76,6 +82,10 @@ export class TxProgressComponent implements OnInit, OnDestroy {
     private metaMaskWalletApiService: MetaMaskWalletApiService,
     private o3EthWalletApiService: O3EthWalletApiService
   ) {
+    this.language$ = store.select('language');
+    this.langUnScribe = this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
     this.swap$ = store.select('swap');
   }
 
@@ -130,6 +140,9 @@ export class TxProgressComponent implements OnInit, OnDestroy {
     }
     if (this.swapUnScribe) {
       this.swapUnScribe.unsubscribe();
+    }
+    if (this.langUnScribe) {
+      this.langUnScribe.unsubscribe();
     }
   }
 

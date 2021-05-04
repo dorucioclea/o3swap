@@ -2,8 +2,13 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { LiquiditySource } from './liquidity-source';
 import { ApiService } from '@core';
-import { CommonHttpResponse } from '@lib';
-import { interval, Unsubscribable } from 'rxjs';
+import { CommonHttpResponse, UPDATE_LANGUAGE } from '@lib';
+import { interval, Observable, Unsubscribable } from 'rxjs';
+import { Store } from '@ngrx/store';
+
+interface State {
+  language: any;
+}
 
 @Component({
   selector: 'app-home',
@@ -12,7 +17,6 @@ import { interval, Unsubscribable } from 'rxjs';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   liquiditySource = LiquiditySource;
-  lang = 'en';
   copyRightYear = new Date().getFullYear();
   roadmapIndex = 0;
   roadmapLen = 4;
@@ -28,19 +32,28 @@ export class HomeComponent implements OnInit, OnDestroy {
   priceOptions = {
     path: '/assets/json/price/data.json',
   };
-
   swapOptions = {
     path: '/assets/json/swap/data.json',
   };
-
   exchangeOptions = {
     path: '/assets/json/exchange.json',
   };
 
+  langPageName = 'home';
+  langUnScribe: Unsubscribable;
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
+    private store: Store<State>,
     private nzMessage: NzMessageService,
     private apiService: ApiService
-  ) {}
+  ) {
+    this.language$ = store.select('language');
+    this.langUnScribe = this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
+  }
 
   ngOnInit(): void {
     this.roadmapIntervalFun();
@@ -49,6 +62,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.roadmapInterval) {
       this.roadmapInterval.unsubscribe();
+    }
+    if (this.langUnScribe) {
+      this.langUnScribe.unsubscribe();
     }
   }
 
@@ -101,7 +117,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   changeLang(lang: 'en' | 'zh'): void {
+    if (lang === this.lang) {
+      return;
+    }
     this.lang = lang;
+    this.store.dispatch({ type: UPDATE_LANGUAGE, data: lang });
     window.scrollTo({
       left: 0,
       top: 0,

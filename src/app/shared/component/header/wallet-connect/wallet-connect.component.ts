@@ -33,6 +33,7 @@ import { environment } from '@env/environment';
 export type ConnectChainType = 'ETH' | 'NEO' | 'BSC' | 'HECO';
 interface State {
   swap: SwapStateType;
+  language: any;
 }
 
 @Component({
@@ -61,6 +62,11 @@ export class WalletConnectComponent implements OnInit, OnDestroy {
   bscWalletName: EthWalletName;
   hecoWalletName: EthWalletName;
 
+  langPageName = 'header';
+  langUnScribe: Unsubscribable;
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
     store: Store<State>,
     private commonService: CommonService,
@@ -71,11 +77,18 @@ export class WalletConnectComponent implements OnInit, OnDestroy {
     private metaMaskWalletApiService: MetaMaskWalletApiService,
     private changeDetectorRef: ChangeDetectorRef
   ) {
+    this.language$ = store.select('language');
+    this.langUnScribe = this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
     this.swap$ = store.select('swap');
   }
   ngOnDestroy(): void {
     if (this.swapUnScribe) {
       this.swapUnScribe.unsubscribe();
+    }
+    if (this.langUnScribe) {
+      this.langUnScribe.unsubscribe();
     }
   }
 

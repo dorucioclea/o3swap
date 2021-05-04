@@ -29,6 +29,7 @@ interface State {
   swap: SwapStateType;
   tokens: any;
   rates: any;
+  language: any;
 }
 @Component({
   selector: 'app-hub',
@@ -80,6 +81,11 @@ export class HubComponent implements OnInit, OnDestroy {
   showConnectWallet = false;
   connectChainType: ConnectChainType;
 
+  langPageName = 'hub';
+  langUnScribe: Unsubscribable;
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
     public store: Store<State>,
     private apiService: ApiService,
@@ -91,6 +97,10 @@ export class HubComponent implements OnInit, OnDestroy {
     private commonService: CommonService,
     private drawerService: NzDrawerService
   ) {
+    this.language$ = store.select('language');
+    this.langUnScribe = this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
     this.swap$ = store.select('swap');
     this.tokens$ = store.select('tokens');
     this.rates$ = store.select('rates');
@@ -104,6 +114,9 @@ export class HubComponent implements OnInit, OnDestroy {
     }
     if (this.ratesUnScribe) {
       this.ratesUnScribe.unsubscribe();
+    }
+    if (this.langUnScribe) {
+      this.langUnScribe.unsubscribe();
     }
   }
 

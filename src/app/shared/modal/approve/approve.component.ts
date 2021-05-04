@@ -1,13 +1,19 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Token } from '@lib';
-import { interval, Unsubscribable } from 'rxjs';
+import { interval, Observable, Unsubscribable } from 'rxjs';
 import { O3EthWalletApiService, MetaMaskWalletApiService } from '@core';
 import { NzModalRef } from 'ng-zorro-antd/modal';
+import { Store } from '@ngrx/store';
+
+interface State {
+  language: any;
+}
+
 @Component({
   templateUrl: './approve.component.html',
   styleUrls: ['./approve.component.scss'],
 })
-export class ApproveComponent implements OnInit {
+export class ApproveComponent implements OnInit, OnDestroy {
   @Input() aggregator?: string;
   @Input() fromToken: Token;
   @Input() fromAddress: string;
@@ -16,11 +22,27 @@ export class ApproveComponent implements OnInit {
   isApproveLoading = false;
   approveInterval: Unsubscribable;
 
+  langPageName = 'approve';
+  langUnScribe: Unsubscribable;
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
+    private store: Store<State>,
     private o3EthWalletApiService: O3EthWalletApiService,
     private metaMaskWalletApiService: MetaMaskWalletApiService,
     private modal: NzModalRef
-  ) {}
+  ) {
+    this.language$ = store.select('language');
+    this.langUnScribe = this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
+  }
+  ngOnDestroy(): void {
+    if (this.langUnScribe) {
+      this.langUnScribe.unsubscribe();
+    }
+  }
 
   ngOnInit(): void {}
 

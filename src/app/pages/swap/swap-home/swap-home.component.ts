@@ -22,6 +22,7 @@ interface State {
   setting: any;
   swap: SwapStateType;
   rates: any;
+  language: any;
 }
 
 @Component({
@@ -63,6 +64,11 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
   inputAmountFiat: string; // 支付的 token 美元价值
   inputAmountError: string;
 
+  langPageName = 'swap-home';
+  langUnScribe: Unsubscribable;
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
     private modal: NzModalService,
     public store: Store<State>,
@@ -71,6 +77,10 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
     private apiService: ApiService,
     private changeDetectorRef: ChangeDetectorRef
   ) {
+    this.language$ = store.select('language');
+    this.langUnScribe = this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
     this.setting$ = store.select('setting');
     this.swap$ = store.select('swap');
     this.rates$ = store.select('rates');
@@ -121,6 +131,9 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
     }
     if (this.ratesUnScribe) {
       this.ratesUnScribe.unsubscribe();
+    }
+    if (this.langUnScribe) {
+      this.langUnScribe.unsubscribe();
     }
   }
 

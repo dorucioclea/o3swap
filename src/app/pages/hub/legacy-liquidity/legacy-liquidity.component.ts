@@ -33,6 +33,7 @@ import { ApproveComponent } from '@shared';
 interface State {
   swap: SwapStateType;
   rates: any;
+  language: any;
 }
 @Component({
   selector: 'app-legacy-liquidity',
@@ -84,6 +85,11 @@ export class LegacyLiquidityComponent implements OnInit, OnDestroy {
     HECO: { value: '', percentage: '0' },
   };
 
+  langPageName = 'liquidity';
+  langUnScribe: Unsubscribable;
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
     private apiService: ApiService,
     private commonService: CommonService,
@@ -94,6 +100,10 @@ export class LegacyLiquidityComponent implements OnInit, OnDestroy {
     private changeDetectorRef: ChangeDetectorRef,
     private modal: NzModalService
   ) {
+    this.language$ = store.select('language');
+    this.langUnScribe = this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
     this.swap$ = store.select('swap');
     this.rates$ = store.select('rates');
     this.addLiquidityTokens.forEach(() => {
@@ -134,6 +144,9 @@ export class LegacyLiquidityComponent implements OnInit, OnDestroy {
     }
     if (this.ratesUnScribe) {
       this.ratesUnScribe.unsubscribe();
+    }
+    if (this.langUnScribe) {
+      this.langUnScribe.unsubscribe();
     }
   }
 

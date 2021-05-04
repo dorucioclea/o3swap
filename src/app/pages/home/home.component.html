@@ -39,10 +39,10 @@
 <section class="content price">
   <div class="wrapper">
     <div class="desc">
-      <p class="desc-title">{{ "feature1Title" | translate: lang }}</p>
-      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature1Detail1" | translate: lang }}</p>
-      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature1Detail2" | translate: lang }}</p>
-      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature1Detail3" | translate: lang }}</p>
+      <p class="desc-title">{{ "feature1Title" | translate: lang:langPageName }}</p>
+      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature1Detail1" | translate: lang:langPageName }}</p>
+      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature1Detail2" | translate: lang:langPageName }}</p>
+      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature1Detail3" | translate: lang:langPageName }}</p>
     </div>
     <ng-lottie class="swap-json" [options]="swapOptions"></ng-lottie>
   </div>
@@ -52,10 +52,10 @@
     <!-- <ng-lottie class="exchange-json" [options]="exchangeOptions"></ng-lottie> -->
     <img class="exchange-json" src="/assets/images/home/exchange.png" alt="">
     <div class="desc">
-      <p class="desc-title">{{ "feature2Title" | translate: lang }}</p>
-      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature2Detail1" | translate: lang }}</p>
-      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature2Detail2" | translate: lang }}</p>
-      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature2Detail3" | translate: lang }}</p>
+      <p class="desc-title">{{ "feature2Title" | translate: lang:langPageName }}</p>
+      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature2Detail1" | translate: lang:langPageName }}</p>
+      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature2Detail2" | translate: lang:langPageName }}</p>
+      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature2Detail3" | translate: lang:langPageName }}</p>
     </div>
     <img class="exchange-json-mobile" src="/assets/images/home/exchange.png" alt="">
   </div>
@@ -70,9 +70,9 @@
           <img src="/assets/images/home/roadmap-dot.png" alt="">
           <p class="name">2021 Q1</p>
           <div class="desc">
-            <p>1. {{ "roadmapQ1Detail1" | translate: lang }}</p>
-            <p>2. {{ "roadmapQ1Detail2" | translate: lang }}</p>
-            <p>3. {{ "roadmapQ1Detail3" | translate: lang }}</p>
+            <p>1. {{ "roadmapQ1Detail1" | translate: lang:langPageName }}</p>
+            <p>2. {{ "roadmapQ1Detail2" | translate: lang:langPageName }}</p>
+            <p>3. {{ "roadmapQ1Detail3" | translate: lang:langPageName }}</p>
           </div>
         </div>
         <div class="time time2" (mouseenter)="enterRoadmap(1)" (mouseleave)="leaveRoadmap()"
@@ -80,9 +80,9 @@
           <img src="/assets/images/home/roadmap-dot.png" alt="">
           <p class="name">2021 Q2-Q3</p>
           <div class="desc">
-            <p>1. {{ "roadmapQ2Q3Detail1" | translate: lang }}</p>
-            <p>2. {{ "roadmapQ2Q3Detail2" | translate: lang }}</p>
-            <p>3. {{ "roadmapQ2Q3Detail3" | translate: lang }}</p>
+            <p>1. {{ "roadmapQ2Q3Detail1" | translate: lang:langPageName }}</p>
+            <p>2. {{ "roadmapQ2Q3Detail2" | translate: lang:langPageName }}</p>
+            <p>3. {{ "roadmapQ2Q3Detail3" | translate: lang:langPageName }}</p>
           </div>
         </div>
         <div class="time time3" (mouseenter)="enterRoadmap(2)" (mouseleave)="leaveRoadmap()"
@@ -90,9 +90,9 @@
           <img src="/assets/images/home/roadmap-dot.png" alt="">
           <p class="name">2021 Q4</p>
           <div class="desc">
-            <p>1. {{ "roadmapQ4Detail1" | translate: lang }}</p>
-            <p>2. {{ "roadmapQ4Detail2" | translate: lang }}</p>
-            <p>2. {{ "roadmapQ4Detail3" | translate: lang }}</p>
+            <p>1. {{ "roadmapQ4Detail1" | translate: lang:langPageName }}</p>
+            <p>2. {{ "roadmapQ4Detail2" | translate: lang:langPageName }}</p>
+            <p>2. {{ "roadmapQ4Detail3" | translate: lang:langPageName }}</p>
           </div>
         </div>
         <div class="time time4" (mouseenter)="enterRoadmap(3)" (mouseleave)="leaveRoadmap()"
@@ -100,9 +100,9 @@
           <img src="/assets/images/home/roadmap-dot.png" alt="">
           <p class="name">2022</p>
           <div class="desc">
-            <p>1. {{ "roadmap2022Detail1" | translate: lang }}</p>
-            <p>2. {{ "roadmap2022Detail2" | translate: lang }}</p>
-            <p>3. {{ "roadmap2022Detail3" | translate: lang }}</p>
+            <p>1. {{ "roadmap2022Detail1" | translate: lang:langPageName }}</p>
+            <p>2. {{ "roadmap2022Detail2" | translate: lang:langPageName }}</p>
+            <p>3. {{ "roadmap2022Detail3" | translate: lang:langPageName }}</p>
           </div>
         </div>
       </div>
@@ -291,11 +291,11 @@
   <div class="bottom">
     <img src="/assets/images/home/footer-logo.png" alt="">
     <p class="copyright">© {{ copyRightYear }} O3 Labs Inc.</p>
-    <!-- <p class="language">
+    <p class="language">
         <span [ngClass]="{active: lang==='en'}" (click)="changeLang('en')">EN</span>
         <span class="line">|</span>
         <span [ngClass]="{active: lang==='zh'}" (click)="changeLang('zh')">CN</span>
-      </p> -->
+      </p>
     <a href="https://docs.o3swap.com/" target="_blank">
       <p class="doc">Doc</p>
     </a>

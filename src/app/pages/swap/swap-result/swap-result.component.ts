@@ -43,6 +43,7 @@ interface State {
   swap: SwapStateType;
   setting: any;
   rates: any;
+  language: any;
 }
 
 @Component({
@@ -107,6 +108,11 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   connectChainType: ConnectChainType;
   isSwapCanClick = true;
 
+  langPageName = 'swap-result';
+  langUnScribe: Unsubscribable;
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
     public store: Store<State>,
     private apiService: ApiService,
@@ -119,6 +125,10 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     private o3EthWalletApiService: O3EthWalletApiService,
     private modal: NzModalService
   ) {
+    this.language$ = store.select('language');
+    this.langUnScribe = this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
     this.swap$ = store.select('swap');
     this.setting$ = store.select('setting');
     this.rates$ = store.select('rates');
@@ -167,6 +177,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
     }
     if (this.ratesUnScribe) {
       this.ratesUnScribe.unsubscribe();
+    }
+    if (this.langUnScribe) {
+      this.langUnScribe.unsubscribe();
     }
   }
 
