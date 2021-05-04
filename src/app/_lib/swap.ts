@@ -21,6 +21,16 @@ export interface SwapTransaction {
   walletName: WalletName;
 }
 
+export interface StakeTransaction {
+  txid: string;
+  isPending: boolean;
+  fromToken: Token;
+  amount: string;
+  isFailed?: boolean;
+  isStake: boolean;
+  walletName: WalletName;
+}
+
 export interface SwapStateType {
   neoWalletName: NeoWalletName;
   ethWalletName: EthWalletName;

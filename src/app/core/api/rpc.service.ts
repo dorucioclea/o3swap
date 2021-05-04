@@ -120,6 +120,30 @@ export class RpcApiService {
       )
       .toPromise();
   }
+
+  getEthCall(params, token: Token): Promise<any> {
+    const method = 'eth_call';
+    return this.http
+      .post(this.getEthRpcHost(token.chain), {
+        jsonrpc: '2.0',
+        id: METAMASK_CHAIN_ID[token.chain],
+        method,
+        params,
+      })
+      .pipe(
+        map((response: any) => {
+          const balance = response.result;
+          if (
+            balance &&
+            !new BigNumber(balance).isNaN() &&
+            new BigNumber(balance).comparedTo(0) > 0
+          ) {
+            return new BigNumber(balance).shiftedBy(-token.decimals).toFixed();
+          }
+        })
+      )
+      .toPromise();
+  }
   //#endregion
 
   //#region transaction

@@ -2,14 +2,14 @@
   <div class="close-group">
     <img (click)="close()" class="close" src="/assets/images/swap/close.png" alt="">
   </div>
-  <p class="title">Stake</p>
+  <p class="title">{{ isStake ? 'Stake' : 'Unstake' }}</p>
   <div class="token-amount-container">
     <div class="content">
       <div class="top">Amount</div>
       <div class="asset">
-        <img src="" alt="" class="asset-img">
+        <img [src]="token.logo" alt="" class="asset-img">
         <div class="asset-name">
-          pnUNI_V2_ETH_WBTC
+          {{ token.symbol }}
         </div>
         <div class="amount">
           <input type="number" (input)="changeInputAmount($event)" [ngModel]="inputAmount" placeholder="0">
@@ -18,7 +18,7 @@
     </div>
   </div>
   <div class="balance">
-    Balance: {{inputAmount}} USDT
+    {{ isStake ? 'Balance' : 'Staked' }}: {{ balance }} {{ token.symbol }}
   </div>
-  <div class="btn">Confirm</div>
+  <div class="btn" (click)="confirm()">Confirm</div>
 </section>

@@ -2,18 +2,18 @@
   <div class="detail">
     <div class="item-container row-1">
       <div class="item-group item-total">
-        <div class="group-title">Available</div>
-        <div class="group-content">9.31673761 O3</div>
-        <div class="group-title">Available</div>
+        <div class="group-title">Total</div>
+        <div class="group-content">{{ o3Total }} O3</div>
+        <!-- <div class="group-title">Available</div> -->
       </div>
       <div class="item-group">
         <div class="group-title">Available</div>
-        <div class="group-content">9.31673761 O3</div>
+        <div class="group-content">{{ o3Available }} O3</div>
         <div class="btn-primary receive-btn">Receive</div>
       </div>
       <div class="item-group">
         <div class="group-title">To be unlocked</div>
-        <div class="group-content">9.31673761 O3</div>
+        <div class="group-content">{{ o3Locked }} O3</div>
         <div class="group-icon">
           <img nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="right"
             src="/assets/images/dashboard/doubt.png" alt="">
@@ -28,12 +28,12 @@
             <p>
               <span class="name">Unlocked amount:</span>
               &nbsp;
-              <span class="value">9.31673761 O3</span>
+              <span class="value">{{ o3ClaimableUnlocked || '--' }} O3</span>
             </p>
             <p>
               <span class="name">Speed value: </span>
               &nbsp;
-              <span class="value">8.60</span>
+              <span class="value">{{ o3UnlockSpeed || '' }}</span>
             </p>
           </div>
         </div>
@@ -51,18 +51,19 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td><img class="token-img" src="" alt=""></td>
-                <td>Name</td>
-                <td>Staked</td>
-                <td>Remaining</td>
+              <tr *ngFor="let item of stakeUnlockTokenList; let i = index">
+                <td><img class="token-img" [src]="item.logo" alt=""></td>
+                <td>{{ stakeUnlockTokenList[i].symbol }}</td>
+                <td>{{ item.staked || '0' }}</td>
+                <td>{{ item.remaining || '0' }}</td>
                 <td>Release value</td>
                 <td>APY%</td>
-                <td nzRight >
-                  <button class="btn-primary">
+                <td nzRight>
+                  <button class="btn-primary" (click)="showStake(stakeUnlockTokenList[i], item.remaining || '0')">
                     Stake
                   </button>
-                  <button class="btn-primary unstake-btn">
+                  <button class="btn-primary unstake-btn"
+                    (click)="showStake(stakeUnlockTokenList[i], item.staked || '0', false)">
                     Unstake
                   </button>
                 </td>
@@ -85,7 +86,7 @@
             <div class="item-group-title">
               <div class="token"><img src="" alt="">pnUNI_V2_ETH_WBTC</div>
               <div class="right">
-                <button class="btn-primary" (click)="showStake()">Stake</button>
+                <button class="btn-primary">Stake</button>
                 <button class="btn-primary unstake-btn">Unstake</button>
               </div>
             </div>

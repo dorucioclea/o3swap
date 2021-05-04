@@ -96,6 +96,15 @@ export const NEO_TOKEN: Token = {
   logo:
     'https://img.o3.network/logo/neo2/0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b.png',
 };
+export const O3_TOKEN: Token = {
+  assetID:
+    NETWORK === 'MainNet' ? '' : '0xF8d653130a460b4a41e2B2271dD091A9Bb910775',
+  symbol: 'O3',
+  decimals: 18,
+  amount: '0',
+  chain: 'ETH',
+  logo: '',
+};
 //#endregion
 
 export const CONST_BRIDGE_TOKENS: Token[] = [

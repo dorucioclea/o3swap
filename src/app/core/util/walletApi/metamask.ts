@@ -30,6 +30,7 @@ import {
   AGGREGATOR_CONTRACT,
   CHAINS,
   INIT_CHAIN_TOKENS,
+  O3_TOKEN,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import BigNumber from 'bignumber.js';
@@ -1034,7 +1035,8 @@ export class MetaMaskWalletApiService {
   async getAllowance(
     fromToken: Token,
     fromAddress: string,
-    aggregator?: string
+    aggregator?: string,
+    spender?: string
   ): Promise<string> {
     this.commonService.log('\u001b[32m  ✓ start get allowance \u001b[0m');
     let tokenhash = fromToken.assetID;
@@ -1046,6 +1048,9 @@ export class MetaMaskWalletApiService {
     let contract = ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain];
     if (aggregator) {
       contract = AGGREGATOR_CONTRACT[fromToken.chain][aggregator];
+    }
+    if (spender) {
+      contract = spender;
     }
     const data = ethErc20Contract.methods
       .allowance(fromAddress, contract)
@@ -1073,7 +1078,8 @@ export class MetaMaskWalletApiService {
   async approve(
     fromToken: Token,
     fromAddress: string,
-    aggregator?: string
+    aggregator?: string,
+    isO3Stake?: boolean
   ): Promise<any> {
     let tokenhash = fromToken.assetID;
     if (fromToken.assetID === ETH_SOURCE_ASSET_HASH) {
@@ -1082,6 +1088,9 @@ export class MetaMaskWalletApiService {
     let contract = ETH_CROSS_SWAP_CONTRACT_HASH[fromToken.chain];
     if (aggregator) {
       contract = AGGREGATOR_CONTRACT[fromToken.chain][aggregator];
+    }
+    if (isO3Stake === true) {
+      contract = O3_TOKEN.assetID;
     }
     const json = await this.getEthErc20Json();
     const ethErc20Contract = new this.web3.eth.Contract(json, tokenhash);

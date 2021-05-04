@@ -1,4 +1,4 @@
-import { RESET_VAULT_WALLET, UPDATE_VAULT_WALLET } from '@lib';
+import { RESET_VAULT_WALLET, UPDATE_VAULT_STAKE_PENDING_TX, UPDATE_VAULT_WALLET } from '@lib';
 
 const initialState = {
   vaultWallet: null,
@@ -17,6 +17,9 @@ export default function vault(state = initialState, action): any {
     case RESET_VAULT_WALLET:
       setSessionStorage('valueWallet', null);
       return { ...state, vaultWallet: null };
+    case UPDATE_VAULT_STAKE_PENDING_TX:
+      setlocalStorage('vaultStakeTransaction', action.data);
+      return { ...state, liquidityTransaction: action.data };
     default:
       return state;
   }
@@ -24,4 +27,8 @@ export default function vault(state = initialState, action): any {
 
 function setSessionStorage(key: string, value: string): void {
   sessionStorage.setItem(key, JSON.stringify(value));
+}
+
+function setlocalStorage(key: string, value: string): void {
+  localStorage.setItem(key, JSON.stringify(value));
 }

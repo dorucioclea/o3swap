@@ -5,7 +5,7 @@ import {
   ChangeDetectorRef,
   OnDestroy,
 } from '@angular/core';
-import { SwapStateType } from '@lib';
+import { SwapStateType, Token } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { CommonService } from '@core';
@@ -21,18 +21,17 @@ interface State {
   styleUrls: ['./vault-stake.component.scss'],
 })
 export class VaultStakeComponent implements OnInit, OnDestroy {
-  @Input() inputAmount: number = 0;
-
   langPageName = 'vault';
   langUnScribe: Unsubscribable;
   language$: Observable<any>;
   lang: string;
-
+  @Input() balance = '0';
+  @Input() isStake = true;
+  @Input() token: Token;
+  inputAmount = '';
   constructor(
     private store: Store<State>,
-    private changeDetectorRef: ChangeDetectorRef,
     private modal: NzModalRef,
-    private commonService: CommonService
   ) {
     this.language$ = store.select('language');
     this.langUnScribe = this.language$.subscribe((state) => {
@@ -53,5 +52,8 @@ export class VaultStakeComponent implements OnInit, OnDestroy {
 
   close(): void {
     this.modal.close();
+  }
+  confirm(): void {
+    this.modal.close(this.inputAmount);
   }
 }
