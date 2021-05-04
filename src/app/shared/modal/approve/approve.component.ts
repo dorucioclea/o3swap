@@ -22,7 +22,7 @@ export class ApproveComponent implements OnInit, OnDestroy {
   isApproveLoading = false;
   approveInterval: Unsubscribable;
 
-  langPageName = 'approve';
+  langPageName = 'app';
   langUnScribe: Unsubscribable;
   language$: Observable<any>;
   lang: string;

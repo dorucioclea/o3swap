@@ -2,7 +2,7 @@
   <li class="wallet" *ngFor="let wallet of walletList" (click)="connectWallet(wallet)">
     <div *ngIf="walletName!==wallet.name" [ngClass]="{disabled: disableEthO3 && chain!=='NEO' && wallet.name=='O3'}">
       <img class="logo" [src]="wallet.logo" alt="">
-      <span class="name">Connect {{ wallet.name }}</span>
+      <span class="name">{{ 'Connect' | translate: lang:langPageName }} {{ wallet.name }}</span>
       <img class="option" src="/assets/images/swap/add.png" alt="">
     </div>
     <div *ngIf="walletName===wallet.name" class="active">

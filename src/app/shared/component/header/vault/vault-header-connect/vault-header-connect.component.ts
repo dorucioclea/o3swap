@@ -23,7 +23,7 @@ export class VaultHeaderConnectComponent implements OnInit, OnDestroy {
   vaultUnScribe: Unsubscribable;
   vaultWallet: VaultWallet;
 
-  langPageName = 'header';
+  langPageName = 'app';
   langUnScribe: Unsubscribable;
   language$: Observable<any>;
   lang: string;

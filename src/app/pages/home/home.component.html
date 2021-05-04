@@ -1,8 +1,8 @@
 <section class="content home">
   <div class="wrapper">
-    <p class="title">Cross-chain</p>
-    <p class="desc1">Aggregation Protocol</p>
-    <p class="desc2">Access multi-chain liquidity sources on one platform</p>
+    <p class="title">{{ 'homeTitle' | translate: lang:langPageName }}</p>
+    <p class="desc1">{{ 'homeDesc1' | translate: lang:langPageName }}</p>
+    <p class="desc2">{{ 'homeDesc2' | translate: lang:langPageName }}</p>
     <!-- <ng-lottie class="price-json" [options]="priceOptions"></ng-lottie> -->
     <img class="price-json" src="/assets/images/home/price.png" alt="">
   </div>
@@ -10,7 +10,7 @@
 <section class="content exchanges">
   <div class="wrapper">
     <img src="/assets/images/home/exchanges/class-bg.png" class="bg" alt="">
-    <p class="sub-title">Liquidity Sources</p>
+    <p class="sub-title">{{ 'LiquiditySource' | translate: lang:langPageName }}</p>
     <div class="exchanges-group">
       <ul class="col col1">
         <li *ngFor="let item of liquiditySource.eth">
@@ -40,9 +40,12 @@
   <div class="wrapper">
     <div class="desc">
       <p class="desc-title">{{ "feature1Title" | translate: lang:langPageName }}</p>
-      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature1Detail1" | translate: lang:langPageName }}</p>
-      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature1Detail2" | translate: lang:langPageName }}</p>
-      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature1Detail3" | translate: lang:langPageName }}</p>
+      <p><img class="dot" src="/assets/images/home/dot.png"
+          alt="">{{ "feature1Detail1" | translate: lang:langPageName }}</p>
+      <p><img class="dot" src="/assets/images/home/dot.png"
+          alt="">{{ "feature1Detail2" | translate: lang:langPageName }}</p>
+      <p><img class="dot" src="/assets/images/home/dot.png"
+          alt="">{{ "feature1Detail3" | translate: lang:langPageName }}</p>
     </div>
     <ng-lottie class="swap-json" [options]="swapOptions"></ng-lottie>
   </div>
@@ -53,16 +56,19 @@
     <img class="exchange-json" src="/assets/images/home/exchange.png" alt="">
     <div class="desc">
       <p class="desc-title">{{ "feature2Title" | translate: lang:langPageName }}</p>
-      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature2Detail1" | translate: lang:langPageName }}</p>
-      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature2Detail2" | translate: lang:langPageName }}</p>
-      <p><img class="dot" src="/assets/images/home/dot.png" alt="">{{ "feature2Detail3" | translate: lang:langPageName }}</p>
+      <p><img class="dot" src="/assets/images/home/dot.png"
+          alt="">{{ "feature2Detail1" | translate: lang:langPageName }}</p>
+      <p><img class="dot" src="/assets/images/home/dot.png"
+          alt="">{{ "feature2Detail2" | translate: lang:langPageName }}</p>
+      <p><img class="dot" src="/assets/images/home/dot.png"
+          alt="">{{ "feature2Detail3" | translate: lang:langPageName }}</p>
     </div>
     <img class="exchange-json-mobile" src="/assets/images/home/exchange.png" alt="">
   </div>
 </section>
 <section class="content roadmap">
   <div class="wrapper">
-    <p class="sub-title">Roadmap</p>
+    <p class="sub-title">{{ 'Roadmap' | translate: lang:langPageName }}</p>
     <div class="roadmap-bg">
       <div class="roadmap-content">
         <div class="time time1" (mouseenter)="enterRoadmap(0)" (mouseleave)="leaveRoadmap()"
@@ -154,16 +160,17 @@
   <div class="wrapper">
     <img class="logo" src="/assets/images/home/o3wallet-logo.png" alt="">
     <div class="left">
-      <p class="title">O3 Wallet</p>
-      <p class="desc">A multi-chain crypto wallet. Manage your assets simply and safely</p>
+      <p class="title">{{ 'O3Wallet' | translate: lang:langPageName }}</p>
+      <p class="desc">{{ 'o3WalletDesc' | translate: lang:langPageName }}</p>
     </div>
-    <a target="_blank" href="https://o3.network/#download"><button class="download">Download</button></a>
+    <a target="_blank" href="https://o3.network/#download"><button
+        class="download">{{ 'Download' | translate: lang:langPageName }}</button></a>
     <img class="screenshot" src="/assets/images/home/o3wallet-screenshot.png" alt="">
   </div>
 </section>
 <section class="content partners">
   <div class="wrapper">
-    <p class="sub-title center">Partners & Investors</p>
+    <p class="sub-title center">{{ 'PartnersInvestors' | translate: lang:langPageName }}</p>
     <img src="/assets/images/home/partners/title-partners.png" class="title" alt="">
     <div class="partners-group">
       <a target="_blank" href="https://www.binance.org/en/smartChain">
@@ -213,7 +220,7 @@
     </div>
   </div>
   <div class="wrapper mobile-wrapper">
-    <p class="sub-title center">Partners & Investors</p>
+    <p class="sub-title center">{{ 'PartnersInvestors' | translate: lang:langPageName }}</p>
     <img src="/assets/mobile-images/home/partners/title-partners.png" class="title" alt="">
     <div class="partners-group">
       <a target="_blank" href="https://www.binance.org/en/smartChain">
@@ -263,13 +270,14 @@
 </section>
 <footer>
   <div class="subscript">
-    <p class="title">Receive our Newsletter</p>
+    <p class="title">{{ 'ReceiveOurNewsletter' | translate: lang:langPageName }}</p>
     <div class="email" *ngIf="canSubscribe" [ngClass]="{focus: isFocus}">
       <input type="email" (focus)="isFocus=true" (blur)="isFocus=false" [(ngModel)]="email"
         placeholder="Please fill in your email address">
-      <button nz-button [nzLoading]="isLoadingEmail" (click)="subscriptNews()" class="submit">Subscribe</button>
+      <button nz-button [nzLoading]="isLoadingEmail" (click)="subscriptNews()"
+        class="submit">{{ 'Subscribe' | translate: lang:langPageName }}</button>
     </div>
-    <button *ngIf="!canSubscribe" class="success">Successfully subscribed</button>
+    <button *ngIf="!canSubscribe" class="success">{{ 'SuccessfullySubscribed' | translate: lang:langPageName }}</button>
   </div>
   <div class="contacts">
     <a target="_blank" href="https://github.com/O3Labs">
@@ -292,12 +300,12 @@
     <img src="/assets/images/home/footer-logo.png" alt="">
     <p class="copyright">© {{ copyRightYear }} O3 Labs Inc.</p>
     <p class="language">
-        <span [ngClass]="{active: lang==='en'}" (click)="changeLang('en')">EN</span>
-        <span class="line">|</span>
-        <span [ngClass]="{active: lang==='zh'}" (click)="changeLang('zh')">CN</span>
-      </p>
+      <span [ngClass]="{active: lang==='en'}" (click)="changeLang('en')">EN</span>
+      <span class="line">|</span>
+      <span [ngClass]="{active: lang==='zh'}" (click)="changeLang('zh')">CN</span>
+    </p>
     <a href="https://docs.o3swap.com/" target="_blank">
-      <p class="doc">Doc</p>
+      <p class="doc">{{ 'Doc' | translate: lang:langPageName }}</p>
     </a>
   </div>
 </footer>

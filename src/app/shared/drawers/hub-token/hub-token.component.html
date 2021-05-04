@@ -1,7 +1,7 @@
 <section class="container">
   <div class="header">
-    <span class="title">SELECT</span>
-    <span class="close" (click)="close()">Cancel</span>
+    <span class="title">{{ 'SELECT' | translate: lang:langPageName}}</span>
+    <span class="close" (click)="close()">{{ 'Cancel' | translate: lang:langPageName }}</span>
   </div>
   <ul class="tokens scroll">
     <li *ngFor="let token of USD_TOKENS" (click)="close(token)">

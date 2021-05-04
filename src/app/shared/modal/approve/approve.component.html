@@ -2,15 +2,16 @@
   <div class="close-group">
     <img (click)="close()" class="close" src="/assets/images/swap/close.png" alt="">
   </div>
-  <p class="title">Approve</p>
+  <p class="title">{{ 'Approve' | translate: lang:langPageName }}</p>
   <div class="content">
     <div class="approve-content">
       <img [src]="fromToken?.logo" alt="">
-      <p class="title">Approve {{ fromToken?.symbol }}</p>
+      <p class="title">{{ 'Approve' | translate: lang:langPageName }} {{ fromToken?.symbol }}</p>
       <div class="desc">
-        Approval is required for the transaction with a first-time contract call and a new address.
+        {{ 'ApproveDesc' | translate: lang:langPageName }}
       </div>
     </div>
-    <button class="approve" nz-button [nzLoading]="isApproveLoading" (click)="approve()">Approve</button>
+    <button class="approve" nz-button [nzLoading]="isApproveLoading"
+      (click)="approve()">{{ 'Approve' | translate: lang:langPageName }}</button>
   </div>
 </section>

@@ -8,3 +8,4 @@ export * from './contract';
 export * from './api';
 export * from './link';
 export * from './network';
+export * from './i18n';

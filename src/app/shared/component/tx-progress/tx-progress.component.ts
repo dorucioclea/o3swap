@@ -69,7 +69,7 @@ export class TxProgressComponent implements OnInit, OnDestroy {
   swapProgress = 20;
   minMessage: string;
 
-  langPageName = 'tx-progress';
+  langPageName = 'swap';
   langUnScribe: Unsubscribable;
   language$: Observable<any>;
   lang: string;

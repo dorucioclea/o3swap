@@ -4,7 +4,7 @@
   </app-header-connect-item>
   <div class="connect-btn" *ngIf="!vaultWallet" (click)="showConnect()">
     <img src="/assets/images/swap/link.png" alt="">
-    <span>Connect Wallet</span>
+    <span>{{ 'ConnectWallet' | translate: lang:langPageName }}</span>
   </div>
 </div>
 

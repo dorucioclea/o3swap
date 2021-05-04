@@ -23,7 +23,7 @@ interface State {
 export class VaultStakeComponent implements OnInit, OnDestroy {
   @Input() inputAmount: number = 0;
 
-  langPageName = 'vault-stake';
+  langPageName = 'vault';
   langUnScribe: Unsubscribable;
   language$: Observable<any>;
   lang: string;

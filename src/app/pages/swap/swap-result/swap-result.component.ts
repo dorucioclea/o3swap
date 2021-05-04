@@ -108,7 +108,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
   connectChainType: ConnectChainType;
   isSwapCanClick = true;
 
-  langPageName = 'swap-result';
+  langPageName = 'swap';
   langUnScribe: Unsubscribable;
   language$: Observable<any>;
   lang: string;

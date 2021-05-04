@@ -19,7 +19,7 @@ export class SwapExchangeComponent implements OnInit, OnDestroy {
 
   toTokenSymbol: string;
 
-  langPageName = 'swap-exchange';
+  langPageName = 'swap';
   langUnScribe: Unsubscribable;
   language$: Observable<any>;
   lang: string;

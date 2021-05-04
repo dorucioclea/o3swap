@@ -12,7 +12,7 @@ interface State {
   styleUrls: ['./risk-warning.component.scss'],
 })
 export class RiskWarningComponent implements OnInit, OnDestroy {
-  langPageName = 'risk-warning';
+  langPageName = 'app';
   langUnScribe: Unsubscribable;
   language$: Observable<any>;
   lang: string;

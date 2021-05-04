@@ -2,9 +2,9 @@
   <div class="close-group">
     <img (click)="close()" class="close" src="/assets/images/swap/close.png" alt="">
   </div>
-  <p class="title">Settings</p>
+  <p class="title">{{ 'Settings' | translate: lang:langPageName }}</p>
   <div class="setting-item">
-    <p class="setting-item-title">Slippage tolerance</p>
+    <p class="setting-item-title">{{ 'SlippageTolerance' | translate: lang:langPageName }}</p>
     <div class="setting-item-content slip">
       <ul class="left">
         <li *ngFor="let slip of slipValueGroup" class="slip-item" (click)="selectSlipValue(slip)"
@@ -18,10 +18,10 @@
     </div>
   </div>
   <div class="setting-item">
-    <p class="setting-item-title">Transaction time limit</p>
+    <p class="setting-item-title">{{ 'TransactionTimeLimit' | translate: lang:langPageName }}</p>
     <div class="setting-item-content tx-time-limit">
       <input type="number" (input)="inputDeadline($event)" (blur)="updateDeadline()" [(ngModel)]="deadline">
-      <span>&nbsp;&nbsp;min</span>
+      <span>&nbsp;&nbsp;{{ 'min' | translate: lang:langPageName }}</span>
     </div>
   </div>
 </section>

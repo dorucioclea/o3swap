@@ -1,15 +1,15 @@
 <section class="wrapper select-token-wrapper">
-  <p class="title">Swap</p>
+  <p class="title">{{ 'Swap' | translate: lang:'app' }}</p>
   <div *ngIf="inputAmountError" class="input-token-error">{{ inputAmountError }}</div>
   <div class="token-select-content">
     <div class="from token-select-item">
       <div class="row1">
         <span class="left">{{'From' | translate: lang:langPageName}}</span>
         <p class="right">
-          Balance:&nbsp;
+          {{ 'Balance' | translate: lang:langPageName }}:&nbsp;
           <app-long-balance class="from-amount" [balance]="fromToken?.amount"></app-long-balance>
           &nbsp;{{ fromToken?.symbol }}
-          <span class="all" (click)="allInputAmount()">Max</span>
+          <span class="all" (click)="allInputAmount()">{{ 'Max' | translate: lang:langPageName }}</span>
         </p>
       </div>
       <div class="row2">
@@ -26,13 +26,13 @@
     <img class="token-exchange" (click)="exchangeToken()" src="/assets/images/swap/exchange-home.png" alt="">
     <div class="to token-select-item">
       <div class="row1">
-        <span class="left">To</span>
+        <span class="left">{{ 'To' | translate: lang:langPageName }}</span>
       </div>
       <div class="row2">
         <div class="token-select" [ngClass]="{'no-selected': !toToken}" (click)="showTokens('to')">
           <div class="flex-1">
             <img *ngIf="toToken" class="logo" [src]="toToken?.logo" alt="">
-            <span class="name">{{ toToken?.symbol || 'SELECT' }}</span>
+            <span class="name">{{ toToken?.symbol || ('SELECT' | translate: lang:langPageName) }}</span>
           </div>
           <img class="arrow" src="/assets/images/swap/arrow-down.png" alt="">
         </div>
@@ -40,10 +40,11 @@
     </div>
   </div>
   <div class="receive content-border" [ngClass]="{'content-border-active': !changeData&&chooseSwapPath }">
-    <p class="sub-title receive-title">You will receive</p>
+    <p class="sub-title receive-title">{{ 'YouWillReceive' | translate: lang:langPageName }}</p>
     <p class="receive-amount">{{ chooseSwapPath?.receiveAmount || '--' }} {{ toToken?.symbol }}</p>
     <p class="receive-fiat">≈＄{{ chooseSwapPath?.fiat || '--.--' }}</p>
-    <button class="confirm" (click)="inquiry()" [ngClass]="{active: checkCanInquiry()}">RFQ</button>
+    <button class="confirm" (click)="inquiry()"
+      [ngClass]="{active: checkCanInquiry()}">{{ 'RFQ' | translate: lang:langPageName }}</button>
     <img class="next" (click)="backToResultPage()" src="/assets/images/swap/next.png" alt="">
   </div>
   <div class="setting-group">

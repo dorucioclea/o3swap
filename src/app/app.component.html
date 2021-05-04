@@ -6,63 +6,65 @@
       </a>
       <ul *ngIf="isHome !== false" [ngClass]="{ 'menu flex-1': isHome !== false }">
         <li [ngClass]="{active: isHome}">
-          <a routerLink="/">Home</a>
+          <a routerLink="/">{{ 'Home' | translate: lang:langPageName }}</a>
         </li>
         <li [ngClass]="{active: currentPage==='/swap'}">
-          <a routerLink="/swap">Swap</a>
+          <a routerLink="/swap">{{ 'Swap' | translate: lang:langPageName }}</a>
         </li>
         <li [ngClass]="{active: currentPage.startsWith('/hub')}">
-          <a routerLink="/hub">Hub</a>
+          <a routerLink="/hub">{{ 'Hub' | translate: lang:langPageName }}</a>
         </li>
         <li [ngClass]="{active: currentPage==='/vault'}">
-          <a routerLink="/vault">Vault</a>
+          <a routerLink="/vault">{{ 'Vault' | translate: lang:langPageName }}</a>
         </li>
         <li class="add-width">
-          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Dashboard</a>
+          <a nz-tooltip nzTooltipTitle="Coming soon..."
+            nzTooltipPlacement="bottom">{{ 'Dashboard' | translate: lang:langPageName }}</a>
         </li>
         <li>
-          <a href="https://medium.com/o3-labs-o3-wallet" target="_blank">Blog</a>
+          <a href="https://medium.com/o3-labs-o3-wallet" target="_blank">{{ 'Blog' | translate: lang:langPageName }}</a>
         </li>
         <!-- <li class="add-width" [ngClass]="{active: currentPage.startsWith('/governance')}">
-          <a>Governance</a>
+          <a>{{ 'Governance' | translate: lang:langPageName }}</a>
         </li> -->
         <li class="add-width">
-          <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Governance</a>
+          <a nz-tooltip nzTooltipTitle="Coming soon..."
+            nzTooltipPlacement="bottom">{{ 'Governance' | translate: lang:langPageName }}</a>
         </li>
         <li>
-          <a href="https://docs.o3swap.com/" target="_blank">Doc</a>
+          <a href="https://docs.o3swap.com/" target="_blank">{{ 'Doc' | translate: lang:langPageName }}</a>
         </li>
       </ul>
       <ul *ngIf="isHome === false" [ngClass]="{ 'left-menu': isHome === false, showRisk: showRisk }">
         <li [ngClass]="{active: isHome}">
-          <a routerLink="/">Home</a>
+          <a routerLink="/">{{ 'Home' | translate: lang:langPageName }}</a>
         </li>
         <li [ngClass]="{active: currentPage==='/swap'}">
-          <a routerLink="/swap">Swap</a>
+          <a routerLink="/swap">{{ 'Swap' | translate: lang:langPageName }}</a>
         </li>
         <li [ngClass]="{active: currentPage.startsWith('/hub')}">
-          <a routerLink="/hub">Hub</a>
+          <a routerLink="/hub">{{ 'Hub' | translate: lang:langPageName }}</a>
         </li>
         <li [ngClass]="{active: currentPage==='/vault'}">
-          <a routerLink="/vault">Vault</a>
+          <a routerLink="/vault">{{ 'Vault' | translate: lang:langPageName }}</a>
         </li>
         <li>
           <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="right"
             [nzTooltipOrigin]="button2.elementRef">
-            <span nz-element #button2="nzElement">Dashboard</span>
+            <span nz-element #button2="nzElement">{{ 'Dashboard' | translate: lang:langPageName }}</span>
           </a>
         </li>
         <li>
-          <a href="https://medium.com/o3-labs-o3-wallet" target="_blank">Blog</a>
+          <a href="https://medium.com/o3-labs-o3-wallet" target="_blank">{{ 'Blog' | translate: lang:langPageName }}</a>
         </li>
         <li>
           <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="right"
             [nzTooltipOrigin]="button3.elementRef">
-            <span nz-element #button3="nzElement">Governance</span>
+            <span nz-element #button3="nzElement">{{ 'Governance' | translate: lang:langPageName }}</span>
           </a>
         </li>
         <li>
-          <a href="https://docs.o3swap.com/" target="_blank">Doc</a>
+          <a href="https://docs.o3swap.com/" target="_blank">{{ 'Doc' | translate: lang:langPageName }}</a>
         </li>
       </ul>
       <app-header-connect *ngIf="isHome===false && currentPage!=='/vault'"></app-header-connect>
@@ -74,9 +76,7 @@
   <div class="risk-tip" *ngIf="showRisk && !isHome">
     <img src="/assets/images/risk-icon.png" alt="">
     <div class="risk-tip-text-box">
-      <span class="risk-tip-text">O3 Swap is currently in the testing phase. The testing amount is limited to below $20
-        in USD. Back up your private
-        keys securely and trade at your own risk.</span>
+      <span class="risk-tip-text">{{ 'riskTip' | translate: lang:langPageName }}</span>
     </div>
     <img (click)="closeRisk()" class="close" src="/assets/images/close-risk.png" alt="">
   </div>
@@ -86,31 +86,33 @@
 <nz-dropdown-menu #mobileMenu="nzDropdownMenu">
   <ul class="mobile-menu" nz-menu>
     <li nz-menu-item [ngClass]="{active: isHome}">
-      <a routerLink="/">Home</a>
+      <a routerLink="/">{{ 'Home' | translate: lang:langPageName }}</a>
     </li>
     <li nz-menu-item [ngClass]="{active: currentPage==='/swap'}">
-      <a routerLink="/swap">Swap</a>
+      <a routerLink="/swap">{{ 'Swap' | translate: lang:langPageName }}</a>
     </li>
     <li nz-menu-item [ngClass]="{active: currentPage.startsWith('/hub')}">
-      <a routerLink="/hub">Hub</a>
+      <a routerLink="/hub">{{ 'Hub' | translate: lang:langPageName }}</a>
     </li>
     <li nz-menu-item [ngClass]="{active: currentPage==='/vault'}">
-      <a routerLink="/vault">Vault</a>
+      <a routerLink="/vault">{{ 'Vault' | translate: lang:langPageName }}</a>
     </li>
     <li nz-menu-item>
-      <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Dashboard</a>
+      <a nz-tooltip nzTooltipTitle="Coming soon..."
+        nzTooltipPlacement="bottom">{{ 'Dashboard' | translate: lang:langPageName }}</a>
     </li>
     <li nz-menu-item>
-      <a href="https://medium.com/o3-labs-o3-wallet" target="_blank">Blog</a>
+      <a href="https://medium.com/o3-labs-o3-wallet" target="_blank">{{ 'Blog' | translate: lang:langPageName }}</a>
     </li>
     <!-- <li [ngClass]="{active: currentPage.startsWith('/governance')}">
-        <a>Governance</a>
+        <a>{{ 'Governance' | translate: lang:langPageName }}</a>
       </li> -->
     <li nz-menu-item>
-      <a nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="bottom">Governance</a>
+      <a nz-tooltip nzTooltipTitle="Coming soon..."
+        nzTooltipPlacement="bottom">{{ 'Governance' | translate: lang:langPageName }}</a>
     </li>
     <li nz-menu-item>
-      <a href="https://docs.o3swap.com/" target="_blank">Doc</a>
+      <a href="https://docs.o3swap.com/" target="_blank">{{ 'Doc' | translate: lang:langPageName }}</a>
     </li>
   </ul>
 </nz-dropdown-menu>

@@ -16,11 +16,13 @@
             [options]="successOptions"></ng-lottie>
           <img *ngIf='transaction?.isFailed' src="/assets/images/swap-result/failed.png" alt="">
         </div>
-        <p class="status" *ngIf='!transaction?.isFailed && transaction?.isPending'>Pending</p>
-        <p class="status" *ngIf='!transaction?.isFailed && !transaction?.isPending'>Success</p>
-        <p class="status" *ngIf='transaction?.isFailed'>Failed</p>
+        <p class="status" *ngIf='!transaction?.isFailed && transaction?.isPending'>
+          {{ 'Pending' | translate: lang:langPageName }}</p>
+        <p class="status" *ngIf='!transaction?.isFailed && !transaction?.isPending'>
+          {{ 'Success' | translate: lang:langPageName }}</p>
+        <p class="status" *ngIf='transaction?.isFailed'>{{ 'Failed' | translate: lang:langPageName }}</p>
         <div class="desc">
-          <span *ngIf="txAtPage!=='liquidity'">Swap</span>
+          <span *ngIf="txAtPage!=='liquidity'">{{ 'Swap' | translate: lang:langPageName }}</span>
           <span
             *ngIf="txAtPage==='liquidity'">{{ transaction?.fromToken.symbol==='LP' ? 'Withdraw' : 'Deposit' }}</span>
           {{ transaction?.amount }} {{ transaction?.fromToken?.symbol }}
@@ -46,10 +48,10 @@
             <div class="right">
               <p class="name">{{ transaction?.toToken.symbol }}</p>
               <div class="hash" *ngIf="transaction?.isFailed && !transaction?.txid">
-                Failed
+                {{ 'Failed' | translate: lang:langPageName }}
               </div>
               <div class="hash" *ngIf="transaction?.txid">
-                <span>Hash</span>
+                <span>{{ 'Hash' | translate: lang:langPageName }}</span>
                 {{ transaction?.txid | shortAddress: 6 }}
                 <img class="copy" (click)="copy(transaction?.txid)" src="/assets/images/swap/copy.png" alt="">
               </div>
@@ -75,16 +77,16 @@
             <div class="right">
               <p class="name">{{ transaction?.fromToken.chain }}</p>
               <div class="hash" *ngIf="transaction?.isFailed">
-                Failed
+                {{ 'Failed' | translate: lang:langPageName }}
               </div>
               <div class="hash" *ngIf="!transaction?.isFailed && transaction?.progress.step1.status===2">
-                <span>Hash</span>
+                <span>{{ 'Hash' | translate: lang:langPageName }}</span>
                 {{ transaction?.progress.step1.hash | shortAddress: 6 }}
                 <img class="copy" (click)="copy(transaction?.progress.step1.hash)" src="/assets/images/swap/copy.png"
                   alt="">
               </div>
               <div class="hash" *ngIf="!transaction?.isFailed && transaction?.progress.step1.status===1">
-                In progress
+                {{ 'InProgress' | translate: lang:langPageName }}
               </div>
               <div class="link" *ngIf="!transaction?.isFailed && transaction?.progress.step1.status===2">
                 <a target="_blank"
@@ -109,19 +111,19 @@
             <div class="right">
               <p class="name">poly</p>
               <div class="hash" *ngIf="transaction?.isFailed">
-                Failed
+                {{ 'Failed' | translate: lang:langPageName }}
               </div>
               <div class="hash" *ngIf="!transaction?.isFailed && transaction?.progress.step2.status===2">
-                <span>Hash</span>
+                <span>{{ 'Hash' | translate: lang:langPageName }}</span>
                 {{ transaction?.progress.step2.hash | shortAddress: 6 }}
                 <img class="copy" (click)="copy(transaction?.progress.step2.hash)" src="/assets/images/swap/copy.png"
                   alt="">
               </div>
               <div class="hash" *ngIf="!transaction?.isFailed && transaction?.progress.step2.status===1">
-                In progress
+                {{ 'InProgress' | translate: lang:langPageName }}
               </div>
               <div class="hash" *ngIf="!transaction?.isFailed && transaction?.progress.step2.status===0">
-                Waiting
+                {{ 'Waiting' | translate: lang:langPageName }}
               </div>
               <div class="link" *ngIf="!transaction?.isFailed && transaction?.progress.step2.status===2">
                 <a target="_blank" href="{{POLY_TX_PAGES_PREFIX}}/{{transaction?.progress.step2.hash}}">
@@ -145,19 +147,19 @@
             <div class="right">
               <p class="name">{{ transaction?.toToken.chain }}</p>
               <div class="hash" *ngIf="transaction?.isFailed">
-                Failed
+                {{ 'Failed' | translate: lang:langPageName }}
               </div>
               <div class="hash" *ngIf="!transaction?.isFailed && transaction?.progress.step3.status===2">
-                <span>Hash</span>
+                <span>{{ 'Hash' | translate: lang:langPageName }}</span>
                 {{ transaction?.progress.step3.hash | shortAddress: 6 }}
                 <img class="copy" (click)="copy(transaction?.progress.step3.hash)" src="/assets/images/swap/copy.png"
                   alt="">
               </div>
               <div class="hash" *ngIf="!transaction?.isFailed && transaction?.progress.step3.status===1">
-                In progress
+                {{ 'InProgress' | translate: lang:langPageName }}
               </div>
               <div class="hash" *ngIf="!transaction?.isFailed && transaction?.progress.step3.status===0">
-                Waiting
+                {{ 'Waiting' | translate: lang:langPageName }}
               </div>
               <div class="link"
                 *ngIf="!transaction?.isFailed && !transaction?.isFailed && transaction?.progress.step3.status===2">

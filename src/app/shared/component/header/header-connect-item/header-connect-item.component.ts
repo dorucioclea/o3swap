@@ -30,7 +30,7 @@ export class HeaderConnectItemComponent implements OnInit, OnDestroy {
   isShowModal = false;
   showModalTimeOut;
 
-  langPageName = 'header';
+  langPageName = 'app';
   langUnScribe: Unsubscribable;
   language$: Observable<any>;
   lang: string;

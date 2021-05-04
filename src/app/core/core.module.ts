@@ -1,18 +1,4 @@
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-
-import { StartupService } from './startup/startup.service';
-export function StartupServiceFactory(startupService: StartupService): any {
-  return () => startupService.load();
-}
-const APPINIT_PROVIDES = [
-  StartupService,
-  {
-    provide: APP_INITIALIZER,
-    useFactory: StartupServiceFactory,
-    deps: [StartupService],
-    multi: true,
-  },
-];
+import { NgModule } from '@angular/core';
 
 //#region services
 import { ApiService } from './api/api.service';
@@ -39,6 +25,6 @@ const SERVICES = [
 //#endregion
 
 @NgModule({
-  providers: [...SERVICES, ...APPINIT_PROVIDES],
+  providers: [...SERVICES],
 })
 export class CoreModule {}

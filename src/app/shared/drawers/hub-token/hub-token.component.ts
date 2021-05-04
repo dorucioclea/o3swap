@@ -17,7 +17,7 @@ export class HubTokenComponent implements OnInit, OnDestroy {
   CONST_BRIDGE_TOKENS = CONST_BRIDGE_TOKENS;
   USD_TOKENS = USD_TOKENS;
 
-  langPageName = 'hub-token';
+  langPageName = 'swap';
   langUnScribe: Unsubscribable;
   language$: Observable<any>;
   lang: string;

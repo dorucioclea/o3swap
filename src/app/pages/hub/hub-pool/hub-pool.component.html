@@ -1,48 +1,48 @@
 <div class="group-container pool">
-  <div class="header">Cross-chain Pool</div>
+  <div class="header">{{ 'CrossChainPool' | translate: lang:langPageName }}</div>
   <div class="group-item">
     <div class="pool-detail">
       <div class="list">
         <div class="item">
           <div class="value">$--</div>
-          <div class="name">TVL</div>
+          <div class="name">{{ 'TVL' | translate: lang:langPageName }}</div>
         </div>
         <div class="item">
           <div class="value">$--</div>
-          <div class="name">VOL</div>
+          <div class="name">{{ 'VOL' | translate: lang:langPageName }}</div>
         </div>
         <div class="item">
           <div class="value">--</div>
-          <div class="name">APR</div>
+          <div class="name">{{ 'APR' | translate: lang:langPageName }}</div>
         </div>
         <div class="item">
           <div class="value">
             <img src="/assets/images/hub/reward-tokens.png" alt="" class="token-logo">
           </div>
-          <div class="name">REWARDS</div>
+          <div class="name">{{ 'REWARDS' | translate: lang:langPageName }}</div>
         </div>
       </div>
       <div class="right">
         <div class="btn-primary btn deposit-btn" [routerLink]="['/hub/liquidity', 'add']">
-          Deposit
+          {{ 'Deposit' | translate: lang:langPageName }}
         </div>
         <div class="btn-primary btn withdrawal-btn" [routerLink]="['/hub/liquidity', 'remove']">
-          Withdraw
+          {{ 'Withdraw' | translate: lang:langPageName }}
         </div>
       </div>
     </div>
     <div class="token-detail">
       <img src="/assets/images/logo-O3.png" alt="" class="token-logo">
       <div class="token-name">
-        O3Pool <span>(USDT+BUSD+HUSD)</span>
+        {{ 'O3Pool' | translate: lang:langPageName }}<span>(USDT+BUSD+HUSD)</span>
       </div>
     </div>
   </div>
 </div>
 <div class="group-container statistical-data">
-  <div class="header">Total Pool Deposits & Daily Volume</div>
+  <div class="header">{{ 'TotalPoolDepositsDailyVolume' | translate: lang:langPageName }}</div>
   <div class="desc">
-    <p>Total pool deposit: $--</p>
-    <p>Daily volume: $--</p>
+    <p>{{ 'TotalPoolDeposit' | translate: lang:langPageName }}: $--</p>
+    <p>{{ 'DailyVolume' | translate: lang:langPageName }}: $--</p>
   </div>
 </div>

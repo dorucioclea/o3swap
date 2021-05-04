@@ -46,7 +46,7 @@ export class HeaderConnectComponent implements OnInit, OnDestroy {
   bscWalletName: EthWalletName;
   hecoWalletName: EthWalletName;
 
-  langPageName = 'header';
+  langPageName = 'app';
   langUnScribe: Unsubscribable;
   language$: Observable<any>;
   lang: string;

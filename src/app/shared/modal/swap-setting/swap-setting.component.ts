@@ -26,7 +26,7 @@ export class SwapSettingComponent implements OnInit, OnDestroy {
   slipValueGroup = [0.1, 0.5, 1, 2];
   slipValueError: string;
 
-  langPageName = 'swap-setting';
+  langPageName = 'swap';
   langUnScribe: Unsubscribable;
   language$: Observable<any>;
   lang: string;

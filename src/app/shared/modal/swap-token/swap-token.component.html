@@ -2,7 +2,7 @@
   <div class="close-group">
     <img (click)="close()" class="close" src="/assets/images/swap/close.png" alt="">
   </div>
-  <p class="title">Choose</p>
+  <p class="title">{{ 'Choose' | translate: lang:langPageName }}</p>
   <div class="search">
     <input type="text" (focus)="isfocusSearchInput=true" (blur)="isfocusSearchInput=false"
       [ngClass]="{focus: isfocusSearchInput}" (input)="search($event)" placeholder="Search token name">

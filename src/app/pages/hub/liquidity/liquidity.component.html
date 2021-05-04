@@ -2,7 +2,7 @@
   <div class="group-container row1">
     <div class="item">
       <div class="header">
-        {{LPToken ? LPToken.symbol : '--' }} <span>BALANCE</span>
+        {{LPToken ? LPToken.symbol : '--' }} <span>{{ 'BALANCE' | translate: lang:langPageName }}</span>
       </div>
       <div class="content">
         <div class="value">
@@ -13,7 +13,7 @@
     </div>
     <div class="item">
       <div class="header">
-        {{LPToken ? LPToken.symbol : '--' }} <span>STAKED</span>
+        {{LPToken ? LPToken.symbol : '--' }} <span>{{ 'STAKED' | translate: lang:langPageName }}</span>
       </div>
       <div class="content">
         <div class="value">
@@ -21,13 +21,13 @@
           <span class="rate">≈＄0.0</span>
         </div>
         <div class="btn-primary receive-btn" nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="top">
-          STAKE
+          {{ 'STAKE' | translate: lang:langPageName }}
         </div>
       </div>
     </div>
     <div class="item">
       <div class="header">
-        O3 <span>EARNED</span>
+        O3 <span>{{ 'EARNED' | translate: lang:langPageName }}</span>
       </div>
       <div class="content">
         <div class="value">
@@ -35,7 +35,7 @@
           <span class="rate">≈＄0.0</span>
         </div>
         <div class="btn-primary receive-btn" nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="top">
-          CLAIM
+          {{ 'CLAIM' | translate: lang:langPageName }}
         </div>
       </div>
     </div>
@@ -45,11 +45,11 @@
       <div class="tab-nav-scroll">
         <div class="tabs tabs-add" [ngClass]="{addActive: liquidityType === 'add'}"
           [routerLink]="['/hub/liquidity', 'add']">
-          Add Liquidity
+          {{ 'AddLiquidity' | translate: lang:langPageName }}
         </div>
         <div class="tabs tabs-remove" [ngClass]="{removeActive: liquidityType === 'remove'}"
           [routerLink]="['/hub/liquidity', 'remove']">
-          Remove Liquidity
+          {{ 'RemoveLiquidity' | translate: lang:langPageName }}
         </div>
       </div>
       <div class="tab-content">
@@ -76,13 +76,13 @@
                         [(ngModel)]="addLiquidityInputAmount[i]" placeholder="0.0">
                     </div>
                     <div class="max-status" (click)="maxAddLiquidityInput(i)"
-                      [ngClass]="{active: tokenItem?.amount != '--'}">MAX</div>
+                      [ngClass]="{active: tokenItem?.amount != '--'}">{{ 'MAX' | translate: lang:langPageName }}</div>
                     <div class="balance">
-                      <span>Balance</span>
+                      <span>{{ 'Balance' | translate: lang:langPageName }}</span>
                       <app-long-balance [balance]="tokenItem?.amount"></app-long-balance>
                     </div>
                     <div class="btn-primary btn-liquidity" (click)="depost(tokenItem, i)">
-                      Deposit
+                      {{ 'Deposit' | translate: lang:langPageName }}
                     </div>
                     <div class="showPolyFeeArrow" (click)="showAddPolyFee[i]=!showAddPolyFee[i]">
                       <img src="/assets/images/swap/arrow-down.png" alt="">
@@ -90,10 +90,10 @@
                   </div>
                 </div>
                 <div class="poly-fee" *ngIf="showAddPolyFee[i]">
-                  <p>Poly Fee:<span *ngIf="addPolyFee[i]">{{ addPolyFee[i] }}
+                  <p>{{ 'PolyFee' | translate: lang:'swap' }}:<span *ngIf="addPolyFee[i]">{{ addPolyFee[i] }}
                       {{ SOURCE_TOKEN_SYMBOL[tokenItem?.chain] }}</span></p>
                   <div class="address">
-                    <p>From:
+                    <p>{{ 'From' | translate: lang:'swap' }}:
                       <span *ngIf="tokenItem?.chain==='ETH'">
                         <img src="/assets/images/swap-chains/ETH.png" alt="">
                         {{ ethAccountAddress | shortAddress: '10' }}
@@ -107,13 +107,13 @@
                         {{ hecoAccountAddress | shortAddress: '10' }}
                       </span>
                     </p>
-                    <p>To:<span><img src="/assets/images/swap-chains/ETH.png" alt="">
+                    <p>{{ 'To' | translate: lang:'swap' }}:<span><img src="/assets/images/swap-chains/ETH.png" alt="">
                         {{ ethAccountAddress | shortAddress: '10' }}</span></p>
                   </div>
                 </div>
               </div>
               <div class="receive">
-                <span>Receive LP</span>
+                <span>{{ 'ReceiveLP' | translate: lang:langPageName }}</span>
                 <app-long-balance [balance]="receiveAmount[i]"></app-long-balance>
               </div>
             </li>
@@ -140,13 +140,13 @@
                         [(ngModel)]="removeLiquidityInputAmount[i]" placeholder="0.0">
                     </div>
                     <div class="max-status" (click)="maxRemoveLiquidityInput(i)"
-                      [ngClass]="{active: tokenItem?.amount != '--'}">MAX</div>
+                      [ngClass]="{active: tokenItem?.amount != '--'}">{{ 'MAX' | translate: lang:langPageName }}</div>
                     <div class="balance">
-                      <span>Balance</span>
+                      <span>{{ 'Balance' | translate: lang:langPageName }}</span>
                       <app-long-balance [balance]="tokenItem?.amount"></app-long-balance>
                     </div>
                     <div class="btn-primary btn-liquidity" (click)=" withdrawal(tokenItem, i)">
-                      Withdraw
+                      {{ 'Withdraw' | translate: lang:langPageName }}
                     </div>
                     <div class="showPolyFeeArrow" (click)="showRemovePolyFee[i]=!showRemovePolyFee[i]">
                       <img src="/assets/images/swap/arrow-down.png" alt="">
@@ -154,13 +154,14 @@
                   </div>
                 </div>
                 <div class="poly-fee" *ngIf="showRemovePolyFee[i]">
-                  <p>Poly Fee:<span *ngIf="removePolyFee[i]">{{ removePolyFee[i] }} ETH</span></p>
+                  <p>{{ 'PolyFee' | translate: lang:'swap' }}:<span *ngIf="removePolyFee[i]">{{ removePolyFee[i] }}
+                      ETH</span></p>
                   <div class="address">
-                    <p>From:
+                    <p>{{ 'From' | translate: lang:'swap' }}:
                       <span><img src="/assets/images/swap-chains/ETH.png" alt="">
                         {{ ethAccountAddress | shortAddress: '10' }}</span>
                     </p>
-                    <p>To:
+                    <p>{{ 'To' | translate: lang:'swap' }}:
                       <span *ngIf="tokenItem?.chain==='ETH'">
                         <img src="/assets/images/swap-chains/ETH.png" alt="">
                         {{ ethAccountAddress | shortAddress: '10' }}
@@ -178,14 +179,14 @@
                 </div>
               </div>
               <div class="receive">
-                <span>PayAmount LP</span>
+                <span>{{ 'PayLP' | translate: lang:langPageName }}</span>
                 <app-long-balance [balance]="payAmount[i]"></app-long-balance>
               </div>
             </li>
           </ng-container>
         </ul>
         <div class="slipvalue">
-          <span class="name">Max slippage：</span>
+          <span class="name">{{ 'MaxSlippage' | translate: lang:langPageName }}：</span>
           <span class="value">{{BRIDGE_SLIPVALUE}}%</span>
         </div>
       </div>
@@ -270,7 +271,7 @@
   <div class="page-info">
     <div class="item">
       <div class="header">
-        {{LPToken ? LPToken.symbol : '--' }} <span>BALANCE</span>
+        {{LPToken ? LPToken.symbol : '--' }} <span>{{ 'BALANCE' | translate: lang:langPageName }}</span>
       </div>
       <div class="content">
         <div class="value">
@@ -281,7 +282,7 @@
     </div>
     <div class="item">
       <div class="header">
-        {{LPToken ? LPToken.symbol : '--' }} <span>STAKED</span>
+        {{LPToken ? LPToken.symbol : '--' }} <span>{{ 'STAKED' | translate: lang:langPageName }}</span>
       </div>
       <div class="content">
         <div class="value">
@@ -289,13 +290,13 @@
           <span class="rate">≈＄0.0</span>
         </div>
         <div class="btn-primary receive-btn" nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="top">
-          STAKE
+          {{ 'STAKE' | translate: lang:langPageName }}
         </div>
       </div>
     </div>
     <div class="item">
       <div class="header">
-        O3 <span>EARNED</span>
+        O3 <span>{{ 'EARNED' | translate: lang:langPageName }}</span>
       </div>
       <div class="content">
         <div class="value">
@@ -303,7 +304,7 @@
           <span class="rate">≈＄0.0</span>
         </div>
         <div class="btn-primary receive-btn" nz-tooltip nzTooltipTitle="Coming soon..." nzTooltipPlacement="top">
-          CLAIM
+          {{ 'CLAIM' | translate: lang:langPageName }}
         </div>
       </div>
     </div>
@@ -313,11 +314,11 @@
       <div class="tab-nav-scroll">
         <div class="tabs tabs-add" [ngClass]="{addActive: liquidityType === 'add'}"
           [routerLink]="['/hub/liquidity', 'add']">
-          Add Liquidity
+          {{ 'AddLiquidity' | translate: lang:langPageName }}
         </div>
         <div class="tabs tabs-remove" [ngClass]="{removeActive: liquidityType === 'remove'}"
           [routerLink]="['/hub/liquidity', 'remove']">
-          Remove Liquidity
+          {{ 'RemoveLiquidity' | translate: lang:langPageName }}
         </div>
       </div>
       <div class="tab-content">
@@ -329,10 +330,10 @@
                   <div class="detail-head">
                     <p class="token-num">Token{{i + 1}}</p>
                     <div class="head-right">
-                      <span>Balance: &nbsp;</span>
+                      <span>{{ 'Balance' | translate: lang:langPageName }}: &nbsp;</span>
                       <app-long-balance [balance]="tokenItem?.amount"></app-long-balance>
                       <span class="max-status" (click)="maxAddLiquidityInput(i)"
-                        [ngClass]="{active: tokenItem?.amount != '--'}">MAX</span>
+                        [ngClass]="{active: tokenItem?.amount != '--'}">{{ 'MAX' | translate: lang:langPageName }}</span>
                     </div>
                   </div>
                   <div class="token-input-block">
@@ -352,22 +353,22 @@
                     </div>
                   </div>
                   <div class="receive">
-                    <span>Receive LP</span>&nbsp;
+                    <span>{{ 'ReceiveLP' | translate: lang:langPageName }}</span>&nbsp;
                     <app-long-balance [balance]="receiveAmount[i]"></app-long-balance>
                   </div>
 
                   <button class="btn-primary btn-liquidity deposit-btn" (click)="depost(tokenItem, i)">
-                    Deposit
+                    {{ 'Deposit' | translate: lang:langPageName }}
                   </button>
                   <div class="show-poly-fee-arrow" (click)="showAddPolyFee[i]=!showAddPolyFee[i]">
                     <img src="/assets/images/swap/arrow-down.png" alt="">
                   </div>
                 </div>
                 <div class="poly-fee" *ngIf="showAddPolyFee[i]">
-                  <p>Poly Fee:<span *ngIf="addPolyFee[i]">{{ addPolyFee[i] }}
+                  <p>{{ 'PolyFee' | translate: lang:'swap' }}:<span *ngIf="addPolyFee[i]">{{ addPolyFee[i] }}
                       {{ SOURCE_TOKEN_SYMBOL[tokenItem?.chain] }}</span></p>
                   <div class="address">
-                    <p>From:
+                    <p>{{ 'From' | translate: lang:'swap' }}:
                       <span *ngIf="tokenItem?.chain==='ETH'">
                         <img src="/assets/images/swap-chains/ETH.png" alt="">
                         {{ ethAccountAddress | shortAddress: '10' }}
@@ -381,7 +382,7 @@
                         {{ hecoAccountAddress | shortAddress: '10' }}
                       </span>
                     </p>
-                    <p>To:<span><img src="/assets/images/swap-chains/ETH.png" alt="">
+                    <p>{{ 'To' | translate: lang:'swap' }}:<span><img src="/assets/images/swap-chains/ETH.png" alt="">
                         {{ ethAccountAddress | shortAddress: '10' }}</span></p>
                   </div>
                 </div>
@@ -395,10 +396,10 @@
                   <div class="detail-head">
                     <p class="token-num">Token{{i + 1}}</p>
                     <div class="head-right">
-                      <span>Balance: &nbsp;</span>
+                      <span>{{ 'Balance' | translate: lang:langPageName }}: &nbsp;</span>
                       <app-long-balance [balance]="tokenItem?.amount"></app-long-balance>
                       <span class="max-status" (click)="maxRemoveLiquidityInput(i)"
-                        [ngClass]="{active: tokenItem?.amount != '--'}">MAX</span>
+                        [ngClass]="{active: tokenItem?.amount != '--'}">{{ 'MAX' | translate: lang:langPageName }}</span>
                     </div>
                   </div>
                   <div class="token-input-block">
@@ -418,25 +419,26 @@
                     </div>
                   </div>
                   <div class="receive">
-                    <span>PayAmount LP</span>&nbsp;
+                    <span>{{ 'PayLP' | translate: lang:langPageName }}</span>&nbsp;
                     <app-long-balance [balance]="receiveAmount[i]"></app-long-balance>
                   </div>
 
                   <button class="btn-primary btn-liquidity deposit-btn" (click)="withdrawal(tokenItem, i)">
-                    Withdraw
+                    {{ 'Withdraw' | translate: lang:langPageName }}
                   </button>
                   <div class="show-poly-fee-arrow" (click)="showRemovePolyFee[i]=!showRemovePolyFee[i]">
                     <img src="/assets/images/swap/arrow-down.png" alt="">
                   </div>
                 </div>
                 <div class="poly-fee" *ngIf="showRemovePolyFee[i]">
-                  <p>Poly Fee:<span *ngIf="removePolyFee[i]">{{ removePolyFee[i] }} ETH</span></p>
+                  <p>{{ 'PolyFee' | translate: lang:'swap' }}:<span *ngIf="removePolyFee[i]">{{ removePolyFee[i] }}
+                      ETH</span></p>
                   <div class="address">
-                    <p>From:
+                    <p>{{ 'From' | translate: lang:'swap' }}:
                       <span><img src="/assets/images/swap-chains/ETH.png" alt="">
                         {{ ethAccountAddress | shortAddress: '10' }}</span>
                     </p>
-                    <p>To:
+                    <p>{{ 'To' | translate: lang:'swap' }}:
                       <span *ngIf="tokenItem?.chain==='ETH'">
                         <img src="/assets/images/swap-chains/ETH.png" alt="">
                         {{ ethAccountAddress | shortAddress: '10' }}
@@ -457,7 +459,7 @@
           </ng-container>
         </ul>
         <div class="slipvalue">
-          <span class="name">Max slippage：</span>
+          <span class="name">{{ 'MaxSlippage' | translate: lang:langPageName }}：</span>
           <span class="value">{{BRIDGE_SLIPVALUE}}%</span>
         </div>
       </div>

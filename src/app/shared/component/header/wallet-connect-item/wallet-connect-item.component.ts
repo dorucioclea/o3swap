@@ -31,7 +31,7 @@ export class WalletConnectItemComponent implements OnInit, OnDestroy {
 
   disableEthO3 = true;
 
-  langPageName = 'header';
+  langPageName = 'app';
   langUnScribe: Unsubscribable;
   language$: Observable<any>;
   lang: string;

@@ -53,7 +53,7 @@ export class SwapTokenComponent implements OnInit, OnDestroy {
   displayTokens: any[] = []; // 最终展示的 tokens, search 结果
   isfocusSearchInput = false;
 
-  langPageName = 'swap-token';
+  langPageName = 'swap';
   langUnScribe: Unsubscribable;
   language$: Observable<any>;
   lang: string;

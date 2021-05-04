@@ -1,8 +1,7 @@
 <section class="wrapper modal-content">
   <p class="title"></p>
   <p class="content">
-    O3 Swap is currently in the testing phase. We are limiting the transaction amount to below $20.
-    Please back up your private keys securely and trade at your own risk!
+    {{ 'riskDesc' | translate: lang:langPageName }}
   </p>
-  <p class="understand-btn" (click)="close()"> I understand</p>
+  <p class="understand-btn" (click)="close()">{{ 'IUnderstand' | translate: lang:langPageName }}</p>
 </section>

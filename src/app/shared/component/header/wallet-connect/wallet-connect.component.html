@@ -5,7 +5,7 @@
       <div class="close-group">
         <img (click)="close()" class="close" src="/assets/images/swap/close.png" alt="">
       </div>
-      <p class="title">Connect wallet</p>
+      <p class="title">{{ 'ConnectWallet' | translate: lang:langPageName }}</p>
       <div class="chains">
         <span class="eth" [ngClass]="{active: connectChainType==='ETH'}" (click)="connectChainType='ETH'"></span>
         <span class="bsc" [ngClass]="{active: connectChainType==='BSC'}" (click)="connectChainType='BSC'"></span>

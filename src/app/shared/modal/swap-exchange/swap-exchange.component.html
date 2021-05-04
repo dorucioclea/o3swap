@@ -2,7 +2,7 @@
   <div class="close-group">
     <img (click)="close()" class="close" src="/assets/images/swap/close.png" alt="">
   </div>
-  <p class="title">Choose Quotes</p>
+  <p class="title">{{ 'ChooseQuotes' | translate: lang:langPageName }}</p>
   <ul class="exchanges scroll">
     <li class="exchange-item" *ngFor="let swapItem of receiveSwapPathArray; index as index"
       (click)="changeSwapPath(index)" [ngClass]="{active: chooseSwapPathIndex===index}">

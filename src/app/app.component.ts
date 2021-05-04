@@ -7,9 +7,14 @@ import {
   O3NeoWalletApiService,
   ApiService,
 } from '@core';
+import { Store } from '@ngrx/store';
 import { RiskWarningComponent } from '@shared';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { interval, Unsubscribable } from 'rxjs';
+import { interval, Observable, Unsubscribable } from 'rxjs';
+
+interface State {
+  language: any;
+}
 
 @Component({
   selector: 'app-root',
@@ -23,7 +28,13 @@ export class AppComponent implements OnInit {
 
   updateRatesInterval: Unsubscribable;
 
+  langPageName = 'app';
+  langUnScribe: Unsubscribable;
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
+    private store: Store<State>,
     private router: Router,
     private metaMaskWalletApiService: MetaMaskWalletApiService,
     private neolineWalletApiService: NeolineWalletApiService,
@@ -32,6 +43,10 @@ export class AppComponent implements OnInit {
     private modal: NzModalService,
     private apiService: ApiService
   ) {
+    this.language$ = store.select('language');
+    this.langUnScribe = this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
     this.router.events.subscribe((res: RouterEvent) => {
       if (res instanceof NavigationEnd) {
         this.currentPage = res.urlAfterRedirects || res.url;

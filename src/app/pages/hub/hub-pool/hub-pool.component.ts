@@ -12,7 +12,7 @@ interface State {
   styleUrls: ['./hub-pool.component.scss', './mobile.scss'],
 })
 export class HubPoolComponent implements OnInit, OnDestroy {
-  langPageName = 'hub-pool';
+  langPageName = 'hub';
   langUnScribe: Unsubscribable;
   language$: Observable<any>;
   lang: string;

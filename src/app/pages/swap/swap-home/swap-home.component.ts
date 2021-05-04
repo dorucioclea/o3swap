@@ -64,7 +64,7 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
   inputAmountFiat: string; // 支付的 token 美元价值
   inputAmountError: string;
 
-  langPageName = 'swap-home';
+  langPageName = 'swap';
   langUnScribe: Unsubscribable;
   language$: Observable<any>;
   lang: string;
