@@ -13,3 +13,5 @@ export const langData = {
   swap,
   vault,
 };
+
+export * from './message';

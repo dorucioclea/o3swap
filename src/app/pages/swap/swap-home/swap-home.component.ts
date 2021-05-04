@@ -9,7 +9,7 @@ import {
   ChangeDetectorRef,
   SimpleChanges,
 } from '@angular/core';
-import { NEO_TOKEN, NNEO_TOKEN, SwapStateType, Token } from '@lib';
+import { MESSAGE, NEO_TOKEN, NNEO_TOKEN, SwapStateType, Token } from '@lib';
 import BigNumber from 'bignumber.js';
 import { SwapSettingComponent, SwapTokenComponent } from '@shared';
 import { NzModalService } from 'ng-zorro-antd/modal';
@@ -275,28 +275,28 @@ export class SwapHomeComponent implements OnInit, OnDestroy, OnChanges {
       (this.fromToken.chain === 'NEO' || this.toToken.chain === 'NEO') &&
       !this.neoAccountAddress
     ) {
-      this.nzMessage.error('Please connect the NEO wallet first');
+      this.nzMessage.error(MESSAGE.ConnectWalletFirst[this.lang](['NEO']));
       return false;
     }
     if (
       (this.fromToken.chain === 'ETH' || this.toToken.chain === 'ETH') &&
       !this.ethAccountAddress
     ) {
-      this.nzMessage.error('Please connect the ETH wallet first');
+      this.nzMessage.error(MESSAGE.ConnectWalletFirst[this.lang](['ETH']));
       return false;
     }
     if (
       (this.fromToken.chain === 'BSC' || this.toToken.chain === 'BSC') &&
       !this.bscAccountAddress
     ) {
-      this.nzMessage.error('Please connect the BSC wallet first');
+      this.nzMessage.error(MESSAGE.ConnectWalletFirst[this.lang](['BSC']));
       return false;
     }
     if (
       (this.fromToken.chain === 'HECO' || this.toToken.chain === 'HECO') &&
       !this.hecoAccountAddress
     ) {
-      this.nzMessage.error('Please connect the HECO wallet first');
+      this.nzMessage.error(MESSAGE.ConnectWalletFirst[this.lang](['HECO']));
       return false;
     }
     return true;

@@ -31,6 +31,7 @@ import {
   CHAINS,
   INIT_CHAIN_TOKENS,
   O3_TOKEN,
+  MESSAGE,
 } from '@lib';
 import { Store } from '@ngrx/store';
 import BigNumber from 'bignumber.js';
@@ -48,6 +49,7 @@ import { RpcApiService } from '../../api/rpc.service';
 interface State {
   swap: SwapStateType;
   tokens: any;
+  language: any;
 }
 @Injectable()
 export class MetaMaskWalletApiService {
@@ -85,6 +87,9 @@ export class MetaMaskWalletApiService {
     },
   };
 
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
     private http: HttpClient,
     private store: Store<State>,
@@ -94,6 +99,10 @@ export class MetaMaskWalletApiService {
     private commonService: CommonService,
     private rpcApiService: RpcApiService
   ) {
+    this.language$ = store.select('language');
+    this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
     this.swap$ = store.select('swap');
     this.tokens$ = store.select('tokens');
     this.swap$.subscribe((state) => {
@@ -165,14 +174,14 @@ export class MetaMaskWalletApiService {
       .request({ method: 'eth_requestAccounts' })
       .then((result) => {
         if (result.length <= 0) {
-          this.nzMessage.error('Please update your MetaMask extension');
+          this.nzMessage.error(MESSAGE.UpdateMetaMaskExtension[this.lang]);
           return;
         }
         this.commonService.log(result);
         this.accountAddress[chain] = result[0];
         this.walletName[chain] = this.myWalletName;
         if (showMessage) {
-          this.nzMessage.success('Connection succeeded!');
+          this.nzMessage.success(MESSAGE.ConnectionSucceeded[this.lang]);
         }
         this.listenBlockNumber();
         this.getBalance(chain as CHAINS, false);
@@ -212,7 +221,7 @@ export class MetaMaskWalletApiService {
     const chain = METAMASK_CHAIN[chainId];
     if (chain !== fromToken.chain) {
       this.nzMessage.error(
-        `Please switch network to ${fromToken.chain} ${NETWORK} on MetaMask extension.`
+        MESSAGE.SwitchMetaMaskNetwork[this.lang]([fromToken.chain, NETWORK])
       );
       return false;
     }

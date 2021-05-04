@@ -1,14 +1,28 @@
 import { Injectable } from '@angular/core';
 import { environment } from '@env/environment';
-import { Token } from '@lib';
+import { MESSAGE, Token } from '@lib';
+import { Store } from '@ngrx/store';
 import BigNumber from 'bignumber.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { Observable } from 'rxjs';
+
+interface State {
+  language: any;
+}
 
 @Injectable()
 export class CommonService {
   isProduction = environment.production;
 
-  constructor(private nzMessage: NzMessageService) {}
+  language$: Observable<any>;
+  lang: string;
+
+  constructor(public store: Store<State>, private nzMessage: NzMessageService) {
+    this.language$ = store.select('language');
+    this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
+  }
 
   log(value: any): void {
     if (this.isProduction === false) {
@@ -23,7 +37,7 @@ export class CommonService {
     input.select();
     if (document.execCommand('copy')) {
       document.execCommand('copy');
-      this.nzMessage.success('Copied Successfully');
+      this.nzMessage.success(MESSAGE.CopiedSuccessfully[this.lang]);
     }
     document.body.removeChild(input);
   }

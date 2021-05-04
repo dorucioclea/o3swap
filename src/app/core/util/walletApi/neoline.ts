@@ -20,6 +20,7 @@ import {
   Network,
   NETWORK,
   SWAP_CONTRACT_CHAIN_ID,
+  MESSAGE,
 } from '@lib';
 import { interval, Observable, Unsubscribable } from 'rxjs';
 import { wallet } from '@cityofzion/neon-js';
@@ -29,6 +30,7 @@ import { RpcApiService } from '../../api/rpc.service';
 
 interface State {
   swap: SwapStateType;
+  language: any;
 }
 
 @Injectable()
@@ -45,6 +47,9 @@ export class NeolineWalletApiService {
   listerTxinterval: Unsubscribable;
   blockNumberInterval: Unsubscribable;
 
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
     private store: Store<State>,
     private nzMessage: NzMessageService,
@@ -53,6 +58,10 @@ export class NeolineWalletApiService {
     private apiService: ApiService,
     private rpcApiService: RpcApiService
   ) {
+    this.language$ = store.select('language');
+    this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
     this.swap$ = store.select('swap');
     this.swap$.subscribe((state) => {
       this.neoWalletName = state.neoWalletName;
@@ -98,7 +107,7 @@ export class NeolineWalletApiService {
       .getAccount()
       .then((result) => {
         if (showMessage) {
-          this.nzMessage.success('Connection succeeded!');
+          this.nzMessage.success(MESSAGE.ConnectionSucceeded[this.lang]);
         }
         this.commonService.log(result);
         this.neoAccountAddress = result.address;
@@ -132,7 +141,7 @@ export class NeolineWalletApiService {
     }
     const checkBalance = await this.getBalances(fromToken.assetID, inputAmount);
     if (checkBalance !== true) {
-      this.nzMessage.error('Insufficient balance');
+      this.nzMessage.error(MESSAGE.InsufficientBalance[this.lang]);
       return;
     }
     return this.neolineDapi
@@ -172,12 +181,12 @@ export class NeolineWalletApiService {
     }
     const checkBalance = await this.getBalances(fromToken.assetID, inputAmount);
     if (checkBalance !== true) {
-      this.nzMessage.error('Insufficient balance');
+      this.nzMessage.error(MESSAGE.InsufficientBalance[this.lang]);
       return;
     }
     const utxoRes = await this.apiService.getUtxo(toAddress, inputAmount);
     if (utxoRes === false) {
-      this.nzMessage.error('System busy');
+      this.nzMessage.error(MESSAGE.SystemBusy[this.lang]);
       return;
     }
     const params = {
@@ -244,7 +253,7 @@ export class NeolineWalletApiService {
     }
     const checkBalance = await this.getBalances(fromToken.assetID, inputAmount);
     if (checkBalance !== true) {
-      this.nzMessage.error('Insufficient balance');
+      this.nzMessage.error(MESSAGE.InsufficientBalance[this.lang]);
       return;
     }
     const toNeoswapPath = await this.apiService.getToStandardSwapPath(
@@ -322,7 +331,7 @@ export class NeolineWalletApiService {
     }
     const checkBalance = await this.getBalances(fromToken.assetID, inputAmount);
     if (checkBalance !== true) {
-      this.nzMessage.error('Insufficient balance');
+      this.nzMessage.error(MESSAGE.InsufficientBalance[this.lang]);
       return;
     }
     const toNeoswapPath = await this.apiService.getToStandardSwapPath(
@@ -472,7 +481,7 @@ export class NeolineWalletApiService {
   private checkNetwork(): boolean {
     if (this.neolineNetwork !== NETWORK) {
       this.nzMessage.error(
-        `Please switch network to ${NETWORK} on NeoLine extension.`
+        MESSAGE.SwitchNeolineNetwork[this.lang]([NETWORK])
       );
       return false;
     }

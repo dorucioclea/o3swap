@@ -21,6 +21,7 @@ import {
   ETH_SOURCE_ASSET_HASH,
   NEO_TOKEN,
   NNEO_TOKEN,
+  MESSAGE,
 } from '@lib';
 import {
   ApiService,
@@ -834,7 +835,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       (this.fromToken.chain === 'NEO' || this.toToken.chain === 'NEO') &&
       !this.neoAccountAddress
     ) {
-      this.nzMessage.error('Please connect the NEO wallet first');
+      this.nzMessage.error(MESSAGE.ConnectWalletFirst[this.lang](['NEO']));
       this.showConnectWallet = true;
       this.connectChainType = 'NEO';
       return false;
@@ -843,7 +844,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       (this.fromToken.chain === 'ETH' || this.toToken.chain === 'ETH') &&
       !this.ethAccountAddress
     ) {
-      this.nzMessage.error('Please connect the ETH wallet first');
+      this.nzMessage.error(MESSAGE.ConnectWalletFirst[this.lang](['ETH']));
       this.showConnectWallet = true;
       this.connectChainType = 'ETH';
       return false;
@@ -852,7 +853,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       (this.fromToken.chain === 'BSC' || this.toToken.chain === 'BSC') &&
       !this.bscAccountAddress
     ) {
-      this.nzMessage.error('Please connect the BSC wallet first');
+      this.nzMessage.error(MESSAGE.ConnectWalletFirst[this.lang](['BSC']));
       this.showConnectWallet = true;
       this.connectChainType = 'BSC';
       return false;
@@ -861,7 +862,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
       (this.fromToken.chain === 'HECO' || this.toToken.chain === 'HECO') &&
       !this.hecoAccountAddress
     ) {
-      this.nzMessage.error('Please connect the HECO wallet first');
+      this.nzMessage.error(MESSAGE.ConnectWalletFirst[this.lang](['HECO']));
       this.showConnectWallet = true;
       this.connectChainType = 'HECO';
       return false;
@@ -879,7 +880,7 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         new BigNumber(this.inputAmount)
       ) < 0
     ) {
-      this.nzMessage.error('Insufficient balance');
+      this.nzMessage.error(MESSAGE.InsufficientBalance[this.lang]);
       return false;
     }
     // 有 poly fee，转非原生资产
@@ -895,9 +896,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         ) < 0
       ) {
         this.nzMessage.error(
-          `Insufficient ${
-            SOURCE_TOKEN_SYMBOL[this.fromToken.chain]
-          } for poly fee`
+          MESSAGE.InsufficientPolyFee[this.lang]([
+            SOURCE_TOKEN_SYMBOL[this.fromToken.chain],
+          ])
         );
         return false;
       }
@@ -918,9 +919,9 @@ export class SwapResultComponent implements OnInit, OnDestroy {
         ) < 0
       ) {
         this.nzMessage.error(
-          `Insufficient ${
-            SOURCE_TOKEN_SYMBOL[this.fromToken.chain]
-          } for transfer amount and poly fee`
+          MESSAGE.InsufficientAmountAndPolyFee[this.lang]([
+            SOURCE_TOKEN_SYMBOL[this.fromToken.chain],
+          ])
         );
         return false;
       }

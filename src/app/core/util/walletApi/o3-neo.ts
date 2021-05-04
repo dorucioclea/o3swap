@@ -20,6 +20,7 @@ import {
   NEO_NNEO_CONTRACT_HASH,
   NETWORK,
   SWAP_CONTRACT_CHAIN_ID,
+  MESSAGE,
 } from '@lib';
 import { interval, Observable, Unsubscribable } from 'rxjs';
 import { wallet } from '@cityofzion/neon-js';
@@ -29,6 +30,7 @@ import { RpcApiService } from '../../api/rpc.service';
 
 interface State {
   swap: SwapStateType;
+  language: any;
 }
 
 @Injectable()
@@ -44,6 +46,9 @@ export class O3NeoWalletApiService {
   listerTxinterval: Unsubscribable;
   blockNumberInterval: Unsubscribable;
 
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
     private store: Store<State>,
     private nzMessage: NzMessageService,
@@ -52,6 +57,10 @@ export class O3NeoWalletApiService {
     private apiService: ApiService,
     private rpcApiService: RpcApiService
   ) {
+    this.language$ = store.select('language');
+    this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
     o3dapi.initPlugins([o3dapiNeo]);
     o3dapi.NEO.addEventListener(o3dapi.NEO.Constants.EventName.READY, () => {
       this.o3DapiIsReady = true;
@@ -84,9 +93,7 @@ export class O3NeoWalletApiService {
 
   connect(): Promise<string> {
     if (this.o3DapiIsReady === false) {
-      this.nzMessage.info(
-        'O3 dAPI is not ready, please open O3 wallet before use.'
-      );
+      this.nzMessage.info(MESSAGE.O3DAPINotReady[this.lang]);
     }
     return o3dapi.NEO.getAccount()
       .then((result) => {
@@ -94,7 +101,7 @@ export class O3NeoWalletApiService {
         if (!result.address) {
           return;
         }
-        this.nzMessage.success('Connection succeeded!');
+        this.nzMessage.success(MESSAGE.ConnectionSucceeded[this.lang]);
         this.neoAccountAddress = result.address;
         this.store.dispatch({
           type: UPDATE_NEO_ACCOUNT,
@@ -122,7 +129,7 @@ export class O3NeoWalletApiService {
   ): Promise<string> {
     const checkBalance = await this.getBalances(fromToken.assetID, inputAmount);
     if (checkBalance !== true) {
-      this.nzMessage.error('Insufficient balance');
+      this.nzMessage.error(MESSAGE.InsufficientBalance[this.lang]);
       return;
     }
     return o3dapi.NEO.invoke({
@@ -158,12 +165,12 @@ export class O3NeoWalletApiService {
   ): Promise<string> {
     const checkBalance = await this.getBalances(fromToken.assetID, inputAmount);
     if (checkBalance !== true) {
-      this.nzMessage.error('Insufficient balance');
+      this.nzMessage.error(MESSAGE.InsufficientBalance[this.lang]);
       return;
     }
     const utxoRes = await this.apiService.getUtxo(toAddress, inputAmount);
     if (utxoRes === false) {
-      this.nzMessage.error('System busy');
+      this.nzMessage.error(MESSAGE.SystemBusy[this.lang]);
       return;
     }
     const params = {
@@ -226,7 +233,7 @@ export class O3NeoWalletApiService {
   ): Promise<string> {
     const checkBalance = await this.getBalances(fromToken.assetID, inputAmount);
     if (checkBalance !== true) {
-      this.nzMessage.error('Insufficient balance');
+      this.nzMessage.error(MESSAGE.InsufficientBalance[this.lang]);
       return;
     }
     const toNeoswapPath = await this.apiService.getToStandardSwapPath(
@@ -299,7 +306,7 @@ export class O3NeoWalletApiService {
   ): Promise<string> {
     const checkBalance = await this.getBalances(fromToken.assetID, inputAmount);
     if (checkBalance !== true) {
-      this.nzMessage.error('Insufficient balance');
+      this.nzMessage.error(MESSAGE.InsufficientBalance[this.lang]);
       return;
     }
     const toNeoswapPath = await this.apiService.getToStandardSwapPath(

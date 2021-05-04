@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ApiService } from '@core';
-import { INIT_CHAIN_TOKENS, Token, USD_TOKENS } from '@lib';
+import { INIT_CHAIN_TOKENS, MESSAGE, Token, USD_TOKENS } from '@lib';
 import { Store } from '@ngrx/store';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Unsubscribable, Observable } from 'rxjs';
@@ -8,6 +8,7 @@ import { Unsubscribable, Observable } from 'rxjs';
 interface State {
   tokens: any;
   swap: any;
+  language: any;
 }
 
 type PageStatus = 'home' | 'result';
@@ -33,11 +34,20 @@ export class SwapComponent implements OnInit, OnDestroy {
   swap$: Observable<any>;
   walletName = { ETH: '', BSC: '', HECO: '', NEO: '' };
 
+  langPageName = 'hub';
+  langUnScribe: Unsubscribable;
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
     private store: Store<State>,
     private apiService: ApiService,
     private nzMessage: NzMessageService
   ) {
+    this.language$ = store.select('language');
+    this.langUnScribe = this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
     this.tokens$ = store.select('tokens');
     this.swap$ = store.select('swap');
   }
@@ -83,6 +93,9 @@ export class SwapComponent implements OnInit, OnDestroy {
     if (this.swapUnScribe) {
       this.swapUnScribe.unsubscribe();
     }
+    if (this.langUnScribe) {
+      this.langUnScribe.unsubscribe();
+    }
   }
 
   //#region home
@@ -113,7 +126,7 @@ export class SwapComponent implements OnInit, OnDestroy {
   swapFail(): void {
     this.pageStatus = 'home';
     this.initResultData = null;
-    this.nzMessage.error('Did not get the quotation, please get it again');
+    this.nzMessage.error(MESSAGE.quoteAgain[this.lang]);
   }
   //#region
 }

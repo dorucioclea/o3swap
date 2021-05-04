@@ -19,6 +19,7 @@ import {
   EthWalletName,
   METAMASK_CHAIN,
   SOURCE_TOKEN_SYMBOL,
+  MESSAGE,
 } from '@lib';
 import BigNumber from 'bignumber.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -210,7 +211,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     const inputAmount = new BigNumber(this.addLiquidityInputAmount[index]);
     if (!inputAmount.isNaN() && inputAmount.comparedTo(0) > 0) {
       if (inputAmount.comparedTo(50) === 1) {
-        this.nzMessage.error(`You've exceeded the maximum limit`);
+        this.nzMessage.error(MESSAGE.maximumLimit[this.lang]);
         return;
       }
       this.receiveAmount[index] = await this.apiService.getPoolOutGivenSingleIn(
@@ -238,7 +239,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     const inputAmount = new BigNumber(this.removeLiquidityInputAmount[index]);
     if (!inputAmount.isNaN() && inputAmount.comparedTo(0) > 0) {
       if (inputAmount.comparedTo(50) === 1) {
-        this.nzMessage.error(`You've exceeded the maximum limit`);
+        this.nzMessage.error(MESSAGE.maximumLimit[this.lang]);
         return;
       }
       this.payAmount[index] = await this.apiService.getPoolInGivenSingleOut(
@@ -302,11 +303,11 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     const tokenBalance = new BigNumber(token.amount);
     const tokenAmount = new BigNumber(this.addLiquidityInputAmount[index]);
     if (tokenAmount.isNaN() || tokenAmount.comparedTo(0) <= 0) {
-      this.nzMessage.error('Wrong input');
+      this.nzMessage.error(MESSAGE.WrongInput[this.lang]);
       return;
     }
     if (tokenBalance.comparedTo(tokenAmount) < 0) {
-      this.nzMessage.error('Insufficient balance');
+      this.nzMessage.error(MESSAGE.InsufficientBalance[this.lang]);
       return;
     }
     const allowance = await swapApi.getAllowance(
@@ -356,11 +357,11 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     const lpBalance = new BigNumber(this.LPToken.amount);
     const lpPayAmount = new BigNumber(this.payAmount[index]);
     if (lpPayAmount.isNaN() || lpPayAmount.comparedTo(0) <= 0) {
-      this.nzMessage.error('Wrong input');
+      this.nzMessage.error(MESSAGE.WrongInput[this.lang]);
       return;
     }
     if (lpBalance.comparedTo(lpPayAmount) < 0) {
-      this.nzMessage.error('Insufficient balance');
+      this.nzMessage.error(MESSAGE.InsufficientBalance[this.lang]);
       return;
     }
     const allowance = await swapApi.getAllowance(
@@ -403,7 +404,7 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   checkInputAmountDecimal(amount: string, decimals: number): boolean {
     const decimalPart = amount && amount.split('.')[1];
     if (decimalPart && decimalPart.length > decimals) {
-      this.nzMessage.error(`You've exceeded the decimal limit.`);
+      this.nzMessage.error(MESSAGE.decimalLimit[this.lang]);
       return false;
     }
     return true;
@@ -448,25 +449,25 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   }
   checkWalletConnect(token: Token): boolean {
     if (token.chain === 'ETH' && !this.ethAccountAddress) {
-      this.nzMessage.error('Please connect the ETH wallet first');
+      this.nzMessage.error(MESSAGE.ConnectWalletFirst[this.lang](['ETH']));
       this.showConnectWallet = true;
       this.connectChainType = 'ETH';
       return false;
     }
     if (token.chain === 'BSC' && !this.bscAccountAddress) {
-      this.nzMessage.error('Please connect the BSC wallet first');
+      this.nzMessage.error(MESSAGE.ConnectWalletFirst[this.lang](['BSC']));
       this.showConnectWallet = true;
       this.connectChainType = 'BSC';
       return false;
     }
     if (token.chain === 'HECO' && !this.hecoAccountAddress) {
-      this.nzMessage.error('Please connect the HECO wallet first');
+      this.nzMessage.error(MESSAGE.ConnectWalletFirst[this.lang](['HECO']));
       this.showConnectWallet = true;
       this.connectChainType = 'HECO';
       return false;
     }
     if (!this.ethAccountAddress) {
-      this.nzMessage.error('Please connect the ETH wallet first');
+      this.nzMessage.error(MESSAGE.ConnectWalletFirst[this.lang](['ETH']));
       this.showConnectWallet = true;
       this.connectChainType = 'ETH';
       return false;

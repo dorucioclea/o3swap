@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { LiquiditySource } from './liquidity-source';
 import { ApiService } from '@core';
-import { CommonHttpResponse, UPDATE_LANGUAGE } from '@lib';
+import { CommonHttpResponse, MESSAGE, UPDATE_LANGUAGE } from '@lib';
 import { interval, Observable, Unsubscribable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
@@ -91,7 +91,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
     if (this.checkEmail() === false) {
-      this.nzMessage.error('please enter your vaild email');
+      this.nzMessage.error(MESSAGE.EnterVaildEmail[this.lang]);
       return;
     }
     this.isLoadingEmail = true;

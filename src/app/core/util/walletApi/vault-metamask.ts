@@ -3,6 +3,7 @@ import {
   ConnectChainType,
   EthWalletName,
   O3_TOKEN,
+  MESSAGE,
   RESET_VAULT_WALLET,
   StakeTransaction,
   Token,
@@ -22,6 +23,7 @@ import BigNumber from 'bignumber.js';
 import { RpcApiService } from '@core/api/rpc.service';
 interface State {
   vault: any;
+  language: any;
 }
 @Injectable()
 export class VaultdMetaMaskWalletApiService {
@@ -36,6 +38,9 @@ export class VaultdMetaMaskWalletApiService {
   web3: Web3;
   o3Json;
 
+  language$: Observable<any>;
+  lang: string;
+
   constructor(
     private http: HttpClient,
     private store: Store<State>,
@@ -44,6 +49,10 @@ export class VaultdMetaMaskWalletApiService {
     private commonService: CommonService,
     private rpcApiService: RpcApiService
   ) {
+    this.language$ = store.select('language');
+    this.language$.subscribe((state) => {
+      this.lang = state.language;
+    });
     this.vault$ = store.select('vault');
     this.vault$.subscribe((state) => {
       this.vaultWallet = state.vaultWallet;
@@ -88,7 +97,7 @@ export class VaultdMetaMaskWalletApiService {
         }
         this.commonService.log(result);
         if (showMessage) {
-          this.nzMessage.success('Connection succeeded!');
+          this.nzMessage.success(MESSAGE.ConnectionSucceeded[this.lang]);
         }
         this.vaultWallet = {
           walletName: this.myWalletName,
