@@ -59,19 +59,19 @@ const bscSource: SourceItem[] = [
     logo: `${logoPrefix}pancakeswap.png`,
   },
   {
-    name: 'BakerySwap',
-    url: 'https://www.bakeryswap.org/#/home',
-    logo: `${logoPrefix}bakeryswap.png`,
-  },
-  {
     name: 'DODO',
     url: 'https://dodoex.io/',
     logo: `${logoPrefix}dodoex.png`,
   },
   {
-    name: 'JulSwap',
-    url: 'https://julswap.com/#/swap',
-    logo: `${logoPrefix}julswap.png`,
+    name: 'MDEX',
+    url: 'https://ht.mdex.com/#/swap',
+    logo: `${logoPrefix}mdex.png`,
+  },
+  {
+    name: 'BakerySwap',
+    url: 'https://www.bakeryswap.org/#/home',
+    logo: `${logoPrefix}bakeryswap.png`,
   },
   {
     name: 'ApeSwap',
@@ -82,6 +82,11 @@ const bscSource: SourceItem[] = [
     name: 'BSCswap',
     url: 'https://trade.bscswap.com/#/swap',
     logo: `${logoPrefix}bscswap.png`,
+  },
+  {
+    name: 'JulSwap',
+    url: 'https://julswap.com/#/swap',
+    logo: `${logoPrefix}julswap.png`,
   },
 ];
 const neoSource: SourceItem[] = [
@@ -111,11 +116,6 @@ const hecoSource: SourceItem[] = [
     name: 'LAVAswap',
     url: 'https://lavaswap.com/',
     logo: `${logoPrefix}lavaswap.png`,
-  },
-  {
-    name: 'Anyswap',
-    url: 'https://huobi.anyswap.exchange/dashboard',
-    logo: `${logoPrefix}anyswap.png`,
   },
   {
     name: 'Depth',
