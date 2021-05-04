@@ -72,7 +72,7 @@
                   </div>
                   <div class="right">
                     <div class="input-container">
-                      <input type="number" title="Pay amount" (input)="changeInAmount(tokenItem, i)"
+                      <input type="number" title="Pay amount" (input)="changeInAmount(tokenItem, i, $event)"
                         [(ngModel)]="addLiquidityInputAmount[i]" placeholder="0.0">
                     </div>
                     <div class="max-status" (click)="maxAddLiquidityInput(i)"
@@ -136,7 +136,7 @@
                   </div>
                   <div class="right">
                     <div class="input-container">
-                      <input type="number" title="Receive amount" (input)="changeOutAmount(tokenItem, i)"
+                      <input type="number" title="Receive amount" (input)="changeOutAmount(tokenItem, i, $event)"
                         [(ngModel)]="removeLiquidityInputAmount[i]" placeholder="0.0">
                     </div>
                     <div class="max-status" (click)="maxRemoveLiquidityInput(i)"
@@ -347,7 +347,7 @@
                     </div>
                     <span class="token-name">{{ tokenItem?.symbol }}</span>
                     <div class="input-box">
-                      <input type="number" title="Pay amount" (input)="changeInAmount(tokenItem, i)"
+                      <input type="number" title="Pay amount" (input)="changeInAmount(tokenItem, i, $event)"
                         [(ngModel)]="addLiquidityInputAmount[i]" placeholder="0.0">
                     </div>
                   </div>
@@ -413,7 +413,7 @@
                     </div>
                     <span class="token-name">{{ tokenItem?.symbol }}</span>
                     <div class="input-box">
-                      <input type="number" title="Pay amount" (input)="changeOutAmount(tokenItem, i)"
+                      <input type="number" title="Pay amount" (input)="changeOutAmount(tokenItem, i, $event)"
                         [(ngModel)]="removeLiquidityInputAmount[i]" placeholder="0.0">
                     </div>
                   </div>

@@ -185,7 +185,15 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     this.liquidityType = params;
   }
 
-  async changeInAmount(token: Token, index: number): Promise<void> {
+  async changeInAmount(token: Token, index: number, $event?): Promise<void> {
+    if (
+      $event &&
+      this.checkInputAmountDecimal($event.target.value, token.decimals) ===
+        false
+    ) {
+      this.receiveAmount[index] = '--';
+      return;
+    }
     const inputAmount = new BigNumber(this.addLiquidityInputAmount[index]);
     if (!inputAmount.isNaN() && inputAmount.comparedTo(0) > 0) {
       if (inputAmount.comparedTo(50) === 1) {
@@ -205,7 +213,15 @@ export class LiquidityComponent implements OnInit, OnDestroy {
     }
   }
 
-  async changeOutAmount(token: Token, index: number): Promise<void> {
+  async changeOutAmount(token: Token, index: number, $event?): Promise<void> {
+    if (
+      $event &&
+      this.checkInputAmountDecimal($event.target.value, token.decimals) ===
+        false
+    ) {
+      this.payAmount[index] = '--';
+      return;
+    }
     const inputAmount = new BigNumber(this.removeLiquidityInputAmount[index]);
     if (!inputAmount.isNaN() && inputAmount.comparedTo(0) > 0) {
       if (inputAmount.comparedTo(50) === 1) {
@@ -292,6 +308,12 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       .shiftedBy(this.LPToken.decimals)
       .dp(0)
       .toFixed();
+    if (!this.addPolyFee[index]) {
+      this.addPolyFee[index] = await this.apiService.getFromEthPolyFee(
+        token,
+        this.LPToken
+      );
+    }
     swapApi
       .addLiquidity(
         token,
@@ -340,6 +362,12 @@ export class LiquidityComponent implements OnInit, OnDestroy {
       .shiftedBy(token.decimals)
       .dp(0)
       .toFixed();
+    if (!this.removePolyFee[index]) {
+      this.removePolyFee[index] = await this.apiService.getFromEthPolyFee(
+        this.LPToken,
+        token
+      );
+    }
     swapApi
       .removeLiquidity(
         this.LPToken,
@@ -359,6 +387,15 @@ export class LiquidityComponent implements OnInit, OnDestroy {
   }
 
   //#region
+  checkInputAmountDecimal(amount: string, decimals: number): boolean {
+    const decimalPart = amount && amount.split('.')[1];
+    if (decimalPart && decimalPart.length > decimals) {
+      this.nzMessage.error(`You've exceeded the decimal limit.`);
+      return false;
+    }
+    return true;
+  }
+
   getFromTokenAddress(token: Token): string {
     switch (token.chain) {
       case 'ETH':
