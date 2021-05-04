@@ -69,7 +69,7 @@
                 </div>
                 <div class="right">
                   <div class="input-container">
-                    <input type="number" title="Receive amount" (input)="changeOutAmount(tokenItem, i)"
+                    <input type="number" title="Receive amount" (input)="changeOutAmount(tokenItem, i, $event)"
                       [(ngModel)]="removeLiquidityInputAmount[i]" placeholder="0.0">
                   </div>
                   <div class="max-status" (click)="maxRemoveLiquidityInput(i)"

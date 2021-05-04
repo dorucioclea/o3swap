@@ -177,7 +177,15 @@ export class LegacyLiquidityComponent implements OnInit, OnDestroy {
       .toFixed();
   }
 
-  async changeOutAmount(token: Token, index: number): Promise<void> {
+  async changeOutAmount(token: Token, index: number, $event?): Promise<void> {
+    if (
+      $event &&
+      this.checkInputAmountDecimal($event.target.value, token.decimals) ===
+        false
+    ) {
+      this.payAmount[index] = '--';
+      return;
+    }
     const inputAmount = new BigNumber(this.removeLiquidityInputAmount[index]);
     if (!inputAmount.isNaN() && inputAmount.comparedTo(0) > 0) {
       if (inputAmount.comparedTo(50) === 1) {
@@ -260,6 +268,15 @@ export class LegacyLiquidityComponent implements OnInit, OnDestroy {
   }
 
   //#region
+  checkInputAmountDecimal(amount: string, decimals: number): boolean {
+    const decimalPart = amount && amount.split('.')[1];
+    if (decimalPart && decimalPart.length > decimals) {
+      this.nzMessage.error(`You've exceeded the decimal limit.`);
+      return false;
+    }
+    return true;
+  }
+
   showApproveModal(token: Token): void {
     let walletName: string;
     switch (token.chain) {
